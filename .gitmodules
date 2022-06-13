@@ -1,0 +1,3 @@
+[submodule "render-engine"]
+	path = render-engine
+	url = https://github.com/galaxysailing/ifc-render-engine.git

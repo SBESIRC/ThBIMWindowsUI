@@ -204,7 +204,8 @@
                     </avalonDock:LayoutAnchorablePaneGroup>
                     <avalonDock:LayoutDocumentPane x:Name="MainDocPane">
                         <avalonDock:LayoutDocument  CanClose="False" Title="3D View">
-                            <xbim:DrawingControl3D 
+                            <Grid Background="White" x:Name ="GridEngine">
+                                <!--<xbim:DrawingControl3D
                                 x:Name="DrawingControl" 
                                    SelectedEntity="{Binding Path=SelectedItem, ElementName=MainWindow, Mode=TwoWay}"    
                                    Model ="{Binding}" 
@@ -215,20 +216,23 @@
                                    MouseDoubleClick="SpatialControl_MouseDoubleClick"
                                    WcsAdjusted="{x:Static local:App.ContextWcsAdjustment}"
                                    >
-                                <xbim:DrawingControl3D.Background>
-                                    <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-                                        <GradientStop Color="#FFB9B1B1" Offset="1"/>
-                                        <GradientStop Color="#FFFAF8FF"/>
-                                    </LinearGradientBrush>
-                                </xbim:DrawingControl3D.Background>
-                            </xbim:DrawingControl3D>
+                                    <xbim:DrawingControl3D.Background>
+                                        <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+                                            <GradientStop Color="#FFB9B1B1" Offset="1"/>
+                                            <GradientStop Color="#FFFAF8FF"/>
+                                        </LinearGradientBrush>
+                                    </xbim:DrawingControl3D.Background>
+                                </xbim:DrawingControl3D>-->
+                            </Grid>
                         </avalonDock:LayoutDocument>
                     </avalonDock:LayoutDocumentPane>
                 </avalonDock:LayoutPanel>
             </avalonDock:LayoutRoot>
         </avalonDock:DockingManager>
 
-        <Grid Grid.Row="2" Margin="0,5" x:Name="CommandBox" Visibility="Collapsed" >
+       
+
+        <Grid Grid.Row="2" Margin="0,5" x:Name="CommandBox" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
@@ -238,9 +242,9 @@
         </Grid>
         
         <StatusBar Grid.Row="3" Height="23"  Name="StatusBar" VerticalAlignment="Top" >
-            <StatusBarItem>
+            <!--<StatusBarItem>
                 <etb:EditableTextBlock x:Name="EntityLabel" ValueSet="EntityLabel_KeyDown"></etb:EditableTextBlock>
-            </StatusBarItem>
+            </StatusBarItem>-->
             <StatusBarItem Visibility="Visible">
                 <Slider x:Name="ModelOpacity"  Minimum="0.1" Maximum="1.0" Value="{Binding Path=ModelOpacity, ElementName=DrawingControl}" Width="100" LargeChange=".01">
                     <Slider.LayoutTransform>
@@ -269,5 +273,6 @@
                 </Grid>
             </StatusBarItem>
         </StatusBar>
+        
     </Grid>
 </Window>

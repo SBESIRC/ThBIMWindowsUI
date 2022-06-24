@@ -64,7 +64,7 @@ namespace XbimXplorer
 
             var mainView = new XplorerMainWindow(blockPlugin);
             mainView.Show();
-            mainView.DrawingControl.ViewHome();
+            //mainView.DrawingControl.ViewHome();
             var bOneModelLoaded = false;
             for (var i = 0; i< e.Args.Length; i++)
             {

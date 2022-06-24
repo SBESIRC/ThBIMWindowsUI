@@ -47,6 +47,10 @@ using Serilog.Events;
 using Xbim.IO;
 using Xbim.Geometry.Engine.Interop;
 using System.Windows.Media;
+using THBimEngine.Presention;
+using System.Windows.Forms.Integration;
+using XbimXplorer.ThBIMEngine;
+using System.Windows.Interop;
 
 #endregion
 
@@ -74,10 +78,12 @@ namespace XbimXplorer
         private string _temporaryXbimFileName;
 
         private string _openedModelFileName;
+        private string _tempMidFileName;
 
         protected Microsoft.Extensions.Logging.ILogger Logger { get; private set; }
 
         public static ILoggerFactory LoggerFactory { get; private set; }
+        
 
         public ILoggerFactory GetLoggerFactory()
 		{
@@ -116,6 +122,8 @@ namespace XbimXplorer
 
         public XplorerMainWindow(bool preventPluginLoad = false)
         {
+            _tempMidFileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".midfile");
+
             // So we can use *.xbim files.
             IfcStore.ModelProviderFactory.UseHeuristicModelProvider();
             
@@ -160,7 +168,7 @@ namespace XbimXplorer
             Closing += XplorerMainWindow_Closing;
 
             // notify the user of changes in the measures taken in the 3d viewer.
-            DrawingControl.UserModeledDimensionChangedEvent += DrawingControl_MeasureChangedEvent;
+            //--DrawingControl.UserModeledDimensionChangedEvent += DrawingControl_MeasureChangedEvent;
 
             // Get the settings
             InitFromSettings();
@@ -210,20 +218,20 @@ namespace XbimXplorer
         {
             if (e == null) 
                 return;
-            var text = e.ToString();
-            if (e.Points.Count() == 1)
-			{
-                var vspace = e.Points.FirstOrDefault();
-                var modelSpace = DrawingControl.ModelPositions.GetPointInverse(new Xbim.Common.Geometry.XbimPoint3D
-                    (
-                    vspace.Point.X,
-                    vspace.Point.Y,
-                    vspace.Point.Z
-                    ));
-                text += $" Model space in meters: X:{modelSpace.X:0.##}, Y:{modelSpace.Y:0.##}, Z:{modelSpace.Z:0.##}";
+   //         var text = e.ToString();
+   //         if (e.Points.Count() == 1)
+			//{
+   //             var vspace = e.Points.FirstOrDefault();
+   //             var modelSpace = DrawingControl.ModelPositions.GetPointInverse(new Xbim.Common.Geometry.XbimPoint3D
+   //                 (
+   //                 vspace.Point.X,
+   //                 vspace.Point.Y,
+   //                 vspace.Point.Z
+   //                 ));
+   //             text += $" Model space in meters: X:{modelSpace.X:0.##}, Y:{modelSpace.Y:0.##}, Z:{modelSpace.Z:0.##}";
 
-			}
-            EntityLabel.Text = text;
+			//}
+   //         EntityLabel.Text = text;
 
             //Debug.WriteLine("Points:");
             //foreach (var pt in e.VisualPoints)
@@ -242,7 +250,17 @@ namespace XbimXplorer
                 e.Cancel = true; //do nothing if a thread is alive
             }
             else
+            {
+                if (!string.IsNullOrEmpty(_tempMidFileName) && File.Exists(_tempMidFileName)) 
+                {
+                    try
+                    {
+                        File.Delete(_tempMidFileName);
+                    }
+                    catch { }
+                }
                 e.Cancel = false;
+            }
         }
 
         void XplorerMainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -285,6 +303,7 @@ namespace XbimXplorer
                 if (_meshModel)
                 {
                     ApplyWorkarounds(model);
+                    
                     // mesh direct model
                     if (model.GeometryStore.IsEmpty)
                     {
@@ -363,6 +382,9 @@ namespace XbimXplorer
                 {
                     Logger.LogWarning("Settings prevent mesh creation.");
                 }
+                var engineFile = new IfcStoreToEngineFile();
+                engineFile.ProgressChanged += OnProgressChanged;
+                engineFile.LoadGeometry(model,_tempMidFileName);
                 args.Result = model;
             }
             catch (Exception ex)
@@ -409,29 +431,29 @@ namespace XbimXplorer
                 return;
             if (fInfo.FullName.ToLower() == GetOpenedModelFileName()) //same file do nothing
                 return;
-
+            InitGLControl();
             // there's no going back; if it fails after this point the current file should be closed anyway
             CloseAndDeleteTemporaryFiles();
             SetOpenedModelFileName(modelFileName.ToLower());
+            //InitGLControl();
             ProgressStatusBar.Visibility = Visibility.Visible;
-            SetWorkerForFileLoad();
-
+			SetWorkerForFileLoad();
             var ext = fInfo.Extension.ToLower();
-            switch (ext)
-            {
-                case ".ifc": //it is an Ifc File
-                case ".ifcxml": //it is an IfcXml File
-                case ".ifczip": //it is a zip file containing xbim or ifc File
-                case ".zip": //it is a zip file containing xbim or ifc File
-                case ".xbimf":
-                case ".xbim":
-                    _loadFileBackgroundWorker.RunWorkerAsync(modelFileName);
-                    break;              
-                default:
-                    Logger.LogWarning("Extension '{extension}' has not been recognised.", ext);
-                    break;
-            }           
-        }
+			switch (ext)
+			{
+				case ".ifc": //it is an Ifc File
+				case ".ifcxml": //it is an IfcXml File
+				case ".ifczip": //it is a zip file containing xbim or ifc File
+				case ".zip": //it is a zip file containing xbim or ifc File
+				case ".xbimf":
+				case ".xbim":
+					_loadFileBackgroundWorker.RunWorkerAsync(modelFileName);
+					break;
+				default:
+					Logger.LogWarning("Extension '{extension}' has not been recognised.", ext);
+					break;
+			}
+		}
 
         /// <summary>
         /// 
@@ -471,6 +493,13 @@ namespace XbimXplorer
                 //this Triggers the event to load the model into the views 
                 ModelProvider.ObjectInstance = args.Result; 
                 ModelProvider.Refresh();
+
+                if (args.Result is IfcStore) 
+                {
+                    
+                    LoadIfcFile(_tempMidFileName);
+                }
+                ResizeEngineWindow();
                 ProgressBar.Value = 0;
                 StatusMsg.Text = "Ready";
                 AddRecentFile();
@@ -575,9 +604,9 @@ namespace XbimXplorer
 
             Dictionary<string, string> options = new Dictionary<string, string>();
             options.Add(".ifc", "Ifc File (*.ifc)|*.ifc");
-            options.Add(".xbim", "xBIM File (*.xBIM)|*.xBIM");
-            options.Add(".ifcxml", "IfcXml File (*.IfcXml)|*.ifcxml");
-            options.Add(".ifczip", "IfcZip File (*.IfcZip)|*.ifczip");
+            //options.Add(".xbim", "xBIM File (*.xBIM)|*.xBIM");
+            //options.Add(".ifcxml", "IfcXml File (*.IfcXml)|*.ifcxml");
+            //options.Add(".ifczip", "IfcZip File (*.IfcZip)|*.ifczip");
 
             var filters = new List<string>();
             if (options.ContainsKey(ext))
@@ -605,12 +634,8 @@ namespace XbimXplorer
         private void CommandBinding_Open(object sender, ExecutedRoutedEventArgs e)
         {
             var corefilters = new[] {
-                "Xbim Files|*.xbim;*.xbimf;*.ifc;*.ifcxml;*.ifczip",
-                "Ifc File (*.ifc)|*.ifc",
-                "xBIM File (*.xBIM)|*.xBIM",
-                "IfcXml File (*.IfcXml)|*.ifcxml",
-                "IfcZip File (*.IfcZip)|*.ifczip",
-                "Zipped File (*.zip)|*.zip"
+                "Xbim Files|*.ifc",
+                "Ifc File (*.ifc)|*.ifc"
             };
 
             // Filter files by extension 
@@ -638,8 +663,8 @@ namespace XbimXplorer
                     ModelProvider.ObjectInstance = null;
                     ModelProvider.Refresh();
                 }
-                if (!(DrawingControl.DefaultLayerStyler is SurfaceLayerStyler))
-                    SetDefaultModeStyler(null, null);
+                //if (!(DrawingControl.DefaultLayerStyler is SurfaceLayerStyler))
+                //    SetDefaultModeStyler(null, null);
             }
             finally
             {
@@ -693,7 +718,7 @@ namespace XbimXplorer
             {
                 // todo: is there something that needs to happen here?
             }
-            DrawingControl.ReloadModel();
+            //DrawingControl.ReloadModel();
         }
         private void EditFederationCmdCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
@@ -823,13 +848,13 @@ namespace XbimXplorer
 
         private static void OnSelectedItemChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var mw = d as XplorerMainWindow;
-            if (mw != null && e.NewValue is IPersistEntity)
-            {
-                var label = (IPersistEntity)e.NewValue;
-                mw.EntityLabel.Text = label != null ? "#" + label.EntityLabel : "";
-            }
-            else if (mw != null) mw.EntityLabel.Text = "";
+            //var mw = d as XplorerMainWindow;
+            //if (mw != null && e.NewValue is IPersistEntity)
+            //{
+            //    var label = (IPersistEntity)e.NewValue;
+            //    mw.EntityLabel.Text = label != null ? "#" + label.EntityLabel : "";
+            //}
+            //else if (mw != null) mw.EntityLabel.Text = "";
         }
 
         // todo: 2021: should remove the modelProvider and use another backing context so that the binding does not fail when null
@@ -854,12 +879,12 @@ namespace XbimXplorer
             }
         }
 
-        /// <summary>
-        /// this variable is used to determine when the user is trying again to double click on the selected item
-        /// from this we detect that he's probably not happy with the view, therefore we add a cutting plane to make the 
-        /// element visible.
-        /// </summary>
-        private bool _camChanged;
+        ///// <summary>
+        ///// this variable is used to determine when the user is trying again to double click on the selected item
+        ///// from this we detect that he's probably not happy with the view, therefore we add a cutting plane to make the 
+        ///// element visible.
+        ///// </summary>
+        //private bool _camChanged;
 
         /// <summary>
         /// determines if models need to be meshed on opening
@@ -882,23 +907,23 @@ namespace XbimXplorer
 
         private void SpatialControl_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            _camChanged = false;
-            DrawingControl.Viewport.Camera.Changed += Camera_Changed;
-            DrawingControl.ZoomSelected();
-            DrawingControl.Viewport.Camera.Changed -= Camera_Changed;
-            if (!_camChanged)
-                DrawingControl.ClipBaseSelected(0.15);
+            //_camChanged = false;
+            //DrawingControl.Viewport.Camera.Changed += Camera_Changed;
+            //DrawingControl.ZoomSelected();
+            //DrawingControl.Viewport.Camera.Changed -= Camera_Changed;
+            //if (!_camChanged)
+            //    DrawingControl.ClipBaseSelected(0.15);
         }
 
         void Camera_Changed(object sender, EventArgs e)
         {
-            _camChanged = true;
+            //_camChanged = true;
         }
 
 
         private void MenuItem_ZoomExtents(object sender, RoutedEventArgs e)
         {
-            DrawingControl.ViewHome();
+            //DrawingControl.ViewHome();
         }
         
         private void OpenExportWindow(object sender, ExecutedRoutedEventArgs executedRoutedEventArgs)
@@ -931,8 +956,8 @@ namespace XbimXplorer
                 sett.Deflection.Text = _deflectionOverride.ToString();
             
             // visuals
-            sett.SimplifiedRendering.IsChecked = DrawingControl.HighSpeed;
-            sett.ShowFps.IsChecked = DrawingControl.ShowFps;
+            //sett.SimplifiedRendering.IsChecked = DrawingControl.HighSpeed;
+            //sett.ShowFps.IsChecked = DrawingControl.ShowFps;
             
             // show dialog
             sett.ShowDialog();
@@ -966,10 +991,10 @@ namespace XbimXplorer
                 ConfigurationManager.AppSettings["BooleanTimeOut"] = sett.BooleanTimeout.Text;
 
             // visuals
-            if (sett.SimplifiedRendering.IsChecked != null)
-                DrawingControl.HighSpeed = sett.SimplifiedRendering.IsChecked.Value;
-            if (sett.ShowFps.IsChecked != null)
-                DrawingControl.ShowFps = sett.ShowFps.IsChecked.Value;
+            //if (sett.SimplifiedRendering.IsChecked != null)
+            //    DrawingControl.HighSpeed = sett.SimplifiedRendering.IsChecked.Value;
+            //if (sett.ShowFps.IsChecked != null)
+            //    DrawingControl.ShowFps = sett.ShowFps.IsChecked.Value;
 
         }
 
@@ -988,22 +1013,22 @@ namespace XbimXplorer
 
         private void SetDefaultModeStyler(object sender, RoutedEventArgs e)
         {           
-            DrawingControl.DefaultLayerStyler = new SurfaceLayerStyler(this.Logger);
+            //DrawingControl.DefaultLayerStyler = new SurfaceLayerStyler(this.Logger);
             ConnectStylerFeedBack();
-            DrawingControl.ReloadModel();
+            //DrawingControl.ReloadModel();
         }
 
         private void ConnectStylerFeedBack()
         {
-            if (DrawingControl.DefaultLayerStyler is IProgressiveLayerStyler)
-            {
-                ((IProgressiveLayerStyler)DrawingControl.DefaultLayerStyler).ProgressChanged += OnProgressChanged;
-            }
+            //if (DrawingControl.DefaultLayerStyler is IProgressiveLayerStyler)
+            //{
+            //    ((IProgressiveLayerStyler)DrawingControl.DefaultLayerStyler).ProgressChanged += OnProgressChanged;
+            //}
         }
 
         DrawingControl3D IXbimXplorerPluginMasterWindow.DrawingControl
         {
-            get { return DrawingControl; }
+            get { return null; }// DrawingControl; }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -1049,88 +1074,88 @@ namespace XbimXplorer
         
         private void EntityLabel_KeyDown()
         {
-            var input = EntityLabel.Text;
-            var re = new Regex(@"#[ \t]*(\d+)");
-            var m = re.Match(input);
-            IPersistEntity entity = null;
-            if (m.Success)
-            {
-                int isLabel;
-                if (!int.TryParse(m.Groups[1].Value, out isLabel))
-                    return;
-                entity = Model.Instances[isLabel];
-            }
-            else
-            {
-                entity = Model.Instances.OfType<IIfcRoot>().FirstOrDefault(x => x.GlobalId == input);
-            }
+            //var input = EntityLabel.Text;
+            //var re = new Regex(@"#[ \t]*(\d+)");
+            //var m = re.Match(input);
+            //IPersistEntity entity = null;
+            //if (m.Success)
+            //{
+            //    int isLabel;
+            //    if (!int.TryParse(m.Groups[1].Value, out isLabel))
+            //        return;
+            //    entity = Model.Instances[isLabel];
+            //}
+            //else
+            //{
+            //    entity = Model.Instances.OfType<IIfcRoot>().FirstOrDefault(x => x.GlobalId == input);
+            //}
 
-            if (entity != null)
-                SelectedItem = entity;
+            //if (entity != null)
+            //    SelectedItem = entity;
 
         }
 
         private void ConfigureStyler(object sender, RoutedEventArgs e)
         {
             var c = new SurfaceLayerStylerConfiguration(Model);
-            if (DrawingControl.ExcludedTypes != null)
-                c.InitialiseSettings(DrawingControl.ExcludedTypes);
-            c.ShowDialog();
-            if (!c.MustUpdate) 
-                return;
-            DrawingControl.ExcludedTypes = c.ExcludedTypes;
-            DrawingControl.ReloadModel(DrawingControl3D.ModelRefreshOptions.ViewPreserveCameraPosition);
+            //if (DrawingControl.ExcludedTypes != null)
+            //    c.InitialiseSettings(DrawingControl.ExcludedTypes);
+            //c.ShowDialog();
+            //if (!c.MustUpdate) 
+            //    return;
+            //DrawingControl.ExcludedTypes = c.ExcludedTypes;
+            //DrawingControl.ReloadModel(DrawingControl3D.ModelRefreshOptions.ViewPreserveCameraPosition);
         }
 
         private void HideSelected(object sender, RoutedEventArgs e)
         {
-            if (null != DrawingControl.HiddenInstances)
-                DrawingControl.HiddenInstances.AddRange(DrawingControl.Selection);
-            else
-                DrawingControl.HiddenInstances = DrawingControl.Selection.ToList();
+            //if (null != DrawingControl.HiddenInstances)
+            //    DrawingControl.HiddenInstances.AddRange(DrawingControl.Selection);
+            //else
+            //    DrawingControl.HiddenInstances = DrawingControl.Selection.ToList();
 
-            DrawingControl.ReloadModel(DrawingControl3D.ModelRefreshOptions.ViewPreserveCameraPosition);
+            //DrawingControl.ReloadModel(DrawingControl3D.ModelRefreshOptions.ViewPreserveCameraPosition);
         }
 
         private void IsolateSelected(object sender, RoutedEventArgs e)
         {
-            DrawingControl.IsolateInstances = DrawingControl.Selection.ToList();
-            DrawingControl.ReloadModel(DrawingControl3D.ModelRefreshOptions.ViewPreserveCameraPosition);
+            //DrawingControl.IsolateInstances = DrawingControl.Selection.ToList();
+            //DrawingControl.ReloadModel(DrawingControl3D.ModelRefreshOptions.ViewPreserveCameraPosition);
         }
 
         private void RestoreView(object sender, RoutedEventArgs e)
         {
-            DrawingControl.IsolateInstances = null;
-            DrawingControl.HiddenInstances = null;
-            DrawingControl.SelectedContexts = null;
-            DrawingControl.ReloadModel(DrawingControl3D.ModelRefreshOptions.ViewPreserveCameraPosition);
+            //DrawingControl.IsolateInstances = null;
+            //DrawingControl.HiddenInstances = null;
+            //DrawingControl.SelectedContexts = null;
+            //DrawingControl.ReloadModel(DrawingControl3D.ModelRefreshOptions.ViewPreserveCameraPosition);
         }
 
         private void SelectRepresentationContext (object sender, RoutedEventArgs e)
         {
-            RepresentationContextSelection w = new RepresentationContextSelection();
-            IEnumerable<IIfcGeometricRepresentationContext> availableContexts = this.Model.Instances.OfType<IIfcGeometricRepresentationContext>();
-            IEnumerable<IIfcGeometricRepresentationContext> availableParentContexts = availableContexts.Except(this.Model.Instances.OfType<IIfcGeometricRepresentationSubContext>());
-            w.SetContextItems(availableParentContexts);
-            if (w.ShowDialog() == true)
-            {
-                this.DrawingControl.SelectedContexts = new List<IIfcGeometricRepresentationContext>();
-                foreach (ContextSelectionItem parent in w.ContextItems)
-                {
-                    if (parent.IsChecked)
-                    {
-                        this.DrawingControl.SelectedContexts.Add(parent.RepresentationContext);
-                    }
-                    foreach (ContextSelectionItem child in parent.Children)
-                    {
-                        if (child.IsChecked)
-                        {
-                            this.DrawingControl.SelectedContexts.Add(child.RepresentationContext); 
-                        }
-                    }
-                }
-                this.DrawingControl.ReloadModel(DrawingControl3D.ModelRefreshOptions.ViewPreserveCameraPosition);
-            }
+            //RepresentationContextSelection w = new RepresentationContextSelection();
+            //IEnumerable<IIfcGeometricRepresentationContext> availableContexts = this.Model.Instances.OfType<IIfcGeometricRepresentationContext>();
+            //IEnumerable<IIfcGeometricRepresentationContext> availableParentContexts = availableContexts.Except(this.Model.Instances.OfType<IIfcGeometricRepresentationSubContext>());
+            //w.SetContextItems(availableParentContexts);
+            //if (w.ShowDialog() == true)
+            //{
+            //    this.DrawingControl.SelectedContexts = new List<IIfcGeometricRepresentationContext>();
+            //    foreach (ContextSelectionItem parent in w.ContextItems)
+            //    {
+            //        if (parent.IsChecked)
+            //        {
+            //            this.DrawingControl.SelectedContexts.Add(parent.RepresentationContext);
+            //        }
+            //        foreach (ContextSelectionItem child in parent.Children)
+            //        {
+            //            if (child.IsChecked)
+            //            {
+            //                this.DrawingControl.SelectedContexts.Add(child.RepresentationContext); 
+            //            }
+            //        }
+            //    }
+            //    this.DrawingControl.ReloadModel(DrawingControl3D.ModelRefreshOptions.ViewPreserveCameraPosition);
+            //}
         }
 
         private void SelectionMode(object sender, RoutedEventArgs e)
@@ -1144,18 +1169,18 @@ namespace XbimXplorer
             Normals.IsChecked = false;
             WireFrame.IsChecked = false;
             mi.IsChecked = true;
-            switch (mi.Name)
-            {
-                case "WholeMesh":
-                    DrawingControl.SelectionHighlightMode = DrawingControl3D.SelectionHighlightModes.WholeMesh;
-                    break;
-                case "Normals":
-                    DrawingControl.SelectionHighlightMode = DrawingControl3D.SelectionHighlightModes.Normals;
-                    break;
-                case "WireFrame":
-                    DrawingControl.SelectionHighlightMode = DrawingControl3D.SelectionHighlightModes.WireFrame;
-                    break;
-            }
+            //switch (mi.Name)
+            //{
+            //    case "WholeMesh":
+            //        DrawingControl.SelectionHighlightMode = DrawingControl3D.SelectionHighlightModes.WholeMesh;
+            //        break;
+            //    case "Normals":
+            //        DrawingControl.SelectionHighlightMode = DrawingControl3D.SelectionHighlightModes.Normals;
+            //        break;
+            //    case "WireFrame":
+            //        DrawingControl.SelectionHighlightMode = DrawingControl3D.SelectionHighlightModes.WireFrame;
+            //        break;
+            //}
         }
 
         private void OpenStrippingWindow(object sender, RoutedEventArgs e)
@@ -1166,7 +1191,7 @@ namespace XbimXplorer
 
         private void MenuItem_ZoomSelected(object sender, RoutedEventArgs e)
         {
-            DrawingControl.ZoomSelected();
+            //DrawingControl.ZoomSelected();
         }
 
         private void StylerIfcSpacesOnly(object sender, RoutedEventArgs e)
@@ -1185,15 +1210,15 @@ namespace XbimXplorer
             tpcoll.AddRange(product4.NonAbstractSubTypes.Select(x => x.Type).ToList());
             tpcoll.RemoveAll(x => x.Name == "IfcSpace");
 
-            DrawingControl.ExcludedTypes = tpcoll;
-            DrawingControl.ReloadModel(DrawingControl3D.ModelRefreshOptions.ViewPreserveCameraPosition);
+            //DrawingControl.ExcludedTypes = tpcoll;
+            //DrawingControl.ReloadModel(DrawingControl3D.ModelRefreshOptions.ViewPreserveCameraPosition);
         }
 
         private void SetStylerBoundCorners(object sender, RoutedEventArgs e)
         {
-            DrawingControl.DefaultLayerStyler = new BoundingBoxStyler(this.Logger);
+            //DrawingControl.DefaultLayerStyler = new BoundingBoxStyler(this.Logger);
             ConnectStylerFeedBack();
-            DrawingControl.ReloadModel();
+            //DrawingControl.ReloadModel();
         }
 
         private void CommandBoxLost(object sender, RoutedEventArgs e)
@@ -1224,32 +1249,99 @@ namespace XbimXplorer
 
 		private void SetRandomStyler(object sender, RoutedEventArgs e)
 		{
-            DrawingControl.DefaultLayerStyler = new RandomColorStyler(Logger);
+            //DrawingControl.DefaultLayerStyler = new RandomColorStyler(Logger);
             ConnectStylerFeedBack();
-            DrawingControl.ReloadModel();
+            //DrawingControl.ReloadModel();
 
         }
 
 		private void SelectionColorCycle(object sender, RoutedEventArgs e)
 		{
-            if (DrawingControl.SelectionColor == Colors.Blue)
-            {
-                DrawingControl.SelectionColor = Colors.LightBlue;
-            }
-            else if (DrawingControl.SelectionColor == Colors.LightBlue)
-            {
-                DrawingControl.SelectionColor = Colors.Orange;
-            }
-            else if (DrawingControl.SelectionColor == Colors.Orange)
-            {
-                DrawingControl.SelectionColor = Colors.Red;
-            }
-            else if (DrawingControl.SelectionColor == Colors.Red)
-            {
-                DrawingControl.SelectionColor = Colors.Blue;
-            }
+            //if (DrawingControl.SelectionColor == Colors.Blue)
+            //{
+            //    DrawingControl.SelectionColor = Colors.LightBlue;
+            //}
+            //else if (DrawingControl.SelectionColor == Colors.LightBlue)
+            //{
+            //    DrawingControl.SelectionColor = Colors.Orange;
+            //}
+            //else if (DrawingControl.SelectionColor == Colors.Orange)
+            //{
+            //    DrawingControl.SelectionColor = Colors.Red;
+            //}
+            //else if (DrawingControl.SelectionColor == Colors.Red)
+            //{
+            //    DrawingControl.SelectionColor = Colors.Blue;
+            //}
             
             
+        }
+
+		private void Button_Click(object sender, RoutedEventArgs e)
+		{
+            LoadIfcFile(".\\ff.ifc");
+        }
+
+		private void formHost_Initialized(object sender, EventArgs e)
+		{
+            var glControl = new GLControl();
+            glControl.SwapBuffers();
+			glControl.MouseDown += GlControl_MouseDown;
+            (sender as WindowsFormsHost).Child = glControl;
+        }
+
+		private void GlControl_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+		{
+			//throw new NotImplementedException();
+		}
+
+		private void LoadIfcFile(string path) 
+        {
+            if (string.IsNullOrEmpty(path))
+                return;
+            var formHost = GridEngine.Children[0] as WindowsFormsHost;
+            var childConrol = formHost.Child as GLControl;
+            //childConrol.CloseNWindow();
+            childConrol.EnableNativeInput();
+            childConrol.MakeCurrent();
+            ExampleScene.Init(childConrol.Handle, childConrol.Width, childConrol.Height, path);
+            ExampleScene.Render();
+        }
+        private void ResizeEngineWindow() 
+        {
+            var formHost = GridEngine.Children[0] as WindowsFormsHost;
+            var childConrol = formHost.Child as GLControl;
+            childConrol.Refresh();
+        }
+        private void CloseHisControl() 
+        {
+            //GridEngine.
+            //formHost.loa
+            //if (formHost.Child == null)
+            //    return;
+            //var childConrol = formHost.Child as GLControl;
+            //childConrol.RecreateControl();
+        }
+        private void InitGLControl()
+        {
+            IntPtr hwnd1 = new WindowInteropHelper(this).Handle;
+			if (GridEngine.Children.Count > 0)
+			{
+                return;
+				//var formHost = GridEngine.Children[0] as WindowsFormsHost;
+				//var childConrol = formHost.Child as GLControl;
+    //            childConrol.CloseNWindow();
+    //            childConrol.Dispose();
+    //            //childConrol.RecreateControl();
+    //            //childConrol.SwapBuffers();
+    //            //Win32.CloseRender(formHost.Handle);
+    //            //Win32.CloseRender(childConrol.Handle);
+    //            GridEngine.Children.RemoveAt(0);
+            }
+			WindowsFormsHost windowsForm = new WindowsFormsHost();
+            windowsForm.Name = "formHost";
+            windowsForm.Initialized += formHost_Initialized;
+            GridEngine.Children.Add(windowsForm);
         }
 	}
 }

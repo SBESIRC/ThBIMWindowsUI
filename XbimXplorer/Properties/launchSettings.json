@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "XbimXplorer": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

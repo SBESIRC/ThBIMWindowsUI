@@ -114,6 +114,7 @@ namespace XbimXplorer.ThBIMEngine
 			DateTime startTime = DateTime.Now;
 			
 			#region 单线程
+			/*
 			int pIndex = 0;
 			var allPointVectors = new List<PointNormal>();
 			var allModels = new List<IfcMeshModel>();
@@ -138,7 +139,8 @@ namespace XbimXplorer.ThBIMEngine
 						{
 						
 						}
-						var material = GetMeshModelMaterial(item.IfcShapeLabel,item.ShapeLabel);
+						var insModel = shapeInstances.Find(c => c.ShapeGeometryLabel == item.ShapeLabel);
+						var material = GetMeshModelMaterial(insModel,item.IfcShapeLabel,item.ShapeLabel);
 						count += 1;
 						var allPts = item.Vertices.ToArray();
 						var ptIndex = allPointVectors.Count;
@@ -153,21 +155,21 @@ namespace XbimXplorer.ThBIMEngine
 								var pt1Index = ptIndexs[i * 3];
 								var pt2Index = ptIndexs[i * 3 + 1];
 								var pt3Index = ptIndexs[i * 3 + 2];
-								var pt1 = allPts[pt1Index];
+								var pt1 = TransPoint(allPts[pt1Index],insModel.Transformation);
 								var pt1Normal = face.Normals.Last();
 								if (pt1Index < face.Normals.Count())
 									pt1Normal = face.NormalAt(pt1Index);
 								pIndex += 1;
 								triangle.ptIndex.Add(pIndex);
 								allPointVectors.Add(GetPointNormal(pIndex, pt1, pt1Normal));
-								var pt2 = allPts[pt2Index];
+								var pt2 = TransPoint(allPts[pt2Index], insModel.Transformation);
 								var pt2Normal = face.Normals.Last();
 								if (pt2Index < face.Normals.Count())
 									pt2Normal = face.NormalAt(pt2Index);
 								pIndex += 1;
 								triangle.ptIndex.Add(pIndex);
 								allPointVectors.Add(GetPointNormal(pIndex, pt2, pt2Normal));
-								var pt3 = allPts[pt3Index];
+								var pt3 = TransPoint(allPts[pt3Index], insModel.Transformation);
 								var pt3Normal = face.Normals.Last();
 								if (pt3Index < face.Normals.Count())
 									pt3Normal = face.NormalAt(pt3Index);
@@ -184,9 +186,9 @@ namespace XbimXplorer.ThBIMEngine
 			}
 			if (null != ProgressChanged)
 				ProgressChanged(this, new ProgressChangedEventArgs(100, "Read Shape End"));
-			WriteMidFile(allModels, allPointVectors, midFilePath);
+			WriteMidFile(allModels, allPointVectors, midFilePath);*/
 			#endregion
-			/*
+			
             #region 多线程
            
 			using (var geomStore = model.GeometryStore)
@@ -195,6 +197,7 @@ namespace XbimXplorer.ThBIMEngine
 				{
 					var geoCount = geomReader.ShapeGeometries.Count();
 					shapeGeometries.AddRange(geomReader.ShapeGeometries);
+					shapeInstances.AddRange(geomReader.ShapeInstances);
 				}
 			}
 			var task = MoreTaskReadAsync();
@@ -218,12 +221,16 @@ namespace XbimXplorer.ThBIMEngine
 			if (null != ProgressChanged)
 				ProgressChanged(this, new ProgressChangedEventArgs(100, "Reading Shape End"));
 			WriteMidFile(readTaskInfo.AllModels, readTaskInfo.AllPointVectors, midFilePath);
-            #endregion*/
+            #endregion
 			DateTime endTime = DateTime.Now;
 			var total = endTime - startTime;
 		}
+		private XbimPoint3D TransPoint(XbimPoint3D xbimPoint ,XbimMatrix3D xbimMatrix) 
+		{
+			return xbimMatrix.Transform(xbimPoint);
 
-        private async Task MoreTaskReadAsync()
+		}
+		private async Task MoreTaskReadAsync()
 		{
 			List<Task> tasks = new List<Task>();
 
@@ -268,7 +275,8 @@ namespace XbimXplorer.ThBIMEngine
 			var thisModels = new List<IfcMeshModel>();
 			foreach (var item in targetShapes)
 			{
-				var material = GetMeshModelMaterial(item.IfcShapeLabel,item.ShapeLabel);
+				var insModel = shapeInstances.Find(c => c.ShapeGeometryLabel == item.ShapeLabel);
+				var material = GetMeshModelMaterial(insModel, item.IfcShapeLabel,item.ShapeLabel);
 				var allPts = item.Vertices.ToArray();
 				var mesh = new IfcMeshModel(item.ShapeLabel);
 				foreach (var face in item.Faces.OfType<WexBimMeshFace>().ToList())
@@ -281,21 +289,21 @@ namespace XbimXplorer.ThBIMEngine
 						var pt1Index = ptIndexs[i * 3];
 						var pt2Index = ptIndexs[i * 3 + 1];
 						var pt3Index = ptIndexs[i * 3 + 2];
-						var pt1 = allPts[pt1Index];
+						var pt1 = TransPoint(allPts[pt1Index], insModel.Transformation);
 						var pt1Normal = face.Normals.Last();
 						if (pt1Index < face.Normals.Count())
 							pt1Normal = face.NormalAt(pt1Index);
 						pIndex += 1;
 						triangle.ptIndex.Add(pIndex);
 						thisPointVectors.Add(GetPointNormal(pIndex, pt1, pt1Normal));
-						var pt2 = allPts[pt2Index];
+						var pt2 = TransPoint(allPts[pt2Index], insModel.Transformation);
 						var pt2Normal = face.Normals.Last();
 						if (pt2Index < face.Normals.Count())
 							pt2Normal = face.NormalAt(pt2Index);
 						pIndex += 1;
 						triangle.ptIndex.Add(pIndex);
 						thisPointVectors.Add(GetPointNormal(pIndex, pt2, pt2Normal));
-						var pt3 = allPts[pt3Index];
+						var pt3 = TransPoint(allPts[pt3Index], insModel.Transformation);
 						var pt3Normal = face.Normals.Last();
 						if (pt3Index < face.Normals.Count())
 							pt3Normal = face.NormalAt(pt3Index);
@@ -425,7 +433,7 @@ namespace XbimXplorer.ThBIMEngine
 				ProgressChanged(this, new ProgressChangedEventArgs(0, ""));
 		}
 
-		private IfcMaterial GetMeshModelMaterial(int ifcLable,int shapeLable) 
+		private IfcMaterial GetMeshModelMaterial(XbimShapeInstance insModel, int ifcLable,int shapeLable) 
 		{
 			var defalutMaterial = new IfcMaterial
 			{
@@ -439,27 +447,32 @@ namespace XbimXplorer.ThBIMEngine
 				NS = 12,
 			};
 			//var ifcModel = ifcInstances[ifcLable];
-			var insModel = shapeInstances.Find(c => c.ShapeGeometryLabel == shapeLable);
+			//var insModel = shapeInstances.Find(c => c.ShapeGeometryLabel == shapeLable);
 			var type = this.ifcModel.Metadata.ExpressType((short)insModel.IfcTypeId);
 			var typeStr = type.ExpressName.ToLower();
 			var v = _colourMap[type.Name];
-			if (typeStr.Contains("window")) 
+			if (typeStr.Contains("window"))
+			{
+
+			}
+			else if (typeStr.Contains("open")) 
 			{
 			
 			}
+			/*
 			defalutMaterial = new IfcMaterial
 			{
 				Kd_R = v.Red,
 				Kd_G = v.Green,
 				Kd_B = v.Blue,
-				Ks_R = v.ReflectionFactor,
+				Ks_R = v.DiffuseFactor,
 				Ks_G = v.SpecularFactor,
-				Ks_B = v.DiffuseFactor,
+				Ks_B = v.DiffuseTransmissionFactor,
 				K = v.Alpha,
-				NS = (int)v.DiffuseTransmissionFactor,
+				NS = 12,
 			};
-			return defalutMaterial;
-			/*
+			return defalutMaterial;*/
+		
 			//testListSting.Add(ifcModel.GetType().ToString().ToLower());
 			//testTypeStr.Add(typeStr);
 			if (typeStr.Contains("wall"))
@@ -562,7 +575,7 @@ namespace XbimXplorer.ThBIMEngine
 			{
 
 			}
-			return defalutMaterial;*/
+			return defalutMaterial;
 		}
 		private string GetTypeName(IPersistEntity entity) 
 		{

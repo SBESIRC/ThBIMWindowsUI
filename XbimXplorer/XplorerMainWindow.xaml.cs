@@ -107,8 +107,8 @@ namespace XbimXplorer
             Dispatcher.BeginInvoke(new Action(delegate
             {
                 Title = string.IsNullOrEmpty(ifcFilename)
-                    ? "Xbim Xplorer" :
-                    "Xbim Xplorer - [" + ifcFilename + "]";
+                    ? "TianHua Bim Xplorer" :
+                    "TianHua Bim Xplorer - [" + ifcFilename + "]";
             }));
         }
 

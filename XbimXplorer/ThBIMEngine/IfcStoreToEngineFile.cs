@@ -4,16 +4,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Xbim.Common;
 using Xbim.Common.Geometry;
-using Xbim.Common.Metadata;
 using Xbim.Ifc;
-using Xbim.Ifc4.GeometricModelResource;
 using Xbim.Ifc4.RepresentationResource;
-using Xbim.Ifc4.SharedBldgElements;
 
 namespace XbimXplorer.ThBIMEngine
 {
@@ -27,85 +23,15 @@ namespace XbimXplorer.ThBIMEngine
 		protected IfcStore ifcModel;
 		private ReadTaskInfo readTaskInfo;
 		readonly XbimColourMap _colourMap = new XbimColourMap();
-		private List<string> testListSting;
-		private List<string> testTypeStr;
-		
+		private Dictionary<int, int> geoIndexIfcIndexMap;
 		public IfcStoreToEngineFile()
 		{
-			//TestReadFile();
-			testListSting = new List<string>();
-			testTypeStr = new List<string>();
 		}
-		public void TestReadFile()
+		public Dictionary<int,int> LoadGeometry(IfcStore model,string midFilePath)
 		{
-			FileStream fileStream = new FileStream(".\\temp3.midfile", FileMode.Open);
-			BinaryReader binaryReader2 = new BinaryReader(fileStream, Encoding.UTF8);
-			int testi = 0;
-			//vertices
-			var ptCount = binaryReader2.ReadUInt64();
-			var ptValue = new List<float>();
-			for (ulong i = 0; i < ptCount; i++)
-			{
-				ptValue.Add(binaryReader2.ReadSingle());
-			}
-			//normals
-			//binaryReader2.ReadUInt64();//有换行或其它字符
-			var normalCount = binaryReader2.ReadUInt64();
-			var normalValue = new List<float>();
-			for (ulong i = 0; i < normalCount; i++)
-			{
-				normalValue.Add(binaryReader2.ReadSingle());
-			}
-			//binaryReader2.ReadUInt64();//有换行或其它字符
-			//global_indices
-			var indexCount = binaryReader2.ReadUInt64();
-			var intdexValue = new List<int>();
-			for (ulong i = 0; i < indexCount; i++)
-			{
-				intdexValue.Add(binaryReader2.ReadInt32());
-			}
-			//components' indices
-			var cIndexCount = binaryReader2.ReadUInt64();
-			List<List<int>> ptIndex = new List<List<int>>();
-			for (ulong i = 0; i < cIndexCount; i++)
-			{
-				//binaryReader2.ReadDouble();
-				var innerCount = binaryReader2.ReadUInt64();
-				List<int> tmpvc = new List<int>();
-				for (ulong j = 0; j < innerCount; j++)
-				{
-					tmpvc.Add(binaryReader2.ReadInt32());
-				}
-				ptIndex.Add(tmpvc);
-			}
-			//material datas
-			var mCount = binaryReader2.ReadUInt64();
-			var mValues = new List<List<object>>();
-			for (ulong i = 0; i < mCount; i++)
-			{
-				var value = new List<object>();
-				for (int j = 0; j < 8; j++)
-				{
-					if (j == 7)
-					{
-						value.Add(binaryReader2.ReadInt32());
-					}
-					else
-					{
-						value.Add(binaryReader2.ReadSingle());
-					}
-				}
-				mValues.Add(value);
-			}
-			if (testi > 0)
-			{
-			}
-			fileStream.Close();
-		}
-		public void LoadGeometry(IfcStore model,string midFilePath)
-		{
+			geoIndexIfcIndexMap = new Dictionary<int, int>();
 			if (null == model || model.Instances == null)
-				return;
+				return geoIndexIfcIndexMap;
 			ifcModel = model;
 			ifcInstances = null;
 			ifcInstances = model.Instances.ToList();
@@ -113,8 +39,8 @@ namespace XbimXplorer.ThBIMEngine
 			shapeInstances = new List<XbimShapeInstance>();
 			shapeGeoLoopups = new Dictionary<int, List<XbimShapeInstance>>();
 			readTaskInfo = new ReadTaskInfo();
-			DateTime startTime = DateTime.Now;
 			
+
 			#region 单线程
 			/*
 			int pIndex = 0;
@@ -148,7 +74,7 @@ namespace XbimXplorer.ThBIMEngine
 						{
 							var transform = copyModel.Transformation;
 							count += 1;
-							var mesh = new IfcMeshModel(item.ShapeLabel + tempCount);
+							var mesh = new IfcMeshModel(item.ShapeLabel + tempCount,item.IfcShapeLabel);
 							foreach (var face in item.Faces.OfType<WexBimMeshFace>().ToList())
 							{
 								var ptIndexs = face.Indices.ToArray();
@@ -196,9 +122,9 @@ namespace XbimXplorer.ThBIMEngine
 				ProgressChanged(this, new ProgressChangedEventArgs(100, "Read Shape End"));
 			WriteMidFile(allModels, allPointVectors, midFilePath);*/
 			#endregion
+
+			#region 多线程
 			
-            #region 多线程
-           
 			using (var geomStore = model.GeometryStore)
 			{
 				if (geomStore is Xbim.Common.Model.InMemoryGeometryStore meyGeoStore) 
@@ -233,9 +159,13 @@ namespace XbimXplorer.ThBIMEngine
 			if (null != ProgressChanged)
 				ProgressChanged(this, new ProgressChangedEventArgs(100, "Reading Shape End"));
 			WriteMidFile(readTaskInfo.AllModels, readTaskInfo.AllPointVectors, midFilePath);
-            #endregion
-			DateTime endTime = DateTime.Now;
-			var total = endTime - startTime;
+			#endregion
+			for (int i = 0; i < readTaskInfo.AllModels.Count; i++) 
+			{
+				var tempModel = readTaskInfo.AllModels[i];
+				geoIndexIfcIndexMap.Add(i, tempModel.IfcIndex);
+			}
+			return geoIndexIfcIndexMap;
 		}
 		private XbimPoint3D TransPoint(XbimPoint3D xbimPoint, XbimMatrix3D xbimMatrix)
 		{
@@ -288,6 +218,7 @@ namespace XbimXplorer.ThBIMEngine
 			int pIndex = 0;
 			var thisPointVectors = new List<PointNormal>();
 			var thisModels = new List<IfcMeshModel>();
+			var intGeoCount = 0;
 			foreach (var item in targetShapes)
 			{
 				var insModel = shapeInstances.Find(c => c.ShapeGeometryLabel == item.ShapeLabel);
@@ -300,7 +231,7 @@ namespace XbimXplorer.ThBIMEngine
 					foreach (var copyModel in allValues)
 					{
 						var transform = copyModel.Transformation;
-						var mesh = new IfcMeshModel(item.ShapeLabel + tempCount);
+						var mesh = new IfcMeshModel(intGeoCount + tempCount,copyModel.IfcProductLabel);
 						foreach (var face in item.Faces.OfType<WexBimMeshFace>().ToList())
 						{
 							var ptIndexs = face.Indices.ToArray();
@@ -344,7 +275,7 @@ namespace XbimXplorer.ThBIMEngine
 				else 
 				{
 					var transform = insModel.Transformation;
-					var mesh = new IfcMeshModel(item.ShapeLabel);
+					var mesh = new IfcMeshModel(intGeoCount, insModel.IfcProductLabel);
 					foreach (var face in item.Faces.OfType<WexBimMeshFace>().ToList())
 					{
 						var ptIndexs = face.Indices.ToArray();
@@ -384,6 +315,8 @@ namespace XbimXplorer.ThBIMEngine
 					}
 					thisModels.Add(mesh);
 				}
+
+				intGeoCount += 1;
 			}
 			lock (readTaskInfo)
 			{
@@ -395,6 +328,7 @@ namespace XbimXplorer.ThBIMEngine
 				}
 				foreach (var item in thisModels) 
 				{
+					item.CIndex += ptOffSet;
 					foreach (var tr in item.FaceTriangles) 
 					{
 						for (int i = 0; i < tr.ptIndex.Count; i++)
@@ -646,15 +580,6 @@ namespace XbimXplorer.ThBIMEngine
 			}
 			return defalutMaterial;
 		}
-		private bool ReadModeGeo(XbimShapeInstance insModel) 
-		{
-			//测试代码
-			var type = this.ifcModel.Metadata.ExpressType((short)insModel.IfcTypeId);
-			var typeStr = type.ExpressName.ToLower();
-			if (typeStr.Contains("wall"))
-				return true;
-			return true;
-		}
 		private string GetTypeName(IPersistEntity entity) 
 		{
 			if (entity is Xbim.Ifc2x3.RepresentationResource.IfcRepresentation ifcRep)
@@ -701,11 +626,13 @@ namespace XbimXplorer.ThBIMEngine
 		}
 		class IfcMeshModel
 		{
-			public int CIndex { get; }
+			public int CIndex { get; set; }
+			public int IfcIndex { get; }
 			public List<FaceTriangle> FaceTriangles { get;}
-			public IfcMeshModel(int index) 
+			public IfcMeshModel(int index,int ifcIndex) 
 			{
 				CIndex = index;
+				IfcIndex = ifcIndex;
 				FaceTriangles = new List<FaceTriangle>();	
 			}
 		}

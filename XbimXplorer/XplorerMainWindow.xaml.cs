@@ -62,6 +62,9 @@ namespace XbimXplorer
     public partial class XplorerMainWindow : IXbimXplorerPluginMasterWindow, INotifyPropertyChanged
     {
         private BackgroundWorker _loadFileBackgroundWorker;
+        private DispatcherTimer _dispatcherTimer;
+        private int _selectIndex=-1;
+        private Dictionary<int, int> _geoIndexIfcIndexMap;
         /// <summary>
         /// Used for the creation of a new federation file
         /// </summary>
@@ -177,10 +180,32 @@ namespace XbimXplorer
             // initialise the logging repository
             LoggedEvents = new ObservableCollection<EventViewModel>();
             // any logging event required should happen after XplorerMainWindow_Loaded
+
+            _geoIndexIfcIndexMap = new Dictionary<int, int>();
+            _dispatcherTimer = new DispatcherTimer();
+            _dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+			_dispatcherTimer.Tick += DispatcherTimer_Tick;
         }
 
+		private void DispatcherTimer_Tick(object sender, EventArgs e)
+		{
+            if (_geoIndexIfcIndexMap == null || _geoIndexIfcIndexMap.Count < 1)
+                return;
+            var selectId = ExampleScene.GetCurrentCompID();
+            if (selectId < 0)
+                return;
+            var ifcIndex = _geoIndexIfcIndexMap[selectId];
+            if (_selectIndex == ifcIndex)
+                return;
+            if (Mouse.LeftButton == MouseButtonState.Pressed || Mouse.RightButton == MouseButtonState.Pressed
+                || Mouse.MiddleButton == MouseButtonState.Pressed || Mouse.XButton1 == MouseButtonState.Pressed ||
+                Mouse.XButton2 == MouseButtonState.Pressed)
+                return;
+            _selectIndex = ifcIndex;
+            SelectedItem = Model.Instances[ifcIndex];
+        }
 
-        public Visibility DeveloperVisible => Settings.Default.DeveloperMode
+		public Visibility DeveloperVisible => Settings.Default.DeveloperMode
             ? Visibility.Visible
             : Visibility.Collapsed;
 
@@ -371,7 +396,7 @@ namespace XbimXplorer
                 }
                 var engineFile = new IfcStoreToEngineFile();
                 engineFile.ProgressChanged += OnProgressChanged;
-                engineFile.LoadGeometry(model, _tempMidFileName);
+                _geoIndexIfcIndexMap = engineFile.LoadGeometry(model, _tempMidFileName);
                 args.Result = model;
             }
             catch (Exception ex)
@@ -418,6 +443,9 @@ namespace XbimXplorer
                 return;
             if (fInfo.FullName.ToLower() == GetOpenedModelFileName()) //same file do nothing
                 return;
+            _dispatcherTimer.Stop();
+            _selectIndex = -1;
+            _geoIndexIfcIndexMap.Clear();
             InitGLControl();
             // there's no going back; if it fails after this point the current file should be closed anyway
             CloseAndDeleteTemporaryFiles();
@@ -1278,7 +1306,8 @@ namespace XbimXplorer
 			childConrol.EnableNativeInput();
 			childConrol.MakeCurrent();
 			ExampleScene.Init(childConrol.Handle, childConrol.Width, childConrol.Height, path);
-			ExampleScene.Render();
+            _dispatcherTimer.Start();
+            ExampleScene.Render();
 		}
         private GLControl GetEnginWindowGLControl() 
         {

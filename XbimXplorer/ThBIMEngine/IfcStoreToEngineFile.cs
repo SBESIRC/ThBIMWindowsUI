@@ -23,6 +23,7 @@ namespace XbimXplorer.ThBIMEngine
 		protected List<IPersistEntity> ifcInstances;
 		protected List<XbimShapeGeometry> shapeGeometries;
 		protected List<XbimShapeInstance> shapeInstances;
+		protected IDictionary<int, List<XbimShapeInstance>> shapeGeoLoopups;
 		protected IfcStore ifcModel;
 		private ReadTaskInfo readTaskInfo;
 		readonly XbimColourMap _colourMap = new XbimColourMap();
@@ -110,6 +111,7 @@ namespace XbimXplorer.ThBIMEngine
 			ifcInstances = model.Instances.ToList();
 			shapeGeometries = new List<XbimShapeGeometry>();
 			shapeInstances = new List<XbimShapeInstance>();
+			shapeGeoLoopups = new Dictionary<int, List<XbimShapeInstance>>();
 			readTaskInfo = new ReadTaskInfo();
 			DateTime startTime = DateTime.Now;
 			
@@ -121,6 +123,7 @@ namespace XbimXplorer.ThBIMEngine
 			
 			using (var geomStore = model.GeometryStore)
 			{
+				var shapeGeoLoopups = ((Xbim.Common.Model.InMemoryGeometryStore)geomStore).GeometryShapeLookup;
 				using (var geomReader = geomStore.BeginRead())
 				{
 					var geoCount = geomReader.ShapeGeometries.Count();
@@ -135,52 +138,57 @@ namespace XbimXplorer.ThBIMEngine
 							var currentProgress = count * 100 / geoCount;
 							ProgressChanged(this, new ProgressChangedEventArgs(currentProgress, "Read ShapeGeometries"));
 						}
-						if (null != item.LocalShapeDisplacement) 
-						{
-						
-						}
 						var insModel = shapeInstances.Find(c => c.ShapeGeometryLabel == item.ShapeLabel);
 						var material = GetMeshModelMaterial(insModel,item.IfcShapeLabel,item.ShapeLabel);
-						count += 1;
+						var allValues = shapeGeoLoopups[item.ShapeLabel];
 						var allPts = item.Vertices.ToArray();
 						var ptIndex = allPointVectors.Count;
-						var mesh = new IfcMeshModel(item.ShapeLabel);
-						foreach (var face in item.Faces.OfType<WexBimMeshFace>().ToList())
+						int tempCount = 1;
+						foreach (var copyModel in allValues) 
 						{
-							var ptIndexs = face.Indices.ToArray();
-							for (int i = 0; i < face.TriangleCount; i++)
+							var transform = copyModel.Transformation;
+							count += 1;
+							var mesh = new IfcMeshModel(item.ShapeLabel + tempCount);
+							foreach (var face in item.Faces.OfType<WexBimMeshFace>().ToList())
 							{
-								var triangle = new FaceTriangle();
-								triangle.TriangleMaterial = material;
-								var pt1Index = ptIndexs[i * 3];
-								var pt2Index = ptIndexs[i * 3 + 1];
-								var pt3Index = ptIndexs[i * 3 + 2];
-								var pt1 = TransPoint(allPts[pt1Index],insModel.Transformation);
-								var pt1Normal = face.Normals.Last();
-								if (pt1Index < face.Normals.Count())
-									pt1Normal = face.NormalAt(pt1Index);
-								pIndex += 1;
-								triangle.ptIndex.Add(pIndex);
-								allPointVectors.Add(GetPointNormal(pIndex, pt1, pt1Normal));
-								var pt2 = TransPoint(allPts[pt2Index], insModel.Transformation);
-								var pt2Normal = face.Normals.Last();
-								if (pt2Index < face.Normals.Count())
-									pt2Normal = face.NormalAt(pt2Index);
-								pIndex += 1;
-								triangle.ptIndex.Add(pIndex);
-								allPointVectors.Add(GetPointNormal(pIndex, pt2, pt2Normal));
-								var pt3 = TransPoint(allPts[pt3Index], insModel.Transformation);
-								var pt3Normal = face.Normals.Last();
-								if (pt3Index < face.Normals.Count())
-									pt3Normal = face.NormalAt(pt3Index);
-								pIndex += 1;
-								triangle.ptIndex.Add(pIndex);
-								allPointVectors.Add(GetPointNormal(pIndex, pt3, pt3Normal));
-								mesh.FaceTriangles.Add(triangle);
+								var ptIndexs = face.Indices.ToArray();
+								for (int i = 0; i < face.TriangleCount; i++)
+								{
+									var triangle = new FaceTriangle();
+									triangle.TriangleMaterial = material;
+									var pt1Index = ptIndexs[i * 3];
+									var pt2Index = ptIndexs[i * 3 + 1];
+									var pt3Index = ptIndexs[i * 3 + 2];
+									var pt1 = TransPoint(allPts[pt1Index], transform);
+									var pt1Normal = face.Normals.Last();
+									if (pt1Index < face.Normals.Count())
+										pt1Normal = face.NormalAt(pt1Index);
+									pt1Normal = TransVector(pt1Normal, transform);
+									pIndex += 1;
+									triangle.ptIndex.Add(pIndex);
+									allPointVectors.Add(GetPointNormal(pIndex, pt1, pt1Normal));
+									var pt2 = TransPoint(allPts[pt2Index], transform);
+									var pt2Normal = face.Normals.Last();
+									if (pt2Index < face.Normals.Count())
+										pt2Normal = face.NormalAt(pt2Index);
+									pt2Normal = TransVector(pt2Normal, transform);
+									pIndex += 1;
+									triangle.ptIndex.Add(pIndex);
+									allPointVectors.Add(GetPointNormal(pIndex, pt2, pt2Normal));
+									var pt3 = TransPoint(allPts[pt3Index], transform);
+									var pt3Normal = face.Normals.Last();
+									if (pt3Index < face.Normals.Count())
+										pt3Normal = face.NormalAt(pt3Index);
+									pt3Normal = TransVector(pt3Normal, transform);
+									pIndex += 1;
+									triangle.ptIndex.Add(pIndex);
+									allPointVectors.Add(GetPointNormal(pIndex, pt3, pt3Normal));
+									mesh.FaceTriangles.Add(triangle);
+								}
 							}
+							allModels.Add(mesh);
+							tempCount += 1;
 						}
-
-						allModels.Add(mesh);
 					}
 				}
 			}
@@ -193,6 +201,10 @@ namespace XbimXplorer.ThBIMEngine
            
 			using (var geomStore = model.GeometryStore)
 			{
+				if (geomStore is Xbim.Common.Model.InMemoryGeometryStore meyGeoStore) 
+				{
+					shapeGeoLoopups = ((Xbim.Common.Model.InMemoryGeometryStore)geomStore).GeometryShapeLookup;
+				}
 				using (var geomReader = geomStore.BeginRead())
 				{
 					var geoCount = geomReader.ShapeGeometries.Count();
@@ -225,10 +237,13 @@ namespace XbimXplorer.ThBIMEngine
 			DateTime endTime = DateTime.Now;
 			var total = endTime - startTime;
 		}
-		private XbimPoint3D TransPoint(XbimPoint3D xbimPoint ,XbimMatrix3D xbimMatrix) 
+		private XbimPoint3D TransPoint(XbimPoint3D xbimPoint, XbimMatrix3D xbimMatrix)
 		{
 			return xbimMatrix.Transform(xbimPoint);
-
+		}
+		private XbimVector3D TransVector(XbimVector3D xbimVector, XbimMatrix3D xbimMatrix) 
+		{
+			return xbimMatrix.Transform(xbimVector);
 		}
 		private async Task MoreTaskReadAsync()
 		{
@@ -278,42 +293,97 @@ namespace XbimXplorer.ThBIMEngine
 				var insModel = shapeInstances.Find(c => c.ShapeGeometryLabel == item.ShapeLabel);
 				var material = GetMeshModelMaterial(insModel, item.IfcShapeLabel,item.ShapeLabel);
 				var allPts = item.Vertices.ToArray();
-				var mesh = new IfcMeshModel(item.ShapeLabel);
-				foreach (var face in item.Faces.OfType<WexBimMeshFace>().ToList())
+				if (shapeGeoLoopups.ContainsKey(item.ShapeLabel))
 				{
-					var ptIndexs = face.Indices.ToArray();
-					for (int i = 0; i < face.TriangleCount; i++)
+					var allValues = shapeGeoLoopups[item.ShapeLabel];
+					int tempCount = 1;
+					foreach (var copyModel in allValues)
 					{
-						var triangle = new FaceTriangle();
-						triangle.TriangleMaterial = material;
-						var pt1Index = ptIndexs[i * 3];
-						var pt2Index = ptIndexs[i * 3 + 1];
-						var pt3Index = ptIndexs[i * 3 + 2];
-						var pt1 = TransPoint(allPts[pt1Index], insModel.Transformation);
-						var pt1Normal = face.Normals.Last();
-						if (pt1Index < face.Normals.Count())
-							pt1Normal = face.NormalAt(pt1Index);
-						pIndex += 1;
-						triangle.ptIndex.Add(pIndex);
-						thisPointVectors.Add(GetPointNormal(pIndex, pt1, pt1Normal));
-						var pt2 = TransPoint(allPts[pt2Index], insModel.Transformation);
-						var pt2Normal = face.Normals.Last();
-						if (pt2Index < face.Normals.Count())
-							pt2Normal = face.NormalAt(pt2Index);
-						pIndex += 1;
-						triangle.ptIndex.Add(pIndex);
-						thisPointVectors.Add(GetPointNormal(pIndex, pt2, pt2Normal));
-						var pt3 = TransPoint(allPts[pt3Index], insModel.Transformation);
-						var pt3Normal = face.Normals.Last();
-						if (pt3Index < face.Normals.Count())
-							pt3Normal = face.NormalAt(pt3Index);
-						pIndex += 1;
-						triangle.ptIndex.Add(pIndex);
-						thisPointVectors.Add(GetPointNormal(pIndex, pt3, pt3Normal));
-						mesh.FaceTriangles.Add(triangle);
+						var transform = copyModel.Transformation;
+						var mesh = new IfcMeshModel(item.ShapeLabel + tempCount);
+						foreach (var face in item.Faces.OfType<WexBimMeshFace>().ToList())
+						{
+							var ptIndexs = face.Indices.ToArray();
+							for (int i = 0; i < face.TriangleCount; i++)
+							{
+								var triangle = new FaceTriangle();
+								triangle.TriangleMaterial = material;
+								var pt1Index = ptIndexs[i * 3];
+								var pt2Index = ptIndexs[i * 3 + 1];
+								var pt3Index = ptIndexs[i * 3 + 2];
+								var pt1 = TransPoint(allPts[pt1Index], transform);
+								var pt1Normal = face.Normals.Last();
+								if (pt1Index < face.Normals.Count())
+									pt1Normal = face.NormalAt(pt1Index);
+								pIndex += 1;
+								pt1Normal = TransVector(pt1Normal, transform);
+								triangle.ptIndex.Add(pIndex);
+								thisPointVectors.Add(GetPointNormal(pIndex, pt1, pt1Normal));
+								var pt2 = TransPoint(allPts[pt2Index], transform);
+								var pt2Normal = face.Normals.Last();
+								if (pt2Index < face.Normals.Count())
+									pt2Normal = face.NormalAt(pt2Index);
+								pIndex += 1;
+								pt2Normal = TransVector(pt2Normal, transform);
+								triangle.ptIndex.Add(pIndex);
+								thisPointVectors.Add(GetPointNormal(pIndex, pt2, pt2Normal));
+								var pt3 = TransPoint(allPts[pt3Index], transform);
+								var pt3Normal = face.Normals.Last();
+								if (pt3Index < face.Normals.Count())
+									pt3Normal = face.NormalAt(pt3Index);
+								pIndex += 1;
+								pt3Normal = TransVector(pt3Normal, transform);
+								triangle.ptIndex.Add(pIndex);
+								thisPointVectors.Add(GetPointNormal(pIndex, pt3, pt3Normal));
+								mesh.FaceTriangles.Add(triangle);
+							}
+						}
+						thisModels.Add(mesh);
 					}
 				}
-				thisModels.Add(mesh);
+				else 
+				{
+					var transform = insModel.Transformation;
+					var mesh = new IfcMeshModel(item.ShapeLabel);
+					foreach (var face in item.Faces.OfType<WexBimMeshFace>().ToList())
+					{
+						var ptIndexs = face.Indices.ToArray();
+						for (int i = 0; i < face.TriangleCount; i++)
+						{
+							var triangle = new FaceTriangle();
+							triangle.TriangleMaterial = material;
+							var pt1Index = ptIndexs[i * 3];
+							var pt2Index = ptIndexs[i * 3 + 1];
+							var pt3Index = ptIndexs[i * 3 + 2];
+							var pt1 = TransPoint(allPts[pt1Index], transform);
+							var pt1Normal = face.Normals.Last();
+							if (pt1Index < face.Normals.Count())
+								pt1Normal = face.NormalAt(pt1Index);
+							pIndex += 1;
+							pt1Normal = TransVector(pt1Normal, transform);
+							triangle.ptIndex.Add(pIndex);
+							thisPointVectors.Add(GetPointNormal(pIndex, pt1, pt1Normal));
+							var pt2 = TransPoint(allPts[pt2Index], transform);
+							var pt2Normal = face.Normals.Last();
+							if (pt2Index < face.Normals.Count())
+								pt2Normal = face.NormalAt(pt2Index);
+							pIndex += 1;
+							pt2Normal = TransVector(pt2Normal, transform);
+							triangle.ptIndex.Add(pIndex);
+							thisPointVectors.Add(GetPointNormal(pIndex, pt2, pt2Normal));
+							var pt3 = TransPoint(allPts[pt3Index], transform);
+							var pt3Normal = face.Normals.Last();
+							if (pt3Index < face.Normals.Count())
+								pt3Normal = face.NormalAt(pt3Index);
+							pIndex += 1;
+							pt3Normal = TransVector(pt3Normal, transform);
+							triangle.ptIndex.Add(pIndex);
+							thisPointVectors.Add(GetPointNormal(pIndex, pt3, pt3Normal));
+							mesh.FaceTriangles.Add(triangle);
+						}
+					}
+					thisModels.Add(mesh);
+				}
 			}
 			lock (readTaskInfo)
 			{
@@ -334,7 +404,6 @@ namespace XbimXplorer.ThBIMEngine
 				readTaskInfo.AllPointVectors.AddRange(thisPointVectors);
 				readTaskInfo.AllModels.AddRange(thisModels);
 				readTaskInfo.TaskCount -= 1;
-
 			}
 		}
 		private PointNormal GetPointNormal(int pIndex, XbimPoint3D point , XbimVector3D normal) 
@@ -380,7 +449,7 @@ namespace XbimXplorer.ThBIMEngine
 			}
 			if (null != ProgressChanged)
 				ProgressChanged(this, new ProgressChangedEventArgs(40, "Convert To midFile"));
-			//global_indices
+			//global_indices, All triangle faces info
 			var sumCount = (ulong)meshModels.Sum(c => c.FaceTriangles.Sum(x => x.ptIndex.Count()));
 			writer.Write(sumCount);
 			for (int i = 0; i < meshModels.Count; i++)
@@ -394,7 +463,7 @@ namespace XbimXplorer.ThBIMEngine
 			}
 			if (null != ProgressChanged)
 				ProgressChanged(this, new ProgressChangedEventArgs(60, "Convert To midFile"));
-			//components' indices
+			//components' indices, all components indices
 			ulong cIdCount = (ulong)meshModels.Count;
 			writer.Write(cIdCount);
 			foreach (var item in meshModels)
@@ -576,6 +645,15 @@ namespace XbimXplorer.ThBIMEngine
 
 			}
 			return defalutMaterial;
+		}
+		private bool ReadModeGeo(XbimShapeInstance insModel) 
+		{
+			//测试代码
+			var type = this.ifcModel.Metadata.ExpressType((short)insModel.IfcTypeId);
+			var typeStr = type.ExpressName.ToLower();
+			if (typeStr.Contains("wall"))
+				return true;
+			return true;
 		}
 		private string GetTypeName(IPersistEntity entity) 
 		{

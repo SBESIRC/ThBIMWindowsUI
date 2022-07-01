@@ -31,24 +31,11 @@ namespace THBimEngine.Presention
             //ifcre_set_config("render_api", "vulkan");
             TWindow* ptrToWnd = (TWindow*)wndPtr.ToPointer();
             ifcre_init(ptrToWnd);
-            //ifcre_run();
         }
-        public static void Ready()
-        {
-            Console.WriteLine("GlWpfControl is now ready");
-            //GL.Enable(EnableCap.Blend);
-            //GL.Enable(EnableCap.DepthTest);
-            //GL.Enable(EnableCap.ScissorTest);
-        }
-
         public static void Render()
         {
-            //Init();
-
             //render by c++ code
             ifcre_run();
-
-            //TestRenderByOldGlAPI();
         }
         
     }

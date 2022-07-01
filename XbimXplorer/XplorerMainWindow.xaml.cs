@@ -51,6 +51,7 @@ using THBimEngine.Presention;
 using System.Windows.Forms.Integration;
 using XbimXplorer.ThBIMEngine;
 using System.Windows.Interop;
+using System.Threading.Tasks;
 #endregion
 
 namespace XbimXplorer
@@ -240,29 +241,13 @@ namespace XbimXplorer
         }
 
         #region "Model File Operations"
-
-        const int WM_CLOSE = 0x0010;
         void XplorerMainWindow_Closing(object sender, CancelEventArgs e)
         {
-            var glControl = (sender as WindowsFormsHost).Child as GLControl;
-            Win32.CloseRender(glControl.Handle);
-            //if (_loadFileBackgroundWorker != null && _loadFileBackgroundWorker.IsBusy)
-            //{
-            //    Logger.LogWarning("Closing cancelled because of active background task.");
-            //    e.Cancel = true; //do nothing if a thread is alive
-            //}
-            //else
-            //{
-            //    if (!string.IsNullOrEmpty(_tempMidFileName) && File.Exists(_tempMidFileName))
-            //    {
-            //        try
-            //        {
-            //            File.Delete(_tempMidFileName);
-            //        }
-            //        catch { }
-            //    }
-            //    e.Cancel = false;
-            //}
+            var glControl = GetEnginWindowGLControl();
+            if (glControl != null)
+            {
+                Win32.CloseRender(glControl.Handle);
+            }
         }
 
         void XplorerMainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -501,7 +486,7 @@ namespace XbimXplorer
 
                     LoadIfcFile(_tempMidFileName);
                 }
-                ResizeEngineWindow();
+                
                 ProgressBar.Value = 0;
                 StatusMsg.Text = "Ready";
                 AddRecentFile();
@@ -1278,72 +1263,52 @@ namespace XbimXplorer
 
 
         }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            LoadIfcFile(".\\ff.ifc");
-        }
-
         private void formHost_Initialized(object sender, EventArgs e)
         {
             var glControl = new GLControl();
             glControl.SwapBuffers();
-            glControl.MouseDown += GlControl_MouseDown;
             (sender as WindowsFormsHost).Child = glControl;
         }
-
-        private void GlControl_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+		private void LoadIfcFile(string path)
+		{
+			if (string.IsNullOrEmpty(path))
+				return;
+			var formHost = GridEngine.Children[0] as WindowsFormsHost;
+			var childConrol = formHost.Child as GLControl;
+			childConrol.EnableNativeInput();
+			childConrol.MakeCurrent();
+			ExampleScene.Init(childConrol.Handle, childConrol.Width, childConrol.Height, path);
+			ExampleScene.Render();
+		}
+        private GLControl GetEnginWindowGLControl() 
         {
-            //throw new NotImplementedException();
-        }
-
-        private void LoadIfcFile(string path)
-        {
-            if (string.IsNullOrEmpty(path))
-                return;
+            if (GridEngine.Children.Count < 1)
+                return null;
             var formHost = GridEngine.Children[0] as WindowsFormsHost;
-            var childConrol = formHost.Child as GLControl;
-            //childConrol.CloseNWindow();
-            childConrol.EnableNativeInput();
-            childConrol.MakeCurrent();
-            ExampleScene.Init(childConrol.Handle, childConrol.Width, childConrol.Height, path);
-            ExampleScene.Render();
-        }
-        private void ResizeEngineWindow()
-        {
-            var formHost = GridEngine.Children[0] as WindowsFormsHost;
-            var childConrol = formHost.Child as GLControl;
-            childConrol.Refresh();
-        }
-        private void CloseHisControl()
-        {
-            //GridEngine.
-            //formHost.loa
-            //if (formHost.Child == null)
-            //    return;
-            //var childConrol = formHost.Child as GLControl;
-            //childConrol.RecreateControl();
+            var childControl = formHost.Child as GLControl;
+            return childControl;
         }
         private void InitGLControl()
         {
-            IntPtr hwnd1 = new WindowInteropHelper(this).Handle;
             if (GridEngine.Children.Count > 0)
             {
                 return;
-                //var formHost = GridEngine.Children[0] as WindowsFormsHost;
-                //var childConrol = formHost.Child as GLControl;
-                //            childConrol.CloseNWindow();
-                //            childConrol.Dispose();
-                //            //childConrol.RecreateControl();
-                //            //childConrol.SwapBuffers();
-                //            //Win32.CloseRender(formHost.Handle);
-                //            //Win32.CloseRender(childConrol.Handle);
-                //            GridEngine.Children.RemoveAt(0);
             }
             WindowsFormsHost windowsForm = new WindowsFormsHost();
             windowsForm.Name = "formHost";
             windowsForm.Initialized += formHost_Initialized;
             GridEngine.Children.Add(windowsForm);
         }
-    }
+		private void GridEngine_GotFocus(object sender, RoutedEventArgs e)
+		{
+            var grid = sender as Grid;
+            if (grid.Children.Count < 1)
+                return;
+            var formsHost = grid.Children[0] as WindowsFormsHost;
+            if (formsHost.Child == null)
+                return;
+            var glControl = formsHost.Child as GLControl;
+            glControl.Focus();
+		}
+	}
 }

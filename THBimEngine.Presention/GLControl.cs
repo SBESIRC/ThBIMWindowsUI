@@ -150,6 +150,7 @@ namespace THBimEngine.Presention
         public GLControl()
             : this(null)
         {
+            CheckForIllegalCrossThreadCalls = false;
         }
 
         /// <summary>
@@ -163,11 +164,18 @@ namespace THBimEngine.Presention
             SetStyle(ControlStyles.UserPaint, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             DoubleBuffered = false;
-
+			this.GotFocus += GLControl_GotFocus;
             _glControlSettings = glControlSettings != null
                 ? glControlSettings.Clone() : new GLControlSettings();
         }
-        public void CloseNWindow() 
+
+		private void GLControl_GotFocus(object sender, EventArgs e)
+		{
+            if(null != _nativeWindow)
+                _nativeWindow.Focus();
+		}
+
+		public void CloseNWindow() 
         {
             if (null != _nativeWindow)
                 _nativeWindow.Close();
@@ -184,6 +192,7 @@ namespace THBimEngine.Presention
             CreateNativeWindow();
             base.OnHandleCreated(e);
 			_nativeWindow.MouseDown += _nativeWindow_MouseDown1;
+            _nativeWindow.Focus();
             if (_resizeEventSuppressed)
             {
                 OnResize(EventArgs.Empty);
@@ -568,11 +577,19 @@ namespace THBimEngine.Presention
 
             base.OnResize(e);
         }
+		protected override void OnMouseDown(MouseEventArgs e)
+		{
+			base.OnMouseDown(e);
 
-        /// <summary>
-        /// Resize the native window to fit this control.
-        /// </summary>
-        private void ResizeNativeWindow()
+		}
+		protected override void OnMouseClick(MouseEventArgs e)
+		{
+			base.OnMouseClick(e);
+		}
+		/// <summary>
+		/// Resize the native window to fit this control.
+		/// </summary>
+		private void ResizeNativeWindow()
         {
             if (IsDesignMode)
                 return;

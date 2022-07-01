@@ -205,7 +205,7 @@
                     </avalonDock:LayoutAnchorablePaneGroup>
                     <avalonDock:LayoutDocumentPane x:Name="MainDocPane">
                         <avalonDock:LayoutDocument  CanClose="False" Title="3D View">
-                            <Grid Background="White" x:Name ="GridEngine">
+                            <Grid Background="White" x:Name ="GridEngine" GotFocus="GridEngine_GotFocus">
                                 <!--<xbim:DrawingControl3D
                                 x:Name="DrawingControl" 
                                    SelectedEntity="{Binding Path=SelectedItem, ElementName=MainWindow, Mode=TwoWay}"    

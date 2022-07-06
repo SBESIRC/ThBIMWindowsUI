@@ -179,7 +179,7 @@ namespace XbimXplorer.ThBIMEngine
 		{
 			List<Task> tasks = new List<Task>();
 
-			int size = 200;
+			int size = 100;
 			int count = shapeGeometries.Count;
 			int taskCount = (int)Math.Ceiling((double)count / size);
 			readTaskInfo.AllCount = count;
@@ -345,8 +345,8 @@ namespace XbimXplorer.ThBIMEngine
 			return new PointNormal
 			{
 				PointIndex = pIndex,
-				Point = new PointVector() { X = (float)point.X, Y = (float)point.Z, Z = (float)point.Y },
-				Normal = new PointVector() { X = (float)normal.X, Y = (float)normal.Z, Z = (float)normal.Y },
+				Point = new PointVector() { X = -(float)point.X, Y = (float)point.Z, Z = (float)point.Y },
+				Normal = new PointVector() { X = -(float)normal.X, Y = (float)normal.Z, Z = (float)normal.Y },
 			};
 		}
 		private void WriteMidFile(List<IfcMeshModel> meshModels,List<PointNormal> meshPoints,string midFilePath) 

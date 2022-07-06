@@ -66,13 +66,13 @@
 		<PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
 		<PackageReference Include="Serilog.Extensions.Logging" Version="2.0.4" />
 		<PackageReference Include="Serilog.Sinks.File" Version="4.0.0" />
-		<PackageReference Include="Xbim.Geometry" Version="5.1.437" />
 		<PackageReference Include="Xbim.IO.Esent" Version="5.1.341" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="Microsoft.CSharp" />
 		<Reference Include="PresentationCore" />
 		<Reference Include="PresentationFramework" />
+		<Reference Include="System.Configuration" />
 		<Reference Include="System.Data.DataSetExtensions" />
 		<Reference Include="System.Windows.Forms" />
 		<Reference Include="System.Xaml" />
@@ -84,6 +84,8 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\THBimEngine.Presention\THBimEngine.Presention.csproj" />
+		<ProjectReference Include="..\Xbim.Geometry.Engine.Interop\Xbim.Geometry.Engine.Interop.csproj" />
+		<ProjectReference Include="..\Xbim.ModelGeometry.Scene\Xbim.ModelGeometry.Scene.csproj" />
 		<ProjectReference Include="..\Xbim.Presentation\Xbim.Presentation.csproj" />
   </ItemGroup>
   <ItemGroup>
@@ -91,4 +93,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
 	</ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /S /Y $(SolutionDir)\WorkDir  $(TargetDir)\" />
+  </Target>
 </Project>

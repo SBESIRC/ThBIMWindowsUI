@@ -10,6 +10,7 @@ using Xbim.Common;
 using Xbim.Common.Geometry;
 using Xbim.Ifc;
 using Xbim.Ifc4.RepresentationResource;
+using Xbim.Presentation.LayerStyling;
 
 namespace XbimXplorer.ThBIMEngine
 {
@@ -29,6 +30,7 @@ namespace XbimXplorer.ThBIMEngine
 		}
 		public Dictionary<int,int> LoadGeometry(IfcStore model,string midFilePath)
 		{
+			var excludedTypes = model.DefaultExclusions(null);
 			geoIndexIfcIndexMap = new Dictionary<int, int>();
 			if (null == model || model.Instances == null)
 				return geoIndexIfcIndexMap;
@@ -39,8 +41,6 @@ namespace XbimXplorer.ThBIMEngine
 			shapeInstances = new List<XbimShapeInstance>();
 			shapeGeoLoopups = new Dictionary<int, List<XbimShapeInstance>>();
 			readTaskInfo = new ReadTaskInfo();
-			
-
 			#region 单线程
 			/*
 			int pIndex = 0;
@@ -72,6 +72,8 @@ namespace XbimXplorer.ThBIMEngine
 						int tempCount = 1;
 						foreach (var copyModel in allValues) 
 						{
+							if (item.FaceCount < 1)
+								continue;
 							var transform = copyModel.Transformation;
 							count += 1;
 							var mesh = new IfcMeshModel(item.ShapeLabel + tempCount,item.IfcShapeLabel);
@@ -133,9 +135,10 @@ namespace XbimXplorer.ThBIMEngine
 				}
 				using (var geomReader = geomStore.BeginRead())
 				{
+					var tempIns = GetShapeInstancesToRender(geomReader, excludedTypes);
 					var geoCount = geomReader.ShapeGeometries.Count();
 					shapeGeometries.AddRange(geomReader.ShapeGeometries);
-					shapeInstances.AddRange(geomReader.ShapeInstances);
+					shapeInstances.AddRange(tempIns);
 				}
 			}
 			var task = MoreTaskReadAsync();
@@ -170,6 +173,14 @@ namespace XbimXplorer.ThBIMEngine
 		private XbimPoint3D TransPoint(XbimPoint3D xbimPoint, XbimMatrix3D xbimMatrix)
 		{
 			return xbimMatrix.Transform(xbimPoint);
+		}
+		protected IEnumerable<XbimShapeInstance> GetShapeInstancesToRender(IGeometryStoreReader geomReader, HashSet<short> excludedTypes)
+		{
+			var shapeInstances = geomReader.ShapeInstances
+				.Where(s => s.RepresentationType == XbimGeometryRepresentationType.OpeningsAndAdditionsIncluded
+							&&
+							!excludedTypes.Contains(s.IfcTypeId));
+			return shapeInstances;
 		}
 		private XbimVector3D TransVector(XbimVector3D xbimVector, XbimMatrix3D xbimMatrix) 
 		{
@@ -221,8 +232,16 @@ namespace XbimXplorer.ThBIMEngine
 			var intGeoCount = 0;
 			foreach (var item in targetShapes)
 			{
+				if (item.FaceCount < 1)
+					continue;
 				var insModel = shapeInstances.Find(c => c.ShapeGeometryLabel == item.ShapeLabel);
-				var material = GetMeshModelMaterial(insModel, item.IfcShapeLabel,item.ShapeLabel);
+				if (insModel == null) 
+				{
+					continue;
+				}
+				var material = GetMeshModelMaterial(insModel, item.IfcShapeLabel,item.ShapeLabel,out string typeStr);
+				if (typeStr.Contains("open"))
+					continue;
 				var allPts = item.Vertices.ToArray();
 				if (shapeGeoLoopups.ContainsKey(item.ShapeLabel))
 				{
@@ -436,8 +455,9 @@ namespace XbimXplorer.ThBIMEngine
 				ProgressChanged(this, new ProgressChangedEventArgs(0, ""));
 		}
 
-		private IfcMaterial GetMeshModelMaterial(XbimShapeInstance insModel, int ifcLable,int shapeLable) 
+		private IfcMaterial GetMeshModelMaterial(XbimShapeInstance insModel, int ifcLable,int shapeLable,out string typeStr) 
 		{
+			typeStr = "";
 			var defalutMaterial = new IfcMaterial
 			{
 				Kd_R = 169 / 255f,
@@ -452,7 +472,7 @@ namespace XbimXplorer.ThBIMEngine
 			//var ifcModel = ifcInstances[ifcLable];
 			//var insModel = shapeInstances.Find(c => c.ShapeGeometryLabel == shapeLable);
 			var type = this.ifcModel.Metadata.ExpressType((short)insModel.IfcTypeId);
-			var typeStr = type.ExpressName.ToLower();
+			typeStr = type.ExpressName.ToLower();
 			var v = _colourMap[type.Name];
 			if (typeStr.Contains("window"))
 			{

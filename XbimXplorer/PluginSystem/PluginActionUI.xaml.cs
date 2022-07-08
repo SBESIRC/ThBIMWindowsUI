@@ -51,13 +51,5 @@ namespace XbimXplorer.PluginSystem
                 SelectedPlugin?.ToggleEnabled();
             }
         }
-
-        private void RemovePlugin(object sender, RoutedEventArgs e)
-        {
-            using (var crs = new WaitCursor())
-            {
-                SelectedPlugin?.RemoveInstallation();
-            }
-        }
     }
 }

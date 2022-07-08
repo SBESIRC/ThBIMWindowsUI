@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using Microsoft.Extensions.Logging;
+using log4net;
 using NuGet;
 using Xbim.Presentation;
 
@@ -15,15 +15,13 @@ namespace XbimXplorer.PluginSystem
     /// </summary>
     public partial class PluginsConfig
     {
-
-        protected Microsoft.Extensions.Logging.ILogger Logger { get; private set; }
+        private static readonly ILog Log = LogManager.GetLogger("XbimXplorer.PluginSystem.PluginsConfig");
 
         private XplorerMainWindow _mainWindow;
 
         public PluginsConfig()
         {
             InitializeComponent();
-            Logger = XplorerMainWindow.LoggerFactory.CreateLogger<PluginsConfig>();
             RefreshPluginList();
             _mainWindow = Application.Current.MainWindow as XplorerMainWindow;
             DataContext = this;
@@ -43,7 +41,7 @@ namespace XbimXplorer.PluginSystem
             }
             catch (Exception ex)
             {
-                Logger.LogError(0, ex, "An error occurred getting repository information.");
+                Log.Error("An error occurred getting repository information.", ex);
             }
             PluginList.ItemsSource = plugins;
         }
@@ -73,7 +71,6 @@ namespace XbimXplorer.PluginSystem
                 {
                     ShowRepository();
                 }
-                SelectedPlugin = new PluginInformationVm(null);
             }
         }
 
@@ -119,7 +116,7 @@ namespace XbimXplorer.PluginSystem
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(0, ex, "Error processing package file {filename}.", fname);
+                    Log.Error($"Error processing package file [{fname}].", ex);
                 }
             }
             RefreshPluginList();

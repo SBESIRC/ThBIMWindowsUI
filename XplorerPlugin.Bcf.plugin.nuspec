@@ -2,26 +2,29 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
   <metadata>
     <id>XplorerPlugin.Bcf</id>
-    <version>5.1.0</version>
+    <version>4.0.15</version>
     <title>XplorerPlugin.Bcf</title>
     <authors>xBIM team</authors>
     <owners>xBIM team</owners>
-    <licenseUrl>https://raw.githubusercontent.com/xBimTeam/XbimEssentials/master/LICENCE.md</licenseUrl>
+    <license type="expression">CDDL-1.0</license>
     <projectUrl>https://github.com/xBimTeam/</projectUrl>
-    <iconUrl>https://avatars1.githubusercontent.com/u/2284875?v=3&amp;s=240</iconUrl>
+    <icon>xbim.jpg</icon>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Integration with Xplorer UI for BuildingSmart's BCF (Building Collaboration Format) files.</description>
-    <summary>Xbim Xplorer Plugin to work with BCF (BIM Collaboration Format) files</summary>
+    <summary>.</summary>
     <language>en-GB</language>
     <!-- the XplorerPlugin tag is used to identify plugins available for donwload from XbimXplorer-->
     <tags>BCF, Building Collaboration Format, BuildingSmart, XplorerPlugin</tags>
     <!-- dependencies need to be worked out, at this stage they will be ignored during install -->
     <dependencies>
-      <dependency id="Xbim.WindowsUI" version="[5.1,5.2)" />
+      <group targetFramework="net45">
+        <dependency id="Xbim.WindowsUI" version="[4.0.15, 5)" />
+      </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="XplorerPlugin.Bcf\bin\Release\net472\DotNetZip.dll"              target="lib\net45\" />
-    <file src="XplorerPlugin.Bcf\bin\Release\net472\XplorerPlugin.Bcf.exe"      target="lib\net45\" />
+    <file src="xbim.jpg" target="" />
+    <file src="XplorerPlugin.Bcf\bin\Release\DotNetZip.dll"              target="lib\net45\" />
+    <file src="XplorerPlugin.Bcf\bin\Release\XplorerPlugin.Bcf.exe"      target="lib\net45\" />
   </files>
 </package>

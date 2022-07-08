@@ -1,9 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Windows.Media;
 using Xbim.Common;
+using Xbim.Common.Geometry;
+using Xbim.Common.XbimExtensions;
 using Xbim.Ifc4.Interfaces;
+using Xbim.Ifc4.MeasureResource;
 
 namespace XbimXplorer.Commands
 {
@@ -12,6 +15,8 @@ namespace XbimXplorer.Commands
     /// </summary>
     internal static class GeometryView
     {
+        // private static IXbimShapeGeometryData geometry;
+
         private static void Report(IIfcClosedShell shell, TextHighliter sb)
         {
             foreach (var face in shell.CfsFaces)
@@ -81,20 +86,11 @@ namespace XbimXplorer.Commands
 
         private static void WritePointCoord(TextHighliter sb, double x, double y, double z, bool relative = false)
         {
-            //x = Convert.ToSingle(x);
-            //y = Convert.ToSingle(y);
-            //z = Convert.ToSingle(z);
-
             var rel = relative ? "@" : "";
             if (!double.IsNaN(z))
-                sb.Append($"{rel}{x:0.###########},{y:0.###########},{z:0.###########}", Brushes.Black);
+                sb.Append($"{rel}{x},{y},{z}", Brushes.Black);
             else
-                sb.Append($"{rel}{x:0.###########},{y:0.###########}", Brushes.Black);
-        }
-
-        private static void WritePointCoord(TextHighliter sb, IItemSet<Xbim.Ifc4.MeasureResource.IfcLengthMeasure> pt)
-        {
-            WritePointCoord(sb, pt[0], pt[1], pt[2], false);
+                sb.Append($"{rel}{x},{y}", Brushes.Black);
         }
 
         private static void WritePointCoord(TextHighliter sb, IIfcCartesianPoint ifcCartesianPoint, bool relative = false)
@@ -105,6 +101,11 @@ namespace XbimXplorer.Commands
         private static void WritePointCoord(TextHighliter sb, IIfcDirection ifcCartesianPoint, bool relative = false)
         {
             WritePointCoord(sb, ifcCartesianPoint.X, ifcCartesianPoint.Y, ifcCartesianPoint.Z, relative);
+        }
+
+        private static void WritePointCoord(TextHighliter sb, IItemSet<IfcLengthMeasure> pt)
+        {
+            WritePointCoord(sb, pt[0], pt[1], pt[2], false);
         }
 
         private static void WritePointCoord(TextHighliter sb, IIfcVector p, bool relative = false)
@@ -132,53 +133,6 @@ namespace XbimXplorer.Commands
             Report(ifcFaceBound.Bound, sb);
         }
 
-        private static void Report(IIfcProductDefinitionShape ifcProductDefinitionShape, TextHighliter sb)
-        {
-            foreach (var item in ifcProductDefinitionShape.Representations)
-            {
-                Report(item, sb);
-            }
-        }
-
-        private static void Report(IIfcRepresentation ifcRepresentation, TextHighliter sb)
-        {
-            foreach (var item in ifcRepresentation.Items)
-            {
-                Report(item, sb);
-            }
-        }
-
-
-        private static void Report(IIfcConnectedFaceSet item, TextHighliter sb)
-        {
-            foreach (var face in item.CfsFaces)
-            {
-                Report(face, sb);
-            }
-        }
-
-        private static void Report(IIfcFaceBasedSurfaceModel item, TextHighliter sb)
-        {
-            foreach (var face in item.FbsmFaces)
-            {
-                Report(face, sb);
-            }
-        }
-
-
-
-        private static void Report(IIfcRepresentationItem item, TextHighliter sb)
-        {
-            if (item is IIfcFaceBasedSurfaceModel)
-            {
-                Report((IIfcFaceBasedSurfaceModel)item, sb);
-            }
-            else
-            {
-
-            }
-        }
-
         private static void Report(IIfcCompositeCurve curve, TextHighliter sb)
         {
             foreach (var ifcCompositeCurveSegment in curve.Segments)
@@ -192,41 +146,9 @@ namespace XbimXplorer.Commands
             Report(ifcCompositeCurveSegment.ParentCurve, sb);
         }
 
-        private static void Report(IIfcTrimmedCurve trimmed, TextHighliter sb)
-        {  
-            if (trimmed.BasisCurve is IIfcCircle circle)
-            {
-                // difficult to cut some shapes, but we know how to cut a circle
-                Report(circle, trimmed.Trim1, trimmed.Trim2, sb);
-            }
-            else
-                Report(trimmed.BasisCurve, sb);
-        }
-
-        private static void Report(IIfcCircle circle, IItemSet<IIfcTrimmingSelect> trim1, IItemSet<IIfcTrimmingSelect> trim2, TextHighliter sb)
+        private static void Report(IIfcTrimmedCurve ifcCompositeCurveSegment, TextHighliter sb)
         {
-            // this one makes an arc, knowing the circle
-            var v1 = trim1.FirstOrDefault();//  as Xbim.Ifc4.MeasureResource.IfcParameterValue;
-            var v2 = trim2.FirstOrDefault();//  as Xbim.Ifc4.MeasureResource.IfcParameterValue;
-            if (v1 is null || v2 == null || v1 is IIfcCartesianPoint || v2 is IIfcCartesianPoint)
-            {
-                Report(circle, sb);
-                return;
-            }
-            var startang = ((Xbim.Ifc4.MeasureResource.IfcParameterValue)v1) * circle.Model.ModelFactors.AngleToRadiansConversionFactor;
-            var endang = ((Xbim.Ifc4.MeasureResource.IfcParameterValue)v2) * circle.Model.ModelFactors.AngleToRadiansConversionFactor;
-            // in acad we need the start point
-            var startPx = circle.Radius * Math.Cos(startang);
-            var startPy = circle.Radius * Math.Sin(startang);
-
-            SetUcs(sb, circle.Position);
-            sb.Append("ARC C", Brushes.Black);
-            WritePointCoord(sb, 0, 0, 0);
-            WritePointCoord(sb, startPx, startPy, double.NaN);
-            sb.Append("A", Brushes.Black);
-            var presentedEndAngle = (endang - startang) * 180 / Math.PI;
-            sb.Append(presentedEndAngle.ToString(), Brushes.Black);
-            SetUcs(sb);
+            Report(ifcCompositeCurveSegment.BasisCurve, sb);
         }
 
         private static void Report(IIfcCircle cr, TextHighliter sb)
@@ -259,14 +181,17 @@ namespace XbimXplorer.Commands
                 WritePointCoord(sb, as1.Location);
                 WritePointCoord(sb, as1.Axis);
                 WritePointCoord(sb, as1.RefDirection);
-                sb.Append("UCS X 90", Brushes.Black);
-                sb.Append("UCS Y 90", Brushes.Black);
+                sb.Append("UCS", Brushes.Black);
+                sb.Append("x", Brushes.Black);
+                sb.Append("90", Brushes.Black);
             }
             else
             {
                 sb.Append($"{pos.GetType().Name} not implemented in IIfcCurve.", Brushes.Red);
             }
         }
+
+
 
         private static void Report(IIfcCurve obj, TextHighliter sb)
         {
@@ -296,6 +221,33 @@ namespace XbimXplorer.Commands
             }
         }
 
+        internal static TextHighliter Meshed(IPersistEntity item)
+        {
+            var model = item.Model;
+            TextHighliter t = new TextHighliter();
+            using (var geomstore = model.GeometryStore)
+            using (var geomReader = geomstore.BeginRead())
+            {
+
+                foreach (var shapeInstance in geomReader.ShapeInstancesOfEntity(item).Where(x => x.RepresentationType != XbimGeometryRepresentationType.OpeningsAndAdditionsExcluded))
+                {
+                    IXbimShapeGeometryData shapegeom = geomReader.ShapeGeometry(shapeInstance.ShapeGeometryLabel);
+                    if (shapegeom.Format != (byte)XbimGeometryType.PolyhedronBinary)
+                        continue;
+                    var ms = new MemoryStream(shapegeom.ShapeData);
+                    var br = new BinaryReader(ms);
+                    var tr = br.ReadShapeTriangulation();
+
+                    t.Append("Verices:", Brushes.Black);
+                    foreach (var vertex in tr.Vertices)
+                    {
+                        t.Append($"{vertex.X}, {vertex.Y}, {vertex.Z}", Brushes.Black);
+                    }
+                }
+            }
+            return t;
+        }
+
         private static void Report(IIfcSweptDiskSolid obj, TextHighliter sb)
         {
             Report((IIfcCurve)obj.Directrix, sb);
@@ -304,62 +256,25 @@ namespace XbimXplorer.Commands
         internal static TextHighliter ReportAcadScript(IPersistEntity obj)
         {
             var sb = new TextHighliter();
-
-            if (obj is IIfcGeometricRepresentationItem cnv)
-            {
-                Report(cnv, sb);
-            }
-            else if (obj is IIfcClosedShell)
+            if (obj is IIfcClosedShell)
                 Report((IIfcClosedShell)obj, sb);
-            else if (obj is IIfcPolyLoop)
+            if (obj is IIfcPolyLoop)
                 Report((IIfcPolyLoop)obj, sb);
-            else if (obj is IIfcSweptDiskSolid)
+            if (obj is IIfcCurve)
+                Report((IIfcCurve)obj, sb);
+            if (obj is IIfcSweptDiskSolid)
                 Report((IIfcSweptDiskSolid)obj, sb);
-            else if (obj is IIfcProductDefinitionShape)
-                Report((IIfcProductDefinitionShape)obj, sb);
+            if (obj is IIfcTessellatedFaceSet)
+                Report((IIfcTessellatedFaceSet)obj, sb);
             else
             {
-                sb.Append($"No information for {obj.GetType()}", Brushes.Black);
+                sb.Append("No information", Brushes.Black);
                 return sb;
             }
             sb.Append("3DORBIT", Brushes.Black);
             sb.Append("", Brushes.Black);
             sb.Append("===", Brushes.Black);
             return sb;
-        }
-
-        private static void Report(IIfcGeometricRepresentationItem obj, TextHighliter sb)
-        {
-            if (obj is IIfcCurve crv)
-                Report(crv, sb);
-            else if (obj is IIfcSolidModel solid)
-                Report(solid, sb);
-            else if (obj is IIfcTessellatedItem tess)
-                Report(tess, sb);
-            else
-                sb.Append($"{obj.GetType().Name} not implemented in IIfcGeometricRepresentationItem.", Brushes.Red);
-        }
-
-        private static void Report(IIfcFacetedBrep obj, TextHighliter sb)
-        {
-            Report(obj.Outer, sb);
-        }
-        
-        private static void Report(IIfcSolidModel obj, TextHighliter sb)
-        {
-            if (obj is IIfcSweptDiskSolid swept)
-                Report(swept, sb);
-            if (obj is IIfcFacetedBrep brep)
-                Report(brep, sb);
-            else
-                sb.Append($"{obj.GetType().Name} not implemented in IIfcSolidModel.", Brushes.Red);
-        }
-        private static void Report(IIfcTessellatedItem obj, TextHighliter sb)
-        {
-            if (obj is IIfcTessellatedFaceSet faceset)
-                Report(faceset, sb);
-            else
-                sb.Append($"{obj.GetType().Name} not implemented in IIfcTessellatedItem.", Brushes.Red);
         }
 
         private static void Report(IIfcTessellatedFaceSet obj, TextHighliter sb)
@@ -407,58 +322,5 @@ namespace XbimXplorer.Commands
                 sb.Append($"", Brushes.Black);
             }
         }
-
-		internal static TextHighliter ReportAsObj(IIfcClosedShell ics)
-		{
-            var sb = new TextHighliter();
-            ReportAsObj(ics, sb);
-            return sb;
-		}
-
-		private static void ReportAsObj(IIfcClosedShell ics, TextHighliter sb)
-		{
-            List<int> vertices = new List<int>(); // entitylabel of the vertex
-            List<int> indices = new List<int>();
-            foreach (var face in ics.CfsFaces)
-            {
-                ReportAsObj(face, sb, vertices, indices);
-            }
-			foreach (var vert in vertices)
-			{
-                var v = ics.Model.Instances[vert] as IIfcCartesianPoint;
-                sb.Append($"v {v.X} {v.Y} {v.Z}", Brushes.Black);
-			}
-            for (int i = 0; i < indices.Count; i += 3)
-            {
-                sb.Append($"f {indices[i]+1} {indices[i + 1]+1} {indices[i + 2]+1}", Brushes.Black);
-            }
-        }
-
-		private static void ReportAsObj(IIfcFace face, TextHighliter sb, List<int> vertices, List<int> indices)
-		{
-			foreach (var bound in face.Bounds)
-			{
-                ReportAsObj(bound, sb, vertices, indices);
-            }
-		}
-
-		private static void ReportAsObj(IIfcFaceBound bound, TextHighliter sb, List<int> vertices, List<int> indices)
-		{
-            if (bound.Bound is IIfcPolyLoop pl)
-            {
-                foreach (var pt in pl.Polygon)
-                {
-                    if (vertices.Contains(pt.EntityLabel))
-					{
-                        indices.Add(vertices.IndexOf(pt.EntityLabel));
-					}
-                    else
-					{
-                        vertices.Add(pt.EntityLabel);
-                        indices.Add(vertices.Count - 1);
-					}
-                }
-            }
-		}
-	}
+    }
 }

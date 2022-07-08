@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using log4net;
 using System;
 using System.Linq;
 using System.Windows.Forms;
@@ -13,19 +13,16 @@ namespace Xbim.WinformsSample
     {
         private WinformsAccessibleControl _wpfControl;
 
+        private static readonly ILog Log = LogManager.GetLogger(typeof(FormExample));
+
         int starting = -1;
 
-        protected ILogger Logger { get; private set; }
-
-
-        public FormExample(ILogger logger = null)
+        public FormExample()
         {
             InitializeComponent();
-            Logger = logger ?? XbimLogging.CreateLogger<FormExample>();
-            //IfcStore.ModelProviderFactory.UseHeuristicModelProvider();
             _wpfControl = new WinformsAccessibleControl();
             _wpfControl.SelectionChanged += _wpfControl_SelectionChanged;
-           
+            
             controlHost.Child = _wpfControl;
         }
 
@@ -70,7 +67,7 @@ namespace Xbim.WinformsSample
                 }
                 catch (Exception geomEx)
                 {
-                    Logger.LogError(0, geomEx, "Failed to create geometry for {filename}", dlgFileName );
+                    Log.Error($"Failed to create geometry for ${dlgFileName}", geomEx);
                 }
             }
             _wpfControl.ModelProvider.ObjectInstance = model;
@@ -94,20 +91,6 @@ namespace Xbim.WinformsSample
                 starting = found.EntityLabel;
             else
                 starting = -1;
-        }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-            _wpfControl.SelectionBehaviour = Presentation.DrawingControl3D.SelectionBehaviours.MultipleSelection;
-
-            var mod = _wpfControl.ModelProvider.ObjectInstance as IfcStore;
-            if (mod == null)
-                return;
-            var found = mod.Instances.OfType<IIfcWallStandardCase>();
-            
-            var sel = new Presentation.EntitySelection(false);
-            sel.AddRange(found);
-            _wpfControl.Selection = sel;
         }
     }
 }

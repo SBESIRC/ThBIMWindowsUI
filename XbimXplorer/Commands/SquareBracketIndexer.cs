@@ -16,8 +16,7 @@ namespace XbimXplorer.Commands
             {
                 string[] cut = start.Split(new char[] { '[', ']' }, StringSplitOptions.RemoveEmptyEntries);
                 Property = cut[0];
-                if (cut.Length > 0)
-                    int.TryParse(cut[1], out Index);
+                int.TryParse(cut[1], out Index);
             }
         }
 

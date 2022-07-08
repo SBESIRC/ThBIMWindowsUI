@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Windows;
-using Xbim.Ifc;
 
 namespace XbimXplorer.Dialogs
 {

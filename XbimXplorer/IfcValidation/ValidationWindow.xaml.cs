@@ -76,7 +76,7 @@ namespace XbimXplorer.IfcValidation
                 ctrl.IgnoreNextSelectionChange = false;
                 return;
             }
-            var validator = new Validator()
+            var validator = new IfcValidator()
             {
                 CreateEntityHierarchy = true,
                 ValidateLevel = ValidationFlags.All
@@ -104,7 +104,7 @@ namespace XbimXplorer.IfcValidation
         {
             using (var cursor = new WaitCursor())
             {
-                var validator = new Validator()
+                var validator = new IfcValidator()
                 {
                     CreateEntityHierarchy = true,
                     ValidateLevel = ValidationFlags.All

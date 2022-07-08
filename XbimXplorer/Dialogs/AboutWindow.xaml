@@ -3,12 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="AboutWindow" Height="340" Width="600" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" WindowStyle="None"
         Deactivated="AboutWindow_OnDeactivated"
-        MouseLeftButtonDown="UserControl_MouseLeftButtonDown" Icon="pack://siteoforigin:,,,/xBIM.ico"
+        MouseLeftButtonDown="UserControl_MouseLeftButtonDown"
         >
     <Border Padding="5" BorderBrush="Black" BorderThickness="1">
         <Grid >
 
-            
+            <Image x:Name="Logo" HorizontalAlignment="Left" Height="50" Margin="424,10,10,10" VerticalAlignment="Top" Width="50" Stretch="None"/>
+
             <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="xBIM Xplorer" VerticalAlignment="Top" FontSize="24" />
             <TextBlock Margin="10,42,0,0" TextWrapping="Wrap">This application is a demonstrator of the xBIM toolkit.</TextBlock>
             <TabControl Margin="10,65,10,10">
@@ -18,6 +19,10 @@
                             The xBIM toolkit is an Open Source software initiative to help software developers and
                             researchers to support the next generation of BIM tools. Unlike other open source application
                             xBIM license is compatible with commercial environments.
+                        </TextBlock>
+                        <TextBlock Foreground="Red" Margin="0,3" TextWrapping="Wrap" >
+                            <Bold>This version is obsolete</Bold>, you can continue to use it for legacy purposes, otherwise  
+                            <Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="http://www.overarching.it/dload/XbimXplorer5/Setup.exe">download the current version</Hyperlink>.
                         </TextBlock>
                         <TextBlock Margin="0,3" >
                             <Hyperlink RequestNavigate="Link_RequestNavigate" NavigateUri="https://github.com/xBimTeam/XbimEssentials/blob/master/LICENCE.md">
@@ -40,10 +45,6 @@
                     <TextBox VerticalScrollBarVisibility="Auto" Margin="10" Text="{Binding ModelInfo, Mode=OneWay}" />
                 </TabItem>
             </TabControl>
-
-            <Image x:Name="Logo" HorizontalAlignment="right" Height="64" Margin="441,10,10,0" VerticalAlignment="Top" Width="64" Stretch="Fill"/>
-
-
         </Grid>
     </Border>
 

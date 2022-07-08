@@ -9,7 +9,7 @@
     xmlns:viewModels="clr-namespace:Xbim.Ifc.ViewModels;assembly=Xbim.Ifc"
     Title="TianHua Bim Xplorer" Height="600" Width="800" 
     x:Name="MainWindow"
-    ContentRendered="RenderedEvents" Icon="pack://siteoforigin:,,,/xBIM.ico" 
+    ContentRendered="RenderedEvents" Icon="xBIM.ico" 
     Closing="XplorerMainWindow_Closing" >
     <Window.Resources>
         <ObjectDataProvider x:Key="ModelProvider"  IsInitialLoadEnabled="False" ></ObjectDataProvider>
@@ -78,6 +78,11 @@
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0" >
+            <Menu.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <DockPanel HorizontalAlignment="Stretch"/>
+                </ItemsPanelTemplate>
+            </Menu.ItemsPanel>
             <MenuItem Header="_File">
                 <MenuItem Header="_Open" Command="Open" ToolTip="Load a single Ifc, Xbim, IfcZip or IfcXML file." />
                 <MenuItem Header="_Reload model" Command="Refresh"/>
@@ -103,14 +108,11 @@
                     <MenuItem Header="Styler _Configuration" Click="ConfigureStyler" />
                     <MenuItem Header="IfcSpaces only" Click="StylerIfcSpacesOnly" />
                     <MenuItem Header="Display bounding corners" Click="SetStylerBoundCorners" />
-                    <MenuItem Header="Set Random Styler (slow)" Click="SetRandomStyler" />
                 </MenuItem>
-                <MenuItem Header="Selection">
+                <MenuItem Header="Selection view _mode">
                     <MenuItem x:Name="WholeMesh" Header="Whole mesh" Click="SelectionMode" IsChecked="True" />
                     <MenuItem x:Name="Normals" Header="Normals" Click="SelectionMode" />
                     <MenuItem x:Name="WireFrame" Header="WireFrame" Click="SelectionMode" />
-					<Separator Visibility="Visible"/>
-					<MenuItem x:Name="SelectionColorCycleMenu" Header="Cycle color" Click="SelectionColorCycle" />
                 </MenuItem>
                 <MenuItem Header="_Zoom">
                     <MenuItem Header="Zoom _Extents" Click="MenuItem_ZoomExtents"/>
@@ -168,6 +170,7 @@
                 -->
             </MenuItem>
             <MenuItem Header="_About" Click="About_Click"/>
+            <MenuItem Header="_UPDATE AVAILABLE" Foreground="Red" HorizontalAlignment="Right" Click="About_Click"/>
         </Menu>
 
         <avalonDock:DockingManager Grid.Row="1" x:Name="DockingManager">
@@ -206,24 +209,7 @@
                     <avalonDock:LayoutDocumentPane x:Name="MainDocPane">
                         <avalonDock:LayoutDocument  CanClose="False" Title="3D View">
                             <Grid Background="White" x:Name ="GridEngine" GotFocus="GridEngine_GotFocus">
-                                <!--<xbim:DrawingControl3D
-                                x:Name="DrawingControl" 
-                                   SelectedEntity="{Binding Path=SelectedItem, ElementName=MainWindow, Mode=TwoWay}"    
-                                   Model ="{Binding}" 
-                                   Focusable="True" 
-                                   Width="Auto" 
-                                   Height="Auto" 
-
-                                   MouseDoubleClick="SpatialControl_MouseDoubleClick"
-                                   WcsAdjusted="{x:Static local:App.ContextWcsAdjustment}"
-                                   >
-                                    <xbim:DrawingControl3D.Background>
-                                        <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-                                            <GradientStop Color="#FFB9B1B1" Offset="1"/>
-                                            <GradientStop Color="#FFFAF8FF"/>
-                                        </LinearGradientBrush>
-                                    </xbim:DrawingControl3D.Background>
-                                </xbim:DrawingControl3D>-->
+                                
                             </Grid>
                         </avalonDock:LayoutDocument>
                     </avalonDock:LayoutDocumentPane>
@@ -231,9 +217,7 @@
             </avalonDock:LayoutRoot>
         </avalonDock:DockingManager>
 
-       
-
-        <Grid Grid.Row="2" Margin="0,5" x:Name="CommandBox" >
+        <Grid Grid.Row="2" Margin="0,5" x:Name="CommandBox" Visibility="Collapsed" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
@@ -243,9 +227,9 @@
         </Grid>
         
         <StatusBar Grid.Row="3" Height="23"  Name="StatusBar" VerticalAlignment="Top" >
-            <!--<StatusBarItem>
+            <StatusBarItem>
                 <etb:EditableTextBlock x:Name="EntityLabel" ValueSet="EntityLabel_KeyDown"></etb:EditableTextBlock>
-            </StatusBarItem>-->
+            </StatusBarItem>
             <StatusBarItem Visibility="Visible">
                 <Slider x:Name="ModelOpacity"  Minimum="0.1" Maximum="1.0" Value="{Binding Path=ModelOpacity, ElementName=DrawingControl}" Width="100" LargeChange=".01">
                     <Slider.LayoutTransform>
@@ -274,6 +258,5 @@
                 </Grid>
             </StatusBarItem>
         </StatusBar>
-        
     </Grid>
 </Window>

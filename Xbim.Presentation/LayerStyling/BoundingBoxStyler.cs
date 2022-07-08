@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -7,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media.Media3D;
+using log4net;
 using Xbim.Common;
 using Xbim.Common.Federation;
 using Xbim.Common.Geometry;
@@ -20,17 +20,12 @@ namespace Xbim.Presentation.LayerStyling
     /// </summary>
     public class BoundingBoxStyler : ILayerStyler, IProgressiveLayerStyler
     {
+        protected static readonly ILog Log = LogManager.GetLogger("Xbim.Presentation.LayerStyling.BoundingBoxStyler");
+
         public event ProgressChangedEventHandler ProgressChanged;
 
         readonly XbimColourMap _colourMap = new XbimColourMap();
-
-        protected ILogger Logger { get; private set; }
-
-        public BoundingBoxStyler(ILogger logger = null)
-        {
-            Logger = logger ?? XbimLogging.CreateLogger<BoundingBoxStyler>();
-        }
-
+        
         /// <summary>
         /// This version uses the new Geometry representation
         /// </summary>
@@ -38,20 +33,12 @@ namespace Xbim.Presentation.LayerStyling
         /// <param name="modelTransform">The transform to place the models geometry in the right place</param>
         /// <param name="opaqueShapes"></param>
         /// <param name="transparentShapes"></param>
-        /// <param name="isolateInstances">List of instances to be isolated</param>
-        /// <param name="hideInstances">List of instances to be hidden</param>
-        /// <param name="excludeTypes">List of type to exclude, by default excplict openings and spaces are excluded if exclude = null</param>
-        /// <param name="selectContexts">Selected Contexts</param>
+        /// <param name="exclude">List of type to exclude, by default excplict openings and spaces are excluded if exclude = null</param>
         /// <returns></returns>
-        public XbimScene<WpfMeshGeometry3D, WpfMaterial> BuildScene(IModel model, XbimMatrix3D modelTransform,
-			ModelVisual3D opaqueShapes, ModelVisual3D transparentShapes, List<IPersistEntity> isolateInstances = null,
-			List<IPersistEntity> hideInstances = null, List<Type> excludeTypes = null,
-			List<IIfcGeometricRepresentationContext> selectContexts = null)
-		{
-            var excludedTypes = model.DefaultExclusions(excludeTypes);
-            var onlyInstances = isolateInstances?.Where(i => i.Model == model).ToDictionary(i => i.EntityLabel);
-            var hiddenInstances = hideInstances?.Where(i => i.Model == model).ToDictionary(i => i.EntityLabel);
-            var selectedContexts = selectContexts?.Where(i => i.Model == model).ToDictionary(i => i.EntityLabel);
+        public XbimScene<WpfMeshGeometry3D, WpfMaterial> BuildScene(IModel model, XbimMatrix3D modelTransform, ModelVisual3D opaqueShapes, ModelVisual3D transparentShapes,
+            List<Type> exclude = null)
+        {
+            var excludedTypes = model.DefaultExclusions(exclude);
 
             var scene = new XbimScene<WpfMeshGeometry3D, WpfMaterial>(model);
             var timer = new Stopwatch();
@@ -85,10 +72,10 @@ namespace Xbim.Presentation.LayerStyling
                     }
                     var prog = 0;
                     var lastProgress = 0;
-
+                    
                     // !typeof (IfcFeatureElement).IsAssignableFrom(IfcMetaData.GetType(s.IfcTypeId)) /*&&
                     // !typeof(IfcSpace).IsAssignableFrom(IfcMetaData.GetType(s.IfcTypeId))*/);
-                    foreach (var shapeInstance in shapeInstances.FilterShapes(onlyInstances, hiddenInstances, selectedContexts))
+                    foreach (var shapeInstance in shapeInstances)
                     {
                         // logging 
                         var currentProgress = 100 * prog++ / tot;
@@ -142,7 +129,7 @@ namespace Xbim.Presentation.LayerStyling
                     }
                 }
             }
-            Logger.LogDebug("Time to load visual components: {0:F3} seconds", timer.Elapsed.TotalSeconds);
+            Log.DebugFormat("Time to load visual components: {0:F3} seconds", timer.Elapsed.TotalSeconds);
 
             ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(0, "Ready"));
             return scene;
@@ -296,10 +283,5 @@ namespace Xbim.Presentation.LayerStyling
         {
             
         }
-
-		public void Clear()
-		{
-			// nothing to do for clearing this style
-		}
-	}
+    }
 }

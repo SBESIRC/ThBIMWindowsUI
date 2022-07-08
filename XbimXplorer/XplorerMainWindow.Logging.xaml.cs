@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows;
+using log4net;
 using XbimXplorer.LogViewer;
 
 namespace XbimXplorer
 {
     public partial class XplorerMainWindow
     {
-        public InMemoryLogSink LogSink { get; private set; }
-
+        private static readonly ILog Log = LogManager.GetLogger("Xbim.WinUI");
+        
         public Visibility AnyErrors
         {
             get
@@ -34,9 +34,12 @@ namespace XbimXplorer
 
         public int NumWarnings { get; private set; }
 
+        private EventAppender _appender;
+
+
         public ObservableCollection<EventViewModel> LoggedEvents { get; private set; }
 
-        internal void LogEvent_Added(object sender, LogEventArgs e)
+        internal void appender_Logged(object sender, LogEventArgs e)
         {
             foreach (var loggingEvent in e.LoggingEvents)
             {
@@ -51,22 +54,24 @@ namespace XbimXplorer
 
         internal void UpdateLoggerCounts()
         {
-            var prevErr = NumErrors;
-            var prevWar = NumWarnings;
-
-            NumErrors = LoggedEvents.Count(x => x.Level == "Error");
-            NumWarnings = LoggedEvents.Count(x => x.Level == "Warning");
-
-            if (NumErrors != prevErr)
+            NumErrors = 0;
+            NumWarnings = 0;
+            foreach (var loggedEvent in LoggedEvents)
             {
-                OnPropertyChanged("AnyErrors");
-                OnPropertyChanged("NumErrors");
+                switch (loggedEvent.Level)
+                {
+                    case "ERROR":
+                        NumErrors++;
+                        break;
+                    case "WARN":
+                        NumWarnings++;
+                        break;
+                }
             }
-            if (NumWarnings != prevWar)
-            {
-                OnPropertyChanged("AnyWarnings");
-                OnPropertyChanged("NumWarnings");
-            }
+            OnPropertyChanged("AnyErrors");
+            OnPropertyChanged("NumErrors");
+            OnPropertyChanged("AnyWarnings");
+            OnPropertyChanged("NumWarnings");
         }
     }
 }

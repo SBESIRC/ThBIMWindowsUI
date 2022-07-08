@@ -1,3 +1,0 @@
-[submodule "render-engine"]
-	path = render-engine
-url=https://github.com/tianhua-ai-center/ifc-render-engine.git

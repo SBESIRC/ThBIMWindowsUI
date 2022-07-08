@@ -1,11 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
+using log4net;
+using NuGet;
 using Xbim.Presentation.XplorerPluginSystem;
 
 namespace XbimXplorer.LogViewer
@@ -17,21 +18,15 @@ namespace XbimXplorer.LogViewer
         "View/Developer/Information Log", "LogViewer/LogViewer.png")]
     public partial class LogViewer : IXbimXplorerPluginWindow
     {
-        private const string VerboseString = "Verbose";
-        private const string DebugString = "Debug";
-        private const string InfoString = "Information";
-        private const string WarningString = "Warning";
-
         private XplorerMainWindow _mw;
 
-        protected ILogger Logger { get; private set; }
+        private static readonly ILog Log = LogManager.GetLogger("Xbim.WinUI");
 
         public ObservableCollection<EventViewModel> LoggedEvents { get; set; }
         
         public LogViewer()
         {
             InitializeComponent();
-            Logger = XplorerMainWindow.LoggerFactory.CreateLogger<LogViewer>();
             WindowTitle = "Information Log";
            
             DataContext = this;
@@ -49,7 +44,7 @@ namespace XbimXplorer.LogViewer
 
         private void Test(object sender, RoutedEventArgs e)
         {
-            Logger.LogDebug("Test");
+            Log.Debug("Test");
         }
 
         private void Clear(object sender, RoutedEventArgs e)
@@ -84,9 +79,8 @@ namespace XbimXplorer.LogViewer
         {
             if (Verbose.IsChecked != null && Verbose.IsChecked.Value)
             {
-                sb.AppendFormat("==== {0}\t{1}\t{2}\r\n{3}\r\n{4}\r\n{5}\r\n\r\n",
+                sb.AppendFormat("==== {0}\t{1}\t{2}\r\n{3}\r\n{4}\r\n\r\n",
                     eventViewModel.TimeStamp,
-                    eventViewModel.ThreadId,
                     eventViewModel.Level,
                     eventViewModel.Logger,
                     eventViewModel.Message,
@@ -103,17 +97,9 @@ namespace XbimXplorer.LogViewer
             }
         }
 
-        private void ClearVerbose(object sender, RoutedEventArgs e)
-        {
-            LoggedEvents.RemoveAll(x => x.Level == VerboseString);
-            if (_mw == null)
-                return;
-            _mw.UpdateLoggerCounts();
-        }
-
         private void ClearDebug(object sender, RoutedEventArgs e)
         {
-            LoggedEvents.RemoveAll(x => x.Level == DebugString || x.Level == VerboseString);
+            LoggedEvents.RemoveAll(x => x.Level == "DEBUG");
             if (_mw == null)
                 return;
             _mw.UpdateLoggerCounts();
@@ -122,10 +108,9 @@ namespace XbimXplorer.LogViewer
         private void ClearWarning(object sender, RoutedEventArgs e)
         {
             LoggedEvents.RemoveAll(x =>
-                x.Level == VerboseString
-                || x.Level == DebugString
-                || x.Level == InfoString
-                || x.Level == WarningString
+                x.Level == "DEBUG"
+                || x.Level == "INFO"
+                || x.Level == "WARN"
                 );
             if (_mw == null)
                 return;
@@ -139,10 +124,9 @@ namespace XbimXplorer.LogViewer
 
         private void ClearInformation(object sender, RoutedEventArgs e)
         {
-            LoggedEvents.RemoveAll(x =>
-                x.Level == VerboseString
-                || x.Level == DebugString
-                || x.Level == InfoString
+            LoggedEvents.RemoveAll(x => 
+                x.Level == "DEBUG"
+                || x.Level == "INFO"
                 );
             if (_mw == null)
                 return;
@@ -171,11 +155,17 @@ namespace XbimXplorer.LogViewer
                 int eLabel;
                 if (!int.TryParse(mEntityLabel.Groups[1].Value, out eLabel))
                     return;
-
-                var ipers = _mw.Model.Instances[eLabel];
-                if (ipers == null)
-                    return;
-                _mw.SelectedItem = ipers;
+                try
+                {
+                    var ipers = _mw.Model.Instances[eLabel];
+                    if (ipers == null)
+                        return;
+                    _mw.SelectedItem = ipers;
+                }
+                catch (Exception)
+                {
+                    // ignored exception   
+                }
             }
 
             var reUrl = new Regex(@"(http([^ ]+))", RegexOptions.IgnoreCase);

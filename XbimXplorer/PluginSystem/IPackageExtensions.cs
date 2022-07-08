@@ -1,6 +1,7 @@
 ﻿using System.IO;
+using ICSharpCode.SharpZipLib.Core;
+using ICSharpCode.SharpZipLib.Zip;
 using NuGet;
-using Ionic.Zip;
 
 namespace XbimXplorer.PluginSystem
 {
@@ -14,31 +15,41 @@ namespace XbimXplorer.PluginSystem
         /// <returns>true if successful, false if fail.</returns>
         internal static bool ExtractManifestFile(this IPackage package, string targetFileName)
         {
-
-            using (var fs = package.GetStream())
+            ZipFile zf = null;
+            try
             {
-
-                using (var zf = ZipFile.Read(fs))
+                using (var fs = package.GetStream())
                 {
+                    zf = new ZipFile(fs);    
                     foreach (ZipEntry zipEntry in zf)
                     {
-                        if (zipEntry.IsDirectory)
+                        if (!zipEntry.IsFile)
                         {
                             continue; // Ignore directories
                         }
-                        var entryFileName = zipEntry.FileName;
+                        var entryFileName = zipEntry.Name;
                         var extension = Path.GetExtension(entryFileName);
                         if (extension == null || extension.ToLowerInvariant() != ".nuspec")
-                            continue;
-
-                        zipEntry.FileName = Path.GetFileName(targetFileName);
-                        zipEntry.Extract(Path.GetDirectoryName(targetFileName), ExtractExistingFileAction.OverwriteSilently);
-
+                            continue;                          
+                        var buffer = new byte[4096]; // 4K is optimum
+                        var zipStream = zf.GetInputStream(zipEntry);
+                        
+                        using (var streamWriter = File.Create(targetFileName))
+                        {
+                            StreamUtils.Copy(zipStream, streamWriter, buffer);
+                        }
                         return true;
                     }
                 }
             }
-
+            finally
+            {
+                if (zf != null)
+                {
+                    zf.IsStreamOwner = true; // Makes close also shut the underlying stream
+                    zf.Close(); // Ensure we release resources
+                }
+            }
             return false;
         }
     }

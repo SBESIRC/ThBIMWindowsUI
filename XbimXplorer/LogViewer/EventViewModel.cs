@@ -1,55 +1,30 @@
-﻿using Serilog.Events;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.ServiceModel.Channels;
 using System.Text;
 
 namespace XbimXplorer.LogViewer
 {
     public class EventViewModel
     {
-        private LogEvent loggingEvent;
+        private log4net.Core.LoggingEvent loggingEvent;
 
-        public EventViewModel(LogEvent loggingEvent)
+        public EventViewModel(log4net.Core.LoggingEvent loggingEvent)
         {
             this.loggingEvent = loggingEvent;
         }
 
+
         public string Logger
         {
-            get { return loggingEvent.Properties.TryGetValue("SourceContext", out LogEventPropertyValue value) 
-                    ? GetTextValue(value) 
-                    : "<Global>"; }
-        }
-
-        public int ThreadId
-        {
-            get
-            {
-                return loggingEvent.Properties.TryGetValue("ThreadId", out LogEventPropertyValue value)
-                  ? GetIntValue(value)
-                  : 0;
-            }
-        }
-
-        private string GetTextValue(LogEventPropertyValue value)
-        {
-            if (value is ScalarValue scalar)
-            {
-                return scalar.Value.ToString();
-            }
-            return "";
-        }
-
-        private int GetIntValue(LogEventPropertyValue value)
-        {
-            if (value is ScalarValue scalar)
-            {
-                return (int)scalar.Value;
-            }
-            return 0;
+            get { return loggingEvent.LoggerName; }
         }
 
         public string Message
         {
-            get { return loggingEvent.RenderMessage(); }
+            get { return loggingEvent.RenderedMessage; }
             
         }
 
@@ -62,10 +37,10 @@ namespace XbimXplorer.LogViewer
         {
             get
             {
-                if (loggingEvent.Exception == null)
+                if (loggingEvent.ExceptionObject == null)
                     return "";
                 var sb = new StringBuilder();
-                var ex = loggingEvent.Exception;
+                var ex = loggingEvent.ExceptionObject;
                 string stackTrace = ex.StackTrace;
                 while (ex != null)
                 {
@@ -77,7 +52,7 @@ namespace XbimXplorer.LogViewer
             }
         }
         public string TimeStamp {
-            get { return loggingEvent.Timestamp.ToString("t"); }
+            get { return loggingEvent.TimeStamp.ToShortTimeString(); }
         }
 
         public string Summary
@@ -92,11 +67,6 @@ namespace XbimXplorer.LogViewer
                     ErrorMessage
                     );
             }
-        }
-
-        public override string ToString()
-        {
-            return Summary;
         }
     }
 }

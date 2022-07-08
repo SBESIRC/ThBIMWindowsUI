@@ -11,6 +11,7 @@ using Xbim.Common.Geometry;
 using Xbim.Common.XbimExtensions;
 using Xbim.Ifc4.Interfaces;
 using Xbim.ModelGeometry.Scene;
+using Xbim.Presentation.Modelpositioning;
 
 namespace Xbim.Presentation
 {
@@ -99,48 +100,24 @@ namespace Xbim.Presentation
             return tgt;
         }
 
-        // attempting to load the shapeGeometry from the database; 
-        // 
-        public static WpfMeshGeometry3D GetGeometry(IIfcShapeRepresentation rep, XbimModelPositioningCollection positions, Material mat, bool wcsAdjust)
+        /// <summary>
+        /// attempting to load the shapeGeometry from the database; 
+        /// </summary>
+        public static WpfMeshGeometry3D GetGeometry(IIfcShapeRepresentation rep, Dictionary<IModel, XbimMatrix3D> positions, Material mat)
         {
             var productContexts = rep.OfProductRepresentation?.OfType<IIfcProductDefinitionShape>().SelectMany(x => x.ShapeOfProduct);
             var representationLabels = rep.Items.Select(x => x.EntityLabel);
             var selModel = rep.Model;
-            var modelTransform = positions[selModel].Transform;
+            var modelTransform = positions[selModel];
 
-            return GetRepresentationGeometry(mat, productContexts, representationLabels, selModel, modelTransform, wcsAdjust);
+            return GetRepresentationGeometry(mat, productContexts, representationLabels, selModel, modelTransform);
         }
 
-
-        internal static WpfMeshGeometry3D GetRepresentationGeometry2(Material mat, IEnumerable<int> representationLabels, IModel selModel, XbimMatrix3D modelTransform, bool wcsAdjust, XbimShapeGeometry shapegeom, IIfcProduct contextualProduct)
+        /// <summary>
+        /// attempting to load the shapeGeometry from the database; 
+        /// </summary>
+        internal static WpfMeshGeometry3D GetRepresentationGeometry(Material mat, IEnumerable<IIfcProduct> productContexts, IEnumerable<int> representationLabels, IModel selModel, XbimMatrix3D modelTransform)
         {
-            var placementTree = new XbimPlacementTree(selModel, wcsAdjust);
-            var trsf = placementTree[contextualProduct.ObjectPlacement.EntityLabel];
-            var tgt = new WpfMeshGeometry3D(mat, mat);
-            tgt.BeginUpdate();
-            if (shapegeom.Format == XbimGeometryType.PolyhedronBinary)
-            {
-                // Debug.WriteLine($"adding {shapegeom.ShapeLabel} at {DateTime.Now.ToLongTimeString()}");
-                var transform = trsf * modelTransform;
-                tgt.Add(
-                    ((IXbimShapeGeometryData)shapegeom).ShapeData,
-                    contextualProduct.ExpressType.TypeId, // shapeInstance.IfcTypeId,
-                    contextualProduct.EntityLabel, // shapeInstance.IfcProductLabel,
-                    -1, // shapeInstance.InstanceLabel,
-                    transform,
-                    (short)contextualProduct.Model.UserDefinedId
-                );
-
-            }
-            tgt.EndUpdate();
-            return tgt;
-        }
-
-        // attempting to load the shapeGeometry from the database; 
-        // 
-        internal static WpfMeshGeometry3D GetRepresentationGeometry(Material mat, IEnumerable<IIfcProduct> productContexts, IEnumerable<int> representationLabels, IModel selModel, XbimMatrix3D modelTransform, bool wcsAdjust)
-        {
-            var placementTree = new XbimPlacementTree(selModel, wcsAdjust);
             var tgt = new WpfMeshGeometry3D(mat, mat);
             tgt.BeginUpdate();
             using (var geomstore = selModel.GeometryStore)
@@ -149,7 +126,8 @@ namespace Xbim.Presentation
                 var matchingGeometries = geomReader.ShapeGeometries.Where(x => representationLabels.Contains(x.IfcShapeLabel));
                 foreach (var contextualProduct in productContexts)
                 {
-                    var trsf = placementTree[contextualProduct.ObjectPlacement.EntityLabel];
+                    var t = geomReader.ShapeInstancesOfEntity(contextualProduct).FirstOrDefault();
+                    var trsf = t.Transformation;
                     foreach (IXbimShapeGeometryData shapegeom in matchingGeometries)
                     {
                         if (shapegeom.Format != (byte)XbimGeometryType.PolyhedronBinary)
@@ -158,7 +136,7 @@ namespace Xbim.Presentation
                         var transform = trsf * modelTransform;
                         tgt.Add(
                             shapegeom.ShapeData,
-                            contextualProduct.ExpressType.TypeId, // shapeInstance.IfcTypeId,
+                            453, // shapeInstance.IfcTypeId,
                             contextualProduct.EntityLabel, // shapeInstance.IfcProductLabel,
                             -1, // shapeInstance.InstanceLabel,
                             transform,
@@ -171,36 +149,67 @@ namespace Xbim.Presentation
             return tgt;
         }
 
-        public static WpfMeshGeometry3D GetGeometry(EntitySelection selection, XbimModelPositioningCollection positions, Material mat)
+        /// <summary>
+        /// attempting to load the shapeGeometry from the database; 
+        /// </summary>
+        internal static WpfMeshGeometry3D GetRepresentationGeometry(Material mat, IEnumerable<IIfcProduct> productContexts, IXbimShapeGeometryData shapegeom, IModel selModel, XbimMatrix3D modelTransform)
+        {
+            StoreMeshingModeDetector p = new StoreMeshingModeDetector(selModel);
+            XbimPlacementTree pt = new XbimPlacementTree(selModel, p.WcsAdjustmentStatus == StoreMeshingModeDetector.WcsAdjustmentStatusEnum.Adjusted);
+            var tgt = new WpfMeshGeometry3D(mat, mat);
+            tgt.BeginUpdate();
+            foreach (var contextualProduct in productContexts)
+            {
+                var trsf = pt[contextualProduct.ObjectPlacement.EntityLabel];
+                // var trsf = XbimMatrix3D.Identity;
+                var disp = ((XbimShapeGeometry)shapegeom).TempOriginDisplacement;
+                var mt = XbimMatrix3D.CreateTranslation(disp.X, disp.Y, disp.Z);
+                trsf = XbimMatrix3D.Multiply(mt, trsf);
+
+                if (shapegeom.Format != (byte)XbimGeometryType.PolyhedronBinary)
+                    continue;
+                var transform = trsf * modelTransform;
+                tgt.Add(
+                    shapegeom.ShapeData,
+                    453, // shapeInstance.IfcTypeId,
+                    contextualProduct.EntityLabel, // shapeInstance.IfcProductLabel,
+                    -1, // shapeInstance.InstanceLabel,
+                    transform,
+                    (short)contextualProduct.Model.UserDefinedId
+                );
+            }
+            tgt.EndUpdate();
+            return tgt;
+        }
+
+
+        public static WpfMeshGeometry3D GetGeometry(EntitySelection selection, Dictionary<IModel, XbimMatrix3D> positions, Material mat)
         {
             var tgt = new WpfMeshGeometry3D(mat, mat);
             tgt.BeginUpdate();
             foreach (var modelgroup in selection.GroupBy(i => i.Model))
             {
                 var model = modelgroup.Key;
-                var modelTransform = positions[model]?.Transform;
-                if (modelTransform != null)
+                var modelTransform = positions[model];
+                using (var geomstore = model.GeometryStore)
+                using (var geomReader = geomstore.BeginRead())
                 {
-                    using (var geomstore = model.GeometryStore)
-                    using (var geomReader = geomstore.BeginRead())
+                    foreach (var item in modelgroup)
                     {
-                        foreach (var item in modelgroup)
+                        foreach (var shapeInstance in geomReader.ShapeInstancesOfEntity(item).Where(x => x.RepresentationType != XbimGeometryRepresentationType.OpeningsAndAdditionsExcluded))
                         {
-                            foreach (var shapeInstance in geomReader.ShapeInstancesOfEntity(item).Where(x => x.RepresentationType != XbimGeometryRepresentationType.OpeningsAndAdditionsExcluded))
-                            {
-                                IXbimShapeGeometryData shapegeom = geomReader.ShapeGeometry(shapeInstance.ShapeGeometryLabel);
-                                if (shapegeom.Format != (byte)XbimGeometryType.PolyhedronBinary)
-                                    continue;
-                                var transform = shapeInstance.Transformation * modelTransform;
-                                tgt.Add(
-                                    shapegeom.ShapeData,
-                                    shapeInstance.IfcTypeId,
-                                    shapeInstance.IfcProductLabel,
-                                    shapeInstance.InstanceLabel,
-                                    transform,
-                                    (short)model.UserDefinedId
-                                    );
-                            }
+                            IXbimShapeGeometryData shapegeom = geomReader.ShapeGeometry(shapeInstance.ShapeGeometryLabel);
+                            if (shapegeom.Format != (byte)XbimGeometryType.PolyhedronBinary)
+                                continue;
+                            var transform = shapeInstance.Transformation * modelTransform;
+                            tgt.Add(
+                                shapegeom.ShapeData,
+                                shapeInstance.IfcTypeId,
+                                shapeInstance.IfcProductLabel,
+                                shapeInstance.InstanceLabel,
+                                transform,
+                                (short)model.UserDefinedId
+                                );
                         }
                     }
                 }

@@ -124,25 +124,18 @@ namespace Xbim.Presentation
 
         private IXbimViewModel FindUnderContainingSpace(IPersistEntity newVal, IIfcProduct p)
         {
-            try
+            var containingSpace = p.IsContainedIn;
+            if (containingSpace != null)
             {
-                var containingSpace = p.IsContainedIn;
-                if (containingSpace != null)
+                var containingSpaceView = FindItemBreadthFirst(containingSpace);
+                if (containingSpaceView != null)
                 {
-                    var containingSpaceView = FindItemBreadthFirst(containingSpace);
-                    if (containingSpaceView != null)
+                    var found = FindItemDepthFirst(containingSpaceView, newVal);
+                    if (found != null)
                     {
-                        var found = FindItemDepthFirst(containingSpaceView, newVal);
-                        if (found != null)
-                        {
-                            return found;
-                        }
+                        return found;
                     }
                 }
-            }
-            catch (System.Exception)
-            {
-                // suppressed.
             }
             return null;
         }

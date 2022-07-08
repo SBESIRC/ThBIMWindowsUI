@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
-using NuGet;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using log4net;
+using NuGet;
 
 namespace XbimXplorer.PluginSystem
 {
@@ -21,12 +21,7 @@ namespace XbimXplorer.PluginSystem
         private readonly Dictionary<string, PluginInformation> _diskPlugins =
            new Dictionary<string, PluginInformation>();
 
-        public PluginManagement(Microsoft.Extensions.Logging.ILogger logger = null)
-        {
-            Logger = logger ?? XplorerMainWindow.LoggerFactory.CreateLogger<PluginManagement>();
-        }
-
-        protected static Microsoft.Extensions.Logging.ILogger Logger { get; private set; }
+        private static readonly ILog Log = LogManager.GetLogger("XbimXplorer.PluginSystem.PluginManagement");
 
         internal static IEnumerable<DirectoryInfo> GetPluginDirectories()
         {
@@ -78,7 +73,7 @@ namespace XbimXplorer.PluginSystem
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogError(0, ex, "Error loading plugin manifest from {path}", path);
+                    Log.Error($"Error loading plugin manifest from [{path}]", ex);
                 }
             }
             return tmp;
@@ -98,13 +93,16 @@ namespace XbimXplorer.PluginSystem
             foreach (var package in fnd)
             {
                 // drop develop if latest stable
-                System.Diagnostics.Debug.WriteLine($"Evaluating {package}");
                 if (option == PluginChannelOption.LatestStable && !string.IsNullOrEmpty(package.Version.SpecialVersion))
                 {
                     continue;
                 }
                 // check it is compatible
                 var sel = package.DependencySets.SelectMany(x => x.Dependencies.Where(y => y.Id.StartsWith("Xbim.WindowsUI"))).FirstOrDefault();
+                if (sel.VersionSpec.MinVersion == sel.VersionSpec.MaxVersion || sel.VersionSpec.MaxVersion == null)
+                {
+                    Log.Warn($"Fix plugin requirements for {package.Id} {package.Version}. Requirement is : '{sel.VersionSpec}'; the system needs a version range.");
+                }
                 if (sel != null && sel.VersionSpec.Satisfies(invokingVerion))
                 {
                     tmpPackages.Add(package);
@@ -146,8 +144,6 @@ namespace XbimXplorer.PluginSystem
 
         internal static string GetStartupFileConfig(DirectoryInfo dir)
         {
-            if (dir == null)
-                return "";
             return Path.Combine(dir.FullName, "PluginConfig.xml");
         }
 

@@ -1,38 +1,54 @@
-﻿?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
   <metadata>
     <id>Xbim.WindowsUI</id>
-    <version>5.0.0</version>
+    <!-- 
+      _____                               _               
+     |  __ \                             | |              
+     | |__) |___ _ __ ___   ___ _ __ ___ | |__   ___ _ __ 
+     |  _  // _ \ '_ ` _ \ / _ \ '_ ` _ \| '_ \ / _ \ '__|
+     | | \ \  __/ | | | | |  __/ | | | | | |_) |  __/ |   
+     |_|  \_\___|_| |_| |_|\___|_| |_| |_|_.__/ \___|_|   
+
+     Update PluginSystem\PluginsConfig.xaml.version.cs TOO
+    -->
+    <version>4.0.15</version>
+    <!--
+    ¯\_(ツ)_/¯
+    -->
     <title>xBIM WindowsUI</title>
     <authors>xBIM team</authors>
     <owners>xBIM team</owners>
-    <licenseUrl>https://raw.githubusercontent.com/xBimTeam/XbimEssentials/master/LICENCE.md</licenseUrl>
+    <license type="expression">CDDL-1.0</license>
     <projectUrl>https://github.com/xBimTeam/</projectUrl>
-    <iconUrl>https://avatars1.githubusercontent.com/u/2284875?v=3&amp;s=240</iconUrl>
+    <icon>xbim.jpg</icon>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>
       xBIM is an Open Source Toolkit for developing IFC based applications (BuildingSmart Data model).
       It provides full support for reading and writing geometry, topology and data in accordance with the Ifc2x3, Ifc4 schema.
       xBIM reads and writes Ifc, IfcXMl and IfcZip formats.
-      The xBIM project provides packages to convert IFC models to COBie spreadsheets in both UK and US cultures as well as a range of 
-      3D viewing controls for use with Windows forms, WPF, WEBGL and OpenGL platforms.
+      The xBIM project provides packages to convert IFC models to COBie spreadsheets in both UK and US cultures as well as a range of 3D viewing controls for use with Windows forms, WPF, WEBGL and OpenGL platforms.
+      IOS and Android versions are under development.
     </description>
-    <summary>Xbim.WindowsUI contains a set of Windows Presentation controls that can be used to build Windows Xaml or forms-based applications that can display the geometry and semantic data in IFC models.</summary>
+    <summary>xBIM Windows UI contains a set of MS Windows controls that can be used to build Windows Xaml or forms based applications that can display the geometry and semantic data in IFC models.</summary>
     <releaseNotes>
-      Migrated to v5 of XBIM toolkit. Many improvements to IFC loading and visualisation
-      StrongNaming disabled.
-      Migrated from log4net to Microsoft.Extensions.Logging
+      Minor change to xPlorer project to resolve problems with including geometry build targets
+      Support for Ifc4 and Ifc4Xml added. All Ifc geometries supported.
+      Export to Cobie and WexBim included
     </releaseNotes>
     <language>en-GB</language>
     <tags>BIM, IFC, IfcXml, IfcZip, Ifc4, Cobie, .Net, C#, BuildingSmart</tags>
     <dependencies>
-      <dependency id="Xbim.Geometry" version="5.0.156" />
-      <dependency id="Xbim.Essentials" version="5.0.204" />
-      <dependency id="HelixToolkit.Wpf" version="2015.1.715" />
-      <dependency id="PropertyTools.Wpf" version="2015.1.66" />
+      <group targetFramework="net45">
+        <dependency id="Xbim.Geometry" version="4.0.19" />
+        <dependency id="Xbim.Essentials" version="4.0.32" />
+        <dependency id="HelixToolkit.Wpf" version="2015.1.715" />
+        <dependency id="PropertyTools.Wpf" version="2015.1.66" />
+      </group>
     </dependencies>
   </metadata>
   <files>
+    <file src="xbim.jpg" target="" />
     <file src="Output\Release\Xbim.Presentation.dll" target="lib\net45\Xbim.Presentation.dll" />
     <file src="Output\Release\Xbim.Presentation.xml" target="lib\net45\Xbim.Presentation.xml" />
     <file src="Output\Release\Xbim.Presentation.pdb" target="lib\net45\Xbim.Presentation.pdb" />

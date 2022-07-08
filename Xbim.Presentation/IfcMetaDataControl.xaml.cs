@@ -421,15 +421,6 @@ namespace Xbim.Presentation
             {
                 AddProperty(item, pSet.Name);
             }
-            foreach (var item in pSet.HasProperties.OfType<IIfcPropertyReferenceValue>()) // handle IfcPropertyReferenceValue
-            {
-                switch (item.PropertyReference.GetType().Name)
-                {
-                    case "IfcIrregularTimeSeries":
-                        AddProperty((IIfcIrregularTimeSeries)item.PropertyReference, pSet.Name);
-                        break;
-                }
-            }
         }
 
         private void AddProperty(IIfcPropertyEnumeratedValue item, string groupName)
@@ -464,19 +455,6 @@ namespace Xbim.Presentation
                 Value = val
             });
         }
-        private void AddProperty(IIfcIrregularTimeSeries item, string groupName)
-        {
-            foreach (var value in item.Values)
-            {
-                _properties.Add(new PropertyItem
-                {
-                    IfcLabel = value.EntityLabel,
-                    PropertySetName = groupName + " / " + item.Name,
-                    Name = value.TimeStamp,
-                    Value = string.Join(", ",value.ListValues)
-                }); 
-            }
-        }
 
         private void FillMaterialData()
         {
@@ -510,18 +488,21 @@ namespace Xbim.Presentation
                 //
                 var repItemsLabels = ifcprod.Representation?.Representations?.SelectMany(rep => rep.Items).Select(i => i.EntityLabel).ToList();
 
-                // is there style information too?
-                var styles = ifcprod.Model.Instances.OfType<IIfcStyledItem>().Where(x => repItemsLabels != null && (x.Item != null && repItemsLabels.Contains(x.Item.EntityLabel)));
-                foreach (var style in styles)
+                if (repItemsLabels != null)
                 {
-                    int i = 0;
-                    _materials.Add(new PropertyItem
+                    // is there style information too?
+                    var styles = ifcprod.Model.Instances.OfType<IIfcStyledItem>().Where(x => x.Item != null && repItemsLabels.Contains(x.Item.EntityLabel));
+                    foreach (var style in styles)
                     {
-                        PropertySetName = "Connected Style Items",
-                        Name = $"Connected Style Items[{i++}]",
-                        Value = $"{style.EntityLabel}",
-                        IfcLabel = style.EntityLabel
-                    });
+                        int i = 0;
+                        _materials.Add(new PropertyItem
+                        {
+                            PropertySetName = "Connected Style Items",
+                            Name = $"Connected Style Items[{i++}]",
+                            Value = $"{style.EntityLabel}",
+                            IfcLabel = style.EntityLabel
+                        });
+                    }
                 }
             }
         }
@@ -577,34 +558,18 @@ namespace Xbim.Presentation
 
         private void ReportProp(IPersistEntity entity, ExpressMetaProperty prop, bool verbose)
         {
-            object propVal = null;
-            try
+            var propVal = prop.PropertyInfo.GetValue(entity, null);
+            if (propVal == null)
             {
-                propVal = prop.PropertyInfo.GetValue(entity, null);
-                if (propVal == null)
-                {
-                    if (!verbose)
-                        return;
-                    propVal = "<null>";
-                }
-            }
-            catch (Exception ex)
-            {
-                var tmpVal = "Error:";
-                while (ex != null)
-                {
-                    tmpVal += " " + ex.Message;
-                    ex = ex.InnerException;
-                }
-                if (prop.EntityAttribute.IsEnumerable)
-                    propVal = new[] { tmpVal };
-                else
-                    propVal = tmpVal;
+                if (!verbose)
+                    return;
+                propVal = "<null>";
             }
             
             if (prop.EntityAttribute.IsEnumerable)
             {
                 var propCollection = propVal as System.Collections.IEnumerable;
+
                 if (propCollection != null)
                 {
                     var propVals = propCollection.Cast<object>().ToArray();
@@ -807,8 +772,7 @@ namespace Xbim.Presentation
         public static readonly DependencyProperty ModelProperty =
             DependencyProperty.Register("Model", typeof (IfcStore), typeof (IfcMetaDataControl),
                 new PropertyMetadata(null, OnModelChanged));
-
-
+        
         private static void OnModelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var ctrl = d as IfcMetaDataControl;
@@ -820,8 +784,7 @@ namespace Xbim.Presentation
             }
             ctrl.DataRebind(null);
         }
-
-
+        
         private void Clear(bool clearHistory = true)
         {
             _objectProperties.Clear();
@@ -854,11 +817,17 @@ namespace Xbim.Presentation
                 throw new ArgumentNullException();
             if (e.Uri.Host == "entitylabel")
             {
+                IModel selModel = Model;
+                if (_entity != null)
+                {
+                    // if an entity is selected then start the navigation from the same model.
+                    selModel = _entity.Model;
+                }
                 var lab = e.Uri.AbsolutePath.Substring(1);
                 int iLabel;
                 if (int.TryParse(lab, out iLabel))
                 {
-                    SelectedEntity = Model.Instances[iLabel];
+                    SelectedEntity = selModel.Instances[iLabel];
                 }
             }
         }
@@ -882,21 +851,5 @@ namespace Xbim.Presentation
         }
 
         private readonly HistoryCollection<IPersistEntity> _history = new HistoryCollection<IPersistEntity>(20);
-
-        /// <summary>
-        /// Event for clicking on external hyperlink
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OpenExternalLink(object sender, System.Windows.Input.ExecutedRoutedEventArgs e)
-        {
-            string path = e.Parameter as string;
-            if (path == null)
-                return;
-            System.Diagnostics.Process uriApp = new System.Diagnostics.Process();
-            uriApp.StartInfo.FileName = path;
-            uriApp.Start();
-        }
-        
     }
 }

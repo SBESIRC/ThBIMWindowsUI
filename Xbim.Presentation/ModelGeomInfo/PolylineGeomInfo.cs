@@ -28,8 +28,6 @@ namespace Xbim.Presentation.ModelGeomInfo
 
         private readonly List<PointGeomInfo> _geomPoints;
 
-        public IEnumerable<PointGeomInfo> Points => _geomPoints;
-
         public EntitySelection ParticipatingEntities
         {
             get
@@ -47,17 +45,19 @@ namespace Xbim.Presentation.ModelGeomInfo
         public override string ToString()
         {
             if (_geomPoints.Count == 1)
+                return
+                    $"Selected point coords: {_geomPoints[0].Point.X:0.##}, {_geomPoints[0].Point.Y:0.##}, {_geomPoints[0].Point.Z:0.##})";
+
+            if (_geomPoints.Count == 2)
             {
-                var p = _geomPoints[0].ModelPoint;
-                return $"Selected point coords: {p.X}, {p.Y:0.##}, {p.Z:0.##}";
+                return
+                    $"Lenght: {GetLenght():0.##} [Dx:  {(_geomPoints[1].Point.X - _geomPoints[0].Point.X):0.##}, Dy: {(_geomPoints[1].Point.Y - _geomPoints[0].Point.Y):0.##}, Dz: {(_geomPoints[1].Point.Z - _geomPoints[0].Point.Z):0.##})";
             }
-            else
-            {
-                var d = GetArea();
-                return !double.IsNaN(d)
-                    ? $"Lenght: {GetLenght():0.##}m Area: {d:0.##}sqm"
-                    : $"Lenght: {GetLenght():0.##}m";
-            }
+
+            var d = GetArea();
+            return !double.IsNaN(d) 
+                ? $"Lenght: {GetLenght():0.##}m Area: {d:0.##}sqm"
+                : $"Lenght: {GetLenght():0.##}m";
         }
 
         public PolylineGeomInfo()
@@ -85,14 +85,16 @@ namespace Xbim.Presentation.ModelGeomInfo
                 return double.NaN;
 
             var normal = Normal() * -1;
-            var firstSegment = FirstVector();
+            var firstSegment = FirstSegment();
             var up = XbimVector3D.CrossProduct(normal, firstSegment);
-            var orig = new XbimVector3D(
+            
+            var campos = new XbimVector3D(
                 _geomPoints[0].Point.X,
                 _geomPoints[0].Point.Y,
                 _geomPoints[0].Point.Z
-                );
-            var m = XbimMatrix3D.CreateLookAt(orig, orig + normal, up);
+                ); 
+            var target = campos + normal;
+            var m = XbimMatrix3D.CreateLookAt(campos, target, up);
 
 
             var point = new XbimPoint3D[Count()];
@@ -121,7 +123,7 @@ namespace Xbim.Presentation.ModelGeomInfo
             return area;
         }
 
-        private XbimVector3D FirstVector()
+        private XbimVector3D FirstSegment()
         {
             var ret = _geomPoints[1].Point - _geomPoints[0].Point;
             return new XbimVector3D(ret.X, ret.Y, ret.Z);

@@ -62,13 +62,13 @@
     <Compile Include="Win32.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GLFW.NET\GLFW.NET.csproj">
-      <Project>{319f9cf5-6012-4bcd-b2c8-a45c3d62da23}</Project>
-      <Name>GLFW.NET</Name>
-    </ProjectReference>
+    <Folder Include="Mathematics\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Mathematics\" />
+    <ProjectReference Include="..\GLFW.NET\GLFW.NET.csproj">
+      <Project>{a3b6bce8-fb82-472f-b5c6-26f4913be501}</Project>
+      <Name>GLFW.NET</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

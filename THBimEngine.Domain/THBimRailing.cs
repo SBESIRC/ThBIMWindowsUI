@@ -2,9 +2,13 @@
 
 namespace THBimEngine.Domain
 {
-    public class THBimRailing : THBimEntity, ICloneable
+    public class THBimRailing : THBimEntity
     {
-        public object Clone()
+        public THBimRailing(int id,string name, GeometryParam geometryParam, string describe,string uid):base(id,name,geometryParam,describe,uid)
+        {
+            
+        }
+        public override object Clone()
         {
             throw new NotImplementedException();
         }

@@ -7,14 +7,15 @@ using Xbim.Common.Geometry;
 
 namespace THBimEngine.Domain
 {
-    public class THBimWall : THBimEntity,ICloneable
+    public class THBimWall : THBimEntity
     {
-        public THBimWall()
+        public IList<THBimDoor> Doors { get; private set; }
+        public IList<THBimWindow> Windows { get; private set; }
+        public THBimWall(int id, string name, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, geometryParam, describe, uid)
         {
-
         }
 
-        public object Clone()
+        public override object Clone()
         {
             throw new NotImplementedException();
         }

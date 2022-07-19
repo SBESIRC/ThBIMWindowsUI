@@ -2,11 +2,13 @@
 
 namespace THBimEngine.Domain
 {
-    internal class THBimDoor : THBimEntity, ICloneable
+    public class THBimDoor : THBimEntity
     {
-        public string Opening { get; set; }
+        public THBimDoor(int id, string name, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, geometryParam, describe, uid)
+        {
+        }
 
-        public object Clone()
+        public override object Clone()
         {
             throw new NotImplementedException();
         }

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace THBimEngine.Domain
 {
-    public class THBimSlab : THBimEntity
+    public class THBimOpening : THBimEntity
     {
-        public THBimSlab(int id, string name, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name,geometryParam, describe, uid)
+        public THBimOpening(int id, string name, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, geometryParam, describe, uid)
         {
         }
 

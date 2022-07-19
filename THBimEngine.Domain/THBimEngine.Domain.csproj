@@ -54,8 +54,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ITHBimElement.cs" />
-    <Compile Include="ITHBimEntity.cs" />
+    <Compile Include="GeometryParam.cs" />
+    <Compile Include="THBimDomainCommon.cs" />
+    <Compile Include="THBimElement.cs" />
+    <Compile Include="THBimEntity.cs" />
     <Compile Include="Model\SurrogateModel\Matrix3DSurrogate.cs" />
     <Compile Include="Model\SurrogateModel\Point3DCollectionSurrogate.cs" />
     <Compile Include="Model\SurrogateModel\Point3DSurrogate.cs" />
@@ -77,9 +79,8 @@
     <Compile Include="Model\ThTCHWindow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="THBimDoor.cs" />
-    <Compile Include="THBimPortal.cs" />
+    <Compile Include="THBimOpening.cs" />
     <Compile Include="THBimRailing.cs" />
-    <Compile Include="THBimRegion.cs" />
     <Compile Include="THBimSlab.cs" />
     <Compile Include="THBimWall.cs" />
     <Compile Include="THBimWindow.cs" />

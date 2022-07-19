@@ -1,9 +1,9 @@
 ﻿using ProtoBuf;
 
-namespace THBimEngine.Presention.Model
+namespace THBimEngine.Domain.Model
 {
     [ProtoContract]
-    public class ThTCHProject //: ThIfcProject
+    public class ThTCHProject
     {
         [ProtoMember(1)]
         public string ProjectName { get; set; }

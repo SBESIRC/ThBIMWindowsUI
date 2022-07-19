@@ -1,7 +1,7 @@
 ﻿using ProtoBuf;
-using THBimEngine.Presention.Model.SurrogateModel;
+using THBimEngine.Domain.Model.SurrogateModel;
 
-namespace THBimEngine.Presention.Model
+namespace THBimEngine.Domain.Model
 {
     /// <summary>
     /// 栏杆

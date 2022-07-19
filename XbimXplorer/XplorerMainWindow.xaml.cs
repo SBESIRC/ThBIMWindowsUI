@@ -130,6 +130,8 @@ namespace XbimXplorer
             _dispatcherTimer = new DispatcherTimer();
             _dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
             _dispatcherTimer.Tick += DispatcherTimer_Tick;
+
+            InitGLControl();
         }
 
 		private void DispatcherTimer_Tick(object sender, EventArgs e)
@@ -147,7 +149,25 @@ namespace XbimXplorer
                 Mouse.XButton2 == MouseButtonState.Pressed)
                 return;
             _selectIndex = ifcIndex;
-            SelectedItem = Model.Instances[ifcIndex];
+            if (Model.IsFederation)
+            {
+                int count = 0;
+                foreach (var item in Model.ReferencedModels) 
+                {
+                    var thisCount = item.Model.Instances.Count();
+                    count += thisCount;
+                    if (count < ifcIndex)
+                        continue;
+                    var realIndex = ifcIndex - count + thisCount;
+                    SelectedItem = item.Model.Instances[realIndex];
+                    break;
+                }
+            }
+            else 
+            {
+                SelectedItem = Model.Instances[ifcIndex];
+            }
+            
         }
 
         public Visibility DeveloperVisible => Settings.Default.DeveloperMode 
@@ -258,6 +278,7 @@ namespace XbimXplorer
         {
             var worker = s as BackgroundWorker;
             var selectedFilename = args.Argument as string;
+            var startTime = DateTime.Now;
             try
             {
                 if (worker == null)
@@ -328,9 +349,7 @@ namespace XbimXplorer
                 {
                     Log.WarnFormat("Settings prevent mesh creation.");
                 }
-                var engineFile = new IfcStoreToEngineFile();
-                engineFile.ProgressChanged += OnProgressChanged;
-                _geoIndexIfcIndexMap = engineFile.LoadGeometry(model, _tempMidFileName);
+                IfcStoreToMidFile(model);
                 args.Result = model;
             }
             catch (Exception ex)
@@ -341,6 +360,9 @@ namespace XbimXplorer
                 Log.Error(sb.ToString(), ex);
                 args.Result = newexception;
             }
+
+            var endTime = DateTime.Now;
+            var totalTime = endTime -startTime;
         }
 
         private void SetDeflection(IModel model)
@@ -357,7 +379,14 @@ namespace XbimXplorer
         private void dlg_OpenAnyFile(object sender, CancelEventArgs e)
         {
             var dlg = sender as OpenFileDialog;
-            if (dlg != null) LoadAnyModel(dlg.FileName);
+            if (dlg != null) 
+                LoadAnyModel(dlg.FileName);
+            var fInfo = new FileInfo(dlg.FileName);
+            var ext = fInfo.Extension.ToLower();
+            if (ext == ".midfile")
+            {
+                LoadIfcFile(dlg.FileName);
+            }
         }
 
         /// <summary>
@@ -375,27 +404,33 @@ namespace XbimXplorer
             _selectIndex = -1;
             _geoIndexIfcIndexMap.Clear();
             InitGLControl();
-            // there's no going back; if it fails after this point the current file should be closed anyway
-            CloseAndDeleteTemporaryFiles();
-            SetOpenedModelFileName(modelFileName.ToLower());
-            ProgressStatusBar.Visibility = Visibility.Visible;
-            SetWorkerForFileLoad();
-
             var ext = fInfo.Extension.ToLower();
-            switch (ext)
+            if (ext == ".midfile")
             {
-                case ".ifc": //it is an Ifc File
-                case ".ifcxml": //it is an IfcXml File
-                case ".ifczip": //it is a zip file containing xbim or ifc File
-                case ".zip": //it is a zip file containing xbim or ifc File
-                case ".xbimf":
-                case ".xbim":
-                    _loadFileBackgroundWorker.RunWorkerAsync(modelFileName);
-                    break;              
-                default:
-                    Log.WarnFormat("Extension '{0}' has not been recognised.", ext);
-                    break;
-            }           
+                //LoadIfcFile(modelFileName);
+            }
+            else 
+            {
+                // there's no going back; if it fails after this point the current file should be closed anyway
+                CloseAndDeleteTemporaryFiles();
+                SetOpenedModelFileName(modelFileName.ToLower());
+                ProgressStatusBar.Visibility = Visibility.Visible;
+                SetWorkerForFileLoad();
+                switch (ext)
+                {
+                    case ".ifc": //it is an Ifc File
+                    case ".ifcxml": //it is an IfcXml File
+                    case ".ifczip": //it is a zip file containing xbim or ifc File
+                    case ".zip": //it is a zip file containing xbim or ifc File
+                    case ".xbimf":
+                    case ".xbim":
+                        _loadFileBackgroundWorker.RunWorkerAsync(modelFileName);
+                        break;
+                    default:
+                        Log.WarnFormat("Extension '{0}' has not been recognised.", ext);
+                        break;
+                }
+            }
         }
 
         /// <summary>
@@ -431,21 +466,9 @@ namespace XbimXplorer
 
         private void FileLoadCompleted(object s, RunWorkerCompletedEventArgs args)
         {
-            if (args.Result is IfcStore) //all ok
+            if (args.Result is IfcStore ifcStore) //all ok
             {
-                //this Triggers the event to load the model into the views 
-                ModelProvider.ObjectInstance = args.Result;
-                ModelProvider.Refresh();
-
-                if (args.Result is IfcStore)
-                {
-
-                    LoadIfcFile(_tempMidFileName);
-                }
-
-                ProgressBar.Value = 0;
-                StatusMsg.Text = "Ready";
-                AddRecentFile();
+                ShowIfcStore(ifcStore);
             }
             else //we have a problem
             {
@@ -473,6 +496,22 @@ namespace XbimXplorer
             FireLoadingComplete(s, args);
         }
 
+        private void IfcStoreToMidFile(IfcStore ifcStore) 
+        {
+            var engineFile = new IfcStoreToEngineFile();
+            engineFile.ProgressChanged += OnProgressChanged;
+            _geoIndexIfcIndexMap = engineFile.LoadGeometry(ifcStore, _tempMidFileName);
+        }
+        private void ShowIfcStore(IfcStore ifcStore) 
+        {
+            //this Triggers the event to load the model into the views 
+            ModelProvider.ObjectInstance = ifcStore;
+            ModelProvider.Refresh();
+            LoadIfcFile(_tempMidFileName);
+            ProgressBar.Value = 0;
+            StatusMsg.Text = "Ready";
+            AddRecentFile();
+        }
         private void OnProgressChanged(object s, ProgressChangedEventArgs args)
         {
             if (args.ProgressPercentage < 0 || args.ProgressPercentage > 100)
@@ -577,8 +616,9 @@ namespace XbimXplorer
         private void CommandBinding_Open(object sender, ExecutedRoutedEventArgs e)
         {
             var corefilters = new[] {
-                "Xbim Files|*.ifc",
-                "Ifc File (*.ifc)|*.ifc"
+                "IFC Files|*.ifc;*.midfile",
+                "Ifc File (*.ifc)|*.ifc",
+                "Engin Midel File (*.midfile)|*.midfile"
             };
 
             // Filter files by extension 
@@ -766,8 +806,10 @@ namespace XbimXplorer
             if (fedModel == null)
                 return;
             CloseAndDeleteTemporaryFiles();
-            ModelProvider.ObjectInstance = fedModel;
-            ModelProvider.Refresh();
+            IfcStoreToMidFile(fedModel);
+            ShowIfcStore(fedModel);
+            //ModelProvider.ObjectInstance = fedModel;
+            //ModelProvider.Refresh();
         }
         
         #endregion
@@ -1267,5 +1309,33 @@ namespace XbimXplorer
             var glControl = formsHost.Child as GLControl;
             glControl.Focus();
 		}
-	}
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            //临时 加载中间文件
+            string fileName = @"C:\Tangent\TArchT20V8\SYS\output\TG20.midfile";
+            if (!File.Exists(fileName))
+            {
+                MessageBox.Show("文件不存在，无法加载");
+                return;
+            }
+            _openedModelFileName = null;
+            LoadAnyModel(fileName);
+            _openedModelFileName = fileName;
+            LoadIfcFile(fileName);
+        }
+
+        private void MenuItem_Click_1(object sender, RoutedEventArgs e)
+        {
+            //临时 加载中间文件
+            string fileName = @"C:\Tangent\TArchT20V8\SYS\output\TG20.ifc";
+            if (!File.Exists(fileName))
+            {
+                MessageBox.Show("文件不存在，无法加载");
+                return;
+            }
+            _openedModelFileName = null;
+            LoadAnyModel(fileName);
+        }
+    }
 }

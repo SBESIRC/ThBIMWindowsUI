@@ -1,7 +1,7 @@
 ﻿using ProtoBuf;
 using System.Collections.Generic;
 
-namespace THBimEngine.Presention.Model.SurrogateModel
+namespace THBimEngine.Domain.Model.SurrogateModel
 {
     [ProtoContract]
     public struct PolylineSurrogate

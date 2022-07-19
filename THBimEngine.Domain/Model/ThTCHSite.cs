@@ -1,6 +1,6 @@
 ﻿using ProtoBuf;
 
-namespace THBimEngine.Presention.Model
+namespace THBimEngine.Domain.Model
 {
     [ProtoContract]
     public class ThTCHSite //: ThIfcSite

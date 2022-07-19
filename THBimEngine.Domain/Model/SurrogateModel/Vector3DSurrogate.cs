@@ -1,11 +1,11 @@
 ﻿using ProtoBuf;
 
-namespace THBimEngine.Presention.Model.SurrogateModel
+namespace THBimEngine.Domain.Model.SurrogateModel
 {
     [ProtoContract]
-    public struct Point3DSurrogate
+    public struct Vector3DSurrogate
     {
-        public Point3DSurrogate(double x, double y, double z) : this()
+        public Vector3DSurrogate(double x, double y, double z) : this()
         {
             this.X = x;
             this.Y = y;

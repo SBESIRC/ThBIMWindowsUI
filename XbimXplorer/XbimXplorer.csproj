@@ -352,6 +352,7 @@
     <Compile Include="IfcValidation\ValidationWindow.xaml.cs">
       <DependentUpon>ValidationWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ThBIMEngine\IfcStoreReadGeomtry.cs" />
     <Compile Include="ThBIMEngine\IfcStoreToEngineFile.cs" />
     <Compile Include="XplorerMainWindow.Logging.xaml.cs">
       <DependentUpon>XplorerMainWindow.xaml</DependentUpon>

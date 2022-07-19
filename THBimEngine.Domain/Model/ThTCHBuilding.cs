@@ -1,7 +1,7 @@
 ﻿using ProtoBuf;
 using System.Collections.Generic;
 
-namespace THBimEngine.Presention.Model
+namespace THBimEngine.Domain.Model
 {
     [ProtoContract]
     public class ThTCHBuilding //: ThIfcBuilding

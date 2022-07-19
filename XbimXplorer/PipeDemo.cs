@@ -2,7 +2,7 @@
 using ProtoBuf;
 using System.IO;
 using System.IO.Pipes;
-using THBimEngine.Presention.Model;
+using THBimEngine.Domain.Model;
 
 namespace XbimXplorer
 {

@@ -509,6 +509,10 @@
     </FileAssociation>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\THBimEngine.Domain\THBimEngine.Domain.csproj">
+      <Project>{989BF8B8-DCB6-423A-80D2-3540E8817335}</Project>
+      <Name>THBimEngine.Domain</Name>
+    </ProjectReference>
     <ProjectReference Include="..\THBimEngine.Presention\THBimEngine.Presention.csproj">
       <Project>{2b4a996d-85a9-455d-99eb-9233f020fce8}</Project>
       <Name>THBimEngine.Presention</Name>

@@ -12,5 +12,4 @@ namespace THBimEngine.Domain
             GeometryParam = geometryParam;
         }
     }
-
 }

@@ -22,5 +22,13 @@ namespace THBimEngine.Domain
         {
             return new XbimVector3D(vector3DSurrogate.X, vector3DSurrogate.Y, vector3DSurrogate.Z);
         }
+        public static XbimVector3D Point3D2Vector(this Point3DSurrogate point3DSurrogate) 
+        {
+            return new XbimVector3D(point3DSurrogate.X, point3DSurrogate.Y, point3DSurrogate.Z);
+        }
+        public static XbimVector3D Point3D2Vector(this XbimPoint3D point3D)
+        {
+            return new XbimVector3D(point3D.X, point3D.Y, point3D.Z);
+        }
     }
 }

@@ -1,0 +1,58 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Xbim.Common.Geometry;
+
+namespace THBimEngine.Domain
+{
+    /// <summary>
+    /// 楼层信息
+    /// </summary>
+    public class THBimStorey : THBimElement
+    {
+        /// <summary>
+        /// 楼层标高
+        /// </summary>
+        public double Elevation { get; set; }
+        /// <summary>
+        /// 层高
+        /// </summary>
+        public double LevelHeight { get; set; }
+        /// <summary>
+        /// 该楼层元素
+        /// </summary>
+        public List<THBimEntity> FloorEntitys { get; private set; }
+        /// <summary>
+        /// 楼层原点
+        /// </summary>
+        public XbimPoint3D Origin { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string MemoryStoreyId { get; set; }
+        public XbimMatrix3D MemoryMatrix3d { get; set; }
+        public THBimStorey(int id, string name,double elevation,double levelHeight, string describe = "", string uid = "") : base(id, name, describe, uid)
+        {
+            FloorEntitys = new List<THBimEntity>();
+            Elevation = elevation;
+            LevelHeight = levelHeight;
+            MemoryStoreyId = string.Empty;
+        }
+
+        public Dictionary<string, List<THBimEntity>> GetTypeGroupValue() 
+        {
+            Dictionary<string, List<THBimEntity>> typeGroup = new Dictionary<string, List<THBimEntity>>();
+            if (FloorEntitys.Count < 1)
+                return typeGroup;
+            foreach (var item in FloorEntitys.GroupBy(c => c.GetType())) 
+            {
+                //typeGroup.Add(item.)
+            }
+            return typeGroup;
+        }
+        public override object Clone()
+        {
+            throw new NotImplementedException();
+        }
+    }
+}

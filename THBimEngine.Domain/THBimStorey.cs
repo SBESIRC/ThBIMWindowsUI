@@ -8,7 +8,7 @@ namespace THBimEngine.Domain
     /// <summary>
     /// 楼层信息
     /// </summary>
-    public class THBimStorey : THBimElement
+    public class THBimStorey : THBimElement, IEquatable<THBimStorey>
     {
         /// <summary>
         /// 楼层标高
@@ -53,6 +53,36 @@ namespace THBimEngine.Domain
         public override object Clone()
         {
             throw new NotImplementedException();
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode() ^ Elevation.GetHashCode() ^ LevelHeight.GetHashCode()^ Origin.GetHashCode()
+                ^ MemoryStoreyId.GetHashCode() ^ FloorEntitys.Count;
+        }
+
+        public bool Equals(THBimStorey other)
+        {
+            if (!base.Equals(other)) return false;
+            if(FloorEntitys.Count!=other.FloorEntitys.Count)
+            {
+                return false;
+            }
+            for(int i =0; i < FloorEntitys.Count;i++)
+            {
+                if (!FloorEntitys[i].Equals(other.FloorEntitys[i]))
+                {
+                    return false;
+                }
+            }
+            if(Elevation.FloatEquals(other.Elevation)&&
+               LevelHeight.FloatEquals(other.LevelHeight) &&
+               Origin.Equals(other.Origin) &&
+               MemoryStoreyId.Equals(other.MemoryStoreyId))
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

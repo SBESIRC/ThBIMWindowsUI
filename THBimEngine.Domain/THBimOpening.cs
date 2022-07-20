@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace THBimEngine.Domain
 {
-    public class THBimOpening : THBimEntity
+    public class THBimOpening : THBimEntity,IEquatable<THBimOpening>
     {
         public THBimOpening(int id, string name, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, geometryParam, describe, uid)
         {
@@ -15,6 +15,17 @@ namespace THBimEngine.Domain
         public override object Clone()
         {
             throw new NotImplementedException();
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        public bool Equals(THBimOpening other)
+        {
+            if(!base.Equals(other)) return false;
+            return true;
         }
     }
 }

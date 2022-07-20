@@ -38,15 +38,23 @@ namespace XbimXplorer.ThBIMEngine
                 _allProjects.Add(project);
                 ConvertProjectToTHBimProject(new List<ThTCHProject> { project });
             }
+            else
+            {
+                UpdateProject(project);
+            }
+
         }
 
         public void DeleteProject() 
         {
             
         }
-        public void UpdateProject() 
+        public void UpdateProject(ThTCHProject project) 
         {
-        
+            newSet , oldSet
+            deletedElements = oldSet - newSet
+            newlyAdded = newSet - oldSet
+
         }
         public void UpdateElement() 
         {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using THBimEngine.Domain.Model.SurrogateModel;
 using Xbim.Common.Geometry;
-
+using System;
 namespace THBimEngine.Domain
 {
     public abstract class GeometryParam
@@ -10,7 +10,7 @@ namespace THBimEngine.Domain
     /// <summary>
     /// 二维轮廓拉伸几何信息
     /// </summary>
-    public class GeometryStretch: GeometryParam
+    public class GeometryStretch: GeometryParam, IEquatable<GeometryStretch>
     {
         /*
          二维轮廓通过拉伸方向和拉伸高度可以拉伸出一个3维几何体
@@ -92,6 +92,37 @@ namespace THBimEngine.Domain
         private void Init() 
         {
             OutLine = new List<PolylineSurrogate>();
+        }
+
+
+        public override int GetHashCode()
+        {
+            return XAxisLength.GetHashCode() 
+                 ^ YAxisLength.GetHashCode() 
+                 ^ ZAxisLength.GetHashCode() 
+                 ^ Origin.GetHashCode() 
+                 ^ ZAxis.GetHashCode() 
+                 ^ XAxis.GetHashCode() 
+                 ^ ZAxisOffSet.GetHashCode()
+                 ^ OutLine.Count;
+        }
+
+        public bool Equals(GeometryStretch other)
+        {
+            if (!OutLine.Count.Equals(other.OutLine.Count)) return false;
+            for(int i = 0; i < OutLine.Count;i++)
+            {
+                if (!OutLine[i].Equals(other.OutLine[i])) return false;
+            }
+            if (XAxisLength.FloatEquals(other.XAxisLength) &&
+                YAxisLength.FloatEquals(other.YAxisLength) &&
+                ZAxisLength.FloatEquals(other.ZAxisLength) &&
+                Origin.Equals(other.Origin) &&
+                ZAxis.Equals(other.ZAxis) &&
+                XAxis.Equals(other.XAxis) &&
+                ZAxisOffSet.Equals(other.ZAxisOffSet))
+                return true;
+            return false;
         }
     }
 }

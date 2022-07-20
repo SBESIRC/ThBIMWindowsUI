@@ -1,4 +1,5 @@
-﻿using THBimEngine.Domain.Model;
+﻿using System;
+using THBimEngine.Domain.Model;
 using THBimEngine.Domain.Model.SurrogateModel;
 using Xbim.Common.Geometry;
 
@@ -6,6 +7,14 @@ namespace THBimEngine.Domain
 {
     public static class THBimDomainCommon
     {
+        public static readonly double DistTolerance = 1.0;
+        public static readonly double AngleTolerance = 0.02;
+
+        public static bool FloatEquals(this double float1, double float2)
+        {
+            return Math.Abs(float1 - float2) < DistTolerance;
+        }
+
         public static readonly XbimVector3D XAxis = new XbimVector3D(1, 0, 0);
         public static readonly XbimVector3D YAxis = new XbimVector3D(0, 1, 0);
         public static readonly XbimVector3D ZAxis = new XbimVector3D(0, 0, 1);

@@ -21,6 +21,10 @@ namespace THBimEngine.Domain
         /// </summary>
         public string Name { get; set; }
         /// <summary>
+        /// 父元素Id
+        /// </summary>
+        public string ParentUid { get; set; }
+        /// <summary>
         /// 描述
         /// </summary>
         public string Describe { get; set; }

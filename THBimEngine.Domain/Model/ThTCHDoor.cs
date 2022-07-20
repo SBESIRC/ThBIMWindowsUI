@@ -4,7 +4,7 @@ using THBimEngine.Domain.Model.SurrogateModel;
 namespace THBimEngine.Domain.Model
 {
     [ProtoContract]
-    public class ThTCHDoor //: ThIfcDoor
+    public class ThTCHDoor
     {
         [ProtoMember(1)]
         public Point3DSurrogate CenterPoint { get; set; }

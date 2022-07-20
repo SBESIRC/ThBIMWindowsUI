@@ -161,7 +161,7 @@ namespace XbimXplorer.ThBIMEngine
 			
 		}
 		
-		private void WriteMidFile(List<IfcMeshModel> meshModels, List<PointNormal> meshPoints, string midFilePath)
+		public void WriteMidFile(List<IfcMeshModel> meshModels, List<PointNormal> meshPoints, string midFilePath)
 		{
 			if (null == meshModels || meshModels.Count < 1
 				|| null == meshPoints || meshPoints.Count < 1)

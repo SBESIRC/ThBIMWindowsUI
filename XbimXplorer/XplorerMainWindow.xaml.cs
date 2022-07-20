@@ -44,6 +44,9 @@ using XbimXplorer.Properties;
 using System.Windows.Forms.Integration;
 using THBimEngine.Presention;
 using XbimXplorer.ThBIMEngine;
+using THBimEngine.Domain.Model;
+using System.IO.Pipes;
+using ProtoBuf;
 #endregion
 
 namespace XbimXplorer
@@ -84,7 +87,9 @@ namespace XbimXplorer
         {
             return _openedModelFileName;
         }
-
+        private ThTCHProject thProject=null;
+        NamedPipeServerStream pipeServer = null;
+        BackgroundWorker backgroundWorker = null;
         private void SetOpenedModelFileName(string ifcFilename)
         {
             _openedModelFileName = ifcFilename;
@@ -131,10 +136,49 @@ namespace XbimXplorer
             _dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
             _dispatcherTimer.Tick += DispatcherTimer_Tick;
 
+            pipeServer = new NamedPipeServerStream("THDB2Push_TestPipe", PipeDirection.In);
+            backgroundWorker = new BackgroundWorker();
+            backgroundWorker.DoWork += Background_DoWork;
+            backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
+            backgroundWorker.RunWorkerAsync();
             InitGLControl();
+
+            
         }
 
-		private void DispatcherTimer_Tick(object sender, EventArgs e)
+        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (null != thProject) 
+            {
+                var bimDataController = new ThBimDataController(new List<ThTCHProject> { thProject });
+                bimDataController.WriteToMidFile(_tempMidFileName);
+                thProject = null;
+                pipeServer = null;
+                backgroundWorker.RunWorkerAsync();
+                LoadIfcFile(_tempMidFileName);
+            }
+            
+        }
+
+        private void Background_DoWork(object sender, DoWorkEventArgs e)
+        {
+            thProject = null;
+            if (null == pipeServer)
+                pipeServer = new NamedPipeServerStream("THDB2Push_TestPipe", PipeDirection.In);
+            pipeServer.WaitForConnection();
+            try
+            {
+                thProject = Serializer.Deserialize<ThTCHProject>(pipeServer);
+            }
+            catch (IOException ioEx)
+            {
+                thProject = null;
+                Console.WriteLine("ERROR: {0}", ioEx.Message);
+            }
+            pipeServer.Dispose();
+        }
+
+        private void DispatcherTimer_Tick(object sender, EventArgs e)
 		{
             if (_geoIndexIfcIndexMap == null || _geoIndexIfcIndexMap.Count < 1)
                 return;
@@ -236,6 +280,14 @@ namespace XbimXplorer
             if (glControl != null)
             {
                 Win32.CloseRender(glControl.Handle);
+            }
+            if(null != backgroundWorker) 
+            {
+                backgroundWorker.Dispose();
+            }
+            if (null == pipeServer) 
+            {
+                pipeServer.Dispose();
             }
         }
 

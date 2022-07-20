@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace THBimEngine.Domain
 {
-    public abstract class THBimElement: ICloneable, IEquatable<THBimElement>
+    /// <summary>
+    /// 元素基类
+    /// </summary>
+    public abstract class THBimElement: ICloneable
     {
         /// <summary>
         /// Guid

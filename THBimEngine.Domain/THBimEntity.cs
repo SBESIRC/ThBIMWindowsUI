@@ -1,10 +1,22 @@
 ﻿using System.Collections.Generic;
 using System;
+using Xbim.Common.Geometry;
+
 namespace THBimEngine.Domain
 {
     public abstract class THBimEntity : THBimElement, IEquatable<THBimEntity>
     {
+        /// <summary>
+        /// 几何Mesh信息
+        /// </summary>
+        public XbimShapeGeometry ShapeGeometry { get; set; }
+        /// <summary>
+        /// 几何参数信息
+        /// </summary>
         public GeometryParam GeometryParam { get; set; }
+        /// <summary>
+        /// 物体开洞信息
+        /// </summary>
         public List<THBimOpening> Openings { get; private set; }
         public THBimEntity(int id, string name, GeometryParam geometryParam, string describe = "", string uid = "") : base(id,name,describe,uid)
         {

@@ -51,9 +51,8 @@ namespace XbimXplorer.ThBIMEngine
         }
         public void UpdateProject(ThTCHProject project) 
         {
-            newSet , oldSet
-            deletedElements = oldSet - newSet
-            newlyAdded = newSet - oldSet
+
+
 
         }
         public void UpdateElement() 

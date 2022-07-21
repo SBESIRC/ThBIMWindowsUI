@@ -107,6 +107,8 @@ namespace XbimXplorer.ThBIMEngine
                 var tr = br.ReadShapeTriangulation();
                 if (tr.Faces.Count < 1)
                     continue;
+                var moveVector = entity.ShapeGeometry.TempOriginDisplacement;
+                var transform = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
                 var material = GetMeshModelMaterial("wall");
                 IfcMeshModel meshModel = new IfcMeshModel(entity.Id, entity.Id);
                 var allPts = tr.Vertices.ToArray();
@@ -121,21 +123,21 @@ namespace XbimXplorer.ThBIMEngine
                         var pt1Index = ptIndexs[i * 3];
                         var pt2Index = ptIndexs[i * 3 + 1];
                         var pt3Index = ptIndexs[i * 3 + 2];
-                        var pt1 = allPts[pt1Index];
+                        var pt1 = TransPoint(allPts[pt1Index],transform);
                         var pt1Normal = face.Normals.Last().Normal;
                         if (pt1Index < face.Normals.Count())
                             pt1Normal = face.Normals[pt1Index].Normal;
                         pIndex += 1;
                         triangle.ptIndex.Add(pIndex);
                         allGeoPointNormals.Add(GetPointNormal(pIndex, pt1, pt1Normal));
-                        var pt2 = allPts[pt2Index];
+                        var pt2 = TransPoint(allPts[pt2Index], transform); ;
                         var pt2Normal = face.Normals.Last().Normal;
                         if (pt2Index < face.Normals.Count())
                             pt2Normal = face.Normals[pt2Index].Normal;
                         pIndex += 1;
                         triangle.ptIndex.Add(pIndex);
                         allGeoPointNormals.Add(GetPointNormal(pIndex, pt2, pt2Normal));
-                        var pt3 = allPts[pt3Index];
+                        var pt3 = TransPoint(allPts[pt3Index], transform); ;
                         var pt3Normal = face.Normals.Last().Normal;
                         if (pt3Index < face.Normals.Count())
                             pt3Normal = face.Normals[pt3Index].Normal;
@@ -164,6 +166,7 @@ namespace XbimXplorer.ThBIMEngine
                 THBimBuilding bimBuilding = new THBimBuilding(CurrentGIndex(), project.Site.Building.BuildingName);
                 foreach (var storey in project.Site.Building.Storeys) 
                 {
+                    var moveVector = storey.Origin.Point3D2Vector();
                     var bimStory = new THBimStorey(CurrentGIndex(), storey.Number, storey.Elevation, storey.Height);
                     AddElementIndex();
                     foreach (var wall in storey.Walls) 
@@ -174,12 +177,16 @@ namespace XbimXplorer.ThBIMEngine
                         bimWall.ParentUid = bimStory.Uid;
                         AddElementIndex();
                         _allEntitys.Add(bimWall.Uid, bimWall);
+                        var openingSolids = new List<IXbimSolid>();
                         if (null != wall.Doors) 
                         {
                             foreach (var door in wall.Doors)
                             {
                                 var bimDoor = new THBimDoor(CurrentGIndex(), string.Format("door#{0}", CurrentGIndex()), door.DoorGeometryParam());
                                 bimDoor.ParentUid = bimWall.Uid;
+                                bimDoor.ShapeGeometry = _geometryFactory.GetShapeGeometry(bimDoor.GeometryParam as GeometryStretch, moveVector,out IXbimSolid doorSolid);
+                                if (null != doorSolid && doorSolid.SurfaceArea > 10)
+                                    openingSolids.Add(doorSolid);
                                 var doorRelation = new THBimElementRelation(bimDoor.Id, bimDoor.Name, bimDoor.Describe, bimDoor.Uid);
                                 bimStory.FloorEntitys.Add(bimDoor.Id, doorRelation);
                                 _allEntitys.Add(bimDoor.Uid, bimDoor);
@@ -190,8 +197,11 @@ namespace XbimXplorer.ThBIMEngine
                         {
                             foreach (var window in wall.Windows)
                             {
-                                var bimWindow = new THBimDoor(CurrentGIndex(), string.Format("door#{0}", CurrentGIndex()), window.WindowGeometryParam());
+                                var bimWindow = new THBimWindow(CurrentGIndex(), string.Format("door#{0}", CurrentGIndex()), window.WindowGeometryParam());
                                 bimWindow.ParentUid = bimWall.Uid;
+                                bimWindow.ShapeGeometry = _geometryFactory.GetShapeGeometry(bimWindow.GeometryParam as GeometryStretch, moveVector, out IXbimSolid windowSolid);
+                                if (null != windowSolid && windowSolid.SurfaceArea > 10)
+                                    openingSolids.Add(windowSolid);
                                 var windowRelation = new THBimElementRelation(bimWindow.Id, bimWindow.Name, bimWindow.Describe, bimWindow.Uid);
                                 bimStory.FloorEntitys.Add(bimWindow.Id, windowRelation);
                                 _allEntitys.Add(bimWindow.Uid, bimWindow);
@@ -202,14 +212,19 @@ namespace XbimXplorer.ThBIMEngine
                         {
                             foreach (var opening in wall.Openings)
                             {
-                                var bimOpening = new THBimDoor(CurrentGIndex(), string.Format("opening#{0}", CurrentGIndex()), opening.OpeningGeometryParam());
+                                var bimOpening = new THBimOpening(CurrentGIndex(), string.Format("opening#{0}", CurrentGIndex()), opening.OpeningGeometryParam());
                                 bimOpening.ParentUid = bimWall.Uid;
+                                bimOpening.ShapeGeometry = _geometryFactory.GetShapeGeometry(bimOpening.GeometryParam as GeometryStretch, moveVector, out IXbimSolid openingSolid);
+                                if (null != openingSolid && openingSolid.SurfaceArea > 10)
+                                    openingSolids.Add(openingSolid);
                                 var openingRelation = new THBimElementRelation(bimOpening.Id, bimOpening.Name, bimOpening.Describe, bimOpening.Uid);
                                 bimStory.FloorEntitys.Add(bimOpening.Id, openingRelation);
                                 _allEntitys.Add(bimOpening.Uid, bimOpening);
                                 AddElementIndex();
                             }
                         }
+
+                        bimWall.ShapeGeometry = _geometryFactory.GetShapeGeometry(bimWall.GeometryParam as GeometryStretch, moveVector, openingSolids);
                     }
                     bimBuilding.BuildingStoreys.Add(bimStory);
                 }
@@ -220,14 +235,18 @@ namespace XbimXplorer.ThBIMEngine
         }
         private void MeshBimEntity(THBimStorey storey,Dictionary<string,THBimEntity> bimEntities) 
         {
-            var moveVector = storey.Origin.Point3D2Vector();
-            foreach (var item in storey.FloorEntitys) 
-            {
-                var realtion = item.Value;
-                var entity = bimEntities[realtion.Uid];
-                bimEntities[realtion.Uid].ShapeGeometry = _geometryFactory.GetShapeGeometry(entity.GeometryParam as GeometryStretch, moveVector);
-            }
+            //var moveVector = storey.Origin.Point3D2Vector();
+            //foreach (var item in storey.FloorEntitys) 
+            //{
+            //    var realtion = item.Value;
+            //    var entity = bimEntities[realtion.Uid];
+            //    bimEntities[realtion.Uid].ShapeGeometry = _geometryFactory.GetShapeGeometry(entity.GeometryParam as GeometryStretch, moveVector);
+            //}
             
+        }
+        private XbimPoint3D TransPoint(XbimPoint3D xbimPoint, XbimMatrix3D xbimMatrix)
+        {
+            return xbimMatrix.Transform(xbimPoint);
         }
         private void AddElementIndex(int addCount =1) 
         {

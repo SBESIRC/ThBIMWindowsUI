@@ -10,7 +10,7 @@ namespace THBimEngine.Domain.Model
         /// <summary>
         /// 编号
         /// </summary>
-        [ProtoMember(1)]
+        [ProtoMember(11)]
         public string Number { get; set; }
         /// <summary>
         /// 标高

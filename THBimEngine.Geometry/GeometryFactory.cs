@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using THBimEngine.Domain;
 using Xbim.Common;
 using Xbim.Common.Geometry;
 using Xbim.Common.Step21;
-using Xbim.Ifc;
-using Xbim.IO.Memory;
-using THBimEngine.Domain;
-using Xbim.Geometry.Engine.Interop;
-using System.IO;
 using Xbim.Common.XbimExtensions;
+using Xbim.Geometry.Engine.Interop;
+using Xbim.Ifc;
 using Xbim.Ifc4.Interfaces;
+using Xbim.IO.Memory;
 
 namespace THBimEngine.Geometry
 {
@@ -44,12 +42,12 @@ namespace THBimEngine.Geometry
                     throw new NotSupportedException("Schema '" + type + "' is not supported");
             }
         }
-
-        public XbimShapeGeometry GetShapeGeometry(GeometryStretch geometryStretch,XbimVector3D moveVector) 
+        
+        public XbimShapeGeometry GetShapeGeometry(GeometryStretch geometryStretch,XbimVector3D moveVector,out IXbimSolid geoSolid) 
         {
+            geoSolid = null;
             using (var txn = memoryModel.BeginTransaction("Create Shape Geometry"))
             {
-                IXbimSolid geoSolid = null;
                 if (ifcVersion == IfcSchemaVersion.Ifc2X3)
                 {
                     geoSolid = GetXBimSolid2x3(geometryStretch, moveVector);
@@ -61,17 +59,54 @@ namespace THBimEngine.Geometry
                 if (null == geoSolid || geoSolid.SurfaceArea<10)
                     return null;
                 XbimShapeGeometry shapeGeometry = geomEngine.CreateShapeGeometry(geoSolid, 0.001, 0.0001,0.5,XbimGeometryType.PolyhedronBinary);
+                txn.Commit();
+                return shapeGeometry;
+            }
+        }
+        public XbimShapeGeometry GetShapeGeometry(GeometryStretch geometryStretch, XbimVector3D moveVector,List<IXbimSolid> openingSolids)
+        {
+            using (var txn = memoryModel.BeginTransaction("Create Shape Geometry"))
+            {
+                IXbimSolid geoSolid = null;
+                if (ifcVersion == IfcSchemaVersion.Ifc2X3)
+                {
+                    geoSolid = GetXBimSolid2x3(geometryStretch, moveVector);
+                }
+                else
+                {
+                    geoSolid = GetXBimSolid4(geometryStretch, moveVector);
+                }
+                if (null == geoSolid || geoSolid.SurfaceArea < 10)
+                    return null;
+                IXbimSolidSet solid = geoSolid as IXbimSolidSet;
+                if (null != openingSolids && openingSolids.Count > 0) 
+                {
+                    foreach (var item in openingSolids) 
+                    {
+                        solid = solid.Cut(item, 1);
+                    }
+                }
+                XbimShapeGeometry shapeGeometry = geomEngine.CreateShapeGeometry(solid, 0.001, 0.0001, 0.5, XbimGeometryType.PolyhedronBinary);
                 using (var ms = new MemoryStream((shapeGeometry as IXbimShapeGeometryData).ShapeData))
                 {
                     var testData = ms.ToArray();
                     var br = new BinaryReader(ms);
                     var tr = br.ReadShapeTriangulation();
                 }
-                   
                 txn.Commit();
                 return shapeGeometry;
             }
-                
+        }
+        public XbimShapeGeometry GetShapeGeometry(IXbimSolid geoSolid)
+        {
+            using (var txn = memoryModel.BeginTransaction("Create Shape Geometry"))
+            {
+                if (null == geoSolid || geoSolid.SurfaceArea < 10)
+                    return null;
+                XbimShapeGeometry shapeGeometry = geomEngine.CreateShapeGeometry(geoSolid, 0.001, 0.0001, 0.5, XbimGeometryType.PolyhedronBinary);
+                txn.Commit();
+                return shapeGeometry;
+            }
         }
         public IXbimSolid GetXBimSolid2x3(GeometryStretch geometryStretch, XbimVector3D moveVector) 
         {

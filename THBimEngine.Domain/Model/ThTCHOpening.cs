@@ -4,20 +4,18 @@ using THBimEngine.Domain.Model.SurrogateModel;
 namespace THBimEngine.Domain.Model
 {
     [ProtoContract]
-    public class ThTCHOpening //: ThIfcOpeningElement
+    public class ThTCHOpening : ThTCHElement
     {
-        [ProtoMember(1)]
+        [ProtoMember(11)]
         public Point3DSurrogate CenterPoint { get; set; }
-        [ProtoMember(2)]
+        [ProtoMember(12)]
         public double Width { get; set; }
-        [ProtoMember(3)]
-        public double Height { get; set; }
-        [ProtoMember(4)]
+        [ProtoMember(13)]
         public double Thickness { get; set; }
-        [ProtoMember(5)]
+        [ProtoMember(14)]
         public Vector3DSurrogate ExtrudedDirection { get; }
         //X轴方向和宽度方向一致
-        [ProtoMember(6)]
+        [ProtoMember(15)]
         public Vector3DSurrogate XVector { get; set; }
 
         private ThTCHOpening()

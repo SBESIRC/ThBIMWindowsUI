@@ -5,7 +5,7 @@ using THBimEngine.Domain.Model.SurrogateModel;
 namespace THBimEngine.Domain.Model
 {
     [ProtoContract]
-    public class ThTCHBuildingStorey //: ThIfcBuildingStorey
+    public class ThTCHBuildingStorey : ThTCHElement
     {
         /// <summary>
         /// 编号
@@ -15,17 +15,12 @@ namespace THBimEngine.Domain.Model
         /// <summary>
         /// 标高
         /// </summary>
-        [ProtoMember(2)]
+        [ProtoMember(12)]
         public double Elevation { get; set; }
-        /// <summary>
-        /// 层高
-        /// </summary>
-        [ProtoMember(3)]
-        public double Height { get; set; }
         /// <summary>
         /// 基点
         /// </summary>
-        [ProtoMember(4)]
+        [ProtoMember(13)]
         public Point3DSurrogate Origin { get; set; }
         public ThTCHBuildingStorey()
         {
@@ -35,19 +30,19 @@ namespace THBimEngine.Domain.Model
             Windows = new List<ThTCHWindow>();
             Railings = new List<ThTCHRailing>();
         }
-        [ProtoMember(5)]
+        [ProtoMember(14)]
         public List<ThTCHWall> Walls { get; set; }
-        [ProtoMember(6)]
+        [ProtoMember(15)]
         public List<ThTCHWindow> Windows { get; set; }
-        [ProtoMember(7)]
+        [ProtoMember(16)]
         public List<ThTCHDoor> Doors { get; set; }
-        [ProtoMember(8)]
+        [ProtoMember(17)]
         public List<ThTCHSlab> Slabs { get; set; }
-        [ProtoMember(9)]
+        [ProtoMember(18)]
         public List<ThTCHRailing> Railings { get; set; }
-        [ProtoMember(10)]
+        [ProtoMember(98)]
         public string MemoryStoreyId { get; set; }
-        [ProtoMember(11)]
+        [ProtoMember(99)]
         public Matrix3DSurrogate MemoryMatrix3d { get; set; }
     }
 }

@@ -3,9 +3,9 @@
 namespace THBimEngine.Domain.Model
 {
     [ProtoContract]
-    public class ThTCHSite //: ThIfcSite
+    public class ThTCHSite : ThTCHElement
     {
-        [ProtoMember(1)]
+        [ProtoMember(11)]
         public ThTCHBuilding Building { get; set; }
     }
 }

@@ -3,11 +3,11 @@
 namespace THBimEngine.Domain.Model
 {
     [ProtoContract]
-    public class ThTCHProject
+    public class ThTCHProject: ThTCHElement
     {
-        [ProtoMember(1)]
+        [ProtoMember(11)]
         public string ProjectName { get; set; }
-        [ProtoMember(2)]
+        [ProtoMember(12)]
         public ThTCHSite Site { get; set; }
     }
 }

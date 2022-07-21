@@ -58,7 +58,7 @@ namespace THBimEngine.Geometry
                 {
                     geoSolid = GetXBimSolid4(geometryStretch, moveVector);
                 }
-                if (null == geoSolid)
+                if (null == geoSolid || geoSolid.SurfaceArea<10)
                     return null;
                 XbimShapeGeometry shapeGeometry = geomEngine.CreateShapeGeometry(geoSolid, 0.001, 0.0001,0.5,XbimGeometryType.PolyhedronBinary);
                 using (var ms = new MemoryStream((shapeGeometry as IXbimShapeGeometryData).ShapeData))

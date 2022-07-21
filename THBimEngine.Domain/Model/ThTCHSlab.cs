@@ -5,18 +5,18 @@ using THBimEngine.Domain.Model.SurrogateModel;
 namespace THBimEngine.Domain.Model
 {
     [ProtoContract]
-    public class ThTCHSlab //: ThIfcSlab
+    public class ThTCHSlab: ThTCHElement
     {
         /// <summary>
         /// 降板信息
         /// </summary>
-        [ProtoMember(1)]
+        [ProtoMember(11)]
         public List<ThTCHSlabDescendingData> Descendings { get; set; }
 
         /// <summary>
         /// 拉伸方向
         /// </summary>
-        [ProtoMember(2)]
+        [ProtoMember(12)]
         public Vector3DSurrogate ExtrudedDirection { get; private set; }
 
         private ThTCHSlab()

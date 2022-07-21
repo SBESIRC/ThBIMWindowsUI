@@ -21,7 +21,7 @@ namespace THBimEngine.Domain
         /// <summary>
         /// 该楼层元素
         /// </summary>
-        public List<THBimEntity> FloorEntitys { get; private set; }
+        public Dictionary<int, THBimElementRelation> FloorEntitys { get; private set; }
         /// <summary>
         /// 楼层原点
         /// </summary>
@@ -33,7 +33,7 @@ namespace THBimEngine.Domain
         public XbimMatrix3D MemoryMatrix3d { get; set; }
         public THBimStorey(int id, string name,double elevation,double levelHeight, string describe = "", string uid = "") : base(id, name, describe, uid)
         {
-            FloorEntitys = new List<THBimEntity>();
+            FloorEntitys = new Dictionary<int, THBimElementRelation>();
             Elevation = elevation;
             LevelHeight = levelHeight;
             MemoryStoreyId = string.Empty;

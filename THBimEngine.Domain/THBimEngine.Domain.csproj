@@ -85,9 +85,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GeometryParam.cs" />
+    <Compile Include="Model\ThTCHElement.cs" />
     <Compile Include="THBimBuilding.cs" />
     <Compile Include="THBimDomainCommon.cs" />
     <Compile Include="THBimElement.cs" />
+    <Compile Include="THBimElementRelation.cs" />
     <Compile Include="THBimEntity.cs" />
     <Compile Include="Model\SurrogateModel\Matrix3DSurrogate.cs" />
     <Compile Include="Model\SurrogateModel\Point3DCollectionSurrogate.cs" />
@@ -103,9 +105,6 @@
     <Compile Include="Model\ThTCHSite.cs" />
     <Compile Include="Model\ThTCHSlab.cs" />
     <Compile Include="Model\ThTCHSlabDescendingData.cs" />
-    <Compile Include="Model\ThTCHSprinkler.cs" />
-    <Compile Include="Model\ThTCHSymbMultiLeader.cs" />
-    <Compile Include="Model\ThTCHVerticalPipe.cs" />
     <Compile Include="Model\ThTCHWall.cs" />
     <Compile Include="Model\ThTCHWindow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

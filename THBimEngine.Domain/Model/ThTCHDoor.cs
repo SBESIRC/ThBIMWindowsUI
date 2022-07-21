@@ -4,21 +4,19 @@ using THBimEngine.Domain.Model.SurrogateModel;
 namespace THBimEngine.Domain.Model
 {
     [ProtoContract]
-    public class ThTCHDoor
+    public class ThTCHDoor: ThTCHElement
     {
-        [ProtoMember(1)]
+        [ProtoMember(11)]
         public Point3DSurrogate CenterPoint { get; set; }
-        [ProtoMember(2)]
+        [ProtoMember(12)]
         public double Width { get; set; }
-        [ProtoMember(3)]
+        [ProtoMember(13)]
         public double Thickness { get; set; }
-        [ProtoMember(4)]
+        [ProtoMember(14)]
         public Vector3DSurrogate ExtrudedDirection { get; }
         //X轴方向和宽度方向一致
-        [ProtoMember(5)]
+        [ProtoMember(15)]
         public Point3DSurrogate XVector { get; set; }
-        [ProtoMember(6)]
-        public string OpenDirection { get; set; }
         private ThTCHDoor()
         {
 

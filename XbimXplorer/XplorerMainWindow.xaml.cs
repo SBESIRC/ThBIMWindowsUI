@@ -77,6 +77,7 @@ namespace XbimXplorer
 
         private string _openedModelFileName;
 		private string _tempMidFileName;
+        private ThBimDataController bimDataController = new ThBimDataController(null);
 
         /// <summary>
         /// Deals with the user-defined model file name.
@@ -150,7 +151,7 @@ namespace XbimXplorer
         {
             if (null != thProject) 
             {
-                var bimDataController = new ThBimDataController(new List<ThTCHProject> { thProject });
+                bimDataController.AddProject(thProject);
                 bimDataController.WriteToMidFile(_tempMidFileName);
                 thProject = null;
                 pipeServer = null;

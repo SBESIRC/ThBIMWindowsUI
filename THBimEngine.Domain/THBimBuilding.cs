@@ -38,24 +38,41 @@ namespace THBimEngine.Domain
             return true;
         }
 
-        public List<string> GetNewlyAddedComponentUids(THBimBuilding newBuilding,List<string> addedUids)
+        public List<string> GetNewlyAddedComponentUids(THBimBuilding newBuilding,List<string> newStoreyUids)
         {
             var addedComponentUids = new List<string>();
-            foreach (var uid in addedUids)
+            foreach (var uid in newStoreyUids)
             {
                 var newStorey = newBuilding.BuildingStoreys[uid];
-                addedComponentUids.AddRange(newStorey.FloorEntitys.Keys.ToList());
+                if (BuildingStoreys.ContainsKey(uid))
+                {
+                    var storey = BuildingStoreys[uid];
+                    addedComponentUids.AddRange(storey.GetAddedComponentUids(newStorey));
+                }
+                else
+                {
+                    addedComponentUids.AddRange(newStorey.FloorEntitys.Keys.ToList());
+                }
+                
             }
             return addedComponentUids;
         }
 
-        public List<string> GetRemovedComponentUids(List<string> removedUids)
+        public List<string> GetRemovedComponentUids(THBimBuilding newBuilding, List<string> storeyUids)
         {
             var removedComponentUids = new List<string>();
-            foreach (var uid in removedUids)
+            foreach (var uid in storeyUids)
             {
                 var storey = BuildingStoreys[uid];
-                removedComponentUids.AddRange(storey.FloorEntitys.Keys.ToList());
+                if (newBuilding.BuildingStoreys.ContainsKey(uid))
+                {
+                    var newStorey = newBuilding.BuildingStoreys[uid];
+                    removedComponentUids.AddRange(storey.GetRemovedComponentUids(newStorey));
+                }
+                else
+                {
+                    removedComponentUids.AddRange(storey.FloorEntitys.Keys.ToList());
+                }
             }
             return removedComponentUids;
         }

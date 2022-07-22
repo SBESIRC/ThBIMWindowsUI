@@ -8,10 +8,10 @@ namespace THBimEngine.Domain
 {
     public class THBimSite : THBimElement,IEquatable<THBimSite>
     {
-        public List<THBimBuilding> SiteBuildings { get; }
+        public Dictionary<string, THBimBuilding> SiteBuildings { get; }
         public THBimSite(int id, string name, string describe = "", string uid = "") : base(id, name, describe, uid)
         {
-            SiteBuildings = new List<THBimBuilding>();
+            SiteBuildings = new Dictionary<string, THBimBuilding>();
         }
 
         public override object Clone()

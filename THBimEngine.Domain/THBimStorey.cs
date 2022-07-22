@@ -89,13 +89,24 @@ namespace THBimEngine.Domain
             return false;
         }
 
-
+        public List<string> GetAddedComponentUids(THBimStorey newStorey)
+        {
+            var newStoreyUids = newStorey.FloorEntitys.Keys.ToList();
+            var storeyUids = FloorEntitys.Keys.ToList();
+            return newStoreyUids.Except(storeyUids).ToList();
+        }
+        public List<string> GetRemovedComponentUids(THBimStorey newStorey)
+        {
+            var newStoreyUids = newStorey.FloorEntitys.Keys.ToList();
+            var storeyUids = FloorEntitys.Keys.ToList();
+            return storeyUids.Except(newStoreyUids).ToList();
+        }
 
         public List<string> GetUpdatedComponentUids(THBimStorey newStorey)
         {
             var newStoreyUids = newStorey.FloorEntitys.Keys.ToList();
             var storeyUids = FloorEntitys.Keys.ToList();
-            var unionUids = newStoreyUids.Union(storeyUids).ToList();
+            var unionUids = newStoreyUids.Intersect(storeyUids).ToList();
             var newUpdatedUids = new List<string>();
             foreach (var uid in unionUids)
             {

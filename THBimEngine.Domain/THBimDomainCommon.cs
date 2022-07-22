@@ -35,6 +35,10 @@ namespace THBimEngine.Domain
         {
             return new XbimVector3D(point3D.X, point3D.Y, point3D.Z);
         }
+        public static XbimPoint3D TransPoint(this XbimPoint3D xbimPoint, XbimMatrix3D xbimMatrix)
+        {
+            return xbimMatrix.Transform(xbimPoint);
+        }
         public static GeometryParam WallGeometryParam(this ThTCHWall tchWall) 
         {
             if (tchWall.Outline.Points.Count >= 3)
@@ -73,6 +77,28 @@ namespace THBimEngine.Domain
                                 tchDoor.ExtrudedDirection.Vector3D2XBimVector(),
                                 tchDoor.Height);
             return geoParam;
+        }
+        public static GeometryParam SlabGeometryParam(this ThTCHSlab tchElement)
+        {
+            var outLineGeoParam = new GeometryStretch(tchElement.Outline, XAxis,
+                                ZAxis.Negated(),
+                                tchElement.Height);
+            if (null != tchElement.Descendings) 
+            {
+                foreach (var item in tchElement.Descendings)
+                {
+                    if (item.IsDescending)
+                    {
+
+                    }
+                    else
+                    {
+                        //洞口
+                        outLineGeoParam.OutLine.Add(item.Outline);
+                    }
+                }
+            }
+            return outLineGeoParam;
         }
         public static GeometryParam WindowGeometryParam(this ThTCHWindow tchWindow)
         {

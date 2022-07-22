@@ -117,7 +117,7 @@ namespace THBimEngine.Geometry
             if (geometryStretch.OutLine != null && geometryStretch.OutLine.Count > 0)
             {
                 isOutLine = true;
-                   profile = ThIFC2x3GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, geometryStretch.OutLine.First());
+                profile = ThIFC2x3GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, geometryStretch.OutLine.First());
             }
             else
             {
@@ -128,11 +128,16 @@ namespace THBimEngine.Geometry
                 return null;
             var solid = memoryModel.ToIfcExtrudedAreaSolid(profile, geometryStretch.ZAxis, geometryStretch.ZAxisLength);
             var geoSolid = geomEngine.CreateSolid(solid);
-            if (!isOutLine) 
+            if (!isOutLine)
             {
                 var yAxis = geometryStretch.ZAxis.CrossProduct(geometryStretch.XAxis);
                 var word = XbimMatrix3D.CreateWorld(planeOrigin.Point3D2Vector(), geometryStretch.ZAxis.Negated(), yAxis);
                 geoSolid = geoSolid.Transform(word) as IXbimSolid;
+            }
+            else 
+            {
+                var trans = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
+                geoSolid = geoSolid.Transform(trans) as IXbimSolid;
             }
             return geoSolid;
         }
@@ -140,8 +145,10 @@ namespace THBimEngine.Geometry
         {
             Xbim.Ifc4.ProfileResource.IfcProfileDef profile = null;
             XbimPoint3D planeOrigin = geometryStretch.Origin + moveVector;
+            bool isOutLine = false;
             if (geometryStretch.OutLine != null && geometryStretch.OutLine.Count > 0)
             {
+                isOutLine = true;
                 profile = ThIFC4GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, geometryStretch.OutLine.First());
             }
             else
@@ -153,6 +160,17 @@ namespace THBimEngine.Geometry
                 return null;
             var solid = memoryModel.ToIfcExtrudedAreaSolid(profile, geometryStretch.ZAxis, geometryStretch.ZAxisLength);
             var geoSolid = geomEngine.CreateSolid(solid);
+            if (!isOutLine)
+            {
+                var yAxis = geometryStretch.ZAxis.CrossProduct(geometryStretch.XAxis);
+                var word = XbimMatrix3D.CreateWorld(planeOrigin.Point3D2Vector(), geometryStretch.ZAxis.Negated(), yAxis);
+                geoSolid = geoSolid.Transform(word) as IXbimSolid;
+            }
+            else
+            {
+                var trans = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
+                geoSolid = geoSolid.Transform(trans) as IXbimSolid;
+            }
             return geoSolid;
         }
     }

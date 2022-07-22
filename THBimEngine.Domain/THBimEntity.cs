@@ -18,7 +18,7 @@ namespace THBimEngine.Domain
         /// 物体开洞信息
         /// </summary>
         public List<THBimOpening> Openings { get; private set; }
-        public THBimEntity(int id, string name, GeometryParam geometryParam, string describe = "", string uid = "") : base(id,name,describe,uid)
+        public THBimEntity(int id, string name, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, describe, uid)
         {
             Openings = new List<THBimOpening>();
             GeometryParam = geometryParam;
@@ -33,14 +33,14 @@ namespace THBimEngine.Domain
         {
             if (!base.Equals(other)) return false;
             if (Openings.Count != other.Openings.Count) return false;
-            for(int i =0; i < Openings.Count;i++)
+            for (int i = 0; i < Openings.Count; i++)
             {
                 if (!Openings[i].Equals(other.Openings[i]))
                 {
                     return false;
                 }
             }
-            if(GeometryParam.Equals(other.GeometryParam) &&
+            if (GeometryParam.Equals(other.GeometryParam) &&
                 Openings.Equals(other.Openings))
             {
                 return true;

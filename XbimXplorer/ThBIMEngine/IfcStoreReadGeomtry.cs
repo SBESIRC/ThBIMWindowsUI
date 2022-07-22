@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using THBimEngine.Domain;
 using Xbim.Common;
 using Xbim.Common.Geometry;
 using Xbim.Common.XbimExtensions;
@@ -137,14 +138,14 @@ namespace XbimXplorer.ThBIMEngine
 				var tr = br.ReadShapeTriangulation();
 				if (tr.Faces.Count < 1)
 					continue;
-				var material = GetMeshModelMaterial(insModel, item.IfcShapeLabel, item.ShapeLabel, out string typeStr);
+				var type = this.ifcModel.Metadata.ExpressType((short)insModel.IfcTypeId);
+				var material = THBimMaterial.GetTHBimEntityMaterial(type.GetType());
+				var typeStr = type.ToString();
 				if (typeStr.Contains("open"))
 					continue;
 				var allPts = tr.Vertices.ToArray();
 				var allFace = tr.Faces;
 				if (allFace.Count < 1)
-					continue;
-				if (typeStr.Contains("open"))
 					continue;
 				if (shapeGeoLoopups.ContainsKey(item.ShapeLabel))
 				{
@@ -287,151 +288,6 @@ namespace XbimXplorer.ThBIMEngine
 							!excludedTypes.Contains(s.IfcTypeId));
 			return shapeInstances;
 		}
-		private IfcMaterial GetMeshModelMaterial(XbimShapeInstance insModel, int ifcLable, int shapeLable, out string typeStr)
-		{
-			typeStr = "";
-			var defalutMaterial = new IfcMaterial
-			{
-				Kd_R = 169 / 255f,
-				Kd_G = 179 / 255f,
-				Kd_B = 218 / 255f,
-				Ks_R = 0,
-				Ks_B = 0,
-				Ks_G = 0,
-				K = 0.5f,
-				NS = 12,
-			};
-			//var ifcModel = ifcInstances[ifcLable];
-			//var insModel = shapeInstances.Find(c => c.ShapeGeometryLabel == shapeLable);
-			var type = this.ifcModel.Metadata.ExpressType((short)insModel.IfcTypeId);
-			typeStr = type.ExpressName.ToLower();
-			var v = _colourMap[type.Name];
-			if (typeStr.Contains("window"))
-			{
-
-			}
-			else if (typeStr.Contains("open"))
-			{
-
-			}
-			/*
-			defalutMaterial = new IfcMaterial
-			{
-				Kd_R = v.Red,
-				Kd_G = v.Green,
-				Kd_B = v.Blue,
-				Ks_R = v.DiffuseFactor,
-				Ks_G = v.SpecularFactor,
-				Ks_B = v.DiffuseTransmissionFactor,
-				K = v.Alpha,
-				NS = 12,
-			};
-			return defalutMaterial;*/
-
-			//testListSting.Add(ifcModel.GetType().ToString().ToLower());
-			//testTypeStr.Add(typeStr);
-			if (typeStr.Contains("wall"))
-			{
-				defalutMaterial = new IfcMaterial
-				{
-					Kd_R = 226 / 255f,
-					Kd_G = 212 / 255f,
-					Kd_B = 190 / 255f,
-					Ks_R = 0,
-					Ks_B = 0,
-					Ks_G = 0,
-					K = 1f,
-					NS = 12,
-				};
-			}
-			else if (typeStr.Contains("beam"))
-			{
-				defalutMaterial = new IfcMaterial
-				{
-					Kd_R = 194 / 255f,
-					Kd_G = 178 / 255f,
-					Kd_B = 152 / 255f,
-					Ks_R = 0,
-					Ks_B = 0,
-					Ks_G = 0,
-					K = 1f,
-					NS = 12,
-				};
-			}
-			else if (typeStr.Contains("door"))
-			{
-				defalutMaterial = new IfcMaterial
-				{
-					Kd_R = 167 / 255f,
-					Kd_G = 182 / 255f,
-					Kd_B = 199 / 255f,
-					Ks_R = 0,
-					Ks_B = 0,
-					Ks_G = 0,
-					K = 1f,
-					NS = 12,
-				};
-			}
-			else if (typeStr.Contains("slab"))
-			{
-				defalutMaterial = new IfcMaterial
-				{
-					Kd_R = 167 / 255f,
-					Kd_G = 182 / 255f,
-					Kd_B = 199 / 255f,
-					Ks_R = 0,
-					Ks_B = 0,
-					Ks_G = 0,
-					K = 1f,
-					NS = 12,
-				};
-			}
-			else if (typeStr.Contains("window"))
-			{
-				defalutMaterial = new IfcMaterial
-				{
-					Kd_R = 116 / 255f,
-					Kd_G = 195 / 255f,
-					Kd_B = 219 / 255f,
-					Ks_R = 0,
-					Ks_B = 0,
-					Ks_G = 0,
-					K = 0.5f,
-					NS = 12,
-				};
-			}
-			else if (typeStr.Contains("column"))
-			{
-				defalutMaterial = new IfcMaterial
-				{
-					Kd_R = 171 / 255f,
-					Kd_G = 157 / 255f,
-					Kd_B = 135 / 255f,
-					Ks_R = 0,
-					Ks_B = 0,
-					Ks_G = 0,
-					K = 1f,
-					NS = 12,
-				};
-			}
-			else if (typeStr.Contains("railing"))
-			{
-				defalutMaterial = new IfcMaterial { Kd_R = 136 / 255f, Kd_G = 211 / 255f, Kd_B = 198 / 255f, Ks_R = 0, Ks_B = 0, Ks_G = 0, K = 0.5f, NS = 12, };
-			}
-			else if (typeStr.Contains("open"))
-			{
-
-			}
-			else if (typeStr.Contains("ifcmaterial"))
-			{
-
-			}
-			else
-			{
-
-			}
-			return defalutMaterial;
-		}
 	}
 	class PointNormal
 	{
@@ -443,7 +299,7 @@ namespace XbimXplorer.ThBIMEngine
 	class FaceTriangle
 	{
 		public List<int> ptIndex { get; }
-		public IfcMaterial TriangleMaterial { get; set; }
+		public THBimMaterial TriangleMaterial { get; set; }
 		public FaceTriangle()
 		{
 			ptIndex = new List<int>();
@@ -467,18 +323,6 @@ namespace XbimXplorer.ThBIMEngine
 		public float Y { get; set; }
 		public float Z { get; set; }
 	}
-	class IfcMaterial
-	{
-		public float Kd_R { get; set; }
-		public float Kd_G { get; set; }
-		public float Kd_B { get; set; }
-		public float Ks_R { get; set; }
-		public float Ks_G { get; set; }
-		public float Ks_B { get; set; }
-		public float K { get; set; }
-		public int NS { get; set; }
-	}
-
 	class ReadTaskInfo
 	{
 		public int AllCount { get; set; }

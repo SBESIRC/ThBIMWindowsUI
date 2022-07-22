@@ -116,7 +116,7 @@ namespace XbimXplorer.ThBIMEngine
             foreach (var item in _allEntitys) 
             {
                 var entity = item.Value;
-                if (null == entity || entity.ShapeGeometry == null)
+                if (null == entity || entity.ShapeGeometry == null || string.IsNullOrEmpty(entity.ShapeGeometry.ShapeData))
                     continue;
                 var ptOffSet = allGeoPointNormals.Count();
                 var ms = new MemoryStream((entity.ShapeGeometry as IXbimShapeGeometryData).ShapeData);
@@ -127,7 +127,7 @@ namespace XbimXplorer.ThBIMEngine
                     continue;
                 var moveVector = entity.ShapeGeometry.TempOriginDisplacement;
                 var transform = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
-                var material = GetMeshModelMaterial("wall");
+                var material = THBimMaterial.GetTHBimEntityMaterial(entity.GetType());
                 IfcMeshModel meshModel = new IfcMeshModel(entity.Id, entity.Id);
                 var allPts = tr.Vertices.ToArray();
                 var allFace = tr.Faces;
@@ -237,11 +237,10 @@ namespace XbimXplorer.ThBIMEngine
                                     openingSolids.Add(openingSolid);
                                 var openingRelation = new THBimElementRelation(bimOpening.Id, bimOpening.Name, bimOpening.Describe, bimOpening.Uid);
                                 bimStory.FloorEntitys.Add(bimOpening.Uid, openingRelation);
-                                _allEntitys.Add(bimOpening.Uid, bimOpening);
+                                //_allEntitys.Add(bimOpening.Uid, bimOpening);
                                 AddElementIndex();
                             }
                         }
-
                         bimWall.ShapeGeometry = _geometryFactory.GetShapeGeometry(bimWall.GeometryParam as GeometryStretch, moveVector, openingSolids);
                     }
                     bimBuilding.BuildingStoreys.Add(bimStory.Uid, bimStory);
@@ -274,146 +273,6 @@ namespace XbimXplorer.ThBIMEngine
         {
             return _globalIndex;
         }
-        private IfcMaterial GetMeshModelMaterial(string typeStr)
-        {
-            var defalutMaterial = new IfcMaterial
-            {
-                Kd_R = 169 / 255f,
-                Kd_G = 179 / 255f,
-                Kd_B = 218 / 255f,
-                Ks_R = 0,
-                Ks_B = 0,
-                Ks_G = 0,
-                K = 0.5f,
-                NS = 12,
-            };
-            if (typeStr.Contains("window"))
-            {
-
-            }
-            else if (typeStr.Contains("open"))
-            {
-
-            }
-            /*
-			defalutMaterial = new IfcMaterial
-			{
-				Kd_R = v.Red,
-				Kd_G = v.Green,
-				Kd_B = v.Blue,
-				Ks_R = v.DiffuseFactor,
-				Ks_G = v.SpecularFactor,
-				Ks_B = v.DiffuseTransmissionFactor,
-				K = v.Alpha,
-				NS = 12,
-			};
-			return defalutMaterial;*/
-
-            //testListSting.Add(ifcModel.GetType().ToString().ToLower());
-            //testTypeStr.Add(typeStr);
-            if (typeStr.Contains("wall"))
-            {
-                defalutMaterial = new IfcMaterial
-                {
-                    Kd_R = 226 / 255f,
-                    Kd_G = 212 / 255f,
-                    Kd_B = 190 / 255f,
-                    Ks_R = 0,
-                    Ks_B = 0,
-                    Ks_G = 0,
-                    K = 1f,
-                    NS = 12,
-                };
-            }
-            else if (typeStr.Contains("beam"))
-            {
-                defalutMaterial = new IfcMaterial
-                {
-                    Kd_R = 194 / 255f,
-                    Kd_G = 178 / 255f,
-                    Kd_B = 152 / 255f,
-                    Ks_R = 0,
-                    Ks_B = 0,
-                    Ks_G = 0,
-                    K = 1f,
-                    NS = 12,
-                };
-            }
-            else if (typeStr.Contains("door"))
-            {
-                defalutMaterial = new IfcMaterial
-                {
-                    Kd_R = 167 / 255f,
-                    Kd_G = 182 / 255f,
-                    Kd_B = 199 / 255f,
-                    Ks_R = 0,
-                    Ks_B = 0,
-                    Ks_G = 0,
-                    K = 1f,
-                    NS = 12,
-                };
-            }
-            else if (typeStr.Contains("slab"))
-            {
-                defalutMaterial = new IfcMaterial
-                {
-                    Kd_R = 167 / 255f,
-                    Kd_G = 182 / 255f,
-                    Kd_B = 199 / 255f,
-                    Ks_R = 0,
-                    Ks_B = 0,
-                    Ks_G = 0,
-                    K = 1f,
-                    NS = 12,
-                };
-            }
-            else if (typeStr.Contains("window"))
-            {
-                defalutMaterial = new IfcMaterial
-                {
-                    Kd_R = 116 / 255f,
-                    Kd_G = 195 / 255f,
-                    Kd_B = 219 / 255f,
-                    Ks_R = 0,
-                    Ks_B = 0,
-                    Ks_G = 0,
-                    K = 0.5f,
-                    NS = 12,
-                };
-            }
-            else if (typeStr.Contains("column"))
-            {
-                defalutMaterial = new IfcMaterial
-                {
-                    Kd_R = 171 / 255f,
-                    Kd_G = 157 / 255f,
-                    Kd_B = 135 / 255f,
-                    Ks_R = 0,
-                    Ks_B = 0,
-                    Ks_G = 0,
-                    K = 1f,
-                    NS = 12,
-                };
-            }
-            else if (typeStr.Contains("railing"))
-            {
-                defalutMaterial = new IfcMaterial { Kd_R = 136 / 255f, Kd_G = 211 / 255f, Kd_B = 198 / 255f, Ks_R = 0, Ks_B = 0, Ks_G = 0, K = 0.5f, NS = 12, };
-            }
-            else if (typeStr.Contains("open"))
-            {
-
-            }
-            else if (typeStr.Contains("ifcmaterial"))
-            {
-
-            }
-            else
-            {
-
-            }
-            return defalutMaterial;
-        }
-
         private PointNormal GetPointNormal(int pIndex, XbimPoint3D point, XbimVector3D normal)
         {
             return new PointNormal

@@ -10,6 +10,7 @@ namespace THBimEngine.Domain.Model.SurrogateModel
         {
             this.Points = pts;
             this.IsClosed = closed;
+            this.InnerPolylines = new List<PolylineSurrogate>();
         }
 
         [ProtoMember(1)]
@@ -17,5 +18,7 @@ namespace THBimEngine.Domain.Model.SurrogateModel
 
         [ProtoMember(2)]
         public bool IsClosed { get; set; }
+        [ProtoMember(3)]
+        public List<PolylineSurrogate> InnerPolylines { get; set; }
     }
 }

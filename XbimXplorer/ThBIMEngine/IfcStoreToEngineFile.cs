@@ -231,13 +231,13 @@ namespace XbimXplorer.ThBIMEngine
 			{
 				foreach (var item in mesh.FaceTriangles)
 				{
-					writer.Write(item.TriangleMaterial.Kd_R);
-					writer.Write(item.TriangleMaterial.Kd_G);
-					writer.Write(item.TriangleMaterial.Kd_B);
-					writer.Write(item.TriangleMaterial.Ks_R);
-					writer.Write(item.TriangleMaterial.Ks_G);
-					writer.Write(item.TriangleMaterial.Ks_B);
-					writer.Write(item.TriangleMaterial.K);
+					writer.Write(item.TriangleMaterial.Color_R);
+					writer.Write(item.TriangleMaterial.Color_G);
+					writer.Write(item.TriangleMaterial.Color_B);
+					writer.Write(item.TriangleMaterial.KS_R);
+					writer.Write(item.TriangleMaterial.KS_G);
+					writer.Write(item.TriangleMaterial.KS_B);
+					writer.Write(item.TriangleMaterial.Alpha);
 					writer.Write(item.TriangleMaterial.NS);
 				}
 			}

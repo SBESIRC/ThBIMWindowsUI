@@ -65,6 +65,7 @@ namespace THBimEngine.Geometry
         }
         public XbimShapeGeometry GetShapeGeometry(GeometryStretch geometryStretch, XbimVector3D moveVector,List<IXbimSolid> openingSolids)
         {
+            XbimShapeGeometry shapeGeometry = null;
             using (var txn = memoryModel.BeginTransaction("Create Shape Geometry"))
             {
                 IXbimSolid geoSolid = null;
@@ -77,22 +78,22 @@ namespace THBimEngine.Geometry
                     geoSolid = GetXBimSolid4(geometryStretch, moveVector);
                 }
                 if (null == geoSolid || geoSolid.SurfaceArea < 10)
-                    return null;
-                IXbimSolidSet solid = geoSolid as IXbimSolidSet;
+                    return shapeGeometry;
+                IXbimSolidSet solid = null;
                 if (null != openingSolids && openingSolids.Count > 0) 
                 {
                     foreach (var item in openingSolids) 
                     {
-                        solid = solid.Cut(item, 1);
+                        if (solid == null)
+                            solid = geoSolid.Cut(item,1);
+                        else
+                            solid = solid.Cut(item, 1);
                     }
                 }
-                XbimShapeGeometry shapeGeometry = geomEngine.CreateShapeGeometry(solid, 0.001, 0.0001, 0.5, XbimGeometryType.PolyhedronBinary);
-                using (var ms = new MemoryStream((shapeGeometry as IXbimShapeGeometryData).ShapeData))
-                {
-                    var testData = ms.ToArray();
-                    var br = new BinaryReader(ms);
-                    var tr = br.ReadShapeTriangulation();
-                }
+                if (solid != null)
+                    shapeGeometry = geomEngine.CreateShapeGeometry(solid, 0.001, 0.0001, 0.5, XbimGeometryType.PolyhedronBinary);
+                else
+                    shapeGeometry = geomEngine.CreateShapeGeometry(geoSolid, 0.001, 0.0001, 0.5, XbimGeometryType.PolyhedronBinary);
                 txn.Commit();
                 return shapeGeometry;
             }
@@ -112,19 +113,27 @@ namespace THBimEngine.Geometry
         {
             Xbim.Ifc2x3.ProfileResource.IfcProfileDef profile = null;
             XbimPoint3D planeOrigin = geometryStretch.Origin + moveVector;
+            bool isOutLine = false;
             if (geometryStretch.OutLine != null && geometryStretch.OutLine.Count > 0)
             {
-                profile = ThIFC2x3GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, geometryStretch.OutLine.First());
+                isOutLine = true;
+                   profile = ThIFC2x3GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, geometryStretch.OutLine.First());
             }
             else
             {
                 if (Math.Abs(geometryStretch.XAxisLength) > 1 && Math.Abs(geometryStretch.YAxisLength) > 1)
-                    profile = ThIFC2x3GeExtension.ToIfcRectangleProfileDef(memoryModel, planeOrigin, geometryStretch.XAxisLength, geometryStretch.YAxisLength);
+                    profile = ThIFC2x3GeExtension.ToIfcRectangleProfileDef(memoryModel, XbimPoint3D.Zero, geometryStretch.XAxisLength, geometryStretch.YAxisLength);
             }
             if (profile == null)
                 return null;
             var solid = memoryModel.ToIfcExtrudedAreaSolid(profile, geometryStretch.ZAxis, geometryStretch.ZAxisLength);
             var geoSolid = geomEngine.CreateSolid(solid);
+            if (!isOutLine) 
+            {
+                var yAxis = geometryStretch.ZAxis.CrossProduct(geometryStretch.XAxis);
+                var word = XbimMatrix3D.CreateWorld(planeOrigin.Point3D2Vector(), geometryStretch.ZAxis.Negated(), yAxis);
+                geoSolid = geoSolid.Transform(word) as IXbimSolid;
+            }
             return geoSolid;
         }
         public IXbimSolid GetXBimSolid4(GeometryStretch geometryStretch, XbimVector3D moveVector)

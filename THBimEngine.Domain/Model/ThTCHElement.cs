@@ -6,7 +6,17 @@ using THBimEngine.Domain.Model.SurrogateModel;
 namespace THBimEngine.Domain.Model
 {
     [ProtoContract]
-    public abstract class ThTCHElement
+    [ProtoInclude(100, typeof(ThTCHProject))]
+    [ProtoInclude(101, typeof(ThTCHSite))]
+    [ProtoInclude(102, typeof(ThTCHBuilding))]
+    [ProtoInclude(103, typeof(ThTCHBuildingStorey))]
+    [ProtoInclude(104, typeof(ThTCHWall))]
+    [ProtoInclude(105, typeof(ThTCHDoor))]
+    [ProtoInclude(106, typeof(ThTCHSlab))]
+    [ProtoInclude(107, typeof(ThTCHWindow))]
+    [ProtoInclude(108, typeof(ThTCHRailing))]
+    [ProtoInclude(109, typeof(ThTCHOpening))]
+    public class ThTCHElement
     {
         /*这里预留10个序列数据，外部序列数字冲11开始*/
         [ProtoMember(1)]

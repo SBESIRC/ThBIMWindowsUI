@@ -81,13 +81,14 @@ namespace THBimEngine.Domain
         /// <param name="zAxis"></param>
         /// <param name="zAxisLength"></param>
         /// <param name="zOffSet"></param>
-        public GeometryStretch(XbimVector3D xAxis, XbimVector3D zAxis, double zAxisLength, double zOffSet = 0.0) 
+        public GeometryStretch(PolylineSurrogate polyline, XbimVector3D xAxis, XbimVector3D zAxis, double zAxisLength, double zOffSet = 0.0) 
         {
             Init();
             XAxis = xAxis;
             ZAxis = zAxis;
             ZAxisLength = zAxisLength;
             ZAxisOffSet = zOffSet;
+            OutLine.Add(polyline);
         }
         private void Init() 
         {

@@ -116,18 +116,32 @@ namespace THBimEngine.Geometry
         public static IfcCompositeCurve ToIfcCompositeCurve(this MemoryModel model, PolylineSurrogate polyline)
         {
             var compositeCurve = CreateIfcCompositeCurve(model);
-            foreach (var item in polyline.Points) 
+            for (int i = 0; i < polyline.Points.Count; i++)
             {
                 var curveSegement = CreateIfcCompositeCurveSegment(model);
                 var poly = model.Instances.New<IfcPolyline>();
-                foreach (var point in item.Points) 
+                var pt1 = polyline.Points[i].Points.First().Point3D2XBimPoint();
+                poly.Points.Add(ToIfcCartesianPoint(model, pt1));
+                if (polyline.Points[i].Points.Count != 1)
                 {
-                    poly.Points.Add(ToIfcCartesianPoint(model, point.Point3D2XBimPoint()));
+                    var midPt = polyline.Points[i].Points.Last().Point3D2XBimPoint();
+                    poly.Points.Add(ToIfcCartesianPoint(model, midPt));
                 }
+                XbimPoint3D pt2 = pt1;
+                if (i + 1 < polyline.Points.Count)
+                {
+                    pt2 = polyline.Points[i + 1].Points.First().Point3D2XBimPoint();
+                }
+                else
+                {
+                    pt2 = polyline.Points[0].Points.First().Point3D2XBimPoint();
+                }
+                if (pt1.PointDistanceToPoint(pt2) < 1)
+                    continue;
+                poly.Points.Add(ToIfcCartesianPoint(model, pt2));
                 curveSegement.ParentCurve = poly;
                 compositeCurve.Segments.Add(curveSegement);
             }
-            
             return compositeCurve;
         }
         public static XbimVector3D ToAcGePoint3d(this IfcCartesianPoint point)

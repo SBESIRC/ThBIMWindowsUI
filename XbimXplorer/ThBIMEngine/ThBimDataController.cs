@@ -31,7 +31,7 @@ namespace XbimXplorer.ThBIMEngine
             {
                 foreach (var building in project.ProjectSite.SiteBuildings) 
                 {
-                    foreach (var storey in building.BuildingStoreys) 
+                    foreach (var storey in building.BuildingStoreys.Values) 
                     {
                         if (string.IsNullOrEmpty(storey.MemoryStoreyId))
                         {
@@ -74,8 +74,26 @@ namespace XbimXplorer.ThBIMEngine
         }
         public void UpdateProject(ThTCHProject project) 
         {
+            THBimProject newBimProject = new THBimProject(CurrentGIndex(), project.ProjectName);
+            foreach (var item in _allBimProject)
+            {
+                var buildings = item.ProjectSite.SiteBuildings;
+                foreach(var building in buildings)
+                {
+                    var buildingId = building.Uid;
+                    var id2BuildingDic = newBimProject.ProjectSite.SiteBuildings.ToDictionary(b => b.Uid);
+                    var newBuilding = id2BuildingDic[buildingId];
 
+                    var newStoreyUids = new List<string>();
+                    var storeyUids = new List<string>();
+                    
 
+                    var newAddedUid = building.GetNewlyAddedComponentUids(newBuilding, newStoreyUids.Except(storeyUids).ToList());
+                    var newRemovedUid = building.GetRemovedComponentUids(storeyUids.Except(newStoreyUids).ToList());
+                    var newUpdatedUid = building.GetUpdatedComponentUids(newBuilding, newStoreyUids.Union(storeyUids).ToList());
+
+                }
+            }
 
         }
         public void UpdateElement() 
@@ -173,7 +191,7 @@ namespace XbimXplorer.ThBIMEngine
                     {
                         var bimWall = new THBimWall(CurrentGIndex(), string.Format("wall#{0}", CurrentGIndex()), wall.WallGeometryParam());
                         var wallRelation = new THBimElementRelation(bimWall.Id, bimWall.Name, bimWall.Describe, bimWall.Uid);
-                        bimStory.FloorEntitys.Add(bimWall.Id, wallRelation);
+                        bimStory.FloorEntitys.Add(bimWall.Uid, wallRelation);
                         bimWall.ParentUid = bimStory.Uid;
                         AddElementIndex();
                         _allEntitys.Add(bimWall.Uid, bimWall);
@@ -188,7 +206,7 @@ namespace XbimXplorer.ThBIMEngine
                                 if (null != doorSolid && doorSolid.SurfaceArea > 10)
                                     openingSolids.Add(doorSolid);
                                 var doorRelation = new THBimElementRelation(bimDoor.Id, bimDoor.Name, bimDoor.Describe, bimDoor.Uid);
-                                bimStory.FloorEntitys.Add(bimDoor.Id, doorRelation);
+                                bimStory.FloorEntitys.Add(bimDoor.Uid, doorRelation);
                                 _allEntitys.Add(bimDoor.Uid, bimDoor);
                                 AddElementIndex();
                             }
@@ -203,7 +221,7 @@ namespace XbimXplorer.ThBIMEngine
                                 if (null != windowSolid && windowSolid.SurfaceArea > 10)
                                     openingSolids.Add(windowSolid);
                                 var windowRelation = new THBimElementRelation(bimWindow.Id, bimWindow.Name, bimWindow.Describe, bimWindow.Uid);
-                                bimStory.FloorEntitys.Add(bimWindow.Id, windowRelation);
+                                bimStory.FloorEntitys.Add(bimWindow.Uid, windowRelation);
                                 _allEntitys.Add(bimWindow.Uid, bimWindow);
                                 AddElementIndex();
                             }
@@ -218,7 +236,7 @@ namespace XbimXplorer.ThBIMEngine
                                 if (null != openingSolid && openingSolid.SurfaceArea > 10)
                                     openingSolids.Add(openingSolid);
                                 var openingRelation = new THBimElementRelation(bimOpening.Id, bimOpening.Name, bimOpening.Describe, bimOpening.Uid);
-                                bimStory.FloorEntitys.Add(bimOpening.Id, openingRelation);
+                                bimStory.FloorEntitys.Add(bimOpening.Uid, openingRelation);
                                 _allEntitys.Add(bimOpening.Uid, bimOpening);
                                 AddElementIndex();
                             }
@@ -226,7 +244,7 @@ namespace XbimXplorer.ThBIMEngine
 
                         bimWall.ShapeGeometry = _geometryFactory.GetShapeGeometry(bimWall.GeometryParam as GeometryStretch, moveVector, openingSolids);
                     }
-                    bimBuilding.BuildingStoreys.Add(bimStory);
+                    bimBuilding.BuildingStoreys.Add(bimStory.Uid, bimStory);
                 }
                 bimSite.SiteBuildings.Add(bimBuilding);
                 bimProject.ProjectSite = bimSite;

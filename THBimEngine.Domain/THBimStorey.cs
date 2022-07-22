@@ -21,19 +21,19 @@ namespace THBimEngine.Domain
         /// <summary>
         /// 该楼层元素
         /// </summary>
-        public Dictionary<int, THBimElementRelation> FloorEntitys { get; private set; }
+        public Dictionary<string, THBimElementRelation> FloorEntitys { get; private set; }
         /// <summary>
         /// 楼层原点
         /// </summary>
         public XbimPoint3D Origin { get; set; }
         /// <summary>
-        /// 
+        /// 链接楼层ID，标准层第一层或非标层为 NULL
         /// </summary>
         public string MemoryStoreyId { get; set; }
         public XbimMatrix3D MemoryMatrix3d { get; set; }
         public THBimStorey(int id, string name,double elevation,double levelHeight, string describe = "", string uid = "") : base(id, name, describe, uid)
         {
-            FloorEntitys = new Dictionary<int, THBimElementRelation>();
+            FloorEntitys = new Dictionary<string, THBimElementRelation>();
             Elevation = elevation;
             LevelHeight = levelHeight;
             MemoryStoreyId = string.Empty;
@@ -68,9 +68,13 @@ namespace THBimEngine.Domain
             {
                 return false;
             }
-            for(int i =0; i < FloorEntitys.Count;i++)
+            foreach(var key in FloorEntitys.Keys)
             {
-                if (!FloorEntitys[i].Equals(other.FloorEntitys[i]))
+                if (!other.FloorEntitys.ContainsKey(key))
+                {
+                    return false;
+                }
+                if (!FloorEntitys[key].Equals(other.FloorEntitys[key]))
                 {
                     return false;
                 }
@@ -83,6 +87,24 @@ namespace THBimEngine.Domain
                 return true;
             }
             return false;
+        }
+
+
+
+        public List<string> GetUpdatedComponentUids(THBimStorey newStorey)
+        {
+            var newStoreyUids = newStorey.FloorEntitys.Keys.ToList();
+            var storeyUids = FloorEntitys.Keys.ToList();
+            var unionUids = newStoreyUids.Union(storeyUids).ToList();
+            var newUpdatedUids = new List<string>();
+            foreach (var uid in unionUids)
+            {
+                if (!FloorEntitys[uid].Equals(newStorey.FloorEntitys[uid]))
+                {
+                    newUpdatedUids.Add(uid);
+                }
+            }
+            return newUpdatedUids;
         }
     }
 }

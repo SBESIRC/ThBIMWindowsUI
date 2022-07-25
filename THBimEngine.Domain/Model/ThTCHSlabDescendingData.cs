@@ -1,5 +1,5 @@
 ﻿using ProtoBuf;
-using THBimEngine.Domain.Model.SurrogateModel;
+using THBimEngine.Domain.GeometryModel;
 
 namespace THBimEngine.Domain.Model
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using THBimEngine.Domain.GeometryModel;
 using THBimEngine.Domain.Model;
-using THBimEngine.Domain.Model.SurrogateModel;
 using Xbim.Common.Geometry;
 
 namespace THBimEngine.Domain
@@ -62,7 +62,7 @@ namespace THBimEngine.Domain
                     else
                     {
                         //洞口
-                        outLineGeoParam.OutLine.Add(item.Outline);
+                        outLineGeoParam.OutLine.InnerPolylines.Add(item.Outline);
                     }
                 }
             }
@@ -79,6 +79,7 @@ namespace THBimEngine.Domain
                                         xVector,
                                         tchElement.ExtrudedDirection.Vector3D2XBimVector(),
                                         tchElement.Height);
+                outLineGeoParam.YAxisLength = tchElement.Width;
                 return outLineGeoParam;
             }
             else

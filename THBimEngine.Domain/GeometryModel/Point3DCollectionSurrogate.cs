@@ -1,7 +1,7 @@
 ﻿using ProtoBuf;
 using System.Collections.Generic;
 
-namespace THBimEngine.Domain.Model.SurrogateModel
+namespace THBimEngine.Domain.GeometryModel
 {
     [ProtoContract]
     public struct Point3DCollectionSurrogate

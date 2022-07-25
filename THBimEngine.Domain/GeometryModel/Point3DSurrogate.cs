@@ -1,6 +1,6 @@
 ﻿using ProtoBuf;
 
-namespace THBimEngine.Domain.Model.SurrogateModel
+namespace THBimEngine.Domain.GeometryModel
 {
     [ProtoContract]
     public struct Point3DSurrogate

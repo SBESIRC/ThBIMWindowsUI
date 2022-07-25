@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using THBimEngine.Domain;
 using THBimEngine.Domain.Model;
+using THBimEngine.Geometry.NTS;
 using Xbim.Common.Geometry;
 using Xbim.Common.Step21;
 
@@ -14,16 +14,13 @@ namespace THBimEngine.Geometry
         private int _globalIndex = 0;
         List<THBimEntity> _allEntitys;
         THBimProject _bimProject;
-        //GeometryFactory _geometryFactory;
         IfcSchemaVersion _schemaVersion;
         Dictionary<string, THBimStorey> _prjEntityFloors;
         Dictionary<string, THBimStorey> _allStoreys;
-        
         public THEntityConvertFactory(IfcSchemaVersion ifcSchemaVersion)
         {
             _allEntitys = new List<THBimEntity>();
             _schemaVersion = ifcSchemaVersion;
-            GeometryFactory _geometryFactory = new GeometryFactory(ifcSchemaVersion);
         }
         public ConvertResult ThTCHProjectConvert(ThTCHProject project)
         {
@@ -184,7 +181,10 @@ namespace THBimEngine.Geometry
                     });
                     Parallel.ForEach(storey.Railings, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, railing => 
                     {
-                        var bimRailing = new THBimRailing(CurrentGIndex(), string.Format("railing#{0}", CurrentGIndex()), railing.THTCHGeometryParam(), "", railing.Uuid);
+                        var railingGeo = railing.THTCHGeometryParam() as GeometryStretch;
+                        if(railingGeo.OutLine.Points != null)
+                            railingGeo.OutLine = railing.Outline.BufferFlatPL(railingGeo.YAxisLength/2);
+                        var bimRailing = new THBimRailing(CurrentGIndex(), string.Format("railing#{0}", CurrentGIndex()), railingGeo, "", railing.Uuid);
                         var wallRelation = new THBimElementRelation(bimRailing.Id, bimRailing.Name, bimRailing, bimRailing.Describe, bimRailing.Uid);
                         bimStorey.FloorEntitys.Add(bimRailing.Uid, wallRelation);
                         bimRailing.ParentUid = bimStorey.Uid;

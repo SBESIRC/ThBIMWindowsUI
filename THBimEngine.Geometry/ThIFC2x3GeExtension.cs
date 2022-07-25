@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using THBimEngine.Domain;
-using THBimEngine.Domain.Model.SurrogateModel;
+using THBimEngine.Domain.GeometryModel;
 using Xbim.Common.Geometry;
 using Xbim.Ifc2x3.GeometricConstraintResource;
 using Xbim.Ifc2x3.GeometricModelResource;

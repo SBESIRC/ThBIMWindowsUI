@@ -91,11 +91,11 @@
     <Compile Include="THBimElement.cs" />
     <Compile Include="THBimElementRelation.cs" />
     <Compile Include="THBimEntity.cs" />
-    <Compile Include="Model\SurrogateModel\Matrix3DSurrogate.cs" />
-    <Compile Include="Model\SurrogateModel\Point3DCollectionSurrogate.cs" />
-    <Compile Include="Model\SurrogateModel\Point3DSurrogate.cs" />
-    <Compile Include="Model\SurrogateModel\PolylineSurrogate.cs" />
-    <Compile Include="Model\SurrogateModel\Vector3DSurrogate.cs" />
+    <Compile Include="GeometryModel\Matrix3DSurrogate.cs" />
+    <Compile Include="GeometryModel\Point3DCollectionSurrogate.cs" />
+    <Compile Include="GeometryModel\Point3DSurrogate.cs" />
+    <Compile Include="GeometryModel\PolylineSurrogate.cs" />
+    <Compile Include="GeometryModel\Vector3DSurrogate.cs" />
     <Compile Include="Model\ThTCHBuilding.cs" />
     <Compile Include="Model\ThTCHBuildingStorey.cs" />
     <Compile Include="Model\ThTCHDoor.cs" />

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using THBimEngine.Domain;
+using THBimEngine.Domain.GeometryModel;
 using Xbim.Common;
 using Xbim.Common.Geometry;
 using Xbim.Common.Step21;
@@ -161,10 +162,10 @@ namespace THBimEngine.Geometry
             Xbim.Ifc2x3.ProfileResource.IfcProfileDef profile = null;
             XbimPoint3D planeOrigin = geometryStretch.Origin + moveVector+ geometryStretch.ZAxis* geometryStretch.ZAxisOffSet;
             bool isOutLine = false;
-            if (geometryStretch.OutLine != null && geometryStretch.OutLine.Count > 0)
+            if (geometryStretch.OutLine.Points != null)
             {
                 isOutLine = true;
-                profile = ThIFC2x3GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, geometryStretch.OutLine.First());
+                profile = ThIFC2x3GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, geometryStretch.OutLine);
             }
             else
             {
@@ -193,10 +194,10 @@ namespace THBimEngine.Geometry
             Xbim.Ifc4.ProfileResource.IfcProfileDef profile = null;
             XbimPoint3D planeOrigin = geometryStretch.Origin + moveVector + geometryStretch.ZAxis*geometryStretch.ZAxisOffSet;
             bool isOutLine = false;
-            if (geometryStretch.OutLine != null && geometryStretch.OutLine.Count > 0)
+            if (geometryStretch.OutLine.Points != null)
             {
                 isOutLine = true;
-                profile = ThIFC4GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, geometryStretch.OutLine.First());
+                profile = ThIFC4GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, geometryStretch.OutLine);
             }
             else
             {

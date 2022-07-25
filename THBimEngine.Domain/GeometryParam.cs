@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
-using THBimEngine.Domain.Model.SurrogateModel;
 using Xbim.Common.Geometry;
 using System;
+using THBimEngine.Domain.GeometryModel;
+
 namespace THBimEngine.Domain
 {
     public abstract class GeometryParam
@@ -51,7 +52,7 @@ namespace THBimEngine.Domain
         /// <summary>
         /// 多边形轮廓（可以带洞口）第一个为外轮廓，其余的为内轮廓（洞口）
         /// </summary>
-        public List<PolylineSurrogate> OutLine { get; private set; }
+        public PolylineSurrogate OutLine { get; set; }
         #endregion
         /// <summary>
         /// 根据中心点创建矩形拉伸数据
@@ -65,7 +66,6 @@ namespace THBimEngine.Domain
         /// <param name="zOffSet">z轴偏移量</param>
         public GeometryStretch(XbimPoint3D origin, XbimVector3D xAxis, double xAxisLength,double yAxisLength, XbimVector3D zAxis,double zAxisLength,double zOffSet=0.0) 
         {
-            Init();
             Origin = origin;
             XAxis = xAxis;
             XAxisLength = xAxisLength;
@@ -83,18 +83,12 @@ namespace THBimEngine.Domain
         /// <param name="zOffSet"></param>
         public GeometryStretch(PolylineSurrogate polyline, XbimVector3D xAxis, XbimVector3D zAxis, double zAxisLength, double zOffSet = 0.0) 
         {
-            Init();
             XAxis = xAxis;
             ZAxis = zAxis;
             ZAxisLength = zAxisLength;
             ZAxisOffSet = zOffSet;
-            OutLine.Add(polyline);
+            OutLine = polyline;
         }
-        private void Init() 
-        {
-            OutLine = new List<PolylineSurrogate>();
-        }
-
 
         public override int GetHashCode()
         {
@@ -104,17 +98,13 @@ namespace THBimEngine.Domain
                  ^ Origin.GetHashCode() 
                  ^ ZAxis.GetHashCode() 
                  ^ XAxis.GetHashCode() 
-                 ^ ZAxisOffSet.GetHashCode()
-                 ^ OutLine.Count;
+                 ^ ZAxisOffSet.GetHashCode();
         }
 
         public bool Equals(GeometryStretch other)
         {
-            if (!OutLine.Count.Equals(other.OutLine.Count)) return false;
-            for(int i = 0; i < OutLine.Count;i++)
-            {
-                if (!OutLine[i].Equals(other.OutLine[i])) return false;
-            }
+            if (!OutLine.Equals(other.OutLine))
+                return false;
             if (XAxisLength.FloatEquals(other.XAxisLength) &&
                 YAxisLength.FloatEquals(other.YAxisLength) &&
                 ZAxisLength.FloatEquals(other.ZAxisLength) &&

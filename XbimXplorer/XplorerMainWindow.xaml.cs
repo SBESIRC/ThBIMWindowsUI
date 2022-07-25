@@ -77,7 +77,7 @@ namespace XbimXplorer
 
         private string _openedModelFileName;
 		private string _tempMidFileName;
-        private ThBimDataController bimDataController = new ThBimDataController(null);
+        private ThBimDataController bimDataController = new ThBimDataController();
 
         /// <summary>
         /// Deals with the user-defined model file name.
@@ -151,14 +151,17 @@ namespace XbimXplorer
         {
             if (null != thProject) 
             {
+                DateTime startTime = DateTime.Now;
                 bimDataController.AddProject(thProject);
-                bimDataController.WriteToMidFile(_tempMidFileName);
+                bimDataController.WriteToMidFileByFloor(_tempMidFileName);
                 thProject = null;
                 pipeServer = null;
                 backgroundWorker.RunWorkerAsync();
+                DateTime endTime = DateTime.Now;
+                var totalTime = (endTime - startTime).TotalSeconds;
+                Log.Info(string.Format("数据解析完成，耗时：{0}s",totalTime));
                 LoadIfcFile(_tempMidFileName);
             }
-            
         }
 
         private void Background_DoWork(object sender, DoWorkEventArgs e)

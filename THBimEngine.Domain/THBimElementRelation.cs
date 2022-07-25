@@ -6,8 +6,13 @@ namespace THBimEngine.Domain
     {
         public int RelationElementId { get; set; }
         public string RelationElementUid { get; set; }
-        public THBimElementRelation(int id, string name, string describe = "", string uid = "") : base(id, name, describe, uid)
+        public THBimElementRelation(int id, string name, THBimElement relationElement =null, string describe = "", string uid = "") : base(id, name, describe, uid)
         {
+            if (null != relationElement) 
+            {
+                RelationElementUid = relationElement.Uid;
+                RelationElementId = relationElement.Id;
+            }
         }
 
         public override object Clone()

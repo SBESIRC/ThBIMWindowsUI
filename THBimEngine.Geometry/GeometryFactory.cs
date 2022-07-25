@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using THBimEngine.Domain;
 using Xbim.Common;
 using Xbim.Common.Geometry;
 using Xbim.Common.Step21;
-using Xbim.Common.XbimExtensions;
 using Xbim.Geometry.Engine.Interop;
 using Xbim.Ifc;
 using Xbim.Ifc4.Interfaces;
@@ -98,6 +96,37 @@ namespace THBimEngine.Geometry
                 return shapeGeometry;
             }
         }
+
+        public XbimShapeGeometry GetShapeGeometry(List<IXbimSolid> geoSolids,List<IXbimSolid> openingSolids)
+        {
+            XbimShapeGeometry shapeGeometry = null;
+            using (var txn = memoryModel.BeginTransaction("Create Shape Geometry"))
+            {
+                IXbimSolidSet solidSet = geomEngine.CreateSolidSet();
+                foreach (var geoSolid in geoSolids) 
+                {
+                    IXbimSolidSet solid = null;
+                    if (null != openingSolids && openingSolids.Count > 0)
+                    {
+                        foreach (var item in openingSolids)
+                        {
+                            if (solid == null)
+                                solid = geoSolid.Cut(item, 1);
+                            else
+                                solid = solid.Cut(item, 1);
+                        }
+                    }
+                    if (solid == null)
+                        solidSet.Add(geoSolid);
+                    else
+                        foreach (var subSolid in solid)
+                            solidSet.Add(subSolid);
+                }
+                shapeGeometry = geomEngine.CreateShapeGeometry(solidSet, 0.001, 0.0001, 0.5, XbimGeometryType.PolyhedronBinary);
+                txn.Commit();
+                return shapeGeometry;
+            }
+        }
         public XbimShapeGeometry GetShapeGeometry(IXbimSolid geoSolid)
         {
             using (var txn = memoryModel.BeginTransaction("Create Shape Geometry"))
@@ -109,10 +138,28 @@ namespace THBimEngine.Geometry
                 return shapeGeometry;
             }
         }
-        public IXbimSolid GetXBimSolid2x3(GeometryStretch geometryStretch, XbimVector3D moveVector) 
+
+        public IXbimSolid GetXBimSolid(GeometryStretch geometryStretch, XbimVector3D moveVector) 
+        {
+            IXbimSolid geoSolid = null;
+            using (var txn = memoryModel.BeginTransaction("Create solid"))
+            {
+                if (ifcVersion == IfcSchemaVersion.Ifc2X3)
+                {
+                    geoSolid = GetXBimSolid2x3(geometryStretch, moveVector);
+                }
+                else
+                {
+                    geoSolid = GetXBimSolid4(geometryStretch, moveVector);
+                }
+                txn.Commit();
+            }
+            return geoSolid;
+        }
+        private IXbimSolid GetXBimSolid2x3(GeometryStretch geometryStretch, XbimVector3D moveVector) 
         {
             Xbim.Ifc2x3.ProfileResource.IfcProfileDef profile = null;
-            XbimPoint3D planeOrigin = geometryStretch.Origin + moveVector;
+            XbimPoint3D planeOrigin = geometryStretch.Origin + moveVector+ geometryStretch.ZAxis* geometryStretch.ZAxisOffSet;
             bool isOutLine = false;
             if (geometryStretch.OutLine != null && geometryStretch.OutLine.Count > 0)
             {
@@ -141,10 +188,10 @@ namespace THBimEngine.Geometry
             }
             return geoSolid;
         }
-        public IXbimSolid GetXBimSolid4(GeometryStretch geometryStretch, XbimVector3D moveVector)
+        private IXbimSolid GetXBimSolid4(GeometryStretch geometryStretch, XbimVector3D moveVector)
         {
             Xbim.Ifc4.ProfileResource.IfcProfileDef profile = null;
-            XbimPoint3D planeOrigin = geometryStretch.Origin + moveVector;
+            XbimPoint3D planeOrigin = geometryStretch.Origin + moveVector + geometryStretch.ZAxis*geometryStretch.ZAxisOffSet;
             bool isOutLine = false;
             if (geometryStretch.OutLine != null && geometryStretch.OutLine.Count > 0)
             {

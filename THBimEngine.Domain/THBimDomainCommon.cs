@@ -39,6 +39,13 @@ namespace THBimEngine.Domain
         {
             return xbimMatrix.Transform(xbimPoint);
         }
+        public static double PointDistanceToPoint(this XbimPoint3D point, XbimPoint3D targetPoint)
+        {
+            var disX = (point.X - targetPoint.X);
+            var disY = (point.Y - targetPoint.Y);
+            var disZ = (point.Z - targetPoint.Z);
+            return Math.Sqrt(disX * disX + disY * disY + disZ + disZ);
+        }
         public static GeometryParam WallGeometryParam(this ThTCHWall tchWall) 
         {
             if (tchWall.Outline.Points.Count >= 3)
@@ -60,13 +67,7 @@ namespace THBimEngine.Domain
                 return geoParam;
             }
         }
-        public static double PointDistanceToPoint(this XbimPoint3D point,XbimPoint3D targetPoint) 
-        {
-            var disX = (point.X - targetPoint.X);
-            var disY = (point.Y - targetPoint.Y);
-            var disZ = (point.Z - targetPoint.Z);
-            return Math.Sqrt(disX * disX + disY * disY + disZ + disZ);
-        }
+        
         public static GeometryParam DoorGeometryParam(this ThTCHDoor tchDoor)
         {
             var geoParam = new GeometryStretch(
@@ -121,6 +122,18 @@ namespace THBimEngine.Domain
                                 thcOpening.ExtrudedDirection.Vector3D2XBimVector(),
                                 thcOpening.Height);
             return geoParam;
+        }
+        public static GeometryParam RailingGeometryParam(this ThTCHRailing tchRailing)
+        {
+            if (tchRailing.Outline.Points.Count >= 3)
+            {
+                var outLineGeoParam = new GeometryStretch(tchRailing.Outline, XAxis,
+                                tchRailing.ExtrudedDirection.Vector3D2XBimVector(),
+                                tchRailing.Depth);
+                outLineGeoParam.ZAxisOffSet = tchRailing.ZOffSet;
+                return outLineGeoParam;
+            }
+            return null;
         }
     }
 }

@@ -110,7 +110,13 @@ namespace THBimEngine.Domain
             var newUpdatedUids = new List<string>();
             foreach (var uid in unionUids)
             {
-                if (!FloorEntitys[uid].Equals(newStorey.FloorEntitys[uid]))
+                if (string.IsNullOrEmpty(uid))
+                    continue;
+                var oldValue = FloorEntitys[uid];
+                var newValue = newStorey.FloorEntitys[uid];
+                if (oldValue == null || newValue == null)
+                    continue;
+                if (!oldValue.Equals(newValue))
                 {
                     newUpdatedUids.Add(uid);
                 }

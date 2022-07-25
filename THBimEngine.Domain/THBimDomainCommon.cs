@@ -46,39 +46,6 @@ namespace THBimEngine.Domain
             var disZ = (point.Z - targetPoint.Z);
             return Math.Sqrt(disX * disX + disY * disY + disZ + disZ);
         }
-        public static GeometryParam WallGeometryParam(this ThTCHWall tchWall) 
-        {
-            if (tchWall.Outline.Points.Count >= 3)
-            {
-                var outLineGeoParam = new GeometryStretch(tchWall.Outline, tchWall.XVector.Vector3D2XBimVector(),
-                                tchWall.ExtrudedDirection.Vector3D2XBimVector(),
-                                tchWall.Height);
-                return outLineGeoParam;
-            }
-            else 
-            {
-                var geoParam = new GeometryStretch(
-                                   tchWall.Origin.Point3D2XBimPoint(),
-                                   tchWall.XVector.Vector3D2XBimVector(),
-                                   tchWall.Length,
-                                   tchWall.Width,
-                                   tchWall.ExtrudedDirection.Vector3D2XBimVector(),
-                                   tchWall.Height);
-                return geoParam;
-            }
-        }
-        
-        public static GeometryParam DoorGeometryParam(this ThTCHDoor tchDoor)
-        {
-            var geoParam = new GeometryStretch(
-                                tchDoor.CenterPoint.Point3D2XBimPoint(),
-                                tchDoor.XVector.Point3D2Vector(),
-                                tchDoor.Width,
-                                tchDoor.Thickness,
-                                tchDoor.ExtrudedDirection.Vector3D2XBimVector(),
-                                tchDoor.Height);
-            return geoParam;
-        }
         public static GeometryParam SlabGeometryParam(this ThTCHSlab tchElement)
         {
             var outLineGeoParam = new GeometryStretch(tchElement.Outline, XAxis,
@@ -101,39 +68,30 @@ namespace THBimEngine.Domain
             }
             return outLineGeoParam;
         }
-        public static GeometryParam WindowGeometryParam(this ThTCHWindow tchWindow)
+    
+        public static GeometryParam THTCHGeometryParam(this ThTCHElement tchElement) 
         {
-            var geoParam = new GeometryStretch(
-                                tchWindow.CenterPoint.Point3D2XBimPoint(),
-                                tchWindow.XVector.Vector3D2XBimVector(),
-                                tchWindow.Width,
-                                tchWindow.Thickness,
-                                tchWindow.ExtrudedDirection.Vector3D2XBimVector(),
-                                tchWindow.Height);
-            return geoParam;
-        }
-        public static GeometryParam OpeningGeometryParam(this ThTCHOpening thcOpening)
-        {
-            var geoParam = new GeometryStretch(
-                                thcOpening.CenterPoint.Point3D2XBimPoint(),
-                                thcOpening.XVector.Vector3D2XBimVector(),
-                                thcOpening.Width,
-                                thcOpening.Thickness,
-                                thcOpening.ExtrudedDirection.Vector3D2XBimVector(),
-                                thcOpening.Height);
-            return geoParam;
-        }
-        public static GeometryParam RailingGeometryParam(this ThTCHRailing tchRailing)
-        {
-            if (tchRailing.Outline.Points.Count >= 3)
+            var xVector = tchElement.XVector.Vector3D2XBimVector();
+            if (tchElement.Outline.Points != null && tchElement.Outline.Points.Count >= 3)
             {
-                var outLineGeoParam = new GeometryStretch(tchRailing.Outline, XAxis,
-                                tchRailing.ExtrudedDirection.Vector3D2XBimVector(),
-                                tchRailing.Depth);
-                outLineGeoParam.ZAxisOffSet = tchRailing.ZOffSet;
+                var outLineGeoParam = new GeometryStretch(
+                                        tchElement.Outline, 
+                                        xVector,
+                                        tchElement.ExtrudedDirection.Vector3D2XBimVector(),
+                                        tchElement.Height);
                 return outLineGeoParam;
             }
-            return null;
+            else
+            {
+                var geoParam = new GeometryStretch(
+                                   tchElement.Origin.Point3D2XBimPoint(),
+                                   xVector,
+                                   tchElement.Length,
+                                   tchElement.Width,
+                                   tchElement.ExtrudedDirection.Vector3D2XBimVector(),
+                                   tchElement.Height);
+                return geoParam;
+            }
         }
     }
 }

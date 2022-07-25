@@ -105,7 +105,7 @@ namespace THBimEngine.Geometry
                     var moveVector = storey.Origin.Point3D2Vector();
                     Parallel.ForEach(storey.Walls, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, wall =>
                     {
-                        var bimWall = new THBimWall(CurrentGIndex(), string.Format("wall#{0}", CurrentGIndex()), wall.WallGeometryParam(), "", wall.Uuid);
+                        var bimWall = new THBimWall(CurrentGIndex(), string.Format("wall#{0}", CurrentGIndex()), wall.THTCHGeometryParam(), "", wall.Uuid);
                         
                         var wallRelation = new THBimElementRelation(bimWall.Id, bimWall.Name,bimWall, bimWall.Describe, bimWall.Uid);
                         lock (bimStorey)
@@ -119,7 +119,7 @@ namespace THBimEngine.Geometry
                         {
                             foreach (var door in wall.Doors)
                             {
-                                var bimDoor = new THBimDoor(CurrentGIndex(), string.Format("door#{0}", CurrentGIndex()), door.DoorGeometryParam(), "", door.Uuid);
+                                var bimDoor = new THBimDoor(CurrentGIndex(), string.Format("door#{0}", CurrentGIndex()), door.THTCHGeometryParam(), "", door.Uuid);
                                 var doorRelation = new THBimElementRelation(bimDoor.Id, bimDoor.Name, bimDoor,bimDoor.Describe, bimDoor.Uid);
                                 lock (bimStorey)
                                 {
@@ -136,7 +136,7 @@ namespace THBimEngine.Geometry
                         {
                             foreach (var window in wall.Windows)
                             {
-                                var bimWindow = new THBimWindow(CurrentGIndex(), string.Format("door#{0}", CurrentGIndex()), window.WindowGeometryParam(), "", window.Uuid);
+                                var bimWindow = new THBimWindow(CurrentGIndex(), string.Format("door#{0}", CurrentGIndex()), window.THTCHGeometryParam(), "", window.Uuid);
                                 bimWindow.ParentUid = bimWall.Uid;
                                 var windowRelation = new THBimElementRelation(bimWindow.Id, bimWindow.Name,bimWindow, bimWindow.Describe, bimWindow.Uid);
                                 lock (bimStorey)
@@ -154,7 +154,7 @@ namespace THBimEngine.Geometry
                         {
                             foreach (var opening in wall.Openings)
                             {
-                                var bimOpening = new THBimOpening(CurrentGIndex(), string.Format("opening#{0}", CurrentGIndex()), opening.OpeningGeometryParam(), "", opening.Uuid);
+                                var bimOpening = new THBimOpening(CurrentGIndex(), string.Format("opening#{0}", CurrentGIndex()), opening.THTCHGeometryParam(), "", opening.Uuid);
                                 bimOpening.ParentUid = bimWall.Uid;
                                 var openingRelation = new THBimElementRelation(bimOpening.Id, bimOpening.Name,bimOpening, bimOpening.Describe, bimOpening.Uid);
                                 lock (bimStorey)
@@ -184,7 +184,7 @@ namespace THBimEngine.Geometry
                     });
                     Parallel.ForEach(storey.Railings, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, railing => 
                     {
-                        var bimRailing = new THBimRailing(CurrentGIndex(), string.Format("railing#{0}", CurrentGIndex()), railing.RailingGeometryParam(), "", railing.Uuid);
+                        var bimRailing = new THBimRailing(CurrentGIndex(), string.Format("railing#{0}", CurrentGIndex()), railing.THTCHGeometryParam(), "", railing.Uuid);
                         var wallRelation = new THBimElementRelation(bimRailing.Id, bimRailing.Name, bimRailing, bimRailing.Describe, bimRailing.Uid);
                         bimStorey.FloorEntitys.Add(bimRailing.Uid, wallRelation);
                         bimRailing.ParentUid = bimStorey.Uid;

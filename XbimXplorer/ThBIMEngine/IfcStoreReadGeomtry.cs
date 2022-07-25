@@ -139,8 +139,8 @@ namespace XbimXplorer.ThBIMEngine
 				if (tr.Faces.Count < 1)
 					continue;
 				var type = this.ifcModel.Metadata.ExpressType((short)insModel.IfcTypeId);
-				var material = THBimMaterial.GetTHBimEntityMaterial(type.GetType());
-				var typeStr = type.ToString();
+				var typeStr = type.Name.ToLower().Replace("ifc", "");
+				var material = THBimMaterial.GetTHBimEntityMaterial(typeStr,true);
 				if (typeStr.Contains("open"))
 					continue;
 				var allPts = tr.Vertices.ToArray();

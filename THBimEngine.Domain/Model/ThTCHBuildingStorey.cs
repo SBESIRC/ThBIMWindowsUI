@@ -10,18 +10,13 @@ namespace THBimEngine.Domain.Model
         /// <summary>
         /// 编号
         /// </summary>
-        [ProtoMember(11)]
+        [ProtoMember(21)]
         public string Number { get; set; }
         /// <summary>
         /// 标高
         /// </summary>
-        [ProtoMember(12)]
+        [ProtoMember(22)]
         public double Elevation { get; set; }
-        /// <summary>
-        /// 基点
-        /// </summary>
-        [ProtoMember(13)]
-        public Point3DSurrogate Origin { get; set; }
         public ThTCHBuildingStorey()
         {
             Walls = new List<ThTCHWall>();
@@ -30,15 +25,15 @@ namespace THBimEngine.Domain.Model
             Windows = new List<ThTCHWindow>();
             Railings = new List<ThTCHRailing>();
         }
-        [ProtoMember(14)]
+        [ProtoMember(31)]
         public List<ThTCHWall> Walls { get; set; }
-        [ProtoMember(15)]
+        [ProtoMember(32)]
         public List<ThTCHWindow> Windows { get; set; }
-        [ProtoMember(16)]
+        [ProtoMember(33)]
         public List<ThTCHDoor> Doors { get; set; }
-        [ProtoMember(17)]
+        [ProtoMember(34)]
         public List<ThTCHSlab> Slabs { get; set; }
-        [ProtoMember(18)]
+        [ProtoMember(35)]
         public List<ThTCHRailing> Railings { get; set; }
         [ProtoMember(98)]
         public string MemoryStoreyId { get; set; }

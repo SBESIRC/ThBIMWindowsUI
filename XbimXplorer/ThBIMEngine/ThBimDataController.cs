@@ -103,7 +103,7 @@ namespace XbimXplorer.ThBIMEngine
             var allStoreys = _allStoreys.Select(c => c.Value).ToList();
             Parallel.ForEach(allStoreys,new ParallelOptions(),storey=>
             {
-                int pIndex = 0;
+                int pIndex = -1;
                 var storeyGeoModels = new List<IfcMeshModel>();
                 var storeyGeoPointNormals = new List<PointNormal>();
                 var storeyMoveVector = (new XbimPoint3D(0, 0, storey.Elevation)).Point3D2Vector();
@@ -186,7 +186,7 @@ namespace XbimXplorer.ThBIMEngine
                 }
             });
             var storeToEngineFile = new IfcStoreToEngineFile();
-            storeToEngineFile.WriteMidFile(meshResult.AllGeoModels, meshResult.AllGeoPointNormals, midPath);
+            storeToEngineFile.WriteMidData(meshResult.AllGeoModels, meshResult.AllGeoPointNormals);
         }
         private void AddProjectEntitys(Dictionary<string, THBimEntity> addBimEntitys) 
         {

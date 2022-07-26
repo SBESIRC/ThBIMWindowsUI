@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using THBimEngine.Presention;
 using Xbim.Common;
 using Xbim.Common.Federation;
 using Xbim.Common.Geometry;
@@ -71,7 +72,7 @@ namespace XbimXplorer.ThBIMEngine
 				ProgressChanged(this, new ProgressChangedEventArgs(100, "Reading Shape End"));
 			if (null != allGeoModels && allGeoModels.Count > 0) 
 			{
-				WriteMidFile(allGeoModels, allGeoPointNormals, midFilePath);
+				WriteMidData(allGeoModels, allGeoPointNormals);
 				for (int i = 0; i < allGeoModels.Count; i++)
 				{
 					var tempModel = allGeoModels[i];
@@ -161,6 +162,8 @@ namespace XbimXplorer.ThBIMEngine
 			
 		}
 		
+
+
 		public void WriteMidFile(List<IfcMeshModel> meshModels, List<PointNormal> meshPoints, string midFilePath)
 		{
 			if (null == meshModels || meshModels.Count < 1
@@ -248,5 +251,86 @@ namespace XbimXplorer.ThBIMEngine
 				ProgressChanged(this, new ProgressChangedEventArgs(0, ""));
 		}
 
+		//实现新的写数据方式
+		public void WriteMidData(List<IfcMeshModel> meshModels, List<PointNormal> meshPoints)
+		{
+			ExampleScene.ifcre_clear_model_data();
+			if (null == meshModels || meshModels.Count < 1
+				|| null == meshPoints || meshPoints.Count < 1)
+				return;
+			if (null != ProgressChanged)
+				ProgressChanged(this, new ProgressChangedEventArgs(5, "Convert To midFile"));
+			ulong ptCount = (ulong)meshPoints.Count();
+			//vertices
+			for (int i = 0; i < meshPoints.Count; i++)
+			{
+				var point = meshPoints[i];
+				ExampleScene.ifcre_set_g_vertices(point.Point.X);
+				ExampleScene.ifcre_set_g_vertices(point.Point.Y);
+				ExampleScene.ifcre_set_g_vertices(point.Point.Z);
+			}
+			if (null != ProgressChanged)
+				ProgressChanged(this, new ProgressChangedEventArgs(20, "Convert To midFile"));
+			//normals
+			for (int i = 0; i < meshPoints.Count; i++)
+			{
+				var point = meshPoints[i];
+
+				ExampleScene.ifcre_set_g_normals(Math.Abs(point.Normal.X) < 1e-6 ? 0 : point.Normal.X);
+				ExampleScene.ifcre_set_g_normals(Math.Abs(point.Normal.Y) < 1e-6 ? 0 : point.Normal.Y);
+				ExampleScene.ifcre_set_g_normals(Math.Abs(point.Normal.Z) < 1e-6 ? 0 : point.Normal.Z);
+			}
+			if (null != ProgressChanged)
+				ProgressChanged(this, new ProgressChangedEventArgs(40, "Convert To midFile"));
+			//global_indices, All triangle faces info
+			var sumCount = (ulong)meshModels.Sum(c => c.FaceTriangles.Sum(x => x.ptIndex.Count()));
+			for (int i = 0; i < meshModels.Count; i++)
+			{
+				var meshModel = meshModels[i];
+				foreach (var item in meshModel.FaceTriangles)
+				{
+					foreach (int ptIndex in item.ptIndex)
+						ExampleScene.ifcre_set_g_indices(ptIndex);
+				}
+			}
+			if (null != ProgressChanged)
+				ProgressChanged(this, new ProgressChangedEventArgs(60, "Convert To midFile"));
+			//components' indices, all components indices
+			ulong cIdCount = (ulong)meshModels.Count;
+			
+			foreach (var item in meshModels)
+			{
+				ulong vCount = (ulong)item.FaceTriangles.Sum(c => c.ptIndex.Count);
+				foreach (var value in item.FaceTriangles)
+				{
+					foreach (int ptIndex in value.ptIndex)
+						ExampleScene.ifcre_set_c_indices(ptIndex);
+				}
+				ExampleScene.ifcre_set_c_indices(-1);
+			}
+			if (null != ProgressChanged)
+				ProgressChanged(this, new ProgressChangedEventArgs(80, "Convert To midFile"));
+			//material datas
+			ulong mCount = (ulong)meshModels.Sum(c => c.FaceTriangles.Count());
+			foreach (var mesh in meshModels)
+			{
+				foreach (var item in mesh.FaceTriangles)
+				{
+					ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.Color_R);
+					ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.Color_G);
+					ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.Color_B);
+					ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.KS_R);
+					ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.KS_G);
+					ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.KS_B);
+					ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.Alpha);
+					ExampleScene.ifcre_set_face_mat((float)item.TriangleMaterial.NS);
+				}
+			}
+			if (null != ProgressChanged)
+				ProgressChanged(this, new ProgressChangedEventArgs(100, "Convert End"));
+			if (null != ProgressChanged)
+				ProgressChanged(this, new ProgressChangedEventArgs(0, ""));
+			
+		}
 	}
 }

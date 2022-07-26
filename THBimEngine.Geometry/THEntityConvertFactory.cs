@@ -38,10 +38,20 @@ namespace THBimEngine.Geometry
             {
                 if (entity == null)
                     return;
-                GeometryFactory _geometryFactory = new GeometryFactory(_schemaVersion);
-                var solid = _geometryFactory.GetXBimSolid(entity.GeometryParam as GeometryStretch, XbimVector3D.Zero);
-                if (null != solid && solid.SurfaceArea > 1)
-                    entity.EntitySolids.Add(solid);
+                var _geometryFactory = new GeometryFactory(_schemaVersion);
+                if (entity is THBimSlab slab)
+                {
+                    var solids = _geometryFactory.GetSlabSolid(entity.GeometryParam as GeometryStretch, slab.SlabDescendingDatas, XbimVector3D.Zero);
+                    if (null != solids && solids.Count > 0)
+                        entity.EntitySolids.AddRange(solids);
+                }
+                else
+                {
+                    var solid = _geometryFactory.GetXBimSolid(entity.GeometryParam as GeometryStretch, XbimVector3D.Zero);
+                    if (null != solid && solid.SurfaceArea > 1)
+                        entity.EntitySolids.Add(solid);
+                }
+
             });
             //step3 Solid剪切和Mesh
             Parallel.ForEach(_allEntitys, new ParallelOptions(), entity =>
@@ -169,7 +179,10 @@ namespace THBimEngine.Geometry
                     });
                     Parallel.ForEach(storey.Slabs, new ParallelOptions() { MaxDegreeOfParallelism=1}, slab =>
                     {
-                        var bimSlab = new THBimSlab(CurrentGIndex(), string.Format("slab#{0}", CurrentGIndex()), slab.SlabGeometryParam(), "", slab.Uuid);
+                        var geoSlab = slab.SlabGeometryParam(out List<GeometryStretch> slabDescendingData);
+                        var bimSlab = new THBimSlab(CurrentGIndex(), string.Format("slab#{0}", CurrentGIndex()), geoSlab, "", slab.Uuid);
+                        foreach (var item in slabDescendingData)
+                            bimSlab.SlabDescendingDatas.Add(item);
                         var wallRelation = new THBimElementRelation(bimSlab.Id, bimSlab.Name, bimSlab, bimSlab.Describe, bimSlab.Uid);
                         bimStorey.FloorEntitys.Add(bimSlab.Uid, wallRelation);
                         bimSlab.ParentUid = bimStorey.Uid;

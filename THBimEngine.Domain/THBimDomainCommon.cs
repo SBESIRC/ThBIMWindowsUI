@@ -46,8 +46,9 @@ namespace THBimEngine.Domain
             var disZ = (point.Z - targetPoint.Z);
             return Math.Sqrt(disX * disX + disY * disY + disZ + disZ);
         }
-        public static GeometryParam SlabGeometryParam(this ThTCHSlab tchElement)
+        public static GeometryParam SlabGeometryParam(this ThTCHSlab tchElement,out List<GeometryStretch> slabDescendingData)
         {
+            slabDescendingData = new List<GeometryStretch>();
             var outLineGeoParam = new GeometryStretch(tchElement.Outline, XAxis,
                                 ZAxis.Negated(),
                                 tchElement.Height);
@@ -57,7 +58,10 @@ namespace THBimEngine.Domain
                 {
                     if (item.IsDescending)
                     {
-
+                        //降板
+                        GeometryStretch desGeoStretch = new GeometryStretch(item.Outline, XAxis, ZAxis.Negated(), item.DescendingThickness, item.DescendingHeight);
+                        desGeoStretch.YAxisLength = item.DescendingWrapThickness;
+                        slabDescendingData.Add(desGeoStretch);
                     }
                     else
                     {

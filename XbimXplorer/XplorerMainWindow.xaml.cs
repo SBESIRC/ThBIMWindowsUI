@@ -142,28 +142,11 @@ namespace XbimXplorer
             backgroundWorker.DoWork += Background_DoWork;
             backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
             backgroundWorker.RunWorkerAsync();
-            InitGLControl();
 
             
         }
 
-        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (null != thProject) 
-            {
-                DateTime startTime = DateTime.Now;
-                bimDataController.AddProject(thProject);
-                bimDataController.WriteToMidFileByFloor(_tempMidFileName);
-                thProject = null;
-                pipeServer = null;
-                backgroundWorker.RunWorkerAsync();
-                DateTime endTime = DateTime.Now;
-                var totalTime = (endTime - startTime).TotalSeconds;
-                Log.Info(string.Format("数据解析完成，耗时：{0}s",totalTime));
-                LoadIfcFile(_tempMidFileName);
-            }
-        }
-
+        #region 接收数据并解析数据渲染
         private void Background_DoWork(object sender, DoWorkEventArgs e)
         {
             thProject = null;
@@ -177,11 +160,37 @@ namespace XbimXplorer
             catch (IOException ioEx)
             {
                 thProject = null;
-                Console.WriteLine("ERROR: {0}", ioEx.Message);
+                Log.Error(string.Format("ERROR: {0}", ioEx.Message));
             }
             pipeServer.Dispose();
         }
-
+        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (null != thProject)
+            {
+                BackgroundWorker convertData = new BackgroundWorker();
+                convertData.DoWork += ConvertData_DoWork;
+                convertData.RunWorkerCompleted += ConvertData_RunWorkerCompleted;
+                convertData.RunWorkerAsync();
+            }
+        }
+        private void ConvertData_DoWork(object sender, DoWorkEventArgs e)
+        {
+            DateTime startTime = DateTime.Now;
+            bimDataController.AddProject(thProject);
+            bimDataController.WriteToMidFileByFloor(_tempMidFileName);
+            thProject = null;
+            pipeServer = null;
+            backgroundWorker.RunWorkerAsync();
+            DateTime endTime = DateTime.Now;
+            var totalTime = (endTime - startTime).TotalSeconds;
+            Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
+        }
+        private void ConvertData_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            LoadIfcFile(_tempMidFileName);
+        }
+        #endregion
         private void DispatcherTimer_Tick(object sender, EventArgs e)
 		{
             if (_geoIndexIfcIndexMap == null || _geoIndexIfcIndexMap.Count < 1)
@@ -217,7 +226,7 @@ namespace XbimXplorer
             }
             
         }
-
+        
         public Visibility DeveloperVisible => Settings.Default.DeveloperMode 
             ? Visibility.Visible 
             : Visibility.Collapsed;
@@ -312,15 +321,7 @@ namespace XbimXplorer
             var hier = LogManager.GetRepository() as Hierarchy;
             hier?.Root.AddAppender(_appender);
 
-            TestCRedist();
-        }
-
-        private void TestCRedist()
-        {
-            if (Xbim.ModelGeometry.XbimEnvironment.RedistInstalled())
-                return;
-            var msg = $"Requisite C++ environment missing, download and install from {Xbim.ModelGeometry.XbimEnvironment.RedistDownloadPath()}";
-            Log.Error(msg);
+            InitGLControl();
         }
 
         private void XplorerMainWindow_Closed(object sender, EventArgs e)

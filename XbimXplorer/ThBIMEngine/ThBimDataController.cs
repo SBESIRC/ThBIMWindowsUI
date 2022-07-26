@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -69,6 +70,8 @@ namespace XbimXplorer.ThBIMEngine
             var newEntitys = convertResult.ProjectEntitys;
             foreach (var item in _allBimProject)
             {
+                if (item.Uid != project.Uuid)
+                    continue;
                 var buildings = item.ProjectSite.SiteBuildings.Values;
                 foreach (var building in buildings)
                 {
@@ -185,8 +188,11 @@ namespace XbimXplorer.ThBIMEngine
                     meshResult.AllGeoModels.AddRange(storeyGeoModels);
                 }
             });
+            DateTime start = DateTime.Now;
             var storeToEngineFile = new IfcStoreToEngineFile();
-            storeToEngineFile.WriteMidData(meshResult.AllGeoModels, meshResult.AllGeoPointNormals);
+            storeToEngineFile.WriteMidDataMultithreading(meshResult.AllGeoModels, meshResult.AllGeoPointNormals);
+            DateTime end = DateTime.Now;
+            var totalTime = (end - start).TotalSeconds;
         }
         private void AddProjectEntitys(Dictionary<string, THBimEntity> addBimEntitys) 
         {

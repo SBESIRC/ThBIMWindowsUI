@@ -332,5 +332,85 @@ namespace XbimXplorer.ThBIMEngine
 				ProgressChanged(this, new ProgressChangedEventArgs(0, ""));
 			
 		}
+
+
+		public void WriteMidDataMultithreading(List<IfcMeshModel> meshModels, List<PointNormal> meshPoints)
+		{
+			ExampleScene.ifcre_clear_model_data();
+			if (null == meshModels || meshModels.Count < 1 || null == meshPoints || meshPoints.Count < 1)
+				return;
+			List<Task> tasks = new List<Task>();
+			tasks.Add(Task.Run(() =>
+			{
+				//vertices
+				for (int i = 0; i < meshPoints.Count; i++)
+				{
+					var point = meshPoints[i];
+					ExampleScene.ifcre_set_g_vertices(point.Point.X);
+					ExampleScene.ifcre_set_g_vertices(point.Point.Y);
+					ExampleScene.ifcre_set_g_vertices(point.Point.Z);
+				}
+			}));
+			tasks.Add(Task.Run(() =>
+			{
+				//normals
+				for (int i = 0; i < meshPoints.Count; i++)
+				{
+					var point = meshPoints[i];
+
+					ExampleScene.ifcre_set_g_normals(Math.Abs(point.Normal.X) < 1e-6 ? 0 : point.Normal.X);
+					ExampleScene.ifcre_set_g_normals(Math.Abs(point.Normal.Y) < 1e-6 ? 0 : point.Normal.Y);
+					ExampleScene.ifcre_set_g_normals(Math.Abs(point.Normal.Z) < 1e-6 ? 0 : point.Normal.Z);
+				}
+			}));
+			tasks.Add(Task.Run(() =>
+			{
+				//global_indices, All triangle faces info
+				var sumCount = (ulong)meshModels.Sum(c => c.FaceTriangles.Sum(x => x.ptIndex.Count()));
+				for (int i = 0; i < meshModels.Count; i++)
+				{
+					var meshModel = meshModels[i];
+					foreach (var item in meshModel.FaceTriangles)
+					{
+						foreach (int ptIndex in item.ptIndex)
+							ExampleScene.ifcre_set_g_indices(ptIndex);
+					}
+				}
+			}));
+			tasks.Add(Task.Run(() =>
+			{
+				//components' indices, all components indices
+				foreach (var item in meshModels)
+				{
+					foreach (var value in item.FaceTriangles)
+					{
+						foreach (int ptIndex in value.ptIndex)
+							ExampleScene.ifcre_set_c_indices(ptIndex);
+					}
+					ExampleScene.ifcre_set_c_indices(-1);
+				}
+			}));
+			tasks.Add(Task.Run(() =>
+			{
+				//material datas
+				ulong mCount = (ulong)meshModels.Sum(c => c.FaceTriangles.Count());
+				foreach (var mesh in meshModels)
+				{
+					foreach (var item in mesh.FaceTriangles)
+					{
+						ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.Color_R);
+						ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.Color_G);
+						ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.Color_B);
+						ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.KS_R);
+						ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.KS_G);
+						ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.KS_B);
+						ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.Alpha);
+						ExampleScene.ifcre_set_face_mat((float)item.TriangleMaterial.NS);
+					}
+				}
+			}));
+			Task.WaitAll(tasks.ToArray());
+		}
+
 	}
 }

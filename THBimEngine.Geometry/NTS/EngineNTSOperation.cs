@@ -14,5 +14,13 @@ namespace THBimEngine.Geometry.NTS
             });
             return buffer.GetResultGeometry(distance).ToPolylineSurrogate();
         }
+        public static PolylineSurrogate Buffer(this PolylineSurrogate polyline, double distance)
+        {
+            var buffer = new BufferOp(polyline.ToNTSLineString(), new BufferParameters()
+            {
+                JoinStyle = NTSJoinStyle.Mitre,
+            });
+            return buffer.GetResultGeometry(distance).ToPolylineSurrogate();
+        }
     }
 }

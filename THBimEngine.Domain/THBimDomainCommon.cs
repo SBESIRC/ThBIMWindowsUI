@@ -72,13 +72,14 @@ namespace THBimEngine.Domain
         public static GeometryParam THTCHGeometryParam(this ThTCHElement tchElement) 
         {
             var xVector = tchElement.XVector.Vector3D2XBimVector();
-            if (tchElement.Outline.Points != null && tchElement.Outline.Points.Count >= 3)
+            if (tchElement.Outline.Points != null && tchElement.Outline.Points.Count >= 2)
             {
                 var outLineGeoParam = new GeometryStretch(
                                         tchElement.Outline, 
                                         xVector,
                                         tchElement.ExtrudedDirection.Vector3D2XBimVector(),
-                                        tchElement.Height);
+                                        tchElement.Height,
+                                        tchElement.ZOffSet);
                 outLineGeoParam.YAxisLength = tchElement.Width;
                 return outLineGeoParam;
             }
@@ -90,7 +91,8 @@ namespace THBimEngine.Domain
                                    tchElement.Length,
                                    tchElement.Width,
                                    tchElement.ExtrudedDirection.Vector3D2XBimVector(),
-                                   tchElement.Height);
+                                   tchElement.Height,
+                                   tchElement.ZOffSet);
                 return geoParam;
             }
         }

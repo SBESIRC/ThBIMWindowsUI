@@ -184,7 +184,8 @@ namespace THBimEngine.Geometry
             }
             else 
             {
-                var trans = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
+                var realMove = moveVector + geometryStretch.ZAxis * geometryStretch.ZAxisOffSet;
+                var trans = XbimMatrix3D.CreateTranslation(realMove.X, realMove.Y, realMove.Z);
                 geoSolid = geoSolid.Transform(trans) as IXbimSolid;
             }
             return geoSolid;
@@ -216,7 +217,8 @@ namespace THBimEngine.Geometry
             }
             else
             {
-                var trans = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
+                var realMove = moveVector + geometryStretch.ZAxis * geometryStretch.ZAxisOffSet;
+                var trans = XbimMatrix3D.CreateTranslation(realMove.X, realMove.Y, realMove.Z);
                 geoSolid = geoSolid.Transform(trans) as IXbimSolid;
             }
             return geoSolid;

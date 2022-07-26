@@ -87,6 +87,10 @@ namespace THBimEngine.Domain
             ZAxis = zAxis;
             ZAxisLength = zAxisLength;
             ZAxisOffSet = zOffSet;
+            if (polyline.InnerPolylines == null)
+                polyline.InnerPolylines = new List<PolylineSurrogate>();
+            if (polyline.Points == null)
+                polyline.Points = new List<Point3DCollectionSurrogate>();
             OutLine = polyline;
         }
 

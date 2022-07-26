@@ -64,7 +64,7 @@ namespace THBimEngine.Domain
         public bool Equals(THBimStorey other)
         {
             if (!base.Equals(other)) return false;
-            if(FloorEntitys.Count!=other.FloorEntitys.Count)
+            if(FloorEntitys.Count != other.FloorEntitys.Count)
             {
                 return false;
             }
@@ -74,6 +74,7 @@ namespace THBimEngine.Domain
                 {
                     return false;
                 }
+                //has problem
                 if (!FloorEntitys[key].Equals(other.FloorEntitys[key]))
                 {
                     return false;
@@ -91,22 +92,22 @@ namespace THBimEngine.Domain
 
         public List<string> GetAddedComponentUids(THBimStorey newStorey)
         {
-            var newStoreyUids = newStorey.FloorEntitys.Keys.ToList();
-            var storeyUids = FloorEntitys.Keys.ToList();
+            var newStoreyUids = newStorey.FloorEntitys.Keys;
+            var storeyUids = FloorEntitys.Keys;
             return newStoreyUids.Except(storeyUids).ToList();
         }
         public List<string> GetRemovedComponentUids(THBimStorey newStorey)
         {
-            var newStoreyUids = newStorey.FloorEntitys.Keys.ToList();
-            var storeyUids = FloorEntitys.Keys.ToList();
+            var newStoreyUids = newStorey.FloorEntitys.Keys;
+            var storeyUids = FloorEntitys.Keys;
             return storeyUids.Except(newStoreyUids).ToList();
         }
 
         public List<string> GetUpdatedComponentUids(THBimStorey newStorey)
         {
-            var newStoreyUids = newStorey.FloorEntitys.Keys.ToList();
-            var storeyUids = FloorEntitys.Keys.ToList();
-            var unionUids = newStoreyUids.Intersect(storeyUids).ToList();
+            var newStoreyUids = newStorey.FloorEntitys.Keys;
+            var storeyUids = FloorEntitys.Keys;
+            var unionUids = newStoreyUids.Intersect(storeyUids);
             var newUpdatedUids = new List<string>();
             foreach (var uid in unionUids)
             {

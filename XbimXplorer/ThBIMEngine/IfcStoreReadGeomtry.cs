@@ -121,7 +121,7 @@ namespace XbimXplorer.ThBIMEngine
 		private void ReadGeometries(List<XbimShapeGeometry> targetShapes, int taskNum, int start, int end)
 		{
 			int thisCount = end - start;
-			int pIndex = 0;
+			int pIndex = -1;
 			var thisPointVectors = new List<PointNormal>();
 			var thisModels = new List<IfcMeshModel>();
 			var intGeoCount = 0;

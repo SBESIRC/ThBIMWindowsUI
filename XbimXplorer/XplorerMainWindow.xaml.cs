@@ -168,10 +168,21 @@ namespace XbimXplorer
         {
             if (null != thProject)
             {
+                DateTime startTime = DateTime.Now;
+                bimDataController.AddProject(thProject);
+                bimDataController.WriteToMidFileByFloor(_tempMidFileName);
+                thProject = null;
+                pipeServer = null;
+                backgroundWorker.RunWorkerAsync();
+                DateTime endTime = DateTime.Now;
+                var totalTime = (endTime - startTime).TotalSeconds;
+                Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
+                LoadIfcFile(_tempMidFileName);
+                /* Engine在卡UI线程，会报错
                 BackgroundWorker convertData = new BackgroundWorker();
                 convertData.DoWork += ConvertData_DoWork;
                 convertData.RunWorkerCompleted += ConvertData_RunWorkerCompleted;
-                convertData.RunWorkerAsync();
+                convertData.RunWorkerAsync();*/
             }
         }
         private void ConvertData_DoWork(object sender, DoWorkEventArgs e)

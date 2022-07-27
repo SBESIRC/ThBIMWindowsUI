@@ -12,6 +12,7 @@ namespace THBimEngine.Domain
             {
                 RelationElementUid = relationElement.Uid;
                 RelationElementId = relationElement.Id;
+                ParentUid = relationElement.Uid;
             }
         }
 

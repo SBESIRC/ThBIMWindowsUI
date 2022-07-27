@@ -43,7 +43,7 @@ namespace XbimXplorer.ThBIMEngine
             if (isAdd)
             {
                 _allProjects.Add(project);
-                var convertResult = entityConvertFactory.ThTCHProjectConvert(project);
+                var convertResult = entityConvertFactory.ThTCHProjectConvert(project,true);
                 if (null != convertResult) 
                 {
                     _allBimProject.Add(convertResult.BimProject);
@@ -65,7 +65,7 @@ namespace XbimXplorer.ThBIMEngine
         }
         public void UpdateProject(ThTCHProject project)
         {
-            var convertResult = entityConvertFactory.ThTCHProjectConvert(project); //ConvertProjectToTHBimProject(project, out Dictionary<string, THBimEntity> newEntitys);
+            var convertResult = entityConvertFactory.ThTCHProjectConvert(project,false); //ConvertProjectToTHBimProject(project, out Dictionary<string, THBimEntity> newEntitys);
             var newBimProject = convertResult.BimProject;
             var newEntitys = convertResult.ProjectEntitys;
             foreach (var item in _allBimProject)

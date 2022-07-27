@@ -22,7 +22,7 @@ namespace THBimEngine.Geometry
             _allEntitys = new List<THBimEntity>();
             _schemaVersion = ifcSchemaVersion;
         }
-        public ConvertResult ThTCHProjectConvert(ThTCHProject project)
+        public ConvertResult ThTCHProjectConvert(ThTCHProject project,bool createSolid)
         {
             ConvertResult convertResult = null;
             _prjEntityFloors = new Dictionary<string, THBimStorey>();
@@ -32,7 +32,17 @@ namespace THBimEngine.Geometry
             _bimProject = null;
             //step1 转换几何数据
             ThTCHProjectToTHBimProject(project);
-            
+            if (createSolid) 
+            {
+                CreateSolidMesh();
+            }
+            var projectEntitys =_allEntitys.Where(c=>c!=null).ToDictionary(c => c.Uid, x => x);
+            convertResult = new ConvertResult(_bimProject, _allStoreys, projectEntitys);
+
+            return convertResult;
+        }
+        private void CreateSolidMesh() 
+        {
             //step2 转换每个实体的Solid;
             Parallel.ForEach(_allEntitys, new ParallelOptions(), entity =>
             {
@@ -69,11 +79,6 @@ namespace THBimEngine.Geometry
                 }
                 entity.ShapeGeometry = _geometryFactory.GetShapeGeometry(entity.EntitySolids, openingSolds);
             });
-
-            var projectEntitys =_allEntitys.Where(c=>c!=null).ToDictionary(c => c.Uid, x => x);
-            convertResult = new ConvertResult(_bimProject, _allStoreys, projectEntitys);
-
-            return convertResult;
         }
         private void ThTCHProjectToTHBimProject(ThTCHProject project)
         {

@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Xbim.Essentials" Version="4.0.32" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\THBimEngine.Presention\THBimEngine.Presention.csproj" />
   </ItemGroup>
 

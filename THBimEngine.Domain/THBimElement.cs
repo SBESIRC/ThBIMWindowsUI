@@ -52,7 +52,7 @@ namespace THBimEngine.Domain
         public bool Equals(THBimElement other)
         {
             if( this.Uid.Equals(other.Uid) &&
-                this.Name.Equals(other.Name) &&
+                //this.Name.Equals(other.Name) &&
                 this.ParentUid.Equals(other.ParentUid))
             {
                 return true;

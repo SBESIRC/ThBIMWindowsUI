@@ -34,17 +34,17 @@ namespace THBimEngine.Geometry
             ThTCHProjectToTHBimProject(project);
             if (createSolid) 
             {
-                CreateSolidMesh();
+                CreateSolidMesh(_allEntitys);
             }
             var projectEntitys =_allEntitys.Where(c=>c!=null).ToDictionary(c => c.Uid, x => x);
             convertResult = new ConvertResult(_bimProject, _allStoreys, projectEntitys);
 
             return convertResult;
         }
-        private void CreateSolidMesh() 
+        public void CreateSolidMesh(List<THBimEntity> meshEntitys) 
         {
             //step2 转换每个实体的Solid;
-            Parallel.ForEach(_allEntitys, new ParallelOptions(), entity =>
+            Parallel.ForEach(meshEntitys, new ParallelOptions(), entity =>
             {
                 if (entity == null)
                     return;
@@ -64,7 +64,7 @@ namespace THBimEngine.Geometry
 
             });
             //step3 Solid剪切和Mesh
-            Parallel.ForEach(_allEntitys, new ParallelOptions(), entity =>
+            Parallel.ForEach(meshEntitys, new ParallelOptions(), entity =>
             {
                 if (entity == null)
                     return;
@@ -98,6 +98,8 @@ namespace THBimEngine.Geometry
                 if (!string.IsNullOrEmpty(storey.MemoryStoreyId))
                 {
                     var memoryStorey = _prjEntityFloors[storey.MemoryStoreyId];
+                    bimStorey.MemoryStoreyId = storey.MemoryStoreyId;
+                    bimStorey.MemoryMatrix3d = storey.MemoryMatrix3d.ToXBimMatrix3D();
                     foreach (var keyValue in memoryStorey.FloorEntitys)
                     {
                         var relation = keyValue.Value;

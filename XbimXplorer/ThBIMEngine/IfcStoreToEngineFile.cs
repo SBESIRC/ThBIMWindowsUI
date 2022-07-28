@@ -72,7 +72,7 @@ namespace XbimXplorer.ThBIMEngine
 				ProgressChanged(this, new ProgressChangedEventArgs(100, "Reading Shape End"));
 			if (null != allGeoModels && allGeoModels.Count > 0) 
 			{
-				WriteMidData(allGeoModels, allGeoPointNormals);
+				WriteMidDataMultithreading(allGeoModels, allGeoPointNormals);
 				for (int i = 0; i < allGeoModels.Count; i++)
 				{
 					var tempModel = allGeoModels[i];
@@ -230,19 +230,16 @@ namespace XbimXplorer.ThBIMEngine
 			//material datas
 			ulong mCount = (ulong)meshModels.Sum(c => c.FaceTriangles.Count());
 			writer.Write(mCount);
-			foreach (var mesh in meshModels)
+			foreach (var item in meshModels)
 			{
-				foreach (var item in mesh.FaceTriangles)
-				{
-					writer.Write(item.TriangleMaterial.Color_R);
-					writer.Write(item.TriangleMaterial.Color_G);
-					writer.Write(item.TriangleMaterial.Color_B);
-					writer.Write(item.TriangleMaterial.KS_R);
-					writer.Write(item.TriangleMaterial.KS_G);
-					writer.Write(item.TriangleMaterial.KS_B);
-					writer.Write(item.TriangleMaterial.Alpha);
-					writer.Write(item.TriangleMaterial.NS);
-				}
+				writer.Write(item.TriangleMaterial.Color_R);
+				writer.Write(item.TriangleMaterial.Color_G);
+				writer.Write(item.TriangleMaterial.Color_B);
+				writer.Write(item.TriangleMaterial.KS_R);
+				writer.Write(item.TriangleMaterial.KS_G);
+				writer.Write(item.TriangleMaterial.KS_B);
+				writer.Write(item.TriangleMaterial.Alpha);
+				writer.Write(item.TriangleMaterial.NS);
 			}
 			if (null != ProgressChanged)
 				ProgressChanged(this, new ProgressChangedEventArgs(100, "Convert End"));
@@ -314,17 +311,14 @@ namespace XbimXplorer.ThBIMEngine
 			ulong mCount = (ulong)meshModels.Sum(c => c.FaceTriangles.Count());
 			foreach (var mesh in meshModels)
 			{
-				foreach (var item in mesh.FaceTriangles)
-				{
-					ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.Color_R);
-					ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.Color_G);
-					ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.Color_B);
-					ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.KS_R);
-					ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.KS_G);
-					ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.KS_B);
-					ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.Alpha);
-					ExampleScene.ifcre_set_face_mat((float)item.TriangleMaterial.NS);
-				}
+				ExampleScene.ifcre_set_face_mat(mesh.TriangleMaterial.Color_R);
+				ExampleScene.ifcre_set_face_mat(mesh.TriangleMaterial.Color_G);
+				ExampleScene.ifcre_set_face_mat(mesh.TriangleMaterial.Color_B);
+				ExampleScene.ifcre_set_face_mat(mesh.TriangleMaterial.KS_R);
+				ExampleScene.ifcre_set_face_mat(mesh.TriangleMaterial.KS_G);
+				ExampleScene.ifcre_set_face_mat(mesh.TriangleMaterial.KS_B);
+				ExampleScene.ifcre_set_face_mat(mesh.TriangleMaterial.Alpha);
+				ExampleScene.ifcre_set_face_mat((float)mesh.TriangleMaterial.NS);
 			}
 			if (null != ProgressChanged)
 				ProgressChanged(this, new ProgressChangedEventArgs(100, "Convert End"));
@@ -396,17 +390,14 @@ namespace XbimXplorer.ThBIMEngine
 				ulong mCount = (ulong)meshModels.Sum(c => c.FaceTriangles.Count());
 				foreach (var mesh in meshModels)
 				{
-					foreach (var item in mesh.FaceTriangles)
-					{
-						ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.Color_R);
-						ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.Color_G);
-						ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.Color_B);
-						ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.KS_R);
-						ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.KS_G);
-						ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.KS_B);
-						ExampleScene.ifcre_set_face_mat(item.TriangleMaterial.Alpha);
-						ExampleScene.ifcre_set_face_mat((float)item.TriangleMaterial.NS);
-					}
+					ExampleScene.ifcre_set_face_mat(mesh.TriangleMaterial.Color_R);
+					ExampleScene.ifcre_set_face_mat(mesh.TriangleMaterial.Color_G);
+					ExampleScene.ifcre_set_face_mat(mesh.TriangleMaterial.Color_B);
+					ExampleScene.ifcre_set_face_mat(mesh.TriangleMaterial.KS_R);
+					ExampleScene.ifcre_set_face_mat(mesh.TriangleMaterial.KS_G);
+					ExampleScene.ifcre_set_face_mat(mesh.TriangleMaterial.KS_B);
+					ExampleScene.ifcre_set_face_mat(mesh.TriangleMaterial.Alpha);
+					ExampleScene.ifcre_set_face_mat((float)mesh.TriangleMaterial.NS);
 				}
 			}));
 			Task.WaitAll(tasks.ToArray());

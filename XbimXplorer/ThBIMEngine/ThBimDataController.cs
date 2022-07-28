@@ -227,6 +227,7 @@ namespace XbimXplorer.ThBIMEngine
                     var transform = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
                     var material = THBimMaterial.GetTHBimEntityMaterial(entity.GetType());
                     IfcMeshModel meshModel = new IfcMeshModel(relation.Id, entity.Id);
+                    meshModel.TriangleMaterial = material;
                     var allPts = tr.Vertices.ToArray();
                     var allFace = tr.Faces;
                     foreach (var face in allFace.ToList())
@@ -235,7 +236,7 @@ namespace XbimXplorer.ThBIMEngine
                         for (int i = 0; i < face.TriangleCount; i++)
                         {
                             var triangle = new FaceTriangle();
-                            triangle.TriangleMaterial = material;
+                            //triangle.TriangleMaterial = material;
                             var pt1Index = ptIndexs[i * 3];
                             var pt2Index = ptIndexs[i * 3 + 1];
                             var pt3Index = ptIndexs[i * 3 + 2];
@@ -422,12 +423,7 @@ namespace XbimXplorer.ThBIMEngine
         }
         private PointNormal GetPointNormal(int pIndex, XbimPoint3D point, XbimVector3D normal)
         {
-            return new PointNormal
-            {
-                PointIndex = pIndex,
-                Point = new PointVector() { X = -(float)point.X, Y = (float)point.Z, Z = (float)point.Y },
-                Normal = new PointVector() { X = -(float)normal.X, Y = (float)normal.Z, Z = (float)normal.Y },
-            };
+            return new PointNormal(pIndex, point, normal);
         }
     }
     class GeoMeshResult 

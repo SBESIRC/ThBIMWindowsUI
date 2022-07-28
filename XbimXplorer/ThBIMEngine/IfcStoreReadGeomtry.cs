@@ -155,13 +155,14 @@ namespace XbimXplorer.ThBIMEngine
 					{
 						var transform = copyModel.Transformation;
 						var mesh = new IfcMeshModel(intGeoCount + tempCount, copyModel.IfcProductLabel);
+						mesh.TriangleMaterial = material;
 						foreach (var face in allFace.ToList())
 						{
 							var ptIndexs = face.Indices.ToArray();
 							for (int i = 0; i < face.TriangleCount; i++)
 							{
 								var triangle = new FaceTriangle();
-								triangle.TriangleMaterial = material;
+								//triangle.TriangleMaterial = material;
 								var pt1Index = ptIndexs[i * 3];
 								var pt2Index = ptIndexs[i * 3 + 1];
 								var pt3Index = ptIndexs[i * 3 + 2];
@@ -199,13 +200,14 @@ namespace XbimXplorer.ThBIMEngine
 				{
 					var transform = insModel.Transformation;
 					var mesh = new IfcMeshModel(intGeoCount, insModel.IfcProductLabel);
+					mesh.TriangleMaterial = material;
 					foreach (var face in allFace.ToList())
 					{
 						var ptIndexs = face.Indices.ToArray();
 						for (int i = 0; i < face.TriangleCount; i++)
 						{
 							var triangle = new FaceTriangle();
-							triangle.TriangleMaterial = material;
+							//triangle.TriangleMaterial = material;
 							var pt1Index = ptIndexs[i * 3];
 							var pt2Index = ptIndexs[i * 3 + 1];
 							var pt3Index = ptIndexs[i * 3 + 2];
@@ -265,12 +267,7 @@ namespace XbimXplorer.ThBIMEngine
 		}
 		private PointNormal GetPointNormal(int pIndex, XbimPoint3D point, XbimVector3D normal)
 		{
-			return new PointNormal
-			{
-				PointIndex = pIndex,
-				Point = new PointVector() { X = -(float)point.X, Y = (float)point.Z, Z = (float)point.Y },
-				Normal = new PointVector() { X = -(float)normal.X, Y = (float)normal.Z, Z = (float)normal.Y },
-			};
+			return new PointNormal(pIndex, point, normal);
 		}
 		private XbimPoint3D TransPoint(XbimPoint3D xbimPoint, XbimMatrix3D xbimMatrix)
 		{
@@ -294,12 +291,17 @@ namespace XbimXplorer.ThBIMEngine
 		public int PointIndex { get; set; }
 		public PointVector Point { get; set; }
 		public PointVector Normal { get; set; }
+		public PointNormal(int pIndex, XbimPoint3D point, XbimVector3D normal) 
+		{
+			PointIndex = pIndex;
+			Point = new PointVector() { X = (float)point.X, Y = (float)point.Z, Z = (float)point.Y };
+			Normal = new PointVector() { X = (float)normal.X, Y = (float)normal.Z, Z = (float)normal.Y };
+		}
 
 	}
 	class FaceTriangle
 	{
 		public List<int> ptIndex { get; }
-		public THBimMaterial TriangleMaterial { get; set; }
 		public FaceTriangle()
 		{
 			ptIndex = new List<int>();
@@ -309,6 +311,7 @@ namespace XbimXplorer.ThBIMEngine
 	{
 		public int CIndex { get; set; }
 		public int IfcIndex { get; }
+		public THBimMaterial TriangleMaterial { get; set; }
 		public List<FaceTriangle> FaceTriangles { get; }
 		public IfcMeshModel(int index, int ifcIndex)
 		{

@@ -14,7 +14,9 @@ namespace THBimEngine.Domain
             { typeof(THBimDoor).ToString().ToLower(),new THBimMaterial{Color_R = 167 / 255f,Color_G = 182 / 255f,Color_B = 199 / 255f,KS_R = 0,KS_B = 0,KS_G = 0,Alpha = 1f,NS = 12 } },
             { typeof(THBimSlab).ToString().ToLower(),new THBimMaterial{Color_R = 167 / 255f,Color_G = 182 / 255f,Color_B = 199 / 255f, KS_R = 0,KS_B = 0,KS_G = 0,Alpha = 1f,NS = 12,} },
             { typeof(THBimRailing).ToString().ToLower(),new THBimMaterial{Color_R = 136 / 255f, Color_G = 211 / 255f, Color_B = 198 / 255f, KS_R = 0, KS_B = 0, KS_G = 0,Alpha = 0.5f, NS = 12, } },
-        };
+            { "beam",new THBimMaterial{ Color_R = 194 / 255f, Color_G = 178 / 255f, Color_B = 152 / 255f, KS_R = 0, KS_B = 0, KS_G = 0, Alpha = 1f, NS = 12, } },
+            { "column",new THBimMaterial{ Color_R = 194 / 255f, Color_G = 178 / 255f, Color_B = 152 / 255f, KS_R = 0, KS_B = 0, KS_G = 0, Alpha = 1f, NS = 12, } },
+         };
         public static THBimMaterial GetTHBimEntityMaterial(Type entityType) 
         {
             var material = THBimDefaultMaterial[DefaultKeyName];

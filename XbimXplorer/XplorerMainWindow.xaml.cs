@@ -170,7 +170,7 @@ namespace XbimXplorer
             {
                 DateTime startTime = DateTime.Now;
                 bimDataController.AddProject(thProject);
-                bimDataController.WriteToMidFileByFloor(_tempMidFileName);
+                bimDataController.WriteToMidDataByFloor();
                 thProject = null;
                 pipeServer = null;
                 backgroundWorker.RunWorkerAsync();
@@ -189,7 +189,7 @@ namespace XbimXplorer
         {
             DateTime startTime = DateTime.Now;
             bimDataController.AddProject(thProject);
-            bimDataController.WriteToMidFileByFloor(_tempMidFileName);
+            bimDataController.WriteToMidDataByFloor();
             thProject = null;
             pipeServer = null;
             backgroundWorker.RunWorkerAsync();

@@ -302,5 +302,6 @@ namespace THBimEngine.Geometry
             geoSolid = geoSolid.Transform(trans) as IXbimSolid;
             return geoSolid;
         }
+
     }
 }

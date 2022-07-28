@@ -4,89 +4,39 @@ using System.Threading.Tasks;
 using THBimEngine.Domain;
 using THBimEngine.Domain.Model;
 using THBimEngine.Geometry.NTS;
-using Xbim.Common.Geometry;
 using Xbim.Common.Step21;
 
-namespace THBimEngine.Geometry
+namespace THBimEngine.Geometry.ProjectFactory
 {
-    public class THEntityConvertFactory
+    public class THProjectConvertFactory: ConvertFactoryBase
     {
-        private int _globalIndex = 0;
-        List<THBimEntity> _allEntitys;
-        THBimProject _bimProject;
-        IfcSchemaVersion _schemaVersion;
-        Dictionary<string, THBimStorey> _prjEntityFloors;
-        Dictionary<string, THBimStorey> _allStoreys;
-        public THEntityConvertFactory(IfcSchemaVersion ifcSchemaVersion)
+        public THProjectConvertFactory(IfcSchemaVersion ifcSchemaVersion):base(ifcSchemaVersion)
         {
-            _allEntitys = new List<THBimEntity>();
-            _schemaVersion = ifcSchemaVersion;
         }
-        public ConvertResult ThTCHProjectConvert(ThTCHProject project,bool createSolid)
+        public override ConvertResult ProjectConvert(object objProject, bool createSolidMesh)
         {
+            var project = objProject as ThTCHProject;
+            if (null == project)
+                throw new System.NotSupportedException();
             ConvertResult convertResult = null;
-            _prjEntityFloors = new Dictionary<string, THBimStorey>();
-            _allStoreys = new Dictionary<string, THBimStorey>();
-            _globalIndex = 0;
-            _allEntitys = new List<THBimEntity>();
-            _bimProject = null;
             //step1 转换几何数据
             ThTCHProjectToTHBimProject(project);
-            if (createSolid) 
+            if (createSolidMesh)
             {
-                CreateSolidMesh(_allEntitys);
+                CreateSolidMesh(allEntitys);
             }
-            var projectEntitys =_allEntitys.Where(c=>c!=null).ToDictionary(c => c.Uid, x => x);
-            convertResult = new ConvertResult(_bimProject, _allStoreys, projectEntitys);
-
+            var projectEntitys = allEntitys.Where(c => c != null).ToDictionary(c => c.Uid, x => x);
+            convertResult = new ConvertResult(bimProject, allStoreys, projectEntitys);
             return convertResult;
-        }
-        public void CreateSolidMesh(List<THBimEntity> meshEntitys) 
-        {
-            //step2 转换每个实体的Solid;
-            Parallel.ForEach(meshEntitys, new ParallelOptions(), entity =>
-            {
-                if (entity == null)
-                    return;
-                var _geometryFactory = new GeometryFactory(_schemaVersion);
-                if (entity is THBimSlab slab)
-                {
-                    var solids = _geometryFactory.GetSlabSolid(entity.GeometryParam as GeometryStretch, slab.SlabDescendingDatas, XbimVector3D.Zero);
-                    if (null != solids && solids.Count > 0)
-                        entity.EntitySolids.AddRange(solids);
-                }
-                else
-                {
-                    var solid = _geometryFactory.GetXBimSolid(entity.GeometryParam as GeometryStretch, XbimVector3D.Zero);
-                    if (null != solid && solid.SurfaceArea > 1)
-                        entity.EntitySolids.Add(solid);
-                }
-
-            });
-            //step3 Solid剪切和Mesh
-            Parallel.ForEach(meshEntitys, new ParallelOptions(), entity =>
-            {
-                if (entity == null)
-                    return;
-                GeometryFactory _geometryFactory = new GeometryFactory(_schemaVersion);
-                var openingSolds = new List<IXbimSolid>();
-                foreach (var opening in entity.Openings)
-                {
-                    if (opening.EntitySolids.Count < 1)
-                        continue;
-                    foreach (var solid in opening.EntitySolids)
-                        openingSolds.Add(solid);
-                }
-                entity.ShapeGeometry = _geometryFactory.GetShapeGeometry(entity.EntitySolids, openingSolds);
-            });
         }
         private void ThTCHProjectToTHBimProject(ThTCHProject project)
         {
-            _allEntitys.Clear();
-            _globalIndex = 0;
+            allEntitys.Clear();
+            globalIndex = 0;
             if (null == project)
                 return;
-            _bimProject = new THBimProject(CurrentGIndex(), project.ProjectName, "", project.Uuid);
+            bimProject = new THBimProject(CurrentGIndex(), project.ProjectName, "", project.Uuid);
+            bimProject.ProjectIdentity = project.Uuid;
             AddElementIndex();
             var bimSite = new THBimSite(CurrentGIndex(), "", "", project.Site.Uuid);
             AddElementIndex();
@@ -97,7 +47,7 @@ namespace THBimEngine.Geometry
                 AddElementIndex();
                 if (!string.IsNullOrEmpty(storey.MemoryStoreyId))
                 {
-                    var memoryStorey = _prjEntityFloors[storey.MemoryStoreyId];
+                    var memoryStorey = prjEntityFloors[storey.MemoryStoreyId];
                     bimStorey.MemoryStoreyId = storey.MemoryStoreyId;
                     bimStorey.MemoryMatrix3d = storey.MemoryMatrix3d.ToXBimMatrix3D();
                     foreach (var keyValue in memoryStorey.FloorEntitys)
@@ -139,9 +89,9 @@ namespace THBimEngine.Geometry
                                 {
                                     bimStorey.FloorEntitys.Add(bimDoor.Uid, doorRelation);
                                 }
-                                lock (_allEntitys)
+                                lock (allEntitys)
                                 {
-                                    _allEntitys.Add(bimDoor);
+                                    allEntitys.Add(bimDoor);
                                 }
                                 AddElementIndex();
                             }
@@ -157,9 +107,9 @@ namespace THBimEngine.Geometry
                                 {
                                     bimStorey.FloorEntitys.Add(bimWindow.Uid, windowRelation);
                                 }
-                                lock (_allEntitys)
+                                lock (allEntitys)
                                 {
-                                    _allEntitys.Add(bimWindow);
+                                    allEntitys.Add(bimWindow);
                                 }
                                 AddElementIndex();
                             }
@@ -173,15 +123,15 @@ namespace THBimEngine.Geometry
                                 var openingRelation = new THBimElementRelation(bimOpening.Id, bimOpening.Name,bimOpening, bimOpening.Describe, bimOpening.Uid);
                                 lock (bimStorey)
                                 {
-                                    _allEntitys.Add(bimOpening);
+                                    allEntitys.Add(bimOpening);
                                 }
                                 bimWall.Openings.Add(bimOpening);
                                 AddElementIndex();
                             }
                         }
-                        lock (_allEntitys)
+                        lock (allEntitys)
                         {
-                            _allEntitys.Add(bimWall);
+                            allEntitys.Add(bimWall);
                         }
                     });
                     Parallel.ForEach(storey.Slabs, new ParallelOptions() { MaxDegreeOfParallelism=1}, slab =>
@@ -194,9 +144,9 @@ namespace THBimEngine.Geometry
                         bimStorey.FloorEntitys.Add(bimSlab.Uid, wallRelation);
                         bimSlab.ParentUid = bimStorey.Uid;
                         AddElementIndex();
-                        lock (_allEntitys)
+                        lock (allEntitys)
                         {
-                            _allEntitys.Add(bimSlab);
+                            allEntitys.Add(bimSlab);
                         }
                     });
                     Parallel.ForEach(storey.Railings, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, railing => 
@@ -209,61 +159,18 @@ namespace THBimEngine.Geometry
                         bimStorey.FloorEntitys.Add(bimRailing.Uid, wallRelation);
                         bimRailing.ParentUid = bimStorey.Uid;
                         AddElementIndex();
-                        lock (_allEntitys)
+                        lock (allEntitys)
                         {
-                            _allEntitys.Add(bimRailing);
+                            allEntitys.Add(bimRailing);
                         }
                     });
-                    _prjEntityFloors.Add(bimStorey.Uid, bimStorey);
+                    prjEntityFloors.Add(bimStorey.Uid, bimStorey);
                 }
-                _allStoreys.Add(bimStorey.Uid, bimStorey);
+                allStoreys.Add(bimStorey.Uid, bimStorey);
                 bimBuilding.BuildingStoreys.Add(bimStorey.Uid, bimStorey);
             }
             bimSite.SiteBuildings.Add(bimBuilding.Uid,bimBuilding);
-            _bimProject.ProjectSite = bimSite;
-        }
-
-        private void AddElementIndex(int addCount = 1)
-        {
-            _globalIndex += addCount;
-        }
-        private int CurrentGIndex()
-        {
-            return _globalIndex;
-        }
-    }
-
-    public class ConvertResult 
-    {
-        public THBimProject BimProject { get; set; }
-        public Dictionary<string,THBimEntity> ProjectEntitys { get; }
-        public Dictionary<string,THBimStorey> ProjectStoreys { get; }
-        public ConvertResult() 
-        {
-            ProjectEntitys = new Dictionary<string, THBimEntity>();
-            ProjectStoreys = new Dictionary<string, THBimStorey>();
-        }
-        public ConvertResult(THBimProject bimProject, Dictionary<string,THBimStorey> storeys, Dictionary<string,THBimEntity> entitys) : this()
-        {
-            BimProject = bimProject;
-            if (null != storeys && storeys.Count > 0) 
-            {
-                foreach (var item in storeys) 
-                {
-                    if (item.Value == null)
-                        continue;
-                    ProjectStoreys.Add(item.Key,item.Value);
-                }
-            }
-            if (null != entitys && entitys.Count > 0) 
-            {
-                foreach (var item in entitys) 
-                {
-                    if (item.Value == null)
-                        continue;
-                    ProjectEntitys.Add(item.Key,item.Value);
-                }
-            }
+            bimProject.ProjectSite = bimSite;
         }
     }
 }

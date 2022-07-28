@@ -119,10 +119,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ProjectFactory\ConvertFactoryBase.cs" />
     <Compile Include="NTS\EngineNTSService.cs" />
     <Compile Include="NTS\EngineNTSOperation.cs" />
     <Compile Include="NTS\GeometryDomainExtension.cs" />
-    <Compile Include="THEntityConvertFactory.cs" />
+    <Compile Include="ProjectFactory\THProjectConvertFactory.cs" />
     <Compile Include="GeometryFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ThIFC2x3GeExtension.cs" />

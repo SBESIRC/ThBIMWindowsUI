@@ -5,8 +5,31 @@ using THBimEngine.Domain.GeometryModel;
 
 namespace THBimEngine.Domain
 {
-    public abstract class GeometryParam
+    public abstract class GeometryParam : ICloneable
     {
+        public abstract object Clone();
+    }
+    /// <summary>
+    /// 三维Brep数据
+    /// </summary>
+    public class GeometryBrep : GeometryParam, IEquatable<GeometryBrep>
+    {
+        public List<PolylineSurrogate> Outer { get; }
+        public List<PolylineSurrogate> Voids { get; }
+        public GeometryBrep() 
+        {
+            Outer = new List<PolylineSurrogate>();
+            Voids = new List<PolylineSurrogate>();
+        }
+        public override object Clone()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Equals(GeometryBrep other)
+        {
+            throw new NotImplementedException();
+        }
     }
     /// <summary>
     /// 二维轮廓拉伸几何信息
@@ -118,6 +141,11 @@ namespace THBimEngine.Domain
                 ZAxisOffSet.Equals(other.ZAxisOffSet))
                 return true;
             return false;
+        }
+
+        public override object Clone()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -11,6 +11,7 @@ using Xbim.Ifc2x3.GeometricModelResource;
 using Xbim.Ifc2x3.GeometryResource;
 using Xbim.Ifc2x3.Interfaces;
 using Xbim.Ifc2x3.ProfileResource;
+using Xbim.Ifc2x3.TopologyResource;
 using Xbim.IO.Memory;
 
 namespace THBimEngine.Geometry
@@ -78,7 +79,6 @@ namespace THBimEngine.Geometry
                 d.Position = ToIfcAxis2Placement2D(model,origin);
             });
         }
-
         public static IfcExtrudedAreaSolid ToIfcExtrudedAreaSolid(this MemoryModel model, IfcProfileDef profile, XbimVector3D direction, double depth)
         {
             return model.Instances.New<IfcExtrudedAreaSolid>(s =>
@@ -143,6 +143,46 @@ namespace THBimEngine.Geometry
                 compositeCurve.Segments.Add(curveSegement);
             }
             return compositeCurve;
+        }
+
+        public static IfcFacetedBrepWithVoids ToIfcFacetedBrep(this MemoryModel model, List<PolylineSurrogate> facePlines,List<PolylineSurrogate> voidsFaces) 
+        {
+            var facetedBrepWithVoids = model.Instances.New<IfcFacetedBrepWithVoids>();
+            facetedBrepWithVoids.Outer = ToIfcClosedShell(model, facePlines);
+            facetedBrepWithVoids.Voids.Add(ToIfcClosedShell(model, voidsFaces));
+            return facetedBrepWithVoids;
+        }
+        private static IfcClosedShell ToIfcClosedShell(this MemoryModel model, List<PolylineSurrogate> facePlines)
+        {
+            var ifcClosedShell = model.Instances.New<IfcClosedShell>();
+            foreach (var face in facePlines)
+            {
+                ifcClosedShell.CfsFaces.Add(ToIfcFace(model, face));
+            }
+            return ifcClosedShell;
+        }
+        private static IfcFace ToIfcFace(this MemoryModel model, PolylineSurrogate facePLine)
+        {
+            var ifcFace = model.Instances.New<IfcFace>();
+            ifcFace.Bounds.Add(ToIfcFaceBound(model, facePLine));
+            return ifcFace;
+        }
+        private static IfcFaceBound ToIfcFaceBound(this MemoryModel model, PolylineSurrogate boundaryLoop)
+        {
+            return model.Instances.New<IfcFaceBound>(b =>
+            {
+                b.Bound = model.ToIfcPolyLoop(boundaryLoop);
+            });
+        }
+        private static IfcPolyLoop ToIfcPolyLoop(this MemoryModel model, PolylineSurrogate boundaryLoop)
+        {
+            var polyLoop = model.Instances.New<IfcPolyLoop>();
+            foreach (var points in boundaryLoop.Points)
+            {
+                foreach(var point in points.Points)
+                    polyLoop.Polygon.Add(ToIfcCartesianPoint(model,point.Point3D2XBimPoint()));
+            }
+            return polyLoop;
         }
         public static XbimVector3D ToAcGePoint3d(this IfcCartesianPoint point)
         {

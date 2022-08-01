@@ -124,13 +124,6 @@ namespace THBimEngine.Geometry.ProjectFactory
                             foreach (var opening in wall.Openings)
                             {
                                 var bimOpening = new THBimOpening(CurrentGIndex(), string.Format("opening#{0}", CurrentGIndex()), opening.THTCHGeometryParam(), "", opening.Uuid);
-                                if (bimOpening.GeometryParam is GeometryStretch stretch) 
-                                {
-                                    if (stretch.ZAxisLength < 10) 
-                                    {
-                                    
-                                    }
-                                }
                                 bimOpening.ParentUid = bimWall.Uid;
                                 var openingRelation = new THBimElementRelation(bimOpening.Id, bimOpening.Name,bimOpening, bimOpening.Describe, bimOpening.Uid);
                                 openingRelation.ParentUid = storey.Uuid;

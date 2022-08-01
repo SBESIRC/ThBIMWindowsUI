@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using THBimEngine.Domain;
 using THBimEngine.Domain.GeometryModel;
 using Xbim.Common.Geometry;
 using Xbim.Ifc2x3.GeometricConstraintResource;
 using Xbim.Ifc2x3.GeometricModelResource;
 using Xbim.Ifc2x3.GeometryResource;
-using Xbim.Ifc2x3.Interfaces;
 using Xbim.Ifc2x3.ProfileResource;
 using Xbim.Ifc2x3.TopologyResource;
 using Xbim.IO.Memory;
@@ -31,25 +27,6 @@ namespace THBimEngine.Geometry
             placement.Location = ToIfcCartesianPoint(model,point);
             return placement;
         }
-
-        //public static IfcAxis2Placement3D ToIfcAxis2Placement3D(this MemoryModel model, CoordinateSystem3d cs)
-        //{
-        //    return model.Instances.New<IfcAxis2Placement3D>(p =>
-        //    {
-        //        p.Axis = model.ToIfcDirection(cs.Zaxis);
-        //        p.RefDirection = model.ToIfcDirection(cs.Xaxis);
-        //        p.Location = model.ToIfcCartesianPoint(cs.Origin);
-        //    });
-        //}
-
-        //public static IfcLocalPlacement ToIfcLocalPlacement(this MemoryModel model, CoordinateSystem3d cs, IfcObjectPlacement relative_to = null)
-        //{
-        //    return model.Instances.New<IfcLocalPlacement>(l =>
-        //    {
-        //        l.PlacementRelTo = relative_to;
-        //        l.RelativePlacement = model.ToIfcAxis2Placement3D(cs);
-        //    });
-        //}
 
         public static IfcLocalPlacement ToIfcLocalPlacement(this MemoryModel model, XbimPoint3D origin, IfcObjectPlacement relative_to = null)
         {

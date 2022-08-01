@@ -109,7 +109,7 @@ namespace THBimEngine.Domain
         {
             var newUpdatedUids = new List<string>();
             var entityIds = this.FloorEntitys.Keys;
-            var newEntityIds = this.FloorEntitys.Keys;
+            var newEntityIds = newStorey.FloorEntitys.Keys;
             var checkEntityIds = entityIds.Intersect(newEntityIds).ToList();
             if (checkEntityIds.Count > 0)
             {

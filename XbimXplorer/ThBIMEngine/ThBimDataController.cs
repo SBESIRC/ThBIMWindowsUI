@@ -270,6 +270,8 @@ namespace XbimXplorer.ThBIMEngine
                     var entity = _allEntitys[relation.RelationElementUid];
                     if (null == entity || entity.ShapeGeometry == null || string.IsNullOrEmpty(entity.ShapeGeometry.ShapeData))
                         continue;
+                    if (UnShowEntityTypes.Contains(entity.GetType().ToString()))
+                        continue;
                     var ptOffSet = storeyGeoPointNormals.Count();
                     var ms = new MemoryStream((entity.ShapeGeometry as IXbimShapeGeometryData).ShapeData);
                     var testData = ms.ToArray();

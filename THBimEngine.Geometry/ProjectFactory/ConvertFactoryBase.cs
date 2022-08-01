@@ -46,15 +46,15 @@ namespace THBimEngine.Geometry.ProjectFactory
                 var geometryFactory = new GeometryFactory(schemaVersion);
                 if (entity is THBimSlab slab)
                 {
-                    var solids = geometryFactory.GetSlabSolid(entity.GeometryParam as GeometryStretch, slab.SlabDescendingDatas, XbimVector3D.Zero);
+                    var solids = geometryFactory.GetSlabSolid(entity.GeometryParam, slab.SlabDescendingDatas, XbimVector3D.Zero);
                     if (null != solids && solids.Count > 0)
                         entity.EntitySolids.AddRange(solids);
                 }
                 else
                 {
-                    var solid = geometryFactory.GetXBimSolid(entity.GeometryParam as GeometryStretch, XbimVector3D.Zero);
-                    if (null != solid && solid.SurfaceArea > 1)
-                        entity.EntitySolids.Add(solid);
+                    var solids = geometryFactory.GetXBimSolid(entity.GeometryParam, XbimVector3D.Zero);
+                    if (null != solids && solids.Count > 0)
+                        entity.EntitySolids.AddRange(solids);
                 }
 
             });

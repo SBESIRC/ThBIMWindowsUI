@@ -51,7 +51,7 @@ namespace THBimEngine.Domain
                 }
                 else
                 {
-                    addedComponentUids.AddRange(newStorey.FloorEntitys.Keys.ToList());
+                    addedComponentUids.AddRange(newStorey.FloorEntityRelations.Keys.ToList());
                 }
                 
             }
@@ -71,7 +71,7 @@ namespace THBimEngine.Domain
                 }
                 else
                 {
-                    removedComponentUids.AddRange(storey.FloorEntitys.Keys.ToList());
+                    removedComponentUids.AddRange(storey.FloorEntityRelations.Keys.ToList());
                 }
             }
             return removedComponentUids;

@@ -13,13 +13,17 @@ namespace THBimEngine.Domain
         /// </summary>
         public string Uid { get; set; }
         /// <summary>
-        /// 索引Id
+        /// 索引Id(目前不能保证唯一性)
         /// </summary>
         public int Id { get; set; }
         /// <summary>
         /// 名称
         /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// 类别名称
+        /// </summary>
+        public virtual string FriendlyTypeName { get { return this.GetType().Name.ToString(); } }
         /// <summary>
         /// 父元素Id
         /// </summary>
@@ -32,8 +36,12 @@ namespace THBimEngine.Domain
         /// 属性
         /// </summary>
         public Dictionary<string, object> Properties { get; }
-        public THBimElement(int id, string name, string describe = "", string uid = "") 
+        public THBimElement(int id, string name, string describe = "", string uid = ""):this(id,name,"",uid,describe)
         {
+        }
+        public THBimElement(int id, string name, string parentUid, string uid,string describe)
+        {
+            ParentUid = parentUid;
             Uid = uid;
             if (string.IsNullOrEmpty(uid))
                 Uid = System.Guid.NewGuid().ToString();
@@ -43,6 +51,7 @@ namespace THBimEngine.Domain
             Properties = new Dictionary<string, object>();
         }
         public abstract object Clone();
+        
 
         public override int GetHashCode()
         {

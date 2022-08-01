@@ -21,7 +21,8 @@ namespace THBimEngine.Domain
         /// <summary>
         /// 该楼层元素
         /// </summary>
-        public Dictionary<string, THBimElementRelation> FloorEntitys { get; private set; }
+        public Dictionary<string, THBimElementRelation> FloorEntityRelations { get; private set; }
+        public Dictionary<string, THBimEntity> FloorEntitys { get; private set; }
         /// <summary>
         /// 楼层原点
         /// </summary>
@@ -33,7 +34,8 @@ namespace THBimEngine.Domain
         public XbimMatrix3D MemoryMatrix3d { get; set; }
         public THBimStorey(int id, string name,double elevation,double levelHeight, string describe = "", string uid = "") : base(id, name, describe, uid)
         {
-            FloorEntitys = new Dictionary<string, THBimElementRelation>();
+            FloorEntityRelations = new Dictionary<string, THBimElementRelation>();
+            FloorEntitys = new Dictionary<string, THBimEntity>();
             Elevation = elevation;
             LevelHeight = levelHeight;
             MemoryStoreyId = string.Empty;
@@ -42,9 +44,9 @@ namespace THBimEngine.Domain
         public Dictionary<string, List<THBimEntity>> GetTypeGroupValue() 
         {
             Dictionary<string, List<THBimEntity>> typeGroup = new Dictionary<string, List<THBimEntity>>();
-            if (FloorEntitys.Count < 1)
+            if (FloorEntityRelations.Count < 1)
                 return typeGroup;
-            foreach (var item in FloorEntitys.GroupBy(c => c.GetType())) 
+            foreach (var item in FloorEntityRelations.GroupBy(c => c.GetType())) 
             {
                 //typeGroup.Add(item.)
             }
@@ -58,24 +60,24 @@ namespace THBimEngine.Domain
         public override int GetHashCode()
         {
             return base.GetHashCode() ^ Elevation.GetHashCode() ^ LevelHeight.GetHashCode()^ Origin.GetHashCode()
-                ^ MemoryStoreyId.GetHashCode() ^ FloorEntitys.Count;
+                ^ MemoryStoreyId.GetHashCode() ^ FloorEntityRelations.Count;
         }
 
         public bool Equals(THBimStorey other)
         {
             if (!base.Equals(other)) return false;
-            if(FloorEntitys.Count != other.FloorEntitys.Count)
+            if(FloorEntityRelations.Count != other.FloorEntityRelations.Count)
             {
                 return false;
             }
-            foreach(var key in FloorEntitys.Keys)
+            foreach(var key in FloorEntityRelations.Keys)
             {
-                if (!other.FloorEntitys.ContainsKey(key))
+                if (!other.FloorEntityRelations.ContainsKey(key))
                 {
                     return false;
                 }
                 //has problem
-                if (!FloorEntitys[key].Equals(other.FloorEntitys[key]))
+                if (!FloorEntityRelations[key].Equals(other.FloorEntityRelations[key]))
                 {
                     return false;
                 }
@@ -92,34 +94,54 @@ namespace THBimEngine.Domain
 
         public List<string> GetAddedComponentUids(THBimStorey newStorey)
         {
-            var newStoreyUids = newStorey.FloorEntitys.Keys;
-            var storeyUids = FloorEntitys.Keys;
+            var newStoreyUids = newStorey.FloorEntityRelations.Keys;
+            var storeyUids = FloorEntityRelations.Keys;
             return newStoreyUids.Except(storeyUids).ToList();
         }
         public List<string> GetRemovedComponentUids(THBimStorey newStorey)
         {
-            var newStoreyUids = newStorey.FloorEntitys.Keys;
-            var storeyUids = FloorEntitys.Keys;
+            var newStoreyUids = newStorey.FloorEntityRelations.Keys;
+            var storeyUids = FloorEntityRelations.Keys;
             return storeyUids.Except(newStoreyUids).ToList();
         }
 
         public List<string> GetUpdatedComponentUids(THBimStorey newStorey)
         {
-            var newStoreyUids = newStorey.FloorEntitys.Keys;
-            var storeyUids = FloorEntitys.Keys;
-            var unionUids = newStoreyUids.Intersect(storeyUids);
             var newUpdatedUids = new List<string>();
-            foreach (var uid in unionUids)
+            var entityIds = this.FloorEntitys.Keys;
+            var newEntityIds = this.FloorEntitys.Keys;
+            var checkEntityIds = entityIds.Intersect(newEntityIds).ToList();
+            if (checkEntityIds.Count > 0)
             {
-                if (string.IsNullOrEmpty(uid))
-                    continue;
-                var oldValue = FloorEntitys[uid];
-                var newValue = newStorey.FloorEntitys[uid];
-                if (oldValue == null || newValue == null)
-                    continue;
-                if (!oldValue.Equals(newValue))
+                foreach (var id in checkEntityIds) 
                 {
-                    newUpdatedUids.Add(uid);
+                    var oldEntity = this.FloorEntitys[id];
+                    var newEntity = newStorey.FloorEntitys[id];
+                    if (oldEntity == null || newEntity == null)
+                        continue;
+                    if (!newEntity.Equals(oldEntity))
+                    {
+                        newUpdatedUids.Add(id);
+                    }
+                }
+            }
+            else 
+            {
+                var newStoreyUids = newStorey.FloorEntityRelations.Keys;
+                var storeyUids = FloorEntityRelations.Keys;
+                var unionUids = newStoreyUids.Intersect(storeyUids);
+                foreach (var uid in unionUids)
+                {
+                    if (string.IsNullOrEmpty(uid))
+                        continue;
+                    var oldValue = FloorEntityRelations[uid];
+                    var newValue = newStorey.FloorEntityRelations[uid];
+                    if (oldValue == null || newValue == null)
+                        continue;
+                    if (!oldValue.Equals(newValue))
+                    {
+                        newUpdatedUids.Add(uid);
+                    }
                 }
             }
             return newUpdatedUids;

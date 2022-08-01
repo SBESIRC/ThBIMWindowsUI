@@ -17,14 +17,12 @@ namespace XbimXplorer.ThBIMEngine
     {
         private Dictionary<string, THBimEntity> _allEntitys { get; }
         private Dictionary<string, THBimStorey> _allStoreys { get; }
-        //private List<ThTCHProject> _allProjects { get; }
         private List<THBimProject> _allBimProject { get; }
         public List<string> UnShowEntityTypes { get; }
         ConvertFactoryBase convertFactory;
         public ThBimDataController()
         {
             _allStoreys = new Dictionary<string, THBimStorey>();
-            //_allProjects = new List<ThTCHProject>();
             _allBimProject = new List<THBimProject>();
             _allEntitys = new Dictionary<string, THBimEntity>();
             UnShowEntityTypes = new List<string>();
@@ -50,10 +48,7 @@ namespace XbimXplorer.ThBIMEngine
                 {
                     _allBimProject.Add(convertResult.BimProject);
                     AddProjectEntitys(convertResult.ProjectEntitys);
-                    foreach (var item in convertResult.ProjectStoreys) 
-                    {
-                        _allStoreys.Add(item.Key, item.Value);
-                    }
+                    UpdateCatchStorey();
                 }
             }
             else
@@ -83,12 +78,13 @@ namespace XbimXplorer.ThBIMEngine
                 if (item.ProjectIdentity != projectResult.BimProject.ProjectIdentity)
                     continue;
                 var buildings = item.ProjectSite.SiteBuildings.Values;
+                var updateMeshIds = new List<string>();
                 foreach (var building in buildings)
                 {
                     var buildingId = building.Uid;
                     var id2BuildingDic = newBimProject.ProjectSite.SiteBuildings;
                     var newBuilding = id2BuildingDic[buildingId];
-                    #region 楼层变化的相关信息（只比较楼层的标准非标准信息，不比较内部的实体信息）
+                    #region 楼层变化的相关信息
                     /*
                      楼层变化的信息比较复杂
                     1、楼层增加、删除 1，2，3  =》1，2，3，4
@@ -97,91 +93,149 @@ namespace XbimXplorer.ThBIMEngine
                     可能出现组合情况
                      */
                     #endregion
-                    /*
-                    var oldStoreys = building.BuildingStoreys.Values.ToList();
-                    var newStoreys = newBuilding.BuildingStoreys.Values.ToList();
-                    //step1 删除原标准层首层和非标层 删除的数据
-                    foreach (var storey in building.BuildingStoreys.Values.ToList()) 
+                    var delFloorIds = new List<string>();
+                    //step1 处理删除掉的数据(1、删除的楼层；2、删除的构件；3、变换楼层的构件;4、楼层的变化)
+                    foreach (var storey in building.BuildingStoreys.Values.ToList())
                     {
-                        if (!string.IsNullOrEmpty(storey.MemoryStoreyId))
-                            continue;
+                        var haveEntity = string.IsNullOrEmpty(storey.MemoryStoreyId);
                         var newRemovedUids = new List<string>();
                         if (newBuilding.BuildingStoreys.ContainsKey(storey.Uid))
                         {
-                            //楼层已经删除
-                            newRemovedUids.AddRange(storey.FloorEntitys.Select(c => c.Key).ToList());
-                        }
-                        else
-                        {
+                            if (!haveEntity)
+                                continue;
                             var newStorey = newBuilding.BuildingStoreys[storey.Uid];
-                            if (string.IsNullOrEmpty(newStorey.MemoryStoreyId))
+                            if (!string.IsNullOrEmpty(newStorey.MemoryStoreyId))
                             {
                                 //楼层变为标准层非首层数据
-                                newRemovedUids.AddRange(storey.FloorEntitys.Select(c => c.Key).ToList());
+                                newRemovedUids.AddRange(storey.FloorEntityRelations.Select(c => c.Key).ToList());
                             }
                             else
                             {
                                 newRemovedUids = storey.GetRemovedComponentUids(newStorey);
                             }
                         }
+                        else
+                        {
+                            //楼层已经删除
+                            delFloorIds.Add(storey.Uid);
+                            if (!haveEntity)
+                                continue;
+                            newRemovedUids.AddRange(storey.FloorEntityRelations.Select(c => c.Key).ToList());
+                        }
                         if (newRemovedUids.Count > 0)
                         {
-                            RemoveEntitys(prjId, newRemovedUids);
+                            needUpdate = true;
+                            RemoveEntitys(building, newRemovedUids);
                         }
                     }
-                    //step2 处理删除的楼层
-                    var oldUids = oldStoreys.Select(c => c.Uid).ToList();
-                    var newUids = newStoreys.Select(c => c.Uid).ToList();
-                    var rmAllUids = oldUids.Except(newUids).ToList();
-                    RemoveStoreys(prjId, rmAllUids);
-                    //step3 处理添加非标和
+                    foreach (var delStorey in delFloorIds)
+                    {
+                        building.BuildingStoreys.Remove(delStorey);
+                    }
+                    //step2 处理添加的数据（1、楼层非标或标准层的首层；2、对应楼层增加的Entity）
+                    var meshEntityIds = new List<string>();
+                    var oldStoreys = building.BuildingStoreys.Values.ToList();
+                    var newStoreys = newBuilding.BuildingStoreys.Values.ToList();
                     var oldNoMemoryUids = oldStoreys.Where(c => string.IsNullOrEmpty(c.MemoryStoreyId)).Select(c => c.Uid).ToList();
                     var newNoMemoryUids = newStoreys.Where(c => string.IsNullOrEmpty(c.MemoryStoreyId)).Select(c => c.Uid).ToList();
-                    //判断是否有变化,先处理非标层和标准层首层的增加
-                    var addAllUids = newUids.Except(oldUids);
                     var addNoMemoryUids = newNoMemoryUids.Except(oldNoMemoryUids);
                     foreach (var addId in addNoMemoryUids)
                     {
-                        if (_allStoreys.ContainsKey(addId))
+                        needUpdate = true;
+                        var thisStorey = newStoreys.Find(c => c.Uid == addId);
+                        var thisStoreyEntityIds = thisStorey.FloorEntityRelations.Select(c => c.Key).ToList();
+                        var addEntitys = new Dictionary<string, THBimEntity>();
+                        foreach (var id in thisStoreyEntityIds) 
+                        {
+                            addEntitys.Add(id, newEntitys[id]);
+                        }
+                        updateMeshIds.AddRange(thisStoreyEntityIds);
+                        AddEntitys(addEntitys);
+                        foreach (var floorEntity in thisStorey.FloorEntityRelations) 
+                        {
+                            var entity = addEntitys[floorEntity.Key];
+                            floorEntity.Value.Id = entity.Id;
+                        }
+                        if (building.BuildingStoreys.ContainsKey(addId))
                         {
                             //标准层非首层变为非标层或标准层的首层
+                            var storey = building.BuildingStoreys[addId];
+                            storey.MemoryStoreyId = string.Empty;
+                            storey.FloorEntityRelations.Clear();
+                            foreach (var floorEntity in thisStorey.FloorEntityRelations)
+                            {
+                                storey.FloorEntityRelations.Add(floorEntity.Key, floorEntity.Value);
+                            }
                         }
                         else
                         {
-                            //新增的非标层或新增的标准层首层
-                            var thisStorey = newStoreys.Find(c => c.Uid == addId);
-                            var thisStoreyEntityIds = thisStorey.FloorEntitys.Select(c => c.Key).ToList();
+                            //增加的楼层
+                            building.BuildingStoreys.Add(thisStorey.Uid, thisStorey);
                         }
-                    }*/
-
-                    var newStoreyUids = new List<string>();
-                    var storeyUids = new List<string>();
-                    newStoreyUids = newBimProject.ProjectSite.SiteBuildings.First().Value.BuildingStoreys.Keys.ToList();
-                    storeyUids = building.BuildingStoreys.Keys.ToList();
-                    var newAddedUids = building.GetNewlyAddedComponentUids(newBuilding, newStoreyUids);
-                    var newRemovedUids = building.GetRemovedComponentUids(newBuilding, storeyUids);
-                    var newUpdatedUids = building.GetUpdatedComponentUids(newBuilding, newStoreyUids.Intersect(storeyUids).ToList());
-                    var idOffSet = LastEntityIntId() + 1;
-                    if (newRemovedUids.Count > 0)
-                    {
-                        needUpdate = true;
-                        RemoveEntitys(prjId, newRemovedUids);
                     }
-                    var updateMeshIds = new List<string>();
-                    if (newAddedUids.Count > 0) 
+                    //step3 处理增加的楼层信息（标准层非首层）
+                    var oldStoreyIds = building.BuildingStoreys.Keys.ToList();
+                    var newStoreyIds = newBuilding.BuildingStoreys.Keys.ToList();
+                    var allAddStoreys = newStoreyIds.Except(oldStoreyIds).ToList();
+                    foreach (var addId in allAddStoreys) 
                     {
+                        if (building.BuildingStoreys.ContainsKey(addId))
+                            continue;
                         needUpdate = true;
-                        updateMeshIds.AddRange(newAddedUids);
-                        var addEntitys = newEntitys.Where(c => newAddedUids.Any(x => x == c.Key)).ToDictionary(c => c.Key, x => x.Value);
-                        AddEntitys(prjId, addEntitys);
+                        //新增标准层非首层数据
+                        var thisStorey = newStoreys.Find(c => c.Uid == addId);
+                        building.BuildingStoreys.Add(thisStorey.Uid, thisStorey);
                     }
-                    if (newUpdatedUids.Count > 0)
+                    //step4 处理楼层所属标准层变更的楼层
+                    foreach (var storeyKeyValue in newBuilding.BuildingStoreys) 
                     {
+                        if (string.IsNullOrEmpty(storeyKeyValue.Value.MemoryStoreyId))
+                            continue;
+                        var oldStorey = building.BuildingStoreys[storeyKeyValue.Key];
+                        if (oldStorey.MemoryStoreyId == storeyKeyValue.Value.MemoryStoreyId)
+                            continue;
                         needUpdate = true;
-                        updateMeshIds.AddRange(newUpdatedUids);
-                        var updateEntitys = newEntitys.Where(c => newUpdatedUids.Any(x => x == c.Key)).ToDictionary(c => c.Key, x => x.Value);
-                        UpdateEntitys(prjId, updateEntitys);
+                        oldStorey.MemoryStoreyId = storeyKeyValue.Value.MemoryStoreyId;
+                        oldStorey.MemoryMatrix3d = storeyKeyValue.Value.MemoryMatrix3d;
+                        oldStorey.FloorEntityRelations.Clear();
+                        foreach (var floorEntity in storeyKeyValue.Value.FloorEntityRelations)
+                        {
+                            oldStorey.FloorEntityRelations.Add(floorEntity.Key, floorEntity.Value);
+                        }
                     }
+                    //step5 处理没有变更非标层或标准层首层的信息
+                    var checkStoreyIds = oldNoMemoryUids.Intersect(newNoMemoryUids);
+                    foreach (var storeyId in checkStoreyIds) 
+                    {
+                        var oldStorey = building.BuildingStoreys[storeyId];
+                        var newStorey = newBuilding.BuildingStoreys[storeyId];
+                        var newAddedUids = oldStorey.GetAddedComponentUids(newStorey);
+                        //var newRemovedUids = oldStorey.GetRemovedComponentUids(newStorey);
+                        var newUpdatedUids = oldStorey.GetUpdatedComponentUids(newStorey);
+                        //if (newRemovedUids.Count > 0)
+                        //{
+                        //    needUpdate = true;
+                        //    RemoveEntitys(building, newRemovedUids);
+                        //}
+                        if (newAddedUids.Count > 0)
+                        {
+                            needUpdate = true;
+                            updateMeshIds.AddRange(newAddedUids);
+                            var addEntitys = newEntitys.Where(c => newAddedUids.Any(x => x == c.Key)).ToDictionary(c => c.Key, x => x.Value);
+                            AddEntitys(building, addEntitys, true);
+                        }
+                        if (newUpdatedUids.Count > 0)
+                        {
+                            needUpdate = true;
+                            updateMeshIds.AddRange(newUpdatedUids);
+                            var updateEntitys = newEntitys.Where(c => newUpdatedUids.Any(x => x == c.Key)).ToDictionary(c => c.Key, x => x.Value);
+                            UpdateEntitys(updateEntitys);
+                        }
+                    }
+                }
+                if (needUpdate) 
+                {
+                    UpdateCatchStorey();
                     UpateEntitySolidMesh(updateMeshIds);
                 }
             }
@@ -208,7 +262,7 @@ namespace XbimXplorer.ThBIMEngine
                 var storeyGeoModels = new List<IfcMeshModel>();
                 var storeyGeoPointNormals = new List<PointNormal>();
                 var storeyMoveVector = (new XbimPoint3D(0, 0, storey.Elevation)).Point3D2Vector();
-                foreach (var item in storey.FloorEntitys)
+                foreach (var item in storey.FloorEntityRelations)
                 {
                     var relation = item.Value;
                     if (null == relation)
@@ -293,23 +347,9 @@ namespace XbimXplorer.ThBIMEngine
             DateTime end = DateTime.Now;
             var totalTime = (end - start).TotalSeconds;
         }
-
-        private void RemoveStoreys(string prjId, List<string> rmStoreyIds) 
+        private void RemoveEntitys(THBimBuilding bimBuilding, List<string> rmEntityIds) 
         {
-            foreach (var item in rmStoreyIds)
-                _allStoreys.Remove(item);
-            foreach (var storeyKeyValue in _allStoreys)
-            {
-                var storey = storeyKeyValue.Value;
-                if (rmStoreyIds.Contains(storey.MemoryStoreyId)) 
-                {
-                    storey.FloorEntitys.Clear();
-                    storey.MemoryStoreyId = string.Empty;
-                }
-            }
-        }
-        private void RemoveEntitys(string prjId, List<string> rmEntityIds) 
-        {
+            var thisStoreys = bimBuilding.BuildingStoreys;
             if (null == rmEntityIds || rmEntityIds.Count < 1)
                 return;
             var rmIds = new List<string>();
@@ -319,23 +359,23 @@ namespace XbimXplorer.ThBIMEngine
                     continue;
                 var entity = _allEntitys[entityId];
                 var pid = entity.ParentUid;
-                while (!string.IsNullOrEmpty(pid) && !_allStoreys.ContainsKey(pid))
+                while (!string.IsNullOrEmpty(pid) && !thisStoreys.ContainsKey(pid))
                 {
                     var pEntity = _allEntitys[pid];
                     pid = pEntity.ParentUid;
                 }
+                rmIds.Add(entityId);
                 if (string.IsNullOrEmpty(pid))
                     continue;
-                rmIds.Add(entityId);
-                foreach (var storeyKeyValue in _allStoreys)
+                foreach (var storeyKeyValue in thisStoreys)
                 {
                     var storey = storeyKeyValue.Value;
                     if (storey.Uid != pid && storey.MemoryStoreyId != pid)
                         continue;
-                    var rmRealtion = storey.FloorEntitys.Where(c => c.Value.RelationElementUid == entityId).Select(c => c.Key).ToList();
+                    var rmRealtion = storey.FloorEntityRelations.Where(c => c.Value.RelationElementUid == entityId).Select(c => c.Key).ToList();
                     foreach (var rmId in rmRealtion)
                     {
-                        storey.FloorEntitys.Remove(rmId);
+                        storey.FloorEntityRelations.Remove(rmId);
                     }
                 }
             }
@@ -344,37 +384,49 @@ namespace XbimXplorer.ThBIMEngine
                 _allEntitys.Remove(rmId);
             }
         }
-        private void AddEntitys(string prjId, Dictionary<string,THBimEntity> addEntitys) 
+        private void AddEntitys(THBimBuilding building, Dictionary<string,THBimEntity> addEntitys,bool changeFloorData) 
         {
             var idOffSet = LastEntityIntId() + 1;
             foreach (var entityKeyValue in addEntitys)
             {
                 var entity = entityKeyValue.Value;
                 var pid = entity.ParentUid;
-                while (!string.IsNullOrEmpty(pid) && !_allStoreys.ContainsKey(pid))
+                while (!string.IsNullOrEmpty(pid) && !building.BuildingStoreys.ContainsKey(pid))
                 {
-                    var pEntity = addEntitys[pid];
+                    //如果只是增加了门窗，父元素为墙，算更新数据，不算增的数据
+                    var pEntity = addEntitys.ContainsKey(pid)? addEntitys[pid]:_allEntitys[pid];
                     pid = pEntity.ParentUid;
                 }
-                if (string.IsNullOrEmpty(pid) || !_allStoreys.ContainsKey(pid))
+                if (string.IsNullOrEmpty(pid) || !building.BuildingStoreys.ContainsKey(pid))
                     continue;
+                entityKeyValue.Value.Id = idOffSet;
                 _allEntitys.Add(entity.Uid, entity);
-                foreach (var storeyKeyValue in _allStoreys)
+                foreach (var storeyKeyValue in building.BuildingStoreys)
                 {
                     var storey = storeyKeyValue.Value;
                     if (storey.Uid != pid && storey.MemoryStoreyId != pid)
                         continue;
-                   
-                    var addRelation = new THBimElementRelation(idOffSet, "#wall");
+                    var uid = storey.Uid == pid ? entity.Uid : string.Empty;
+                    var addRelation = new THBimElementRelation(idOffSet, entity.FriendlyTypeName,null,"", uid);
                     addRelation.ParentUid = storey.Uid;
                     addRelation.RelationElementUid = entity.Uid;
                     addRelation.RelationElementId = entity.Id;
-                    storey.FloorEntitys.Add(addRelation.Uid, addRelation);
+                    storey.FloorEntityRelations.Add(addRelation.Uid, addRelation);
                     idOffSet += 1;
                 }
             }
         }
-        private void UpdateEntitys(string prjId, Dictionary<string, THBimEntity> updateEntitys)
+        private void AddEntitys(Dictionary<string, THBimEntity> addEntitys)
+        {
+            var idOffSet = LastEntityIntId() + 1;
+            foreach (var entityKeyValue in addEntitys)
+            {
+                var entity = entityKeyValue.Value;
+                entityKeyValue.Value.Id = idOffSet;
+                _allEntitys.Add(entity.Uid, entity);
+            }
+        }
+        private void UpdateEntitys(Dictionary<string, THBimEntity> updateEntitys)
         {
             if (null == updateEntitys || updateEntitys.Count < 1)
                 return;
@@ -386,6 +438,9 @@ namespace XbimXplorer.ThBIMEngine
                 oldValue.GeometryParam = entity.GeometryParam;
                 oldValue.EntitySolids.Clear();
                 oldValue.ShapeGeometry = null;
+                oldValue.Openings.Clear();
+                foreach (var item in entity.Openings)
+                    oldValue.Openings.Add(item);
             }
         }
         private void UpateEntitySolidMesh(List<string> updateEntityIds) 
@@ -395,9 +450,12 @@ namespace XbimXplorer.ThBIMEngine
             List<THBimEntity> updateEntitys = new List<THBimEntity>();
             foreach (var id in updateEntityIds) 
             {
-                if (!_allEntitys.ContainsKey(id))
-                    continue;
-                updateEntitys.Add(_allEntitys[id]);
+                var entity = _allEntitys[id];
+                updateEntitys.Add(entity);
+                foreach (var item in entity.Openings)
+                {
+                    updateEntitys.Add(_allEntitys[item.Uid]);
+                }
             }
             if (updateEntitys.Count < 1)
                 return;
@@ -405,9 +463,7 @@ namespace XbimXplorer.ThBIMEngine
         }
         private void AddProjectEntitys(Dictionary<string, THBimEntity> addBimEntitys) 
         {
-            int idOffset = 0;
-            if (_allEntitys.Count > 0)
-                idOffset= _allEntitys.Last().Value.Id+1;
+            int idOffset = LastEntityIntId() + 1;
             foreach (var keyValue in addBimEntitys) 
             {
                 keyValue.Value.Id += idOffset;
@@ -424,6 +480,18 @@ namespace XbimXplorer.ThBIMEngine
         private PointNormal GetPointNormal(int pIndex, XbimPoint3D point, XbimVector3D normal)
         {
             return new PointNormal(pIndex, point, normal);
+        }
+        private void UpdateCatchStorey() 
+        {
+            _allStoreys.Clear();
+            foreach (var project in _allBimProject) 
+            {
+                foreach (var build in project.ProjectSite.SiteBuildings) 
+                {
+                    foreach (var storeyKeyValue in build.Value.BuildingStoreys)
+                        _allStoreys.Add(storeyKeyValue.Key, storeyKeyValue.Value);
+                }
+            }
         }
     }
     class GeoMeshResult 

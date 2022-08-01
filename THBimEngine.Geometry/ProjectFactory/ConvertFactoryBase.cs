@@ -68,9 +68,19 @@ namespace THBimEngine.Geometry.ProjectFactory
                 foreach (var opening in entity.Openings)
                 {
                     if (opening.EntitySolids.Count < 1)
-                        continue;
-                    foreach (var solid in opening.EntitySolids)
-                        openingSolds.Add(solid);
+                    {
+                        var opEntity = meshEntitys.Find(c=>c.Uid == opening.Uid);
+                        if (null != opEntity) 
+                        {
+                            foreach (var solid in opEntity.EntitySolids)
+                                openingSolds.Add(solid);
+                        }
+                    }
+                    else 
+                    {
+                        foreach (var solid in opening.EntitySolids)
+                            openingSolds.Add(solid);
+                    }
                 }
                 entity.ShapeGeometry = geometryFactory.GetShapeGeometry(entity.EntitySolids, openingSolds);
             });

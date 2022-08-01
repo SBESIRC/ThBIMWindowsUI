@@ -18,5 +18,18 @@ namespace THBimEngine.Domain.GeometryModel
         public double Y { get; set; }
         [ProtoMember(3)]
         public double Z { get; set; }
+        public override bool Equals(object obj)
+        {
+            if (null == obj || !(obj is Vector3DSurrogate))
+                return false;
+            var otherPoint = (Vector3DSurrogate)obj;
+            if (!this.X.Equals(otherPoint.X) || !this.Y.Equals(otherPoint.Y) || !this.Z.Equals(otherPoint.Z))
+                return false;
+            return true;
+        }
+        public override int GetHashCode()
+        {
+            return X.GetHashCode() ^ Y.GetHashCode() ^ Z.GetHashCode();
+        }
     }
 }

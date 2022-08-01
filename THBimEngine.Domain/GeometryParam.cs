@@ -5,14 +5,15 @@ using THBimEngine.Domain.GeometryModel;
 
 namespace THBimEngine.Domain
 {
-    public abstract class GeometryParam : ICloneable
+    public abstract class GeometryParam : ICloneable, IEquatable<GeometryParam>
     {
         public abstract object Clone();
+        public abstract bool Equals(GeometryParam other);
     }
     /// <summary>
     /// 三维Brep数据
     /// </summary>
-    public class GeometryBrep : GeometryParam, IEquatable<GeometryBrep>
+    public class GeometryBrep : GeometryParam
     {
         public List<PolylineSurrogate> Outer { get; }
         public List<PolylineSurrogate> Voids { get; }
@@ -26,7 +27,7 @@ namespace THBimEngine.Domain
             throw new NotImplementedException();
         }
 
-        public bool Equals(GeometryBrep other)
+        public override bool Equals(GeometryParam other)
         {
             throw new NotImplementedException();
         }
@@ -34,7 +35,7 @@ namespace THBimEngine.Domain
     /// <summary>
     /// 二维轮廓拉伸几何信息
     /// </summary>
-    public class GeometryStretch: GeometryParam, IEquatable<GeometryStretch>
+    public class GeometryStretch: GeometryParam
     {
         /*
          二维轮廓通过拉伸方向和拉伸高度可以拉伸出一个3维几何体
@@ -128,18 +129,21 @@ namespace THBimEngine.Domain
                  ^ ZAxisOffSet.GetHashCode();
         }
 
-        public bool Equals(GeometryStretch other)
+        public override bool Equals(GeometryParam other)
         {
-            if (!OutLine.Equals(other.OutLine))
-                return false;
-            if (XAxisLength.FloatEquals(other.XAxisLength) &&
-                YAxisLength.FloatEquals(other.YAxisLength) &&
-                ZAxisLength.FloatEquals(other.ZAxisLength) &&
-                Origin.Equals(other.Origin) &&
-                ZAxis.Equals(other.ZAxis) &&
-                XAxis.Equals(other.XAxis) &&
-                ZAxisOffSet.Equals(other.ZAxisOffSet))
-                return true;
+            if (other is GeometryStretch geometry) 
+            {
+                if (!OutLine.Equals(geometry.OutLine))
+                    return false;
+                if (XAxisLength.FloatEquals(geometry.XAxisLength) &&
+                    YAxisLength.FloatEquals(geometry.YAxisLength) &&
+                    ZAxisLength.FloatEquals(geometry.ZAxisLength) &&
+                    Origin.Equals(geometry.Origin) &&
+                    ZAxis.Equals(geometry.ZAxis) &&
+                    XAxis.Equals(geometry.XAxis) &&
+                    ZAxisOffSet.Equals(geometry.ZAxisOffSet))
+                    return true;
+            }
             return false;
         }
 

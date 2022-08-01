@@ -45,8 +45,7 @@ namespace THBimEngine.Domain
                     return false;
                 }
             }
-            if (GeometryParam.Equals(other.GeometryParam) &&
-                Openings.Equals(other.Openings))
+            if (GeometryParam.Equals(other.GeometryParam))
             {
                 return true;
             }

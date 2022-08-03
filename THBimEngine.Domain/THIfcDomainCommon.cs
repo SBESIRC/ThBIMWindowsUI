@@ -33,6 +33,31 @@ namespace THBimEngine.Domain
             return null;
         }
 
+        public static GeometryParam SlabGeometryParam(this Xbim.Ifc2x3.SharedBldgElements.IfcSlab ifcElement, out List<GeometryStretch> slabDescendingData)
+        {
+            slabDescendingData = new List<GeometryStretch>();
+            var ifcFaceBasedSurfaceModel = ifcElement.Representation.Representations.FirstOrDefault().Items[0] as Xbim.Ifc2x3.GeometricModelResource.IfcFaceBasedSurfaceModel;
+            var cfsFaces = (ifcFaceBasedSurfaceModel.FbsmFaces).FirstOrDefault().CfsFaces;
+            var geometryBrep = new GeometryBrep();
+            foreach (var ifcFace in cfsFaces)
+            {
+                var pts = (ifcFace.Bounds.FirstOrDefault().Bound as Xbim.Ifc2x3.TopologyResource.IfcPolyLoop).Polygon.ToList();
+                geometryBrep.Outer.Add(pts.ToPlineSurrogate());
+            }
+            return geometryBrep;
+        }
+
+        public static PolylineSurrogate ToPlineSurrogate(this List<Xbim.Ifc2x3.GeometryResource.IfcCartesianPoint> pts)
+        {
+            var pt3DSurrogates = new List<Point3DSurrogate>();
+            foreach (var pt in pts)
+            {
+                pt3DSurrogates.Add(pt.ToPt3DSurrogate());
+            }
+            var pt3DCollectionSurrogate = new Point3DCollectionSurrogate(pt3DSurrogates);
+            return new PolylineSurrogate(new List<Point3DCollectionSurrogate>() { pt3DCollectionSurrogate },true);
+        }
+
         public static XbimPoint3D ToXbimPt(this Xbim.Ifc2x3.GeometryResource.IfcCartesianPoint pt)
         {
             double X = 0, Y = 0, Z = 0;
@@ -86,34 +111,6 @@ namespace THBimEngine.Domain
             }
 
             return new Point3DSurrogate(X,Y,Z);
-        }
-
-        public static GeometryParam SlabGeometryParam(this Xbim.Ifc2x3.SharedBldgElements.IfcSlab tchElement, out List<GeometryStretch> slabDescendingData)
-        {
-            slabDescendingData = new List<GeometryStretch>();
-            return null;
-            //var outLineGeoParam = new GeometryStretch(tchElement.Outline, XAxis,
-            //                    ZAxis.Negated(),
-            //                    tchElement.Height);
-            //if (null != tchElement.Descendings)
-            //{
-            //    foreach (var item in tchElement.Descendings)
-            //    {
-            //        if (item.IsDescending)
-            //        {
-            //            //降板
-            //            GeometryStretch desGeoStretch = new GeometryStretch(item.Outline, XAxis, ZAxis.Negated(), item.DescendingThickness, item.DescendingHeight);
-            //            desGeoStretch.YAxisLength = item.DescendingWrapThickness;
-            //            slabDescendingData.Add(desGeoStretch);
-            //        }
-            //        else
-            //        {
-            //            //洞口
-            //            outLineGeoParam.OutLine.InnerPolylines.Add(item.Outline);
-            //        }
-            //    }
-            //}
-            //return outLineGeoParam;
         }
 
 

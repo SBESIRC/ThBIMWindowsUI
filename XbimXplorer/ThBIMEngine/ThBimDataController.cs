@@ -59,8 +59,32 @@ namespace XbimXplorer.ThBIMEngine
         }
         public void AddProject(IfcStore ifcStore) 
         {
-            convertFactory = new THProjectConvertFactory(ifcStore.IfcSchemaVersion);
-            throw new System.NotSupportedException();
+            convertFactory = new THIfcStoreConvertFactory(Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3);
+            bool isAdd = true;
+            foreach (var item in _allBimProject)
+            {
+                if (item.Name == ifcStore.FileName)
+                {
+                    isAdd = false;
+                    break;
+                }
+            }
+            if (isAdd)
+            {
+                var convertResult = convertFactory.ProjectConvert(ifcStore, true);
+                if (null != convertResult)
+                {
+                    _allBimProject.Add(convertResult.BimProject);
+                    AddProjectEntitys(convertResult.ProjectEntitys);
+                    UpdateCatchStorey();
+                }
+                WriteToMidDataByFloor();
+            }
+            else
+            {
+                var convertResult = convertFactory.ProjectConvert(ifcStore, false);
+                UpdateProject(convertResult);
+            }
         }
 
         public void DeleteProject()

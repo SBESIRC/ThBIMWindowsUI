@@ -354,70 +354,71 @@ namespace XbimXplorer
                 _temporaryXbimFileName = Path.GetTempFileName();
                 SetOpenedModelFileName(selectedFilename);
                 var model = IfcStore.Open(selectedFilename, null, null, worker.ReportProgress, FileAccessMode);
-                if (_meshModel)
-                {
-                    // mesh direct model
-                    if (model.GeometryStore.IsEmpty)
-                    {
-                        try
-                        {
-                            var context = new Xbim3DModelContext(model);
-                            if (!_multiThreading)
-                                context.MaxThreads = 1;
-                            context.UseSimplifiedFastExtruder = _simpleFastExtrusion;
-                            SetDeflection(model);
-                            //upgrade to new geometry representation, uses the default 3D model
-                            context.CreateContext(worker.ReportProgress, App.ContextWcsAdjustment);
-                        }
-                        catch (Exception geomEx)
-                        {
-                            var sb = new StringBuilder();
-                            sb.AppendLine($"Error creating geometry context of '{selectedFilename}' {geomEx.StackTrace}.");
-                            var newexception = new Exception(sb.ToString(), geomEx);
-                            Log.Error(sb.ToString(), newexception);
-                        }
-                    }
 
-                    // mesh references
-                    foreach (var modelReference in model.ReferencedModels)
-                    {
-                        // creates federation geometry contexts if needed
-                        Debug.WriteLine(modelReference.Name);
-                        if (modelReference.Model == null)
-                            continue;
-                        if (!modelReference.Model.GeometryStore.IsEmpty)
-                            continue;
-                        var context = new Xbim3DModelContext(modelReference.Model);
-                        if (!_multiThreading)
-                            context.MaxThreads = 1;
-                        context.UseSimplifiedFastExtruder = _simpleFastExtrusion;
-                        SetDeflection(modelReference.Model);
-                        //upgrade to new geometry representation, uses the default 3D model
-                        context.CreateContext(worker.ReportProgress, App.ContextWcsAdjustment);
-                    }
-                    if (worker.CancellationPending)
-                    //if a cancellation has been requested then don't open the resulting file
-                    {
-                        try
-                        {
-                            model.Close();
-                            if (File.Exists(_temporaryXbimFileName))
-                                File.Delete(_temporaryXbimFileName); //tidy up;
-                            _temporaryXbimFileName = null;
-                            SetOpenedModelFileName(null);
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Error(ex.Message, ex);
-                        }
-                        return;
-                    }
-                }
-                else
-                {
-                    Log.WarnFormat("Settings prevent mesh creation.");
-                }
-                IfcStoreToMidFile(model);
+                //if (_meshModel)
+                //{
+                //    // mesh direct model
+                //    if (model.GeometryStore.IsEmpty)
+                //    {
+                //        try
+                //        {
+                //            var context = new Xbim3DModelContext(model);
+                //            if (!_multiThreading)
+                //                context.MaxThreads = 1;
+                //            context.UseSimplifiedFastExtruder = _simpleFastExtrusion;
+                //            SetDeflection(model);
+                //            //upgrade to new geometry representation, uses the default 3D model
+                //            context.CreateContext(worker.ReportProgress, App.ContextWcsAdjustment);
+                //        }
+                //        catch (Exception geomEx)
+                //        {
+                //            var sb = new StringBuilder();
+                //            sb.AppendLine($"Error creating geometry context of '{selectedFilename}' {geomEx.StackTrace}.");
+                //            var newexception = new Exception(sb.ToString(), geomEx);
+                //            Log.Error(sb.ToString(), newexception);
+                //        }
+                //    }
+
+                //    // mesh references
+                //    foreach (var modelReference in model.ReferencedModels)
+                //    {
+                //        // creates federation geometry contexts if needed
+                //        Debug.WriteLine(modelReference.Name);
+                //        if (modelReference.Model == null)
+                //            continue;
+                //        if (!modelReference.Model.GeometryStore.IsEmpty)
+                //            continue;
+                //        var context = new Xbim3DModelContext(modelReference.Model);
+                //        if (!_multiThreading)
+                //            context.MaxThreads = 1;
+                //        context.UseSimplifiedFastExtruder = _simpleFastExtrusion;
+                //        SetDeflection(modelReference.Model);
+                //        //upgrade to new geometry representation, uses the default 3D model
+                //        context.CreateContext(worker.ReportProgress, App.ContextWcsAdjustment);
+                //    }
+                //    if (worker.CancellationPending)
+                //    //if a cancellation has been requested then don't open the resulting file
+                //    {
+                //        try
+                //        {
+                //            model.Close();
+                //            if (File.Exists(_temporaryXbimFileName))
+                //                File.Delete(_temporaryXbimFileName); //tidy up;
+                //            _temporaryXbimFileName = null;
+                //            SetOpenedModelFileName(null);
+                //        }
+                //        catch (Exception ex)
+                //        {
+                //            Log.Error(ex.Message, ex);
+                //        }
+                //        return;
+                //    }
+                //}
+                //else
+                //{
+                //    Log.WarnFormat("Settings prevent mesh creation.");
+                //}
+                //IfcStoreToMidFile(model);
                 args.Result = model;
             }
             catch (Exception ex)
@@ -536,7 +537,9 @@ namespace XbimXplorer
         {
             if (args.Result is IfcStore ifcStore) //all ok
             {
-                ShowIfcStore(ifcStore);
+                bimDataController.AddProject(ifcStore);
+                LoadIfcFile(_tempMidFileName);
+                //ShowIfcStore(ifcStore);
             }
             else //we have a problem
             {

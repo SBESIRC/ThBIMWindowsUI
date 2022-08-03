@@ -66,7 +66,6 @@ namespace THBimEngine.Geometry.ProjectFactory
                 else 
                 {
                     //多线程有少数据导致后面报错，后续再处理
-                    var moveVector = storey.Origin.Point3D2Vector();
                     Parallel.ForEach(storey.Walls, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, wall =>
                     {
                         var bimWall = new THBimWall(CurrentGIndex(), string.Format("wall#{0}", CurrentGIndex()), wall.THTCHGeometryParam(), "", wall.Uuid);

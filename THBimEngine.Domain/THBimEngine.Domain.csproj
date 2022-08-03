@@ -120,6 +120,7 @@
     <Compile Include="THBimUntypedEntity.cs" />
     <Compile Include="THBimWall.cs" />
     <Compile Include="THBimWindow.cs" />
+    <Compile Include="THIfcDomainCommon.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

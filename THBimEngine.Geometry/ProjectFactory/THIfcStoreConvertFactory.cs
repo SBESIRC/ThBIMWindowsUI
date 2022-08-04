@@ -55,11 +55,12 @@ namespace THBimEngine.Geometry.ProjectFactory
                 {
                     var storey = ifcStorey as Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey;
                     double Storey_Elevation = 0;
-                    double Storey_Height = 0;
+                    double Storey_Height = 3200;//0;
                     if (!(storey.Elevation is null))
                     {
                         Storey_Elevation = storey.Elevation.Value;
-                        Storey_Height = double.Parse(((storey.PropertySets.FirstOrDefault().PropertySetDefinitions.FirstOrDefault() as Xbim.Ifc2x3.Kernel.IfcPropertySet).HasProperties.FirstOrDefault(o => o.Name == "Height") as Xbim.Ifc2x3.PropertyResource.IfcPropertySingleValue).NominalValue.Value.ToString());
+                        //高度需要做修改
+                       //Storey_Height = double.Parse(((storey.PropertySets.FirstOrDefault().PropertySetDefinitions.FirstOrDefault() as Xbim.Ifc2x3.Kernel.IfcPropertySet).HasProperties.FirstOrDefault(o => o.Name == "Height") as Xbim.Ifc2x3.PropertyResource.IfcPropertySingleValue).NominalValue.Value.ToString());
                     }
                     var bimStorey = new THBimStorey(CurrentGIndex(), storey.Name, Storey_Elevation, Storey_Height, "", storey.GlobalId);
                     foreach (var spatialStructure in storey.ContainsElements)
@@ -73,6 +74,10 @@ namespace THBimEngine.Geometry.ProjectFactory
                             {
                                 var wallId = CurrentGIndex();
                                 var wall = ifcWall as Xbim.Ifc2x3.SharedBldgElements.IfcWall;
+                                if(wall == null)
+                                {
+                                    return;
+                                }
                                 var bimWall = new THBimWall(wallId, string.Format("wall#{0}", wallId), wall.THIFCGeometryParam(), "", wall.GlobalId);
                                 bimWall.ParentUid = bimStorey.Uid;
                                 var wallRelation = new THBimElementRelation(bimWall.Id, bimWall.Name, bimWall, bimWall.Describe, bimWall.Uid);

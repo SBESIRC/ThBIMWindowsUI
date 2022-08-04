@@ -9,14 +9,39 @@ namespace THBimEngine.Domain
     {
         public static GeometryParam THIFCGeometryParam(this Xbim.Ifc2x3.Kernel.IfcProduct ifcElement)
         {
+            if(ifcElement is null)
+            {
+                return null;
+            }
+            var type = ifcElement.Representation.Representations.First().Items[0].ToString();
+
+            if(type.Contains("Xbim.Ifc2x3.GeometricModelResource.IfcFacetedBrep"))
+            {
+                ;
+                var ifcFacetedBrep = ifcElement.Representation.Representations.First().Items[0] as Xbim.Ifc2x3.GeometricModelResource.IfcFacetedBrep;
+                var outerCurve = ifcFacetedBrep.Outer.CfsFaces.ToList();
+                var geometryBrep = new GeometryBrep();
+                foreach (var ifcFace in outerCurve)
+                {
+                    var pts = (ifcFace.Bounds.FirstOrDefault().Bound as Xbim.Ifc2x3.TopologyResource.IfcPolyLoop).Polygon.ToList();
+                    geometryBrep.Outer.Add(pts.ToPlineSurrogate());
+                }
+                return geometryBrep;
+            }
             var ifcExtrudedAreaSolid = ifcElement.Representation.Representations.First().Items[0] as Xbim.Ifc2x3.GeometricModelResource.IfcExtrudedAreaSolid;
             var height = ifcExtrudedAreaSolid.Depth;
             if (!(ifcExtrudedAreaSolid.SweptArea as Xbim.Ifc2x3.ProfileResource.IfcArbitraryClosedProfileDef is null))
             {
-                var outerCurve = (ifcExtrudedAreaSolid.SweptArea as Xbim.Ifc2x3.ProfileResource.IfcArbitraryClosedProfileDef).OuterCurve as Xbim.Ifc2x3.GeometryResource.IfcCompositeCurve;
+
+                var outerCurve = (ifcExtrudedAreaSolid.SweptArea as Xbim.Ifc2x3.ProfileResource.IfcArbitraryClosedProfileDef).OuterCurve;
+                if(outerCurve.ToString().Contains("IfcPolyline"))
+                {
+                    var pts = outerCurve
+                }
+                    //as Xbim.Ifc2x3.GeometryResource.IfcCompositeCurve;
                 var zAxis = ifcExtrudedAreaSolid.ExtrudedDirection.XbimVector3D();
                 if (outerCurve.Segments.Count > 0)
-                    return new GeometryStretch(outerCurve.ToOutline(), new XbimVector3D(1, 0, 0), zAxis, height);
+                    return new GeometryStretch(outerCurve.ToOutline(), new XbimVector3D(1, 0, 0), zAxis, height, ((Xbim.Ifc2x3.GeometryResource.IfcPlacement)((Xbim.Ifc2x3.GeometricConstraintResource.IfcLocalPlacement)ifcElement.ObjectPlacement).RelativePlacement).Location.Z);
             }
             else
             {
@@ -92,6 +117,23 @@ namespace THBimEngine.Domain
                 point3DCollectionSurrogate.Add(pt3DCollectionSurrogate);
             }
             return new PolylineSurrogate(point3DCollectionSurrogate,true);
+        }
+
+        public static PolylineSurrogate ToOutline(this List<Xbim.Ifc2x3.TopologyResource.IfcFace> outerCurve)
+        {
+            List<Point3DCollectionSurrogate> point3DCollectionSurrogate = new List<Point3DCollectionSurrogate>();
+            foreach (Xbim.Ifc2x3.TopologyResource.IfcFace ifcFace in outerCurve)
+            {
+                var pts = (ifcFace.Bounds as Xbim.Ifc2x3.TopologyResource.IfcPolyLoop).Polygon;
+                var pt3DSurrogates = new List<Point3DSurrogate>();
+                for (int i = 0; i < pts.Count - 1; i++)
+                {
+                    pt3DSurrogates.Add(pts[i].ToPt3DSurrogate());
+                }
+                var pt3DCollectionSurrogate = new Point3DCollectionSurrogate(pt3DSurrogates);
+                point3DCollectionSurrogate.Add(pt3DCollectionSurrogate);
+            }
+            return new PolylineSurrogate(point3DCollectionSurrogate, true);
         }
 
         public static Point3DSurrogate ToPt3DSurrogate(this Xbim.Ifc2x3.GeometryResource.IfcCartesianPoint pt)

@@ -159,7 +159,20 @@ namespace THBimEngine.Geometry
                 solids.Add(item);
             return solids;
         }
-
+        public List<IXbimSolid> GetXBimSolid(IPersistEntity persistEntity) 
+        {
+            var resSolids = new List<IXbimSolid>();
+            if (persistEntity is IIfcElement ifc4Elem)
+            {
+                var ifcGeo = ifc4Elem.Representation.Representations[0].Items[0];
+                //var test = geomEngine.CreateSolidSet(ifcGeo);
+            }
+            else if(persistEntity is Xbim.Ifc2x3.Interfaces.IIfcElement ifc2Elem)
+            {
+                
+            }
+            return resSolids;
+        }
         public IXbimSolid GetXBimSolid(GeometryStretch geometryStretch, XbimVector3D moveVector) 
         {
             IXbimSolid geoSolid = null;

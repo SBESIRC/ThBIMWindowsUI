@@ -122,12 +122,11 @@ namespace THBimEngine.Geometry
             return compositeCurve;
         }
 
-        public static IfcFacetedBrepWithVoids ToIfcFacetedBrep(this MemoryModel model, List<PolylineSurrogate> facePlines,List<PolylineSurrogate> voidsFaces) 
+        public static IfcFacetedBrep ToIfcFacetedBrep(this MemoryModel model, List<PolylineSurrogate> facePlines,List<PolylineSurrogate> voidsFaces) 
         {
-            var facetedBrepWithVoids = model.Instances.New<IfcFacetedBrepWithVoids>();
-            facetedBrepWithVoids.Outer = ToIfcClosedShell(model, facePlines);
-            facetedBrepWithVoids.Voids.Add(ToIfcClosedShell(model, voidsFaces));
-            return facetedBrepWithVoids;
+            var facetedBrep = model.Instances.New<IfcFacetedBrep>();
+            facetedBrep.Outer = ToIfcClosedShell(model, facePlines);
+            return facetedBrep;
         }
         private static IfcClosedShell ToIfcClosedShell(this MemoryModel model, List<PolylineSurrogate> facePlines)
         {

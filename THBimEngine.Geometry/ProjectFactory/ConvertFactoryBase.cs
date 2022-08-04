@@ -97,13 +97,11 @@ namespace THBimEngine.Geometry.ProjectFactory
             allEntitys = new List<THBimEntity>();
             bimProject = null;
         }
-        protected void AddElementIndex(int addCount = 1)
-        {
-            globalIndex += addCount;
-        }
         protected int CurrentGIndex()
         {
-            return globalIndex;
+            var res = globalIndex;
+            globalIndex += 1;
+            return res;
         }
     }
     

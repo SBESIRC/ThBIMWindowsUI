@@ -21,10 +21,10 @@ namespace THBimEngine.Domain
         /// <summary>
         /// 物体开洞信息
         /// </summary>
-        public List<THBimOpening> Openings { get; private set; }
+        public List<THBimEntity> Openings { get; private set; }
         public THBimEntity(int id, string name, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, describe, uid)
         {
-            Openings = new List<THBimOpening>();
+            Openings = new List<THBimEntity>();
             GeometryParam = geometryParam;
             EntitySolids = new List<IXbimSolid>();
         }

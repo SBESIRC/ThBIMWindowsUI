@@ -1,4 +1,5 @@
 ﻿using System;
+using Xbim.Common.Geometry;
 
 namespace THBimEngine.Domain
 {
@@ -6,6 +7,7 @@ namespace THBimEngine.Domain
     {
         public int RelationElementId { get; set; }
         public string RelationElementUid { get; set; }
+        public XbimMatrix3D Matrix3D { get; set; }
         public THBimElementRelation(int id, string name, THBimElement relationElement =null, string describe = "", string uid = "") : base(id, name, describe, uid)
         {
             if (null != relationElement) 

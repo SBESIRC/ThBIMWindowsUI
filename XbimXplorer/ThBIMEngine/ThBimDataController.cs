@@ -305,7 +305,7 @@ namespace XbimXplorer.ThBIMEngine
                         continue;
                     var moveVector = entity.ShapeGeometry.TempOriginDisplacement + storeyMoveVector;
                     var transform = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
-                    var material = THBimMaterial.GetTHBimEntityMaterial(entity.GetType());
+                    var material = THBimMaterial.GetTHBimEntityMaterial(entity.FriendlyTypeName,true);
                     IfcMeshModel meshModel = new IfcMeshModel(relation.Id, entity.Id);
                     meshModel.TriangleMaterial = material;
                     var allPts = tr.Vertices.ToArray();

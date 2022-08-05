@@ -11,6 +11,7 @@ using Xbim.Geometry.Engine.Interop;
 using Xbim.Ifc;
 using Xbim.Ifc4.Interfaces;
 using Xbim.IO.Memory;
+using Xbim.ModelGeometry.Scene.Extensions;
 
 namespace THBimEngine.Geometry
 {
@@ -57,6 +58,8 @@ namespace THBimEngine.Geometry
                     {
                         foreach (var item in openingSolids)
                         {
+                            if(null == item)
+                                continue;
                             if (solid == null)
                                 solid = geoSolid.Cut(item, 1);
                             else
@@ -164,15 +167,16 @@ namespace THBimEngine.Geometry
             }
             return solids;
         }
-        public XbimShapeGeometry GetXBimSolid(IIfcProduct persistEntity) 
+        public List<IXbimSolid> GetXBimSolid(IIfcProduct persistEntity)
         {
-            XbimShapeGeometry shapeGeometry =null;
+            var resList = new List<IXbimSolid>();
+            XbimShapeGeometry shapeGeometry = null;
             var thisEntityIfcType = persistEntity.Model.SchemaVersion;
             List<int> productShapeIds = new List<int>();
             if (persistEntity.Representation != null)
             {
                 if (persistEntity.Representation.Representations == null)
-                    return shapeGeometry;
+                    return resList;
                 var rep = persistEntity.Representation.Representations.FirstOrDefault();
                 //write out the representation if it has one
                 if (rep != null)
@@ -180,32 +184,64 @@ namespace THBimEngine.Geometry
                     foreach (var shape in rep.Items.Where(i => !(i is IIfcGeometricSet)))
                     {
                         var mappedItem = shape as IIfcMappedItem;
-                        //if not already processed, then add it
-                        productShapeIds.Add(shape.EntityLabel);
-                        // according to https://github.com/BuildingSMART/IFC4-CV/issues/14 no need to punch holes in the shape if it's a tessellated body
-                        //if (rep.RepresentationType.ToString().ToLowerInvariant() == "tessellation" && rep.RepresentationIdentifier.ToString().ToLowerInvariant() == "body")
-                        //{
-                        //    var groupsToRemove = OpeningsAndProjections.Where(x => x.Key.EntityLabel == product.EntityLabel).ToArray();
-                        //    foreach (var rem in groupsToRemove)
-                        //    {
-                        //        OpeningsAndProjections.Remove(rem);
-                        //    }
-                        //    VoidedProductIds.Remove(product.EntityLabel);
-                        //    continue;
-                        //}
+                        if (mappedItem != null)
+                        {
+
+                        }
+                        else 
+                        {
+                            //if not already processed, then add it
+                            productShapeIds.Add(shape.EntityLabel);
+                            // according to https://github.com/BuildingSMART/IFC4-CV/issues/14 no need to punch holes in the shape if it's a tessellated body
+                            //if (rep.RepresentationType.ToString().ToLowerInvariant() == "tessellation" && rep.RepresentationIdentifier.ToString().ToLowerInvariant() == "body")
+                            //{
+                            //    var groupsToRemove = OpeningsAndProjections.Where(x => x.Key.EntityLabel == product.EntityLabel).ToArray();
+                            //    foreach (var rem in groupsToRemove)
+                            //    {
+                            //        OpeningsAndProjections.Remove(rem);
+                            //    }
+                            //    VoidedProductIds.Remove(product.EntityLabel);
+                            //    continue;
+                            //}
+                        }
+
                     }
                 }
             }
-            foreach (var item in productShapeIds) 
+            else 
+            {
+            
+            }
+            if (productShapeIds.Count < 1) 
+            {
+            
+            }
+            XbimMatrix3D matrix3D = persistEntity.ObjectPlacement.PlacementToMatrix3D();
+            foreach (var item in productShapeIds)
             {
                 var geoItem = persistEntity.Model.Instances[item] as IIfcGeometricRepresentationItem;
                 if (null == geoItem)
                     continue;
                 var createGeo = geomEngine.Create(geoItem);
-                shapeGeometry = geomEngine.CreateShapeGeometry(createGeo, 1, 1, 0.5, XbimGeometryType.PolyhedronBinary);
-                break;
+
+                if (createGeo is IXbimSolid solid)
+                {
+                    var transSolid = solid.Transform(matrix3D) as IXbimSolid;
+                    resList.Add(transSolid);
+                }
+                else if (createGeo is IXbimGeometryObjectSet geoSet) 
+                {
+                    foreach (var gSolid in geoSet.Solids) 
+                    {
+                        var transSolid = gSolid.Transform(matrix3D) as IXbimSolid;
+                        resList.Add(transSolid);
+                    }
+                }
+                else
+                {
+                    throw new NotSupportedException(string.Format("暂未支持的类型{0},GeoType {1}", createGeo.GetType().Name, createGeo.GeometryType));
+                }
             }
-            
             //if (thisEntityIfcType == IfcSchemaVersion.Ifc2X3)
             //{
             //    var ifc2Elem = persistEntity as Xbim.Ifc2x3.Interfaces.IIfcElement;
@@ -228,9 +264,9 @@ namespace THBimEngine.Geometry
             //    var ifc4Elem = persistEntity as Xbim.Ifc4.Interfaces.IIfcElement;
 
             //}
-            return shapeGeometry;
+            return resList;
         }
-        public IXbimSolid GetXBimSolid(GeometryStretch geometryStretch, XbimVector3D moveVector) 
+        public IXbimSolid GetXBimSolid(GeometryStretch geometryStretch, XbimVector3D moveVector)
         {
             IXbimSolid geoSolid = null;
             using (var txn = memoryModel.BeginTransaction("Create solid"))

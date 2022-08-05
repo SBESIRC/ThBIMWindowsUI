@@ -2,12 +2,14 @@
 using System.Threading.Tasks;
 using THBimEngine.Domain;
 using Xbim.Common.Geometry;
+using Xbim.Common.Logging;
 using Xbim.Common.Step21;
 
 namespace THBimEngine.Geometry.ProjectFactory
 {
     public abstract class ConvertFactoryBase
     {
+        protected readonly ILogger Logger = LoggerFactory.GetLogger();
         /// <summary>
         /// Ifc版本信息
         /// </summary>
@@ -20,7 +22,7 @@ namespace THBimEngine.Geometry.ProjectFactory
         /// <summary>
         /// 项目中所有的实体信息
         /// </summary>
-        protected List<THBimEntity> allEntitys;
+        protected Dictionary<string,THBimEntity> allEntitys;
         /// <summary>
         /// 项目中非标层，和标准层首层楼层数据
         /// </summary>
@@ -31,7 +33,7 @@ namespace THBimEngine.Geometry.ProjectFactory
         protected Dictionary<string, THBimStorey> allStoreys;
         public ConvertFactoryBase(IfcSchemaVersion ifcSchemaVersion) 
         {
-            allEntitys = new List<THBimEntity>();
+            allEntitys = new Dictionary<string, THBimEntity>();
             schemaVersion = ifcSchemaVersion;
             InitOrClearData();
         }
@@ -46,9 +48,13 @@ namespace THBimEngine.Geometry.ProjectFactory
                 var geometryFactory = new GeometryFactory(schemaVersion);
                 if (entity is THBimIFCEntity ifcEntity) 
                 {
-                    var shapeGeometry = geometryFactory.GetXBimSolid(ifcEntity.IfcEntity as Xbim.Ifc4.Interfaces.IIfcProduct);
-                    if (null != shapeGeometry)
-                        entity.ShapeGeometry = shapeGeometry;
+                    //var shapeGeometry = geometryFactory.GetXBimSolid(ifcEntity.IfcEntity as Xbim.Ifc4.Interfaces.IIfcProduct);
+                    //if (null != shapeGeometry)
+                    //    entity.ShapeGeometry = shapeGeometry;
+
+                    var solids = geometryFactory.GetXBimSolid(ifcEntity.IfcEntity as Xbim.Ifc4.Interfaces.IIfcProduct);
+                    if (null != solids && solids.Count > 0)
+                        entity.EntitySolids.AddRange(solids);
                 }
                 else if (entity is THBimSlab slab)
                 {
@@ -96,7 +102,7 @@ namespace THBimEngine.Geometry.ProjectFactory
             prjEntityFloors = new Dictionary<string, THBimStorey>();
             allStoreys = new Dictionary<string, THBimStorey>();
             globalIndex = 0;
-            allEntitys = new List<THBimEntity>();
+            allEntitys = new Dictionary<string, THBimEntity>();
             bimProject = null;
         }
         protected int CurrentGIndex()

@@ -119,6 +119,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GeometryCommon.cs" />
     <Compile Include="ProjectFactory\ConvertFactoryBase.cs" />
     <Compile Include="NTS\EngineNTSService.cs" />
     <Compile Include="NTS\EngineNTSOperation.cs" />
@@ -142,6 +143,10 @@
     <ProjectReference Include="..\Xbim.Geometry.Engine.Interop\Xbim.Geometry.Engine.Interop.csproj">
       <Project>{f94a98ea-ab29-4818-a51f-6b33beb7561a}</Project>
       <Name>Xbim.Geometry.Engine.Interop</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Xbim.ModelGeometry.Scene\Xbim.ModelGeometry.Scene.csproj">
+      <Project>{3d9d37de-a254-4433-b172-7590cbd84c69}</Project>
+      <Name>Xbim.ModelGeometry.Scene</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

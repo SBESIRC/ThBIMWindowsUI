@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using THBimEngine.Domain;
 using Xbim.Common.Step21;
 using Xbim.Ifc;
+using Xbim.Ifc4.Interfaces;
 
 namespace THBimEngine.Geometry.ProjectFactory
 {
@@ -19,24 +21,17 @@ namespace THBimEngine.Geometry.ProjectFactory
                 throw new System.NotSupportedException();
             ConvertResult convertResult = null;
             //step1 转换几何数据
-            if(ifcStore.IfcSchemaVersion== IfcSchemaVersion.Ifc2X3)
-            {
-                THIfcStoreToTHBimProject2X3(ifcStore);
-            }
-            else
-            {
-                THIfcStoreToTHBimProject4(ifcStore);
-            }
+            THIfcStoreToTHBimProject(ifcStore);
             if (createSolidMesh)
             {
-                CreateSolidMesh(allEntitys);
+                CreateSolidMesh(allEntitys.Values.ToList());
             }
-            var projectEntitys = allEntitys.Where(c => c != null).ToDictionary(c => c.Uid, x => x);
-            convertResult = new ConvertResult(bimProject, allStoreys, projectEntitys);
+            //var projectEntitys = allEntitys.Where(c => c != null).ToDictionary(c => c.Uid, x => x);
+            convertResult = new ConvertResult(bimProject, allStoreys, allEntitys);
             return convertResult;
         }
 
-        private void THIfcStoreToTHBimProject2X3(IfcStore ifcStore)
+        private void THIfcStoreToTHBimProject(IfcStore ifcStore)
         {
             var project = ifcStore.Instances.FirstOrDefault<Xbim.Ifc2x3.Kernel.IfcProject>();
             allEntitys.Clear();
@@ -46,7 +41,8 @@ namespace THBimEngine.Geometry.ProjectFactory
             bimProject.ProjectIdentity = project.GlobalId;
             var site = project.Sites.First() as Xbim.Ifc2x3.ProductExtension.IfcSite;
             var bimSite = new THBimSite(CurrentGIndex(), "", "", site.GlobalId);
-
+            Dictionary<string, List<string>> elemntHoles =new Dictionary<string, List<string>>();
+            var openings = GetOpeningsAndProjections(ifcStore);
             foreach (var building in site.Buildings)
             {
                 var ifcBuilding = building as Xbim.Ifc2x3.ProductExtension.IfcBuilding;
@@ -70,12 +66,32 @@ namespace THBimEngine.Geometry.ProjectFactory
                         var ifcType = elements.First().ToString();
                         foreach (var item in elements) 
                         {
+                            var ifcElem = item as IIfcElement;
+                            //if (ifcElem.ContainedInStructure.Count() > 0)
+                            //{
+                            //    //关联关系
+                            //    foreach (var connnect in ifcElem.ContainedInStructure) 
+                            //    {
+                            //        foreach (var reElem in connnect.RelatedElements) 
+                            //        {
+                            //            var railingRelation = new THBimElementRelation(reElem.EntityLabel, reElem.Name, reElem.GlobalId,bimStorey.Uid);
+                            //            bimStorey.FloorEntityRelations.Add(railingRelation.Uid, railingRelation);
+                            //        }
+                            //    }
+                            //}
+                            //else 
+                            //{
+
+                            //}
+                            //实体
                             var addEntity = new THBimIFCEntity(item);
+                            addEntity.Uid = item.GlobalId;
                             addEntity.ParentUid = bimStorey.Uid;
-                            allEntitys.Add(addEntity);
+                            allEntitys.Add(addEntity.Uid, addEntity);
                             var railingRelation = new THBimElementRelation(addEntity.Id, addEntity.Name, addEntity, addEntity.Describe, addEntity.Uid);
                             bimStorey.FloorEntityRelations.Add(addEntity.Uid, railingRelation);
                             bimStorey.FloorEntitys.Add(addEntity.Uid, addEntity);
+
                         }
                         
                         /*
@@ -166,7 +182,27 @@ namespace THBimEngine.Geometry.ProjectFactory
                 }
                 bimSite.SiteBuildings.Add(bimBuilding.Uid, bimBuilding);
             }
-
+            Parallel.ForEach(openings, new ParallelOptions(), elementToFeatureGroup =>
+            {
+                if (allEntitys.TryGetValue(elementToFeatureGroup.Key.GlobalId, out THBimEntity entity)) 
+                {
+                    foreach (var opening in elementToFeatureGroup) 
+                    {
+                        if (allEntitys.ContainsKey(opening.GlobalId))
+                        {
+                            entity.Openings.Add(allEntitys[opening.GlobalId]);
+                        }
+                        else 
+                        {
+                            var addEntity = new THBimIFCEntity(opening);
+                            addEntity.Uid = opening.GlobalId;
+                            addEntity.ParentUid = entity.Uid;
+                            allEntitys.Add(addEntity.Uid, addEntity);
+                            entity.Openings.Add(addEntity);
+                        }
+                    }
+                }
+            });
             bimProject.ProjectSite = bimSite;
         }
         private List<THBimEntity> GetAddEntity(string storeyUid,string wallUid,Xbim.Ifc2x3.ProductExtension.IfcElement ifcElement,out List<THBimElementRelation> addRealtion) 
@@ -224,9 +260,93 @@ namespace THBimEngine.Geometry.ProjectFactory
             }
             return addEntitys;
         }
-        private void THIfcStoreToTHBimProject4(IfcStore ifcStore)
-        {
 
+        private List<IGrouping<IIfcElement, IIfcFeatureElement>> GetOpeningsAndProjections(IfcStore ifcStore) 
+        {
+            //srl change the way we handle aggregation as some ifc models now send them in multiple relationships
+            //var compoundElementsDictionary =
+            //    Model.Instances.OfType<IIfcRelAggregates>()
+            //        .Where(x => x.RelatingObject is IIfcElement)
+            //        .ToDictionary(x => x.RelatingObject, y => y.RelatedObjects);
+
+            var compoundElementsDictionary = XbimMultiValueDictionary<IIfcObjectDefinition, IIfcObjectDefinition>.Create<HashSet<IIfcObjectDefinition>>();
+            foreach (var aggRel in ifcStore.Instances.OfType<IIfcRelAggregates>())
+            {
+                try
+                {
+                    foreach (var relObj in aggRel.RelatedObjects)
+                    {
+                        compoundElementsDictionary.Add(aggRel.RelatingObject, relObj);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Error($"Problem in aggregates definition for #{aggRel.EntityLabel}", e);
+                }
+            }
+            // openings
+            var elementsWithFeatures = new List<ElementWithFeature>();
+            var openingRelations = ifcStore.Instances.OfType<IIfcRelVoidsElement>()
+                .Where(
+                    r =>
+                        r.RelatingBuildingElement != null && r.RelatingBuildingElement.Representation != null &&
+                        r.RelatedOpeningElement != null && r.RelatedOpeningElement.Representation != null).ToList();
+            foreach (var openingRelation in openingRelations)
+            {
+                // process parts
+                ICollection<IIfcObjectDefinition> childrenElements;
+                if (compoundElementsDictionary.TryGetValue(openingRelation.RelatingBuildingElement, out childrenElements))
+                {
+                    elementsWithFeatures.AddRange(
+                        childrenElements.OfType<IIfcElement>().Select(childElement => new ElementWithFeature()
+                        {
+                            Element = childElement,
+                            Feature = openingRelation.RelatedOpeningElement
+                        }));
+                }
+
+                // process parent
+                elementsWithFeatures.Add(new ElementWithFeature()
+                {
+                    Element = openingRelation.RelatingBuildingElement,
+                    Feature = openingRelation.RelatedOpeningElement
+                });
+            }
+            // projections
+            var projectingRelations = ifcStore.Instances.OfType<IIfcRelProjectsElement>()
+                .Where(
+                    r =>
+                        r.RelatingElement.Representation != null &&
+                        r.RelatedFeatureElement.Representation != null).ToList();
+            foreach (var projectionRelation in projectingRelations)
+            {
+                // process parts
+                ICollection<IIfcObjectDefinition> childrenElements;
+                if (compoundElementsDictionary.TryGetValue(projectionRelation.RelatingElement, out childrenElements))
+                {
+                    elementsWithFeatures.AddRange(
+                        childrenElements.OfType<IIfcElement>().Select(childElement => new ElementWithFeature()
+                        {
+                            Element = childElement,
+                            Feature = projectionRelation.RelatedFeatureElement
+                        }));
+                }
+
+                // process parent
+                elementsWithFeatures.Add(new ElementWithFeature()
+                {
+                    Element = projectionRelation.RelatingElement,
+                    Feature = projectionRelation.RelatedFeatureElement
+                });
+            }
+            var openingsAndProjections = elementsWithFeatures.GroupBy(x => x.Element, y => y.Feature).ToList();
+            return openingsAndProjections;
+        }
+        private struct ElementWithFeature
+        {
+            internal IIfcElement Element;
+            internal IIfcFeatureElement Feature;
         }
     }
+
 }

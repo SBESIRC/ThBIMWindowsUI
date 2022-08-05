@@ -23,10 +23,10 @@ namespace THBimEngine.Geometry.ProjectFactory
             ThTCHProjectToTHBimProject(project);
             if (createSolidMesh)
             {
-                CreateSolidMesh(allEntitys);
+                CreateSolidMesh(allEntitys.Values.ToList());
             }
-            var projectEntitys = allEntitys.Where(c => c != null).ToDictionary(c => c.Uid, x => x);
-            convertResult = new ConvertResult(bimProject, allStoreys, projectEntitys);
+            //var projectEntitys = allEntitys.Where(c => c != null).ToDictionary(c => c.Uid, x => x);
+            convertResult = new ConvertResult(bimProject, allStoreys, allEntitys);
             return convertResult;
         }
         private void ThTCHProjectToTHBimProject(ThTCHProject project)
@@ -90,7 +90,7 @@ namespace THBimEngine.Geometry.ProjectFactory
                                 }
                                 lock (allEntitys)
                                 {
-                                    allEntitys.Add(bimDoor);
+                                    allEntitys.Add(bimDoor.Uid, bimDoor);
                                 }
                             }
                         }
@@ -110,7 +110,7 @@ namespace THBimEngine.Geometry.ProjectFactory
                                 }
                                 lock (allEntitys)
                                 {
-                                    allEntitys.Add(bimWindow);
+                                    allEntitys.Add(bimWindow.Uid, bimWindow);
                                 }
                             }
                         }
@@ -130,14 +130,14 @@ namespace THBimEngine.Geometry.ProjectFactory
                                 }
                                 lock (bimStorey)
                                 {
-                                    allEntitys.Add(bimOpening);
+                                    allEntitys.Add(bimOpening.Uid,bimOpening);
                                 }
                                 bimWall.Openings.Add(bimOpening);
                             }
                         }
                         lock (allEntitys)
                         {
-                            allEntitys.Add(bimWall);
+                            allEntitys.Add(bimWall.Uid,bimWall);
                         }
                     });
                     Parallel.ForEach(storey.Slabs, new ParallelOptions() { MaxDegreeOfParallelism=1}, slab =>
@@ -153,7 +153,7 @@ namespace THBimEngine.Geometry.ProjectFactory
                         bimStorey.FloorEntitys.Add(bimSlab.Uid, bimSlab);
                         lock (allEntitys)
                         {
-                            allEntitys.Add(bimSlab);
+                            allEntitys.Add(bimSlab.Uid, bimSlab);
                         }
                     });
                     Parallel.ForEach(storey.Railings, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, railing => 
@@ -169,7 +169,7 @@ namespace THBimEngine.Geometry.ProjectFactory
                         bimStorey.FloorEntitys.Add(bimRailing.Uid, bimRailing);
                         lock (allEntitys)
                         {
-                            allEntitys.Add(bimRailing);
+                            allEntitys.Add(bimRailing.Uid, bimRailing);
                         }
                     });
                     prjEntityFloors.Add(bimStorey.Uid, bimStorey);

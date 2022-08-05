@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using THBimEngine.Domain;
 using THBimEngine.Domain.GeometryModel;
 using THBimEngine.Geometry.NTS;
@@ -163,19 +164,71 @@ namespace THBimEngine.Geometry
             }
             return solids;
         }
-        public List<IXbimSolid> GetXBimSolid(IPersistEntity persistEntity) 
+        public XbimShapeGeometry GetXBimSolid(IIfcProduct persistEntity) 
         {
-            var resSolids = new List<IXbimSolid>();
-            if (persistEntity is IIfcElement ifc4Elem)
+            XbimShapeGeometry shapeGeometry =null;
+            var thisEntityIfcType = persistEntity.Model.SchemaVersion;
+            List<int> productShapeIds = new List<int>();
+            if (persistEntity.Representation != null)
             {
-                var ifcGeo = ifc4Elem.Representation.Representations[0].Items[0];
-                //var test = geomEngine.CreateSolidSet(ifcGeo);
+                if (persistEntity.Representation.Representations == null)
+                    return shapeGeometry;
+                var rep = persistEntity.Representation.Representations.FirstOrDefault();
+                //write out the representation if it has one
+                if (rep != null)
+                {
+                    foreach (var shape in rep.Items.Where(i => !(i is IIfcGeometricSet)))
+                    {
+                        var mappedItem = shape as IIfcMappedItem;
+                        //if not already processed, then add it
+                        productShapeIds.Add(shape.EntityLabel);
+                        // according to https://github.com/BuildingSMART/IFC4-CV/issues/14 no need to punch holes in the shape if it's a tessellated body
+                        //if (rep.RepresentationType.ToString().ToLowerInvariant() == "tessellation" && rep.RepresentationIdentifier.ToString().ToLowerInvariant() == "body")
+                        //{
+                        //    var groupsToRemove = OpeningsAndProjections.Where(x => x.Key.EntityLabel == product.EntityLabel).ToArray();
+                        //    foreach (var rem in groupsToRemove)
+                        //    {
+                        //        OpeningsAndProjections.Remove(rem);
+                        //    }
+                        //    VoidedProductIds.Remove(product.EntityLabel);
+                        //    continue;
+                        //}
+                    }
+                }
             }
-            else if(persistEntity is Xbim.Ifc2x3.Interfaces.IIfcElement ifc2Elem)
+            foreach (var item in productShapeIds) 
             {
-                
+                var geoItem = persistEntity.Model.Instances[item] as IIfcGeometricRepresentationItem;
+                if (null == geoItem)
+                    continue;
+                var createGeo = geomEngine.Create(geoItem);
+                shapeGeometry = geomEngine.CreateShapeGeometry(createGeo, 1, 1, 0.5, XbimGeometryType.PolyhedronBinary);
+                break;
             }
-            return resSolids;
+            
+            //if (thisEntityIfcType == IfcSchemaVersion.Ifc2X3)
+            //{
+            //    var ifc2Elem = persistEntity as Xbim.Ifc2x3.Interfaces.IIfcElement;
+            //    foreach (var item in ifc2Elem.Representation.Representations)
+            //    {
+
+            //        var geoItem = ((Xbim.Ifc2x3.RepresentationResource.IfcRepresentation)item.Model.Instances[item.EntityLabel]).Items[0] as IIfcGeometricRepresentationItem;
+            //        if (null == geoItem)
+            //            continue;
+            //        var createGeo = geomEngine.Create(geoItem);
+            //        var shapeGeo = geomEngine.CreateShapeGeometry(createGeo, 1, 1, 0.5, XbimGeometryType.PolyhedronBinary);
+            //    }
+            //    if (ifc2Elem is Xbim.Ifc2x3.Interfaces.IIfcWall wall) 
+            //    {
+            //        //处理洞口
+            //    }
+            //}
+            //else 
+            //{
+            //    var ifc4Elem = persistEntity as Xbim.Ifc4.Interfaces.IIfcElement;
+
+            //}
+            return shapeGeometry;
         }
         public IXbimSolid GetXBimSolid(GeometryStretch geometryStretch, XbimVector3D moveVector) 
         {

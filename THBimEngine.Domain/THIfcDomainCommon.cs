@@ -33,15 +33,15 @@ namespace THBimEngine.Domain
             if (!(ifcExtrudedAreaSolid.SweptArea as Xbim.Ifc2x3.ProfileResource.IfcArbitraryClosedProfileDef is null))
             {
 
-                var outerCurve = (ifcExtrudedAreaSolid.SweptArea as Xbim.Ifc2x3.ProfileResource.IfcArbitraryClosedProfileDef).OuterCurve;
-                if(outerCurve.ToString().Contains("IfcPolyline"))
-                {
-                    var pts = outerCurve
-                }
-                    //as Xbim.Ifc2x3.GeometryResource.IfcCompositeCurve;
-                var zAxis = ifcExtrudedAreaSolid.ExtrudedDirection.XbimVector3D();
-                if (outerCurve.Segments.Count > 0)
-                    return new GeometryStretch(outerCurve.ToOutline(), new XbimVector3D(1, 0, 0), zAxis, height, ((Xbim.Ifc2x3.GeometryResource.IfcPlacement)((Xbim.Ifc2x3.GeometricConstraintResource.IfcLocalPlacement)ifcElement.ObjectPlacement).RelativePlacement).Location.Z);
+                //var outerCurve = (ifcExtrudedAreaSolid.SweptArea as Xbim.Ifc2x3.ProfileResource.IfcArbitraryClosedProfileDef).OuterCurve;
+                ////if(outerCurve.ToString().Contains("IfcPolyline"))
+                ////{
+                ////    var pts = outerCurve
+                ////}
+                //    //as Xbim.Ifc2x3.GeometryResource.IfcCompositeCurve;
+                //var zAxis = ifcExtrudedAreaSolid.ExtrudedDirection.XbimVector3D();
+                //if (outerCurve.Segments.Count > 0)
+                //    return new GeometryStretch(outerCurve.ToOutline(), new XbimVector3D(1, 0, 0), zAxis, height, ((Xbim.Ifc2x3.GeometryResource.IfcPlacement)((Xbim.Ifc2x3.GeometricConstraintResource.IfcLocalPlacement)ifcElement.ObjectPlacement).RelativePlacement).Location.Z);
             }
             else
             {

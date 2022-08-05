@@ -39,14 +39,16 @@ namespace THBimEngine.Geometry.ProjectFactory
         public virtual void CreateSolidMesh(List<THBimEntity> meshEntitys)
         {
             //step2 转换每个实体的Solid;
-            Parallel.ForEach(meshEntitys, new ParallelOptions(), entity =>
+            Parallel.ForEach(meshEntitys, new ParallelOptions() { MaxDegreeOfParallelism =1}, entity =>
             {
                 if (entity == null)
                     return;
                 var geometryFactory = new GeometryFactory(schemaVersion);
                 if (entity is THBimIFCEntity ifcEntity) 
                 {
-                    geometryFactory.GetXBimSolid(ifcEntity.IfcEntity);
+                    var shapeGeometry = geometryFactory.GetXBimSolid(ifcEntity.IfcEntity as Xbim.Ifc4.Interfaces.IIfcProduct);
+                    if (null != shapeGeometry)
+                        entity.ShapeGeometry = shapeGeometry;
                 }
                 else if (entity is THBimSlab slab)
                 {
@@ -65,7 +67,7 @@ namespace THBimEngine.Geometry.ProjectFactory
             //step3 Solid剪切和Mesh
             Parallel.ForEach(meshEntitys, new ParallelOptions(), entity =>
             {
-                if (entity == null)
+                if (entity == null || entity.EntitySolids.Count < 1)
                     return;
                 GeometryFactory geometryFactory = new GeometryFactory(schemaVersion);
                 var openingSolds = new List<IXbimSolid>();

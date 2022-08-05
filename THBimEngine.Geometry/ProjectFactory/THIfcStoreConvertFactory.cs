@@ -68,6 +68,17 @@ namespace THBimEngine.Geometry.ProjectFactory
                         var elements = spatialStructure.RelatedElements;
                         if (elements.Count == 0) continue;
                         var ifcType = elements.First().ToString();
+                        foreach (var item in elements) 
+                        {
+                            var addEntity = new THBimIFCEntity(item);
+                            addEntity.ParentUid = bimStorey.Uid;
+                            allEntitys.Add(addEntity);
+                            var railingRelation = new THBimElementRelation(addEntity.Id, addEntity.Name, addEntity, addEntity.Describe, addEntity.Uid);
+                            bimStorey.FloorEntityRelations.Add(addEntity.Uid, railingRelation);
+                            bimStorey.FloorEntitys.Add(addEntity.Uid, addEntity);
+                        }
+                        
+                        /*
                         if(ifcType.Contains("IfcWall"))
                         {
                             Parallel.ForEach(elements, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, ifcWall =>
@@ -147,7 +158,7 @@ namespace THBimEngine.Geometry.ProjectFactory
                                     allEntitys.Add(bimRailing);
                                 }
                             });
-                        }
+                        }*/
                     }
                     prjEntityFloors.Add(bimStorey.Uid, bimStorey);
                     allStoreys.Add(bimStorey.Uid, bimStorey);

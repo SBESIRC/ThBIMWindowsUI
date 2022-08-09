@@ -68,7 +68,7 @@ namespace THBimEngine.Geometry
                         foreach (var subSolid in solid)
                             solidSet.Add(subSolid);
                 }
-                shapeGeometry = geomEngine.CreateShapeGeometry(solidSet, 0.001, 0.0001, 0.5, XbimGeometryType.PolyhedronBinary);
+                shapeGeometry = geomEngine.CreateShapeGeometry(solidSet, 0.001, 10, 0.5, XbimGeometryType.PolyhedronBinary);
                 txn.Commit();
                 return shapeGeometry;
             }

@@ -9,20 +9,21 @@ namespace THBimEngine.Domain
         public static Dictionary<string, THBimMaterial> THBimDefaultMaterial = new Dictionary<string, THBimMaterial>
         {
             { DefaultKeyName,new THBimMaterial{ Color_R = 169 / 255f,Color_G = 179 / 255f, Color_B = 218 / 255f,KS_R = 0,KS_B = 0,KS_G = 0,Alpha = 0.5f,NS = 12,} },
-            { typeof(THBimWall).ToString().ToLower(),new THBimMaterial{Color_R = 226 / 255f,Color_G = 212 / 255f,Color_B = 190 / 255f,KS_R = 0,KS_B = 0,KS_G = 0, Alpha = 1f,NS = 12, } },
-            { typeof(THBimWindow).ToString().ToLower(),new THBimMaterial{Color_R = 116 / 255f,Color_G = 195 / 255f,Color_B = 219 / 255f,KS_R = 0,KS_B = 0,KS_G = 0,Alpha = 0.5f,NS = 12,} },
-            { typeof(THBimDoor).ToString().ToLower(),new THBimMaterial{Color_R = 167 / 255f,Color_G = 182 / 255f,Color_B = 199 / 255f,KS_R = 0,KS_B = 0,KS_G = 0,Alpha = 1f,NS = 12 } },
-            { typeof(THBimSlab).ToString().ToLower(),new THBimMaterial{Color_R = 167 / 255f,Color_G = 182 / 255f,Color_B = 199 / 255f, KS_R = 0,KS_B = 0,KS_G = 0,Alpha = 1f,NS = 12,} },
-            { typeof(THBimRailing).ToString().ToLower(),new THBimMaterial{Color_R = 136 / 255f, Color_G = 211 / 255f, Color_B = 198 / 255f, KS_R = 0, KS_B = 0, KS_G = 0,Alpha = 0.5f, NS = 12, } },
-            { "beam",new THBimMaterial{ Color_R = 194 / 255f, Color_G = 178 / 255f, Color_B = 152 / 255f, KS_R = 0, KS_B = 0, KS_G = 0, Alpha = 1f, NS = 12, } },
-            { "column",new THBimMaterial{ Color_R = 194 / 255f, Color_G = 178 / 255f, Color_B = 152 / 255f, KS_R = 0, KS_B = 0, KS_G = 0, Alpha = 1f, NS = 12, } },
+            { typeof(THBimWall).Name.ToString().ToLower(),new THBimMaterial{Color_R = 226 / 255f,Color_G = 212 / 255f,Color_B = 190 / 255f,KS_R = 0,KS_B = 0,KS_G = 0, Alpha = 1f,NS = 12, } },
+            { typeof(THBimWindow).Name.ToString().ToLower(),new THBimMaterial{Color_R = 116 / 255f,Color_G = 195 / 255f,Color_B = 219 / 255f,KS_R = 0,KS_B = 0,KS_G = 0,Alpha = 0.5f,NS = 12,} },
+            { typeof(THBimDoor).Name.ToString().ToLower(),new THBimMaterial{Color_R = 102 / 255f,Color_G = 58 / 255f,Color_B = 37 / 255f,KS_R = 0,KS_B = 0,KS_G = 0,Alpha = 1f,NS = 12 } },
+            { typeof(THBimSlab).Name.ToString().ToLower(),new THBimMaterial{Color_R = 167 / 255f,Color_G = 182 / 255f,Color_B = 199 / 255f, KS_R = 0,KS_B = 0,KS_G = 0,Alpha = 1f,NS = 12,} },
+            { typeof(THBimRailing).Name.ToString().ToLower(),new THBimMaterial{Color_R = 136 / 255f, Color_G = 211 / 255f, Color_B = 198 / 255f, KS_R = 0, KS_B = 0, KS_G = 0,Alpha = 0.5f, NS = 12, } },
+            { "thbeam",new THBimMaterial{ Color_R = 194 / 255f, Color_G = 178 / 255f, Color_B = 152 / 255f, KS_R = 0, KS_B = 0, KS_G = 0, Alpha = 1f, NS = 12, } },
+            { "thcolumn",new THBimMaterial{ Color_R = 194 / 255f, Color_G = 178 / 255f, Color_B = 152 / 255f, KS_R = 0, KS_B = 0, KS_G = 0, Alpha = 1f, NS = 12, } },
+            { "buildingelementproxy",new THBimMaterial{ Color_R = 186 / 255f, Color_G = 184 / 255f, Color_B = 203 / 255f, KS_R = 0, KS_B = 0, KS_G = 0, Alpha = 1f, NS = 12, } }
          };
         public static THBimMaterial GetTHBimEntityMaterial(Type entityType) 
         {
             var material = THBimDefaultMaterial[DefaultKeyName];
             if (null == entityType)
                 return material;
-            var typeStr = entityType.ToString().ToLower();
+            var typeStr = entityType.Name.ToString();
             return GetTHBimEntityMaterial(typeStr);
         }
         public static THBimMaterial GetTHBimEntityMaterial(string type,bool isContain=false)

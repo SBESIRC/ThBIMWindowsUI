@@ -428,9 +428,9 @@ namespace XbimXplorer
                 Log.Error(sb.ToString(), ex);
                 args.Result = newexception;
             }
-
             var endTime = DateTime.Now;
-            var totalTime = endTime -startTime;
+            var totalTime = (endTime - startTime).TotalSeconds;
+            Log.Info(string.Format("Ifc数据解析完成，耗时：{0}s", totalTime));
         }
 
         private void SetDeflection(IModel model)

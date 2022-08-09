@@ -59,11 +59,12 @@ namespace THBimEngine.Domain.Model
         public double ZOffSet { get; set; }
         #endregion
         //传object数据有问题，后续需要处理
-        public Dictionary<string, object> Properties { get; set; }
+        [ProtoMember(19)]
+        public Dictionary<string, string> Properties { get; set; }
         public ThTCHElement()
         {
             Uuid = Guid.NewGuid().ToString();
-            Properties = new Dictionary<string, object>();
+            Properties = new Dictionary<string, string>();
         }
     }
 }

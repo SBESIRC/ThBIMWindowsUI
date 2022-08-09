@@ -96,14 +96,7 @@ namespace THBimEngine.Geometry
             for (int i = 0; i < polyline.Points.Count; i++)
             {
                 var curveSegement = CreateIfcCompositeCurveSegment(model);
-                var poly = model.Instances.New<IfcPolyline>();
                 var pt1 = polyline.Points[i].Points.First().Point3D2XBimPoint();
-                poly.Points.Add(ToIfcCartesianPoint(model, pt1));
-                if (polyline.Points[i].Points.Count != 1)
-                {
-                    var midPt = polyline.Points[i].Points.Last().Point3D2XBimPoint();
-                    poly.Points.Add(ToIfcCartesianPoint(model, midPt));
-                }
                 XbimPoint3D pt2 = pt1;
                 if (i + 1 < polyline.Points.Count)
                 {
@@ -115,13 +108,49 @@ namespace THBimEngine.Geometry
                 }
                 if (pt1.PointDistanceToPoint(pt2) < 1)
                     continue;
-                poly.Points.Add(ToIfcCartesianPoint(model, pt2));
-                curveSegement.ParentCurve = poly;
-                compositeCurve.Segments.Add(curveSegement);
+                if (polyline.Points[i].Points.Count != 1)
+                {
+                    //圆弧
+                    var midPt = polyline.Points[i].Points.Last().Point3D2XBimPoint();
+                    //poly.Points.Add(ToIfcCartesianPoint(model, midPt));
+                    //计算圆心，半径
+                    var seg1 = midPt - pt1;
+                    var seg1Mid = pt1 + seg1.Normalized()*(midPt.PointDistanceToPoint(pt1)/2);
+                    var seg2 = midPt - pt2;
+                    var seg2Mid = pt2 + seg2.Normalized() * (midPt.PointDistanceToPoint(pt2)/2);
+                    var faceNormal = THBimDomainCommon.ZAxis;
+                    var mid1Dir = seg1.Normalized().CrossProduct(faceNormal);
+                    var mid2Dir = seg2.Normalized().CrossProduct(faceNormal);
+                    if (LineHelper.FindIntersection(seg1Mid, mid1Dir, seg2Mid, mid2Dir, out XbimPoint3D arcCenter) == 1) 
+                    {
+                        bool isCl = seg1.Normalized().CrossProduct(seg2.Normalized().Negated()).Z > 0;
+                        var radius = arcCenter.PointDistanceToPoint(pt1);
+                        var trimmedCurve = model.Instances.New<IfcTrimmedCurve>();
+                        trimmedCurve.BasisCurve = model.Instances.New<IfcCircle>(c =>
+                        {
+                            c.Radius = radius;
+                            c.Position = ToIfcAxis2Placement2D(model, arcCenter, THBimDomainCommon.XAxis);
+                        });
+                        trimmedCurve.MasterRepresentation = IfcTrimmingPreference.CARTESIAN;
+                        trimmedCurve.SenseAgreement = isCl;
+                        trimmedCurve.Trim1.Add(ToIfcCartesianPoint(model, pt1));
+                        trimmedCurve.Trim2.Add(ToIfcCartesianPoint(model, pt2));
+                        curveSegement.ParentCurve = trimmedCurve;
+                        compositeCurve.Segments.Add(curveSegement);
+                    }
+                }
+                else
+                {
+                    var poly = model.Instances.New<IfcPolyline>();
+                    poly.Points.Add(ToIfcCartesianPoint(model, pt1));
+                    poly.Points.Add(ToIfcCartesianPoint(model, pt2));
+                    curveSegement.ParentCurve = poly;
+                    compositeCurve.Segments.Add(curveSegement);
+                }
+                
             }
             return compositeCurve;
         }
-
         public static IfcFacetedBrepWithVoids ToIfcFacetedBrep(this MemoryModel model, List<PolylineSurrogate> facePlines,List<PolylineSurrogate> voidsFaces) 
         {
             var facetedBrepWithVoids = model.Instances.New<IfcFacetedBrepWithVoids>();

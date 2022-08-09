@@ -46,7 +46,7 @@ namespace THBimEngine.Geometry.ProjectFactory
                 var geometryFactory = new GeometryFactory(schemaVersion);
                 if (entity is THBimIFCEntity ifcEntity) 
                 {
-                    geometryFactory.GetXBimSolid(ifcEntity.IfcEntity);
+                    //geometryFactory.GetXBimSolid(ifcEntity.IfcEntity);
                 }
                 else if (entity is THBimSlab slab)
                 {

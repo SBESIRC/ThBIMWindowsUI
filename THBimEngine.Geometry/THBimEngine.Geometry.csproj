@@ -119,6 +119,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LineHelper.cs" />
     <Compile Include="ProjectFactory\ConvertFactoryBase.cs" />
     <Compile Include="NTS\EngineNTSService.cs" />
     <Compile Include="NTS\EngineNTSOperation.cs" />

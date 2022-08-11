@@ -26,20 +26,15 @@ namespace XbimXplorer.ThBIMEngine
             _allBimProject = new List<THBimProject>();
             _allEntitys = new Dictionary<string, THBimEntity>();
             UnShowEntityTypes = new List<string>();
-            UnShowEntityTypes.Add(typeof(THBimOpening).ToString());
+            UnShowEntityTypes.Add(typeof(THBimOpening).Name.ToString());
+            UnShowEntityTypes.Add("opening");
+            UnShowEntityTypes.Add("openingelement");
+            UnShowEntityTypes.Add("open");
         }
         public void AddProject(ThTCHProject project)
         {
             convertFactory = new THProjectConvertFactory(Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3);
-            bool isAdd = true;
-            foreach (var item in _allBimProject)
-            {
-                if (item.Name == project.ProjectName)
-                {
-                    isAdd = false;
-                    break;
-                }
-            }
+            bool isAdd = IsAddProject(project.Uuid);
             if (isAdd)
             {
                 //_allProjects.Add(project);
@@ -57,10 +52,31 @@ namespace XbimXplorer.ThBIMEngine
                 UpdateProject(convertResult);
             }
         }
+        /// <summary>
+        /// 这里目前只处理Mesh后的IfcStore
+        /// </summary>
+        /// <param name="ifcStore"></param>
         public void AddProject(IfcStore ifcStore) 
         {
-            convertFactory = new THProjectConvertFactory(ifcStore.IfcSchemaVersion);
-            throw new System.NotSupportedException();
+            convertFactory = new THIfcStoreMeshConvertFactory(ifcStore.IfcSchemaVersion);
+            var isAdd = IsAddProject(ifcStore.FileName);
+            if (!isAdd) 
+            {
+                //这里增量跟新没有做，先删除原来的数据，再增加现在的数据
+                DeleteProjectData(ifcStore.FileName);
+            }
+            //出来的数据是包含Mesh的，后续不需要创建Solid的步骤了
+            var convertResult = convertFactory.ProjectConvert(ifcStore,false);
+            if (null != convertResult)
+            {
+                _allBimProject.Add(convertResult.BimProject);
+                AddProjectEntitys(convertResult.ProjectEntitys);
+                UpdateCatchStorey();
+            }
+            else if (isAdd) 
+            {
+                UpdateCatchStorey();
+            }
         }
 
         public void DeleteProject()
@@ -270,7 +286,7 @@ namespace XbimXplorer.ThBIMEngine
                     var entity = _allEntitys[relation.RelationElementUid];
                     if (null == entity || entity.ShapeGeometry == null || string.IsNullOrEmpty(entity.ShapeGeometry.ShapeData))
                         continue;
-                    if (UnShowEntityTypes.Contains(entity.GetType().ToString()))
+                    if (UnShowEntityTypes.Contains(entity.FriendlyTypeName.ToString()))
                         continue;
                     var ptOffSet = storeyGeoPointNormals.Count();
                     var ms = new MemoryStream((entity.ShapeGeometry as IXbimShapeGeometryData).ShapeData);
@@ -279,9 +295,10 @@ namespace XbimXplorer.ThBIMEngine
                     var tr = br.ReadShapeTriangulation();
                     if (tr.Faces.Count < 1)
                         continue;
-                    var moveVector = entity.ShapeGeometry.TempOriginDisplacement + storeyMoveVector;
-                    var transform = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
-                    var material = THBimMaterial.GetTHBimEntityMaterial(entity.GetType());
+                    var moveVector = entity.ShapeGeometry.TempOriginDisplacement;
+                    var transform =  XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
+                    transform = relation.Matrix3D * transform * storey.Matrix3D; //XbimMatrix3D.Multiply(relationTrans, transform);
+                    var material = THBimMaterial.GetTHBimEntityMaterial(entity.FriendlyTypeName,true);
                     IfcMeshModel meshModel = new IfcMeshModel(relation.Id, entity.Id);
                     meshModel.TriangleMaterial = material;
                     var allPts = tr.Vertices.ToArray();
@@ -348,6 +365,43 @@ namespace XbimXplorer.ThBIMEngine
             storeToEngineFile.WriteMidDataMultithreading(meshResult.AllGeoModels, meshResult.AllGeoPointNormals);
             DateTime end = DateTime.Now;
             var totalTime = (end - start).TotalSeconds;
+        }
+        private void DeleteProjectData(string prjIdentity) 
+        {
+            THBimProject delPrj = null;
+            foreach (var project in _allBimProject)
+            {
+                if (project.ProjectIdentity != prjIdentity)
+                    continue;
+                delPrj = project;
+                //删除楼层记录，要删除的实体
+                foreach (var build in project.ProjectSite.SiteBuildings) 
+                {
+                    foreach (var storey in build.Value.BuildingStoreys) 
+                    {
+                        foreach (var item in storey.Value.FloorEntitys) 
+                        {
+                            _allEntitys.Remove(item.Key);
+                        }
+                        _allStoreys.Remove(storey.Key);
+                    }
+                }
+            }
+            if (null != delPrj)
+                _allBimProject.Remove(delPrj);
+        }
+        private bool IsAddProject(string prjIdentity) 
+        {
+            bool isAdd = true;
+            foreach (var item in _allBimProject)
+            {
+                if (item.ProjectIdentity == prjIdentity)
+                {
+                    isAdd = false;
+                    break;
+                }
+            }
+            return isAdd;
         }
         private void RemoveEntitys(THBimBuilding bimBuilding, List<string> rmEntityIds) 
         {

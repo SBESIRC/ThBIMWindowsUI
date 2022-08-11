@@ -1,4 +1,5 @@
 ﻿using System;
+using Xbim.Common.Geometry;
 
 namespace THBimEngine.Domain
 {
@@ -26,6 +27,7 @@ namespace THBimEngine.Domain
             RelationElementId = relationElementId;
             ParentUid = parentUid;
         }
+        
 
         public override object Clone()
         {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Xbim.Common.Geometry;
 
 namespace THBimEngine.Domain
 {
@@ -36,8 +37,10 @@ namespace THBimEngine.Domain
         /// 属性
         /// </summary>
         public Dictionary<string, object> Properties { get; }
+        public XbimMatrix3D Matrix3D { get; set; }
         public THBimElement(int id, string name, string describe = "", string uid = ""):this(id,name,"",uid,describe)
         {
+            Matrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero);
         }
         public THBimElement(int id, string name, string parentUid, string uid,string describe)
         {
@@ -51,8 +54,6 @@ namespace THBimEngine.Domain
             Properties = new Dictionary<string, object>();
         }
         public abstract object Clone();
-        
-
         public override int GetHashCode()
         {
             return Uid.GetHashCode() ^ Name.GetHashCode() ^ ParentUid.GetHashCode();

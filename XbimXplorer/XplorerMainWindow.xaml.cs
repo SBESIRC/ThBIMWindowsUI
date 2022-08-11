@@ -417,7 +417,7 @@ namespace XbimXplorer
                 {
                     Log.WarnFormat("Settings prevent mesh creation.");
                 }
-                IfcStoreToMidFile(model);
+                //IfcStoreToMidFile(model);
                 args.Result = model;
             }
             catch (Exception ex)
@@ -536,7 +536,14 @@ namespace XbimXplorer
         {
             if (args.Result is IfcStore ifcStore) //all ok
             {
-                ShowIfcStore(ifcStore);
+                DateTime startTime = DateTime.Now;
+                bimDataController.AddProject(ifcStore);
+                bimDataController.WriteToMidDataByFloor();
+                //DateTime endTime = DateTime.Now;
+                //var totalTime = (endTime - startTime).TotalSeconds;
+                //Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
+                LoadIfcFile(_tempMidFileName);
+                //ShowIfcStore(ifcStore);
             }
             else //we have a problem
             {

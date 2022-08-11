@@ -6,6 +6,7 @@ namespace THBimEngine.Domain
     {
         public string ProjectIdentity { get; set; }
         public THBimSite ProjectSite { get; set; }
+        public object SourceProject { get; set; }
         public THBimProject(int id, string name, string describe = "", string uid = "") : base(id, name, describe, uid)
         {
         }

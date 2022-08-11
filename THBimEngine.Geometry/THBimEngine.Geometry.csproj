@@ -124,6 +124,7 @@
     <Compile Include="NTS\EngineNTSService.cs" />
     <Compile Include="NTS\EngineNTSOperation.cs" />
     <Compile Include="NTS\GeometryDomainExtension.cs" />
+    <Compile Include="ProjectFactory\THIfcStoreMeshConvertFactory.cs" />
     <Compile Include="ProjectFactory\THProjectConvertFactory.cs" />
     <Compile Include="GeometryFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

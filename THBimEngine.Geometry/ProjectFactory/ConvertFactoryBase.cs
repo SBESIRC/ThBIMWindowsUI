@@ -20,7 +20,7 @@ namespace THBimEngine.Geometry.ProjectFactory
         /// <summary>
         /// 项目中所有的实体信息
         /// </summary>
-        protected List<THBimEntity> allEntitys;
+        protected Dictionary<string,THBimEntity> allEntitys;
         /// <summary>
         /// 项目中非标层，和标准层首层楼层数据
         /// </summary>
@@ -31,7 +31,7 @@ namespace THBimEngine.Geometry.ProjectFactory
         protected Dictionary<string, THBimStorey> allStoreys;
         public ConvertFactoryBase(IfcSchemaVersion ifcSchemaVersion) 
         {
-            allEntitys = new List<THBimEntity>();
+            allEntitys = new Dictionary<string,THBimEntity>();
             schemaVersion = ifcSchemaVersion;
             InitOrClearData();
         }
@@ -94,16 +94,14 @@ namespace THBimEngine.Geometry.ProjectFactory
             prjEntityFloors = new Dictionary<string, THBimStorey>();
             allStoreys = new Dictionary<string, THBimStorey>();
             globalIndex = 0;
-            allEntitys = new List<THBimEntity>();
+            allEntitys = new Dictionary<string,THBimEntity>();
             bimProject = null;
-        }
-        protected void AddElementIndex(int addCount = 1)
-        {
-            globalIndex += addCount;
         }
         protected int CurrentGIndex()
         {
-            return globalIndex;
+            var res = globalIndex;
+            globalIndex += 1;
+            return res;
         }
     }
     

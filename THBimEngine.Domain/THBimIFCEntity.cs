@@ -17,7 +17,15 @@ namespace THBimEngine.Domain
         public THBimIFCEntity(int id, string name, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, geometryParam, describe, uid)
         {
         }
-
+        public override string FriendlyTypeName 
+        {
+            get 
+            { 
+                if (null == IfcEntity)
+                    return "";
+                return IfcEntity.ExpressType.ExpressName.ToLower().Replace("ifc", "");
+            }
+        }
         public override object Clone()
         {
             throw new NotImplementedException();

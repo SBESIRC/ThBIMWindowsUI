@@ -542,7 +542,7 @@ namespace XbimXplorer
                 //DateTime endTime = DateTime.Now;
                 //var totalTime = (endTime - startTime).TotalSeconds;
                 //Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
-                LoadIfcFile(_tempMidFileName);
+                LoadIfcFile("");
                 //ShowIfcStore(ifcStore);
             }
             else //we have a problem
@@ -1344,8 +1344,8 @@ namespace XbimXplorer
         }
 		private void LoadIfcFile(string path)
 		{
-			if (string.IsNullOrEmpty(path))
-				return;
+			//if (string.IsNullOrEmpty(path))
+			//	return;
 			var formHost = GridEngine.Children[0] as WindowsFormsHost;
 			var childConrol = formHost.Child as GLControl;
 			childConrol.EnableNativeInput();
@@ -1384,33 +1384,10 @@ namespace XbimXplorer
             var glControl = formsHost.Child as GLControl;
             glControl.Focus();
 		}
-
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        private void MenuItem_Click_2(object sender, RoutedEventArgs e)
         {
-            //临时 加载中间文件
-            string fileName = @"C:\Tangent\TArchT20V8\SYS\output\TG20.midfile";
-            if (!File.Exists(fileName))
-            {
-                MessageBox.Show("文件不存在，无法加载");
-                return;
-            }
-            _openedModelFileName = null;
-            LoadAnyModel(fileName);
-            _openedModelFileName = fileName;
-            LoadIfcFile(fileName);
-        }
-
-        private void MenuItem_Click_1(object sender, RoutedEventArgs e)
-        {
-            //临时 加载中间文件
-            string fileName = @"C:\Tangent\TArchT20V8\SYS\output\TG20.ifc";
-            if (!File.Exists(fileName))
-            {
-                MessageBox.Show("文件不存在，无法加载");
-                return;
-            }
-            _openedModelFileName = null;
-            LoadAnyModel(fileName);
+            bimDataController.ClearAllProject();
+            LoadIfcFile(_tempMidFileName);
         }
     }
 }

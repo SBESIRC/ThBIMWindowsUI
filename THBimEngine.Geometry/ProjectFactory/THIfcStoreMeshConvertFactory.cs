@@ -87,6 +87,8 @@ namespace THBimEngine.Geometry.ProjectFactory
                                     if (!dicEntitys.ContainsKey(ins.ShapeGeometryLabel))
                                         continue;
                                     var addEntity = dicEntitys[ins.ShapeGeometryLabel];
+                                    if (bimStorey.FloorEntityRelations.ContainsKey(addEntity.Uid))
+                                        continue;
                                     if (!allEntitys.ContainsKey(addEntity.Uid))
                                     {
                                         addEntity.ShapeGeometry.TempOriginDisplacement = XbimPoint3D.Zero;

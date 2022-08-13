@@ -264,12 +264,14 @@ namespace XbimXplorer.ThBIMEngine
         }
         public void ClearAllProject()
         {
-            //_allProjects.Clear();
             _allEntitys.Clear();
             _allBimProject.Clear();
+            _allStoreys.Clear();
         }
         public void WriteToMidDataByFloor()
         {
+            if (_allStoreys.Count < 1)
+                return;
             var meshResult = new GeoMeshResult();
             var allStoreys = _allStoreys.Select(c => c.Value).ToList();
             Parallel.ForEach(allStoreys,new ParallelOptions(),storey=>
@@ -297,7 +299,7 @@ namespace XbimXplorer.ThBIMEngine
                         continue;
                     var moveVector = entity.ShapeGeometry.TempOriginDisplacement;
                     var transform =  XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
-                    transform = relation.Matrix3D * transform * storey.Matrix3D; //XbimMatrix3D.Multiply(relationTrans, transform);
+                    transform = relation.Matrix3D * storey.Matrix3D * transform ; //XbimMatrix3D.Multiply(relationTrans, transform);
                     var material = THBimMaterial.GetTHBimEntityMaterial(entity.FriendlyTypeName,true);
                     IfcMeshModel meshModel = new IfcMeshModel(relation.Id, entity.Id);
                     meshModel.TriangleMaterial = material;

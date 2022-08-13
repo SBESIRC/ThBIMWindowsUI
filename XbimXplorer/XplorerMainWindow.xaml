@@ -170,8 +170,7 @@
                 -->
             </MenuItem>
             <MenuItem Header="_About" Click="About_Click"/>
-            <MenuItem Header="加载文件" Click="MenuItem_Click"></MenuItem>
-            <MenuItem Header="加载IFC" Click="MenuItem_Click_1"></MenuItem>
+            <MenuItem Header="清空数据" Click="MenuItem_Click_2"></MenuItem>
             <MenuItem Header="_UPDATE AVAILABLE" Foreground="Red" HorizontalAlignment="Right" Click="About_Click"/>
         </Menu>
 

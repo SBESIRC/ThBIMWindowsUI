@@ -23,7 +23,20 @@ namespace THBimEngine.Domain
             { 
                 if (null == IfcEntity)
                     return "";
-                return IfcEntity.ExpressType.ExpressName.ToLower().Replace("ifc", "");
+                var typeStr = IfcEntity.ExpressType.ExpressName.ToLower();
+                if (typeStr.Contains("wall"))
+                    return "wall";
+                if (typeStr.Contains("window"))
+                    return "window";
+                if (typeStr.Contains("door"))
+                    return "door";
+                if (typeStr.Contains("beam"))
+                    return "beam";
+                if (typeStr.Contains("slabe"))
+                    return "slabe";
+                if (typeStr.Contains("railing"))
+                    return "railing";
+                return typeStr.Replace("ifc", "");
             }
         }
         public override object Clone()

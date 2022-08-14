@@ -34,10 +34,8 @@ namespace THBimEngine.Presention
         public static extern void ifcre_set_c_indices(int val);
         [DllImport("ifc-render-engine.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.None, ExactSpelling = false)]
         public static extern void ifcre_set_face_mat(float val);
-
-
-
-
+        [DllImport("ifc-render-engine.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.None, ExactSpelling = false)]
+        public static extern void ifcre_set_edge_indices(int val);
         public static unsafe void Init(IntPtr wndPtr, int width, int height,string ifcPath)
         {
             ifcre_set_config("width", width.ToString());

@@ -288,6 +288,16 @@ namespace XbimXplorer.ThBIMEngine
 				{
 					foreach (int ptIndex in item.ptIndex)
 						ExampleScene.ifcre_set_g_indices(ptIndex);
+					//三角形边信息
+					var ptIndex1 = item.ptIndex[0];
+					var ptIndex2 = item.ptIndex[1];
+					var ptIndex3 = item.ptIndex[2];
+					ExampleScene.ifcre_set_edge_indices(ptIndex1);
+					ExampleScene.ifcre_set_edge_indices(ptIndex2);
+					ExampleScene.ifcre_set_edge_indices(ptIndex2);
+					ExampleScene.ifcre_set_edge_indices(ptIndex3);
+					ExampleScene.ifcre_set_edge_indices(ptIndex3);
+					ExampleScene.ifcre_set_edge_indices(ptIndex1);
 				}
 			}
 			if (null != ProgressChanged)
@@ -360,7 +370,7 @@ namespace XbimXplorer.ThBIMEngine
 			tasks.Add(Task.Run(() =>
 			{
 				//global_indices, All triangle faces info
-				var sumCount = (ulong)meshModels.Sum(c => c.FaceTriangles.Sum(x => x.ptIndex.Count()));
+				//var sumCount = (ulong)meshModels.Sum(c => c.FaceTriangles.Sum(x => x.ptIndex.Count()));
 				for (int i = 0; i < meshModels.Count; i++)
 				{
 					var meshModel = meshModels[i];
@@ -368,6 +378,16 @@ namespace XbimXplorer.ThBIMEngine
 					{
 						foreach (int ptIndex in item.ptIndex)
 							ExampleScene.ifcre_set_g_indices(ptIndex);
+						//三角形边信息
+						var ptIndex1 = item.ptIndex[0];
+						var ptIndex2 = item.ptIndex[1];
+						var ptIndex3 = item.ptIndex[2];
+						ExampleScene.ifcre_set_edge_indices(ptIndex1);
+						ExampleScene.ifcre_set_edge_indices(ptIndex2);
+						ExampleScene.ifcre_set_edge_indices(ptIndex2);
+						ExampleScene.ifcre_set_edge_indices(ptIndex3);
+						ExampleScene.ifcre_set_edge_indices(ptIndex3);
+						ExampleScene.ifcre_set_edge_indices(ptIndex1);
 					}
 				}
 			}));

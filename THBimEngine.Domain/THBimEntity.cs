@@ -15,9 +15,9 @@ namespace THBimEngine.Domain
         /// </summary>
         public List<IXbimSolid> EntitySolids { get; }
         /// <summary>
-        /// 几何Mesh信息，Mesh中不包含物体的Solid
+        /// 几何Mesh信息，Mesh中不包含物体的Solid (一个物体可能包含多个实体信息)
         /// </summary>
-        public XbimShapeGeometry ShapeGeometry { get; set; }
+        public List<THBimShapeGeometry> AllShapeGeometries { get; }
         /// <summary>
         /// 物体开洞信息
         /// </summary>
@@ -27,6 +27,7 @@ namespace THBimEngine.Domain
             Openings = new List<THBimOpening>();
             GeometryParam = geometryParam;
             EntitySolids = new List<IXbimSolid>();
+            AllShapeGeometries = new List<THBimShapeGeometry>();
         }
 
         public override int GetHashCode()
@@ -50,6 +51,22 @@ namespace THBimEngine.Domain
                 return true;
             }
             return false;
+        }
+    }
+
+    public class THBimShapeGeometry 
+    {
+        public XbimShapeGeometry ShapeGeometry { get; }
+        public XbimMatrix3D Matrix3D { get; set; }
+        public THBimShapeGeometry(XbimShapeGeometry shapeGeometry) 
+        {
+            ShapeGeometry = shapeGeometry;
+            Matrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero);
+        }
+        public THBimShapeGeometry(XbimShapeGeometry shapeGeometry,XbimMatrix3D matrix3D) 
+        {
+            Matrix3D = matrix3D;
+            ShapeGeometry = shapeGeometry;
         }
     }
 }

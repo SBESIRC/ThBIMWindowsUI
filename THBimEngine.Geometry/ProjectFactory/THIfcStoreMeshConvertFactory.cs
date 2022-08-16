@@ -26,25 +26,55 @@ namespace THBimEngine.Geometry.ProjectFactory
         {
         }
 
-        public override ConvertResult ProjectConvert(object prject, bool createSolidMesh)
+        public override ConvertResult ProjectConvert(object project, bool createSolidMesh)
         {
-            var ifcStore = prject as IfcStore;
+            var ifcStore = project as IfcStore;
             if (null == ifcStore)
                 return null;
             ReadDictionary(ifcStore);
             var dicEntitys = ReadGeomtry(ifcStore);
-
-            var project = ifcStore.Instances.FirstOrDefault<IIfcProject>();
+            var ifcProject = ifcStore.Instances.FirstOrDefault<IIfcProject>();
             allEntitys.Clear();
             globalIndex = 0;
             if (null == project) 
                 return null;
-            bimProject = new THBimProject(CurrentGIndex(), project.Name, "", project.GlobalId);
+            bimProject = new THBimProject(CurrentGIndex(), ifcProject.Name, "", ifcProject.GlobalId);
             bimProject.ProjectIdentity = ifcStore.FileName;
-            var site = project.Sites.First();
-            var bimSite = new THBimSite(CurrentGIndex(), "", "", site.GlobalId);
+            THBimSite bimSite = null;
             bool haveLoopup = shapeGeoLoopups != null && shapeGeoLoopups.Count > 0;
-            foreach (var building in site.Buildings)
+            foreach (var item in dicEntitys)
+            {
+                if (allEntitys.ContainsKey(item.Value.Uid))
+                    continue;
+                allEntitys.Add(item.Value.Uid, item.Value);
+            }
+            if (ifcProject.Sites != null && ifcProject.Sites.Count() > 0)
+            {
+                var site = ifcProject.Sites.First();
+                bimSite = new THBimSite(CurrentGIndex(), site.Name, site.Description.ToString(), site.GlobalId);
+                var addBuildings = IfcBuildingData(site.Buildings.ToList(), dicEntitys);
+                foreach (var item in addBuildings)
+                    bimSite.SiteBuildings.Add(item.Uid,item);
+            }
+            else 
+            {
+                bimSite = new THBimSite(CurrentGIndex(), "默认场地");
+                if (ifcProject.Buildings != null && ifcProject.Buildings.Count() > 0) 
+                {
+                    var addBuildings = IfcBuildingData(ifcProject.Buildings.ToList(), dicEntitys);
+                    foreach (var item in addBuildings)
+                        bimSite.SiteBuildings.Add(item.Uid, item);
+                }
+            }
+            
+            bimProject.ProjectSite = bimSite;
+            var convertResult = new ConvertResult(bimProject, allStoreys, allEntitys);
+            return convertResult;
+        }
+        private List<THBimBuilding> IfcBuildingData(List<IIfcBuilding> allBuildings, Dictionary<int, THBimIFCEntity> dicEntitys) 
+        {
+            var resBuildings = new List<THBimBuilding>();
+            foreach (var building in allBuildings)
             {
                 var bimBuilding = new THBimBuilding(CurrentGIndex(), building.Name, "", building.GlobalId);
                 foreach (var ifcStorey in building.BuildingStoreys)
@@ -59,61 +89,44 @@ namespace THBimEngine.Geometry.ProjectFactory
                         foreach (var item in elements)
                         {
                             var ifcElem = item as IIfcElement;
-                            if (!haveLoopup)
-                            {
-                                var insModel = shapeInstances.Find(c => c.IfcProductLabel == item.EntityLabel);
-                                if (null == insModel)
-                                    continue;
-                                if (!dicEntitys.ContainsKey(insModel.ShapeGeometryLabel))
-                                    continue;
-                                var addEntity = dicEntitys[insModel.ShapeGeometryLabel];
-                                if (!allEntitys.ContainsKey(addEntity.Uid))
-                                {
-                                    addEntity.ShapeGeometry.TempOriginDisplacement = XbimPoint3D.Zero;
-                                    allEntitys.Add(addEntity.Uid, addEntity);
-                                }
-                                var railingRelation = new THBimElementRelation(addEntity.Id, addEntity.Name, addEntity, addEntity.Describe, addEntity.Uid);
-                                railingRelation.Matrix3D = insModel.Transformation;
-                                bimStorey.FloorEntityRelations.Add(addEntity.Uid, railingRelation);
-                                bimStorey.FloorEntitys.Add(addEntity.Uid, addEntity);
-                            }
-                            else
-                            {
-                                var entityIns = ((Xbim.IO.Memory.InMemoryGeometryStore)ifcStore.GeometryStore).EntityInstanceLookup[ifcElem.EntityLabel];
-                                foreach (var ins in entityIns)
-                                {
-                                    if (ins.IfcProductLabel != item.EntityLabel)
-                                        continue;
-                                    if (!dicEntitys.ContainsKey(ins.ShapeGeometryLabel))
-                                        continue;
-                                    var addEntity = dicEntitys[ins.ShapeGeometryLabel];
-                                    if (bimStorey.FloorEntityRelations.ContainsKey(addEntity.Uid))
-                                        continue;
-                                    if (!allEntitys.ContainsKey(addEntity.Uid))
-                                    {
-                                        addEntity.ShapeGeometry.TempOriginDisplacement = XbimPoint3D.Zero;
-                                        allEntitys.Add(addEntity.Uid, addEntity);
-                                    }
-                                    var railingRelation = new THBimElementRelation(addEntity.Id, addEntity.Name, addEntity, addEntity.Describe, addEntity.Uid);
-                                    railingRelation.Matrix3D = ins.Transformation;
-                                    bimStorey.FloorEntityRelations.Add(addEntity.Uid, railingRelation);
-                                    bimStorey.FloorEntitys.Add(addEntity.Uid, addEntity);
-                                    break;
-                                }
-                            }
+                            if (!dicEntitys.ContainsKey(item.EntityLabel))
+                                continue;
+                            var addEntity = dicEntitys[item.EntityLabel];
+                            var relation = new THBimElementRelation(addEntity.Id, addEntity.Name, addEntity, addEntity.Describe, addEntity.Uid);
+                            bimStorey.FloorEntityRelations.Add(addEntity.Uid, relation);
+                            bimStorey.FloorEntitys.Add(addEntity.Uid, addEntity);
                         }
                     }
                     prjEntityFloors.Add(bimStorey.Uid, bimStorey);
                     allStoreys.Add(bimStorey.Uid, bimStorey);
                     bimBuilding.BuildingStoreys.Add(bimStorey.Uid, bimStorey);
                 }
-                bimSite.SiteBuildings.Add(bimBuilding.Uid, bimBuilding);
+                if (building.ContainsElements.Count() > 0) 
+                {
+                    var bimStorey = new THBimStorey(CurrentGIndex(), "默认楼层", 0, 0);
+                    foreach (var spatialStructure in building.ContainsElements) 
+                    {
+                        var elements = spatialStructure.RelatedElements;
+                        if (elements.Count == 0)
+                            continue;
+                        var ifcType = elements.First().ToString();
+                        foreach (var item in elements)
+                        {
+                            var ifcElem = item as IIfcElement;
+                            if (!dicEntitys.ContainsKey(item.EntityLabel))
+                                continue;
+                            var addEntity = dicEntitys[item.EntityLabel];
+                            var relation = new THBimElementRelation(addEntity.Id, addEntity.Name, addEntity, addEntity.Describe, addEntity.Uid);
+                            bimStorey.FloorEntityRelations.Add(addEntity.Uid, relation);
+                            bimStorey.FloorEntitys.Add(addEntity.Uid, addEntity);
+                        }
+                    }
+                    bimBuilding.BuildingStoreys.Add(bimStorey.Uid, bimStorey);
+                }
+                resBuildings.Add(bimBuilding);
             }
-            bimProject.ProjectSite = bimSite;
-            var convertResult = new ConvertResult(bimProject, allStoreys, allEntitys);
-            return convertResult;
+            return resBuildings;
         }
-
         private THBimStorey IfcStoreyToBimStorey(Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey storey) 
         {
             double storey_Elevation = 0;
@@ -186,7 +199,8 @@ namespace THBimEngine.Geometry.ProjectFactory
                     var ifcItem = ifcStore.Instances[insModel.IfcProductLabel] as IIfcElement;
                     var addEntity = new THBimIFCEntity(ifcItem);
                     addEntity.Uid = ifcItem.GlobalId;
-                    addEntity.ShapeGeometry = geo;
+                    geo.TempOriginDisplacement = XbimPoint3D.Zero;
+                    addEntity.AllShapeGeometries.Add(new THBimShapeGeometry(geo, insModel.Transformation));
                     lock (allGeoEntitys) 
                     {
                         allGeoEntitys.Add(geo.ShapeLabel, addEntity);
@@ -197,16 +211,31 @@ namespace THBimEngine.Geometry.ProjectFactory
             {
                 Parallel.ForEach(shapeGeometries.Values, new ParallelOptions(), geo =>
                 {
+                    var insModel = shapeInstances.Find(c => c.ShapeGeometryLabel == geo.ShapeLabel);
+                    if (insModel == null)
+                        return;
                     var insModels = shapeGeoLoopups[geo.ShapeLabel];
                     if (insModels.Count < 1)
                         return;
-                    var ifcItem = ifcStore.Instances[insModels.First().IfcProductLabel] as IIfcElement;
-                    var addEntity = new THBimIFCEntity(ifcItem);
-                    addEntity.Uid = ifcItem.GlobalId;
-                    addEntity.ShapeGeometry = geo;
-                    lock (allGeoEntitys)
+                    geo.TempOriginDisplacement = XbimPoint3D.Zero;
+                    foreach (var copyModel in insModels)
                     {
-                        allGeoEntitys.Add(geo.ShapeLabel, addEntity);
+                        var ifcItem = ifcStore.Instances[copyModel.IfcProductLabel] as IIfcElement;
+                        var addEntity = new THBimIFCEntity(ifcItem);
+                        addEntity.Uid = ifcItem.GlobalId;
+                        addEntity.AllShapeGeometries.Add(new THBimShapeGeometry(geo, copyModel.Transformation));
+                        lock (allGeoEntitys)
+                        {
+                            if (!allGeoEntitys.ContainsKey(copyModel.IfcProductLabel))
+                            {
+                                allGeoEntitys.Add(copyModel.IfcProductLabel, addEntity);
+                            }
+                            else
+                            {
+                                var oldEntitys = allGeoEntitys[copyModel.IfcProductLabel];
+                                oldEntitys.AllShapeGeometries.AddRange(addEntity.AllShapeGeometries);
+                            }
+                        }
                     }
                 });
             }

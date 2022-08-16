@@ -86,7 +86,9 @@ namespace THBimEngine.Geometry.ProjectFactory
                             openingSolds.Add(solid);
                     }
                 }
-                entity.ShapeGeometry = geometryFactory.GetShapeGeometry(entity.EntitySolids, openingSolds);
+                var geo = geometryFactory.GetShapeGeometry(entity.EntitySolids, openingSolds);
+                entity.AllShapeGeometries.Add(new THBimShapeGeometry(geo));
+                
             });
         }
         protected virtual void InitOrClearData() 

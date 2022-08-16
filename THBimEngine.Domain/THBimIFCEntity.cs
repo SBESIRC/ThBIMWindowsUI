@@ -19,6 +19,10 @@ namespace THBimEngine.Domain
         }
         public override string FriendlyTypeName 
         {
+            /*
+             * IFC数据有好几种数据格式
+             * 比如墙 IIfcWall,
+             */
             get 
             { 
                 if (null == IfcEntity)

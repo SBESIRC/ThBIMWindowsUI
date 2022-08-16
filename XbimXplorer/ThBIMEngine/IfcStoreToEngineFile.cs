@@ -340,6 +340,7 @@ namespace XbimXplorer.ThBIMEngine
 
 		public void WriteMidDataMultithreading(List<IfcMeshModel> meshModels, List<PointNormal> meshPoints)
 		{
+			ExampleScene.ifcre_set_sleep_time(2000);
 			ExampleScene.ifcre_clear_model_data();
 			if (null == meshModels || meshModels.Count < 1 || null == meshPoints || meshPoints.Count < 1)
 				return;
@@ -421,6 +422,7 @@ namespace XbimXplorer.ThBIMEngine
 				}
 			}));
 			Task.WaitAll(tasks.ToArray());
+			ExampleScene.ifcre_set_sleep_time(10);
 		}
 
 	}

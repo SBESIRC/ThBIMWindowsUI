@@ -170,7 +170,6 @@ namespace XbimXplorer
             {
                 DateTime startTime = DateTime.Now;
                 bimDataController.AddProject(thProject);
-                bimDataController.WriteToMidDataByFloor();
                 thProject = null;
                 pipeServer = null;
                 backgroundWorker.RunWorkerAsync();
@@ -189,7 +188,6 @@ namespace XbimXplorer
         {
             DateTime startTime = DateTime.Now;
             bimDataController.AddProject(thProject);
-            bimDataController.WriteToMidDataByFloor();
             thProject = null;
             pipeServer = null;
             backgroundWorker.RunWorkerAsync();
@@ -538,10 +536,9 @@ namespace XbimXplorer
             {
                 DateTime startTime = DateTime.Now;
                 bimDataController.AddProject(ifcStore);
-                bimDataController.WriteToMidDataByFloor();
-                //DateTime endTime = DateTime.Now;
-                //var totalTime = (endTime - startTime).TotalSeconds;
-                //Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
+                DateTime endTime = DateTime.Now;
+                var totalTime = (endTime - startTime).TotalSeconds;
+                Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
                 LoadIfcFile("");
                 //ShowIfcStore(ifcStore);
             }
@@ -1387,7 +1384,8 @@ namespace XbimXplorer
         private void MenuItem_Click_2(object sender, RoutedEventArgs e)
         {
             bimDataController.ClearAllProject();
-            LoadIfcFile(_tempMidFileName);
+            //ExampleScene.ifcre_clear_model_data();
+            //LoadIfcFile(_tempMidFileName);
         }
     }
 }

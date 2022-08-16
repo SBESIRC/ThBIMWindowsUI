@@ -112,6 +112,7 @@
     <Compile Include="THBimIFCEntity.cs" />
     <Compile Include="THBimMaterial.cs" />
     <Compile Include="THBimProject.cs" />
+    <Compile Include="THBimScene.cs" />
     <Compile Include="THBimSite.cs" />
     <Compile Include="THBimStorey.cs" />
     <Compile Include="THBimOpening.cs" />

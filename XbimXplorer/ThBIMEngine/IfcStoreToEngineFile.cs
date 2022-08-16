@@ -1,25 +1,21 @@
-﻿using HelixToolkit.Wpf;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
+using THBimEngine.Domain;
 using THBimEngine.Presention;
 using Xbim.Common;
 using Xbim.Common.Federation;
 using Xbim.Common.Geometry;
-using Xbim.Common.XbimExtensions;
 using Xbim.Ifc;
-using Xbim.Ifc4.RepresentationResource;
-using Xbim.IO.Memory;
 using Xbim.Presentation.LayerStyling;
 using Xbim.Presentation.Modelpositioning;
 
 namespace XbimXplorer.ThBIMEngine
 {
-	class IfcStoreToEngineFile
+    class IfcStoreToEngineFile
 	{
 		public event ProgressChangedEventHandler ProgressChanged;
 		protected IfcStore ifcModel;

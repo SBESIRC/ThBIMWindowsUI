@@ -286,46 +286,7 @@ namespace XbimXplorer.ThBIMEngine
 			return shapeInstances;
 		}
 	}
-	class PointNormal
-	{
-		public int PointIndex { get; set; }
-		public PointVector Point { get; set; }
-		public PointVector Normal { get; set; }
-		public PointNormal(int pIndex, XbimPoint3D point, XbimVector3D normal) 
-		{
-			PointIndex = pIndex;
-			Point = new PointVector() { X = (float)point.X, Y = (float)point.Z, Z = (float)point.Y };
-			Normal = new PointVector() { X = (float)normal.X, Y = (float)normal.Z, Z = (float)normal.Y };
-		}
-
-	}
-	class FaceTriangle
-	{
-		public List<int> ptIndex { get; }
-		public FaceTriangle()
-		{
-			ptIndex = new List<int>();
-		}
-	}
-	class IfcMeshModel
-	{
-		public int CIndex { get; set; }
-		public int IfcIndex { get; }
-		public THBimMaterial TriangleMaterial { get; set; }
-		public List<FaceTriangle> FaceTriangles { get; }
-		public IfcMeshModel(int index, int ifcIndex)
-		{
-			CIndex = index;
-			IfcIndex = ifcIndex;
-			FaceTriangles = new List<FaceTriangle>();
-		}
-	}
-	class PointVector
-	{
-		public float X { get; set; }
-		public float Y { get; set; }
-		public float Z { get; set; }
-	}
+	
 	class ReadTaskInfo
 	{
 		public int AllCount { get; set; }

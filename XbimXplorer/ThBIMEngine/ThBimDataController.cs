@@ -1,35 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using THBimEngine.Domain;
 using THBimEngine.Domain.Model;
-using THBimEngine.Geometry;
 using THBimEngine.Geometry.ProjectFactory;
-using Xbim.Common.Geometry;
-using Xbim.Common.XbimExtensions;
 using Xbim.Ifc;
 
 namespace XbimXplorer.ThBIMEngine
 {
     class ThBimDataController
     {
-        private Dictionary<string, THBimEntity> _allEntitys { get; }
-        private Dictionary<string, THBimStorey> _allStoreys { get; }
-        private List<THBimProject> _allBimProject { get; }
-        public List<string> UnShowEntityTypes { get; }
+        
         ConvertFactoryBase convertFactory;
         public ThBimDataController()
         {
-            _allStoreys = new Dictionary<string, THBimStorey>();
-            _allBimProject = new List<THBimProject>();
-            _allEntitys = new Dictionary<string, THBimEntity>();
-            UnShowEntityTypes = new List<string>();
-            UnShowEntityTypes.Add(typeof(THBimOpening).Name.ToString());
-            UnShowEntityTypes.Add("opening");
-            UnShowEntityTypes.Add("openingelement");
-            UnShowEntityTypes.Add("open");
+            THBimScene.Instance.UnShowEntityTypes.Add(typeof(THBimOpening).Name.ToString());
+            THBimScene.Instance.UnShowEntityTypes.Add("opening");
+            THBimScene.Instance.UnShowEntityTypes.Add("openingelement");
+            THBimScene.Instance.UnShowEntityTypes.Add("open");
         }
         public void AddProject(ThTCHProject project)
         {
@@ -41,7 +29,7 @@ namespace XbimXplorer.ThBIMEngine
                 var convertResult = convertFactory.ProjectConvert(project,true);
                 if (null != convertResult) 
                 {
-                    _allBimProject.Add(convertResult.BimProject);
+                    THBimScene.Instance.AllBimProjects.Add(convertResult.BimProject);
                     AddProjectEntitys(convertResult.ProjectEntitys);
                     UpdateCatchStorey();
                     WriteToMidDataByFloor();
@@ -70,7 +58,7 @@ namespace XbimXplorer.ThBIMEngine
             var convertResult = convertFactory.ProjectConvert(ifcStore,false);
             if (null != convertResult)
             {
-                _allBimProject.Add(convertResult.BimProject);
+                THBimScene.Instance.AllBimProjects.Add(convertResult.BimProject);
                 AddProjectEntitys(convertResult.ProjectEntitys);
             }
             UpdateCatchStorey();
@@ -87,7 +75,7 @@ namespace XbimXplorer.ThBIMEngine
             var newBimProject = projectResult.BimProject;
             var newEntitys = projectResult.ProjectEntitys;
             bool needUpdate = false;
-            foreach (var item in _allBimProject)
+            foreach (var item in THBimScene.Instance.AllBimProjects)
             {
                 if (item.ProjectIdentity != projectResult.BimProject.ProjectIdentity)
                     continue;
@@ -262,118 +250,23 @@ namespace XbimXplorer.ThBIMEngine
         }
         public void ClearAllProject()
         {
-            _allEntitys.Clear();
-            _allBimProject.Clear();
-            _allStoreys.Clear();
+            THBimScene.Instance.ClearAllData();
         }
         public void WriteToMidDataByFloor()
         {
-            if (_allStoreys.Count < 1)
+            if (THBimScene.Instance.AllStoreys.Count < 1)
                 return;
-            var meshResult = new GeoMeshResult();
-            var allStoreys = _allStoreys.Select(c => c.Value).ToList();
-            Parallel.ForEach(allStoreys,new ParallelOptions(),storey=>
-            {
-                int pIndex = -1;
-                var storeyGeoModels = new List<IfcMeshModel>();
-                var storeyGeoPointNormals = new List<PointNormal>();
-                foreach (var item in storey.FloorEntityRelations)
-                {
-                    var relation = item.Value;
-                    if (null == relation)
-                        continue;
-                    var entity = _allEntitys[relation.RelationElementUid];
-                    if (null == entity || entity.AllShapeGeometries.Count < 1)
-                        continue;
-                    if (UnShowEntityTypes.Contains(entity.FriendlyTypeName.ToString()))
-                        continue;
-                    var ptOffSet = storeyGeoPointNormals.Count();
-                    var material = THBimMaterial.GetTHBimEntityMaterial(entity.FriendlyTypeName, true);
-                    IfcMeshModel meshModel = new IfcMeshModel(relation.Id, entity.Id);
-                    meshModel.TriangleMaterial = material;
-                    foreach (var shapeGeo in entity.AllShapeGeometries) 
-                    {
-                        if(shapeGeo == null || shapeGeo.ShapeGeometry == null || string.IsNullOrEmpty(shapeGeo.ShapeGeometry.ShapeData))
-                            continue;
-                        var ms = new MemoryStream((shapeGeo.ShapeGeometry as IXbimShapeGeometryData).ShapeData);
-                        var testData = ms.ToArray();
-                        var br = new BinaryReader(ms);
-                        var tr = br.ReadShapeTriangulation();
-                        if (tr.Faces.Count < 1)
-                            continue;
-                        var moveVector = shapeGeo.ShapeGeometry.TempOriginDisplacement;
-                        var transform = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
-                        transform = relation.Matrix3D * storey.Matrix3D * transform * shapeGeo.Matrix3D;
-                        var allPts = tr.Vertices.ToArray();
-                        var allFace = tr.Faces;
-                        foreach (var face in allFace.ToList())
-                        {
-                            var ptIndexs = face.Indices.ToArray();
-                            for (int i = 0; i < face.TriangleCount; i++)
-                            {
-                                var triangle = new FaceTriangle();
-                                var pt1Index = ptIndexs[i * 3];
-                                var pt2Index = ptIndexs[i * 3 + 1];
-                                var pt3Index = ptIndexs[i * 3 + 2];
-                                var pt1 = allPts[pt1Index].TransPoint(transform);
-                                var pt1Normal = face.Normals.Last().Normal;
-                                if (pt1Index < face.Normals.Count())
-                                    pt1Normal = face.Normals[pt1Index].Normal;
-                                pIndex += 1;
-                                triangle.ptIndex.Add(pIndex);
-                                storeyGeoPointNormals.Add(GetPointNormal(pIndex, pt1, pt1Normal));
-                                var pt2 = allPts[pt2Index].TransPoint(transform);
-                                var pt2Normal = face.Normals.Last().Normal;
-                                if (pt2Index < face.Normals.Count())
-                                    pt2Normal = face.Normals[pt2Index].Normal;
-                                pIndex += 1;
-                                triangle.ptIndex.Add(pIndex);
-                                storeyGeoPointNormals.Add(GetPointNormal(pIndex, pt2, pt2Normal));
-                                var pt3 = allPts[pt3Index].TransPoint(transform);
-                                var pt3Normal = face.Normals.Last().Normal;
-                                if (pt3Index < face.Normals.Count())
-                                    pt3Normal = face.Normals[pt3Index].Normal;
-                                pIndex += 1;
-                                triangle.ptIndex.Add(pIndex);
-                                storeyGeoPointNormals.Add(GetPointNormal(pIndex, pt3, pt3Normal));
-                                meshModel.FaceTriangles.Add(triangle);
-                            }
-                        }
-                        
-                    }
-                    storeyGeoModels.Add(meshModel);
-                }
-
-                lock (meshResult) 
-                {
-                    int ptOffSet = meshResult.AllGeoPointNormals.Count;
-                    foreach (var item in storeyGeoPointNormals)
-                    {
-                        item.PointIndex += ptOffSet;
-                    }
-                    foreach (var item in storeyGeoModels)
-                    {
-                        item.CIndex += ptOffSet;
-                        foreach (var tr in item.FaceTriangles)
-                        {
-                            for (int i = 0; i < tr.ptIndex.Count; i++)
-                                tr.ptIndex[i] += ptOffSet;
-                        }
-                    }
-                    meshResult.AllGeoPointNormals.AddRange(storeyGeoPointNormals);
-                    meshResult.AllGeoModels.AddRange(storeyGeoModels);
-                }
-            });
+            THBimScene.Instance.ReadGeometryMesh();
             DateTime start = DateTime.Now;
             var storeToEngineFile = new IfcStoreToEngineFile();
-            storeToEngineFile.WriteMidDataMultithreading(meshResult.AllGeoModels, meshResult.AllGeoPointNormals);
+            storeToEngineFile.WriteMidDataMultithreading(THBimScene.Instance.AllGeoModels, THBimScene.Instance.AllGeoPointNormals);
             DateTime end = DateTime.Now;
             var totalTime = (end - start).TotalSeconds;
         }
         private void DeleteProjectData(string prjIdentity) 
         {
             THBimProject delPrj = null;
-            foreach (var project in _allBimProject)
+            foreach (var project in THBimScene.Instance.AllBimProjects)
             {
                 if (project.ProjectIdentity != prjIdentity)
                     continue;
@@ -385,19 +278,19 @@ namespace XbimXplorer.ThBIMEngine
                     {
                         foreach (var item in storey.Value.FloorEntitys) 
                         {
-                            _allEntitys.Remove(item.Key);
+                            THBimScene.Instance.AllEntitys.Remove(item.Key);
                         }
-                        _allStoreys.Remove(storey.Key);
+                        THBimScene.Instance.AllStoreys.Remove(storey.Key);
                     }
                 }
             }
             if (null != delPrj)
-                _allBimProject.Remove(delPrj);
+                THBimScene.Instance.AllBimProjects.Remove(delPrj);
         }
         private bool IsAddProject(string prjIdentity) 
         {
             bool isAdd = true;
-            foreach (var item in _allBimProject)
+            foreach (var item in THBimScene.Instance.AllBimProjects)
             {
                 if (item.ProjectIdentity == prjIdentity)
                 {
@@ -415,13 +308,13 @@ namespace XbimXplorer.ThBIMEngine
             var rmIds = new List<string>();
             foreach (var entityId in rmEntityIds)
             {
-                if (!_allEntitys.ContainsKey(entityId))
+                if (!THBimScene.Instance.AllEntitys.ContainsKey(entityId))
                     continue;
-                var entity = _allEntitys[entityId];
+                var entity = THBimScene.Instance.AllEntitys[entityId];
                 var pid = entity.ParentUid;
                 while (!string.IsNullOrEmpty(pid) && !thisStoreys.ContainsKey(pid))
                 {
-                    var pEntity = _allEntitys[pid];
+                    var pEntity = THBimScene.Instance.AllEntitys[pid];
                     pid = pEntity.ParentUid;
                 }
                 rmIds.Add(entityId);
@@ -441,7 +334,7 @@ namespace XbimXplorer.ThBIMEngine
             }
             foreach (var rmId in rmIds) 
             {
-                _allEntitys.Remove(rmId);
+                THBimScene.Instance.AllEntitys.Remove(rmId);
             }
         }
         private void AddEntitys(THBimBuilding building, Dictionary<string,THBimEntity> addEntitys,bool changeFloorData) 
@@ -454,13 +347,13 @@ namespace XbimXplorer.ThBIMEngine
                 while (!string.IsNullOrEmpty(pid) && !building.BuildingStoreys.ContainsKey(pid))
                 {
                     //如果只是增加了门窗，父元素为墙，算更新数据，不算增的数据
-                    var pEntity = addEntitys.ContainsKey(pid)? addEntitys[pid]:_allEntitys[pid];
+                    var pEntity = addEntitys.ContainsKey(pid)? addEntitys[pid]: THBimScene.Instance.AllEntitys[pid];
                     pid = pEntity.ParentUid;
                 }
                 if (string.IsNullOrEmpty(pid) || !building.BuildingStoreys.ContainsKey(pid))
                     continue;
                 entityKeyValue.Value.Id = idOffSet;
-                _allEntitys.Add(entity.Uid, entity);
+                THBimScene.Instance.AllEntitys.Add(entity.Uid, entity);
                 foreach (var storeyKeyValue in building.BuildingStoreys)
                 {
                     var storey = storeyKeyValue.Value;
@@ -483,7 +376,7 @@ namespace XbimXplorer.ThBIMEngine
             {
                 var entity = entityKeyValue.Value;
                 entityKeyValue.Value.Id = idOffSet;
-                _allEntitys.Add(entity.Uid, entity);
+                THBimScene.Instance.AllEntitys.Add(entity.Uid, entity);
             }
         }
         private void UpdateEntitys(Dictionary<string, THBimEntity> updateEntitys)
@@ -494,7 +387,7 @@ namespace XbimXplorer.ThBIMEngine
             {
                 var id = keyValue.Key;
                 var entity = keyValue.Value;
-                var oldValue = _allEntitys[id];
+                var oldValue = THBimScene.Instance.AllEntitys[id];
                 oldValue.GeometryParam = entity.GeometryParam;
                 oldValue.EntitySolids.Clear();
                 oldValue.AllShapeGeometries.Clear();
@@ -510,11 +403,11 @@ namespace XbimXplorer.ThBIMEngine
             List<THBimEntity> updateEntitys = new List<THBimEntity>();
             foreach (var id in updateEntityIds) 
             {
-                var entity = _allEntitys[id];
+                var entity = THBimScene.Instance.AllEntitys[id];
                 updateEntitys.Add(entity);
                 foreach (var item in entity.Openings)
                 {
-                    updateEntitys.Add(_allEntitys[item.Uid]);
+                    updateEntitys.Add(THBimScene.Instance.AllEntitys[item.Uid]);
                 }
             }
             if (updateEntitys.Count < 1)
@@ -527,41 +420,19 @@ namespace XbimXplorer.ThBIMEngine
             foreach (var keyValue in addBimEntitys) 
             {
                 keyValue.Value.Id += idOffset;
-                _allEntitys.Add(keyValue.Key, keyValue.Value);
+                THBimScene.Instance.AllEntitys.Add(keyValue.Key, keyValue.Value);
             }
         }
         private int LastEntityIntId() 
         {
             int idOffset = 0;
-            if (_allEntitys.Count > 0)
-                idOffset = _allEntitys.Last().Value.Id;
+            if (THBimScene.Instance.AllEntitys.Count > 0)
+                idOffset = THBimScene.Instance.AllEntitys.Last().Value.Id;
             return idOffset;
-        }
-        private PointNormal GetPointNormal(int pIndex, XbimPoint3D point, XbimVector3D normal)
-        {
-            return new PointNormal(pIndex, point, normal);
         }
         private void UpdateCatchStorey() 
         {
-            _allStoreys.Clear();
-            foreach (var project in _allBimProject) 
-            {
-                foreach (var build in project.ProjectSite.SiteBuildings) 
-                {
-                    foreach (var storeyKeyValue in build.Value.BuildingStoreys)
-                        _allStoreys.Add(storeyKeyValue.Key, storeyKeyValue.Value);
-                }
-            }
-        }
-    }
-    class GeoMeshResult 
-    {
-        public List<IfcMeshModel> AllGeoModels { get; }
-        public List<PointNormal> AllGeoPointNormals { get; }
-        public GeoMeshResult() 
-        {
-            AllGeoModels = new List<IfcMeshModel>();
-            AllGeoPointNormals = new List<PointNormal>();
+            THBimScene.Instance.UpdateCatchStoreyRelation();
         }
     }
 }

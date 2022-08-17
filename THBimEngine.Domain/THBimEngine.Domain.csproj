@@ -84,8 +84,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BuildingCatagory.cs" />
+    <Compile Include="GeometryModel\FaceTriangle.cs" />
+    <Compile Include="GeometryModel\GeometryMeshModel.cs" />
     <Compile Include="GeometryParam.cs" />
     <Compile Include="Model\ThTCHElement.cs" />
+    <Compile Include="GeometryModel\PointNormal.cs" />
+    <Compile Include="GeometryModel\PointVector.cs" />
     <Compile Include="THBimBuilding.cs" />
     <Compile Include="THBimDomainCommon.cs" />
     <Compile Include="THBimElement.cs" />

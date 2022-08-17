@@ -32,7 +32,7 @@ namespace XbimXplorer.ThBIMEngine
 			readGeomtry.ProgressChanged += ProgressChanged;
 			var excludedTypes = model.DefaultExclusions(null);
 			var geoIndexIfcIndexMap = new Dictionary<int, int>();
-			var allGeoModels = new List<IfcMeshModel>();
+			var allGeoModels = new List<GeometryMeshModel>();
 			var allGeoPointNormals = new List<PointNormal>();
 			if (null == model || model.Instances == null)
 				return geoIndexIfcIndexMap;
@@ -160,7 +160,7 @@ namespace XbimXplorer.ThBIMEngine
 		
 
 
-		public void WriteMidFile(List<IfcMeshModel> meshModels, List<PointNormal> meshPoints, string midFilePath)
+		public void WriteMidFile(List<GeometryMeshModel> meshModels, List<PointNormal> meshPoints, string midFilePath)
 		{
 			if (null == meshModels || meshModels.Count < 1
 				|| null == meshPoints || meshPoints.Count < 1)
@@ -245,7 +245,7 @@ namespace XbimXplorer.ThBIMEngine
 		}
 
 		//实现新的写数据方式
-		public void WriteMidData(List<IfcMeshModel> meshModels, List<PointNormal> meshPoints)
+		public void WriteMidData(List<GeometryMeshModel> meshModels, List<PointNormal> meshPoints)
 		{
 			ExampleScene.ifcre_clear_model_data();
 			if (null == meshModels || meshModels.Count < 1
@@ -334,7 +334,7 @@ namespace XbimXplorer.ThBIMEngine
 		}
 
 
-		public void WriteMidDataMultithreading(List<IfcMeshModel> meshModels, List<PointNormal> meshPoints)
+		public void WriteMidDataMultithreading(List<GeometryMeshModel> meshModels, List<PointNormal> meshPoints)
 		{
 			ExampleScene.ifcre_set_sleep_time(2000);
 			ExampleScene.ifcre_clear_model_data();
@@ -379,13 +379,13 @@ namespace XbimXplorer.ThBIMEngine
 						var ptIndex1 = item.ptIndex[0];
 						var ptIndex2 = item.ptIndex[1];
 						var ptIndex3 = item.ptIndex[2];
-						ExampleScene.ifcre_set_edge_indices(ptIndex1);
-						ExampleScene.ifcre_set_edge_indices(ptIndex2);
-						ExampleScene.ifcre_set_edge_indices(ptIndex2);
-						ExampleScene.ifcre_set_edge_indices(ptIndex3);
-						ExampleScene.ifcre_set_edge_indices(ptIndex3);
-						ExampleScene.ifcre_set_edge_indices(ptIndex1);
-					}
+                        ExampleScene.ifcre_set_edge_indices(ptIndex1);
+                        ExampleScene.ifcre_set_edge_indices(ptIndex2);
+                        ExampleScene.ifcre_set_edge_indices(ptIndex2);
+                        ExampleScene.ifcre_set_edge_indices(ptIndex3);
+                        ExampleScene.ifcre_set_edge_indices(ptIndex3);
+                        ExampleScene.ifcre_set_edge_indices(ptIndex1);
+                    }
 				}
 			}));
 			tasks.Add(Task.Run(() =>

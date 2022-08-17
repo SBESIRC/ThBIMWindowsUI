@@ -28,7 +28,7 @@ namespace XbimXplorer.ThBIMEngine
 		private ReadTaskInfo readTaskInfo;
 		readonly XbimColourMap _colourMap = new XbimColourMap();
 		public IfcStoreReadGeomtry(){}
-		public List<IfcMeshModel> ReadGeomtry(IfcStore model,out List<PointNormal> allPointNormals) 
+		public List<GeometryMeshModel> ReadGeomtry(IfcStore model,out List<PointNormal> allPointNormals) 
 		{
 			ifcModel = model;
 			allPointNormals = new List<PointNormal>();
@@ -58,7 +58,7 @@ namespace XbimXplorer.ThBIMEngine
 			bool isContinue = true;
 			while (isContinue)
 			{
-				Thread.Sleep(2000);
+				Thread.Sleep(100);
 				lock (readTaskInfo)
 				{
 					if (readTaskInfo.AllCount < 1)
@@ -123,7 +123,7 @@ namespace XbimXplorer.ThBIMEngine
 			int thisCount = end - start;
 			int pIndex = -1;
 			var thisPointVectors = new List<PointNormal>();
-			var thisModels = new List<IfcMeshModel>();
+			var thisModels = new List<GeometryMeshModel>();
 			var intGeoCount = 0;
 			foreach (var item in targetShapes)
 			{
@@ -154,7 +154,7 @@ namespace XbimXplorer.ThBIMEngine
 					foreach (var copyModel in allValues)
 					{
 						var transform = copyModel.Transformation;
-						var mesh = new IfcMeshModel(intGeoCount + tempCount, copyModel.IfcProductLabel);
+						var mesh = new GeometryMeshModel(intGeoCount + tempCount, copyModel.IfcProductLabel);
 						mesh.TriangleMaterial = material;
 						foreach (var face in allFace.ToList())
 						{
@@ -199,7 +199,7 @@ namespace XbimXplorer.ThBIMEngine
 				else
 				{
 					var transform = insModel.Transformation;
-					var mesh = new IfcMeshModel(intGeoCount, insModel.IfcProductLabel);
+					var mesh = new GeometryMeshModel(intGeoCount, insModel.IfcProductLabel);
 					mesh.TriangleMaterial = material;
 					foreach (var face in allFace.ToList())
 					{
@@ -294,6 +294,6 @@ namespace XbimXplorer.ThBIMEngine
 		public int TaskCount { get; set; }
 		public int AllTaskCount { get; set; }
 		public List<PointNormal> AllPointVectors { get; } = new List<PointNormal>();
-		public List<IfcMeshModel> AllModels { get; } = new List<IfcMeshModel>();
+		public List<GeometryMeshModel> AllModels { get; } = new List<GeometryMeshModel>();
 	}
 }

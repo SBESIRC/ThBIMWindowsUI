@@ -88,7 +88,10 @@ namespace THBimEngine.Geometry.ProjectFactory
                                 doorRelation.ParentUid = storey.Uuid;
                                 //添加Opening
                                 var doorOpening = DoorWindowOpening(bimDoor.GeometryParam as GeometryStretch, wallWidth, out THBimElementRelation openingRelation);
+                                doorOpening.Uid = bimDoor.Uid + bimDoor.ParentUid;
                                 doorOpening.ParentUid = bimWall.Uid;
+                                openingRelation.Uid = doorOpening.Uid;
+                                openingRelation.RelationElementUid = doorOpening.Uid;
                                 openingRelation.ParentUid = storey.Uuid;
                                 lock (bimStorey)
                                 {
@@ -116,13 +119,16 @@ namespace THBimEngine.Geometry.ProjectFactory
                                 windowRelation.ParentUid = storey.Uuid;
                                 //添加Opening
                                 var winOpening = DoorWindowOpening(bimWindow.GeometryParam as GeometryStretch, wallWidth, out THBimElementRelation openingRelation);
+                                winOpening.Uid = bimWindow.Uid + bimWindow.ParentUid;
                                 winOpening.ParentUid = bimWall.Uid;
+                                openingRelation.Uid = winOpening.Uid;
+                                openingRelation.RelationElementUid = winOpening.Uid;
                                 openingRelation.ParentUid = storey.Uuid;
                                 lock (bimStorey)
                                 {
                                     bimStorey.FloorEntityRelations.Add(bimWindow.Uid, windowRelation);
                                     bimStorey.FloorEntitys.Add(bimWindow.Uid, bimWindow);
-                                    bimStorey.FloorEntityRelations.Add(openingRelation.Uid, openingRelation);
+                                    bimStorey.FloorEntityRelations.Add(winOpening.Uid, openingRelation);
                                     bimStorey.FloorEntitys.Add(winOpening.Uid, winOpening);
                                 }
                                 lock (allEntitys)

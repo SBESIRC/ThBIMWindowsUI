@@ -69,6 +69,7 @@ namespace THBimEngine.Geometry.ProjectFactory
                     {
                         var wallId = CurrentGIndex();
                         var bimWall = new THBimWall(wallId, string.Format("wall#{0}", wallId), wall.THTCHGeometryParam(), "", wall.Uuid);
+                        var wallWidth = wall.Width;
                         bimWall.ParentUid = bimStorey.Uid;
                         var wallRelation = new THBimElementRelation(bimWall.Id, bimWall.Name,bimWall, bimWall.Describe, bimWall.Uid);
                         lock (bimStorey)
@@ -85,15 +86,23 @@ namespace THBimEngine.Geometry.ProjectFactory
                                 bimDoor.ParentUid = bimWall.Uid;
                                 var doorRelation = new THBimElementRelation(bimDoor.Id, bimDoor.Name, bimDoor,bimDoor.Describe, bimDoor.Uid);
                                 doorRelation.ParentUid = storey.Uuid;
+                                //添加Opening
+                                var doorOpening = DoorWindowOpening(bimDoor.GeometryParam as GeometryStretch, wallWidth, out THBimElementRelation openingRelation);
+                                doorOpening.ParentUid = bimWall.Uid;
+                                openingRelation.ParentUid = storey.Uuid;
                                 lock (bimStorey)
                                 {
                                     bimStorey.FloorEntityRelations.Add(bimDoor.Uid, doorRelation);
                                     bimStorey.FloorEntitys.Add(bimDoor.Uid, bimDoor);
+                                    bimStorey.FloorEntityRelations.Add(openingRelation.Uid, openingRelation);
+                                    bimStorey.FloorEntitys.Add(doorOpening.Uid, doorOpening);
                                 }
                                 lock (allEntitys)
                                 {
+                                    allEntitys.Add(doorOpening.Uid, doorOpening);
                                     allEntitys.Add(bimDoor.Uid,bimDoor);
                                 }
+                                bimWall.Openings.Add(doorOpening);
                             }
                         }
                         if (null != wall.Windows)
@@ -105,15 +114,23 @@ namespace THBimEngine.Geometry.ProjectFactory
                                 bimWindow.ParentUid = bimWall.Uid;
                                 var windowRelation = new THBimElementRelation(bimWindow.Id, bimWindow.Name,bimWindow, bimWindow.Describe, bimWindow.Uid);
                                 windowRelation.ParentUid = storey.Uuid;
+                                //添加Opening
+                                var winOpening = DoorWindowOpening(bimWindow.GeometryParam as GeometryStretch, wallWidth, out THBimElementRelation openingRelation);
+                                winOpening.ParentUid = bimWall.Uid;
+                                openingRelation.ParentUid = storey.Uuid;
                                 lock (bimStorey)
                                 {
                                     bimStorey.FloorEntityRelations.Add(bimWindow.Uid, windowRelation);
                                     bimStorey.FloorEntitys.Add(bimWindow.Uid, bimWindow);
+                                    bimStorey.FloorEntityRelations.Add(openingRelation.Uid, openingRelation);
+                                    bimStorey.FloorEntitys.Add(winOpening.Uid, winOpening);
                                 }
                                 lock (allEntitys)
                                 {
-                                    allEntitys.Add(bimWindow.Uid,bimWindow);
+                                    allEntitys.Add(winOpening.Uid, winOpening);
+                                    allEntitys.Add(bimWindow.Uid, bimWindow);
                                 }
+                                bimWall.Openings.Add(winOpening);
                             }
                         }
                         if (null != wall.Openings)
@@ -181,6 +198,18 @@ namespace THBimEngine.Geometry.ProjectFactory
             }
             bimSite.SiteBuildings.Add(bimBuilding.Uid,bimBuilding);
             bimProject.ProjectSite = bimSite;
+        }
+        private THBimOpening DoorWindowOpening(GeometryStretch doorWindowParam,double wallWidth,out THBimElementRelation openingRelation) 
+        {
+            var cloneParam = doorWindowParam.Clone() as GeometryStretch;
+            var openingId = CurrentGIndex();
+            if (wallWidth > cloneParam.YAxisLength) 
+            {
+                cloneParam.YAxisLength = wallWidth + 120;
+            }
+            var bimOpening = new THBimOpening(openingId, string.Format("opening#{0}", openingId), cloneParam);
+            openingRelation = new THBimElementRelation(bimOpening.Id, bimOpening.Name, bimOpening, bimOpening.Describe, bimOpening.Uid);
+            return bimOpening;
         }
     }
 }

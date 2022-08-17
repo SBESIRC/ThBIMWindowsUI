@@ -149,7 +149,19 @@ namespace THBimEngine.Domain
 
         public override object Clone()
         {
-            throw new NotImplementedException();
+            GeometryStretch clone = null;
+            if (OutLine.Points != null && OutLine.Points.Count > 0)
+            {
+                clone = new GeometryStretch(this.OutLine, this.XAxis, this.ZAxis, this.ZAxisLength, this.ZAxisOffSet);
+                clone.XAxisLength = this.XAxisLength;
+                clone.YAxisLength = this.YAxisLength;
+                clone.Origin = this.Origin;
+            }
+            else 
+            {
+                clone = new GeometryStretch(this.Origin, this.XAxis,this.XAxisLength, this.YAxisLength,this.ZAxis, this.ZAxisLength, this.ZAxisOffSet);
+            }
+            return clone;
         }
     }
 }

@@ -58,7 +58,7 @@ namespace XbimXplorer.ThBIMEngine
             var ifcProject = ifcStore.Instances.FirstOrDefault<IIfcProject>();
             var bimProject = new THBimProject(0, ifcProject.Name, "", ifcProject.GlobalId);
             bimProject.ProjectIdentity = ifcStore.FileName;
-            bimProject.SourceProject = ifcProject;
+            bimProject.SourceProject = ifcStore;
             var allGeoPointNormals = new List<PointNormal>();
             var readGeomtry = new IfcStoreReadGeomtry();
             var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out allGeoPointNormals);

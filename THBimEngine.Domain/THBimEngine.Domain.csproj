@@ -88,6 +88,13 @@
     <Compile Include="GeometryModel\FaceTriangle.cs" />
     <Compile Include="GeometryModel\GeometryMeshModel.cs" />
     <Compile Include="GeometryParam.cs" />
+    <Compile Include="MidModel\Base.cs" />
+    <Compile Include="MidModel\Buildingstorey.cs" />
+    <Compile Include="MidModel\Component.cs" />
+    <Compile Include="MidModel\Edge.cs" />
+    <Compile Include="MidModel\OutingPolygon.cs" />
+    <Compile Include="MidModel\TempModel.cs" />
+    <Compile Include="MidModel\UniComponent.cs" />
     <Compile Include="Model\ThTCHElement.cs" />
     <Compile Include="GeometryModel\PointNormal.cs" />
     <Compile Include="GeometryModel\PointVector.cs" />
@@ -131,5 +138,6 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

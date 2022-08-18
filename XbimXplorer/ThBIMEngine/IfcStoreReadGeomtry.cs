@@ -79,9 +79,38 @@ namespace XbimXplorer.ThBIMEngine
 			}
 			#endregion;
 			allPointNormals.AddRange(readTaskInfo.AllPointVectors);
+			var mergeMesh = MergeModelMesh(readTaskInfo.AllModels);
+			readTaskInfo.AllModels.Clear();
+			readTaskInfo.AllModels.AddRange(mergeMesh);
 			return readTaskInfo.AllModels;
 		}
-        private async Task MoreTaskReadAsync()
+		private List<GeometryMeshModel> MergeModelMesh(List<GeometryMeshModel> meshModels) 
+		{
+			//一个物体可能会有多个实体构成
+			var res = new Dictionary<string, GeometryMeshModel>();
+			foreach (var item in meshModels) 
+			{
+				if (res.ContainsKey(item.EntityLable))
+				{
+					res[item.EntityLable].FaceTriangles.AddRange(item.FaceTriangles);
+				}
+				else 
+				{
+					res.Add(item.EntityLable, item);
+				}
+			}
+			var newMeshModels = new List<GeometryMeshModel>();
+			int index = 0;
+			foreach (var keyValue in res) 
+			{
+				keyValue.Value.CIndex = index;
+				newMeshModels.Add(keyValue.Value);
+				index += 1;
+			}
+			return newMeshModels;
+		}
+
+		private async Task MoreTaskReadAsync()
 		{
 			List<Task> tasks = new List<Task>();
 
@@ -154,7 +183,7 @@ namespace XbimXplorer.ThBIMEngine
 					foreach (var copyModel in allValues)
 					{
 						var transform = copyModel.Transformation;
-						var mesh = new GeometryMeshModel(intGeoCount + tempCount, copyModel.IfcProductLabel);
+						var mesh = new GeometryMeshModel(intGeoCount + tempCount, copyModel.IfcProductLabel.ToString());
 						mesh.TriangleMaterial = material;
 						foreach (var face in allFace.ToList())
 						{
@@ -199,7 +228,7 @@ namespace XbimXplorer.ThBIMEngine
 				else
 				{
 					var transform = insModel.Transformation;
-					var mesh = new GeometryMeshModel(intGeoCount, insModel.IfcProductLabel);
+					var mesh = new GeometryMeshModel(intGeoCount, insModel.IfcProductLabel.ToString());
 					mesh.TriangleMaterial = material;
 					foreach (var face in allFace.ToList())
 					{

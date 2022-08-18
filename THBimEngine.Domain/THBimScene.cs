@@ -127,7 +127,7 @@ namespace THBimEngine.Domain
 			{
 				int ptOffSet = meshResult.AllGeoPointNormals.Count;
 				int gOffSet = meshResult.AllGeoModels.Count;
-				var models = project.AllGeoModels();
+				var models = project.AllGeoModels().Values;
 				var points = project.AllGeoPointNormals();
 				foreach (var item in points)
 				{

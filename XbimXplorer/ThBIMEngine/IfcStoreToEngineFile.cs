@@ -72,7 +72,7 @@ namespace XbimXplorer.ThBIMEngine
 				for (int i = 0; i < allGeoModels.Count; i++)
 				{
 					var tempModel = allGeoModels[i];
-					geoIndexIfcIndexMap.Add(i, tempModel.IfcIndex);
+					geoIndexIfcIndexMap.Add(i, Convert.ToInt32(tempModel.EntityLable));
 				}
 			}
 			return geoIndexIfcIndexMap;

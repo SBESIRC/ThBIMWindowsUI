@@ -15,7 +15,7 @@ namespace THBimEngine.Domain
         public THBimSite ProjectSite { get; set; }
         public object SourceProject { get; set; }
 		public bool HaveChange { get; set; }
-		private List<GeometryMeshModel> _allGeoMeshModels { get; }
+		private Dictionary<string,GeometryMeshModel> _allGeoMeshModels { get; }
 		private List<PointNormal> _allGeoPointNormals { get; }
 		public Dictionary<string,THBimEntity> PrjAllEntitys { get; }
 		public Dictionary<string,THBimElementRelation> PrjAllRelations { get; }
@@ -24,7 +24,7 @@ namespace THBimEngine.Domain
 		public THBimProject(int id, string name, string describe = "", string uid = "") : base(id, name, describe, uid)
         {
 			HaveChange = false;
-			_allGeoMeshModels = new List<GeometryMeshModel>();
+			_allGeoMeshModels = new Dictionary<string, GeometryMeshModel>();
 			_allGeoPointNormals = new List<PointNormal>();
 			PrjAllEntitys = new Dictionary<string, THBimEntity>();
 			PrjAllRelations = new Dictionary<string, THBimElementRelation>();
@@ -67,8 +67,7 @@ namespace THBimEngine.Domain
 						continue;
 					var ptOffSet = storeyGeoPointNormals.Count();
 					var material = THBimMaterial.GetTHBimEntityMaterial(entity.FriendlyTypeName, true);
-					var meshModel = new GeometryMeshModel(gIndex, entity.Id);
-					meshModel.RelationUid = relation.Uid;
+					var meshModel = new GeometryMeshModel(gIndex, relation.Uid);
 					meshModel.TriangleMaterial = material;
 					foreach (var shapeGeo in entity.AllShapeGeometries)
 					{
@@ -148,14 +147,17 @@ namespace THBimEngine.Domain
 			_allGeoMeshModels.Clear();
 			_allGeoPointNormals.Clear();
 			_allGeoPointNormals.AddRange(meshResult.AllGeoPointNormals);
-			_allGeoMeshModels.AddRange(meshResult.AllGeoModels);
+			foreach (var item in meshResult.AllGeoModels) 
+			{
+				_allGeoMeshModels.Add(item.EntityLable, item);
+			}
 		}
-        public List<GeometryMeshModel> AllGeoModels()
+        public Dictionary<string,GeometryMeshModel> AllGeoModels()
         {
-			var resList = new List<GeometryMeshModel>();
+			var resList = new Dictionary<string,GeometryMeshModel>();
 			foreach (var item in _allGeoMeshModels) 
 			{
-				resList.Add(item.Clone() as GeometryMeshModel);
+				resList.Add(item.Key,item.Value.Clone() as GeometryMeshModel);
 			}
 			return resList;
 		}
@@ -175,7 +177,12 @@ namespace THBimEngine.Domain
 		/// <param name="pointNormals"></param>
 		public void AddGeoMeshModels(List<GeometryMeshModel> meshModels, List<PointNormal> pointNormals) 
 		{
-			_allGeoMeshModels.AddRange(meshModels);
+			_allGeoMeshModels.Clear();
+			_allGeoPointNormals.Clear();
+			foreach (var item in meshModels)
+			{
+				_allGeoMeshModels.Add(item.EntityLable,item);
+			}
 			_allGeoPointNormals.AddRange(pointNormals);
 		}
 		public void ClearAllData()

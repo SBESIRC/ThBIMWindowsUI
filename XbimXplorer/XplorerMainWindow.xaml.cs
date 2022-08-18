@@ -269,31 +269,6 @@ namespace XbimXplorer
             Settings.Default.Save();
         }
 
-        private void DrawingControl_MeasureChangedEvent(DrawingControl3D m, PolylineGeomInfo e)
-        {
-            if (e == null) 
-                return;
-            //         var text = e.ToString();
-            //         if (e.Points.Count() == 1)
-            //{
-            //             var vspace = e.Points.FirstOrDefault();
-            //             var modelSpace = DrawingControl.ModelPositions.GetPointInverse(new Xbim.Common.Geometry.XbimPoint3D
-            //                 (
-            //                 vspace.Point.X,
-            //                 vspace.Point.Y,
-            //                 vspace.Point.Z
-            //                 ));
-            //             text += $" Model space in meters: X:{modelSpace.X:0.##}, Y:{modelSpace.Y:0.##}, Z:{modelSpace.Z:0.##}";
-
-            //}
-            //         EntityLabel.Text = text;
-
-            //Debug.WriteLine("Points:");
-            //foreach (var pt in e.VisualPoints)
-            //{
-            //    Debug.WriteLine("X:{0} Y:{1} Z:{2}", pt.X, pt.Y, pt.Z);
-            //}
-        }
         
         #region "Model File Operations"
 
@@ -581,9 +556,9 @@ namespace XbimXplorer
             //this Triggers the event to load the model into the views 
             ModelProvider.ObjectInstance = ifcStore;
             ModelProvider.Refresh();
-            LoadIfcFile(_tempMidFileName);
             ProgressBar.Value = 0;
-            StatusMsg.Text = "Ready";
+            StatusMsg.Text = "";
+            LoadIfcFile(_tempMidFileName);
             AddRecentFile();
         }
         private void OnProgressChanged(object s, ProgressChangedEventArgs args)
@@ -1343,9 +1318,11 @@ namespace XbimXplorer
         }
 		private void LoadIfcFile(string path)
 		{
-			//if (string.IsNullOrEmpty(path))
-			//	return;
-			var formHost = GridEngine.Children[0] as WindowsFormsHost;
+            ProgressBar.Value = 0;
+            StatusMsg.Text = "";
+            //if (string.IsNullOrEmpty(path))
+            //	return;
+            var formHost = GridEngine.Children[0] as WindowsFormsHost;
 			var childConrol = formHost.Child as GLControl;
 			childConrol.EnableNativeInput();
 			childConrol.MakeCurrent();

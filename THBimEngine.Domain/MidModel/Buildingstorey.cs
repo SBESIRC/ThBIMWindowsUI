@@ -45,5 +45,22 @@ namespace THBimEngine.Domain.MidModel
 
 			buildingIndex++;
 		}
+		public Buildingstorey(Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey storey, ref int buildingIndex)
+		{
+			floor_name = storey.Name;
+			if(!(storey.Elevation is null))
+            {
+				elevation = storey.Elevation.Value;
+				top_elevation = storey.Elevation.Value;// + storey.LevelHeight;
+				bottom_elevation = storey.Elevation.Value;
+			}
+	
+			stdFlrNo = buildingIndex;///
+			floorNo = buildingIndex;///
+			height = 0;
+			description = storey.Description;
+
+			buildingIndex++;
+		}
 	}
 }

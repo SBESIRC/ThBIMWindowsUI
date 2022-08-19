@@ -13,7 +13,6 @@ namespace THBimEngine.Domain.MidModel
         public List<Edge> Edges;
         public List<OutingPolygon> OutingPolygons;
         public List<UniComponent> UniComponents;
-        public Dictionary<string, THBimEntity> AllEntitys;
 
         public TempModel()
         {
@@ -23,36 +22,8 @@ namespace THBimEngine.Domain.MidModel
             Edges = new List<Edge>();
             OutingPolygons = new List<OutingPolygon>();
             UniComponents = new List<UniComponent>();
-            AllEntitys = new Dictionary<string, THBimEntity>();
         }
 
-        public double GetIfcStoreyHeight(Xbim.Ifc4.ProductExtension.IfcBuildingStorey storey)
-        {
-            foreach (var item in storey.PropertySets)
-            {
-                if (item.PropertySetDefinitions == null) continue;
-                foreach (var prop in item.PropertySetDefinitions)
-                {
-                    if (!(prop is Xbim.Ifc4.Interfaces.IIfcPropertySet))
-                        continue;
-                    var propertySet = prop as Xbim.Ifc4.Interfaces.IIfcPropertySet;
-                    foreach (var realProp in propertySet.HasProperties)
-                    {
-                        if (realProp.Name == "Height")
-                        {
-                            if (realProp is IIfcPropertySingleValue propValue)
-                            {
-                                if (double.TryParse(propValue.NominalValue.ToString(), out double height))
-                                {
-                                    return height;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return 0;
-        }
 
         public void ModelConvert(THBimProject bimProject)
         {
@@ -69,7 +40,6 @@ namespace THBimEngine.Domain.MidModel
             var ifcStore = bimProject.SourceProject as IfcStore;
             if (ifcStore != null)//处理ifc数据
             {
-
                 var ifcProject = ifcStore.Instances.FirstOrDefault<Xbim.Ifc4.Interfaces.IIfcProject>();
                 var site = ifcProject.Sites.First();
                 var buildings = site.Buildings.ToList();
@@ -77,33 +47,75 @@ namespace THBimEngine.Domain.MidModel
                 {
                     foreach (var ifcStorey in building.BuildingStoreys)
                     {
-                        var storey = ifcStorey as Xbim.Ifc4.ProductExtension.IfcBuildingStorey;
-                        var buildingStorey = new Buildingstorey(storey, ref buildingIndex);
-                        var height = GetIfcStoreyHeight(storey);
-                        buildingStorey.height = height;
-                        buildingStorey.top_elevation += height;
-                        foreach (var spatialStructure in storey.ContainsElements)
-                        {
-                            var elements = spatialStructure.RelatedElements;
-                            if (elements.Count == 0) continue;
-                            var ifcType = elements.First().ToString();
-                            foreach (var item in elements)
-                            {
-                                var uid = item.EntityLabel.ToString();
-                                var material = THBimMaterial.GetTHBimEntityMaterial(bimProject.PrjAllEntitys[uid].FriendlyTypeName, true);
-                                var uniComponent = new UniComponent(uid,material, ref uniComponentIndex, buildingStorey);
-                                UniComponents.Add(uniComponent);
 
-                                uniComponent.edge_ind_s = edgeIndex;
-                                uniComponent.tri_ind_s = triangleIndex;
-                                var triangles = allGeoModels[uid].FaceTriangles;
-                                GetTrianglesAndEdges(triangles, allPoints, ref triangleIndex, ref edgeIndex, uniComponent.unique_id, ref ptIndex);
-                                uniComponent.edge_ind_e = edgeIndex - 1;
-                                uniComponent.tri_ind_e = triangleIndex - 1;
+                        if (ifcStorey.GetType().FullName== "Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey")
+                        {
+                            var storey = ifcStorey as Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey;
+                            var buildingStorey = new Buildingstorey(storey, ref buildingIndex);
+                            var height = GetIfcStoreyHeight(storey);
+                            buildingStorey.height = height;
+                            buildingStorey.top_elevation += height;
+                            foreach (var spatialStructure in storey.ContainsElements)
+                            {
+                                var elements = spatialStructure.RelatedElements;
+                                if (elements.Count == 0) continue;
+                                var ifcType = elements.First().ToString();
+                                buildingStorey.element_index_s = uniComponentIndex;
+
+                                foreach (var item in elements)
+                                {
+                                    var uid = item.EntityLabel.ToString();
+                                    var material = THBimMaterial.GetTHBimEntityMaterial("Default", true);
+                                    if (bimProject.PrjAllEntitys.ContainsKey(uid))
+                                    {
+                                        material = THBimMaterial.GetTHBimEntityMaterial(bimProject.PrjAllEntitys[uid].FriendlyTypeName, true);
+                                    }
+                                    var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, buildingStorey);
+                                    UniComponents.Add(uniComponent);
+
+                                    uniComponent.edge_ind_s = edgeIndex;
+                                    uniComponent.tri_ind_s = triangleIndex;
+                                    var triangles = allGeoModels[uid].FaceTriangles;
+                                    GetTrianglesAndEdges(triangles, allPoints, ref triangleIndex, ref edgeIndex, uniComponent.unique_id, ref ptIndex);
+                                    uniComponent.edge_ind_e = edgeIndex - 1;
+                                    uniComponent.tri_ind_e = triangleIndex - 1;
+                                }
                             }
+                            buildingStorey.element_index_e = uniComponentIndex - 1;
+                            Buildingstoreys.Add(buildingStorey);
                         }
-                        buildingStorey.element_index_e = uniComponentIndex - 1;
-                        Buildingstoreys.Add(buildingStorey);
+                        else
+                        {
+                            var storey = ifcStorey as Xbim.Ifc4.ProductExtension.IfcBuildingStorey;
+                            var buildingStorey = new Buildingstorey(storey, ref buildingIndex);
+                            var height = GetIfcStoreyHeight(storey);
+                            buildingStorey.height = height;
+                            buildingStorey.top_elevation += height;
+                            foreach (var spatialStructure in storey.ContainsElements)
+                            {
+                                var elements = spatialStructure.RelatedElements;
+                                if (elements.Count == 0) continue;
+                                var ifcType = elements.First().ToString();
+                                buildingStorey.element_index_s = uniComponentIndex;
+                                foreach (var item in elements)
+                                {
+                                    var uid = item.EntityLabel.ToString();
+                                    var material = THBimMaterial.GetTHBimEntityMaterial(bimProject.PrjAllEntitys[uid].FriendlyTypeName, true);
+                                    var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, buildingStorey);
+                                    UniComponents.Add(uniComponent);
+
+                                    uniComponent.edge_ind_s = edgeIndex;
+                                    uniComponent.tri_ind_s = triangleIndex;
+                                    var triangles = allGeoModels[uid].FaceTriangles;
+                                    GetTrianglesAndEdges(triangles, allPoints, ref triangleIndex, ref edgeIndex, uniComponent.unique_id, ref ptIndex);
+                                    uniComponent.edge_ind_e = edgeIndex - 1;
+                                    uniComponent.tri_ind_e = triangleIndex - 1;
+                                }
+                            }
+                            buildingStorey.element_index_e = uniComponentIndex - 1;
+                            Buildingstoreys.Add(buildingStorey);
+                        }
+
                     }
                 }
                 return;
@@ -139,6 +151,59 @@ namespace THBimEngine.Domain.MidModel
                 buildingStorey.element_index_e = uniComponentIndex-1;
                 Buildingstoreys.Add(buildingStorey);
             }
+        }
+
+        public double GetIfcStoreyHeight(Xbim.Ifc4.ProductExtension.IfcBuildingStorey storey)
+        {
+            foreach (var item in storey.PropertySets)
+            {
+                if (item.PropertySetDefinitions == null) continue;
+                foreach (var prop in item.PropertySetDefinitions)
+                {
+                    if (!(prop is Xbim.Ifc4.Interfaces.IIfcPropertySet)) continue;
+                    var propertySet = prop as Xbim.Ifc4.Interfaces.IIfcPropertySet;
+                    foreach (var realProp in propertySet.HasProperties)
+                    {
+                        if (realProp.Name == "Height")
+                        {
+                            if (realProp is IIfcPropertySingleValue propValue)
+                            {
+                                if (double.TryParse(propValue.NominalValue.ToString(), out double height))
+                                {
+                                    return height;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return 0;
+        }
+        public double GetIfcStoreyHeight(Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey storey)
+        {
+            foreach (var item in storey.PropertySets)
+            {
+                if (item.PropertySetDefinitions == null) continue;
+                foreach (var prop in item.PropertySetDefinitions)
+                {
+                    if (!(prop is Xbim.Ifc4.Interfaces.IIfcPropertySet)) continue;
+                    var propertySet = prop as Xbim.Ifc4.Interfaces.IIfcPropertySet;
+                    foreach (var realProp in propertySet.HasProperties)
+                    {
+                        if (realProp.Name == "Height")
+                        {
+                            if (realProp is IIfcPropertySingleValue propValue)
+                            {
+                                if (double.TryParse(propValue.NominalValue.ToString(), out double height))
+                                {
+                                    return height;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return 0;
         }
 
         public List<Edge> GetEdges(OutingPolygon outingPolygon, ref int edgeIndex, int parentId)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using THBimEngine.Domain;
+using THBimEngine.Domain.MidModel;
 using THBimEngine.Domain.Model;
 using THBimEngine.Geometry.ProjectFactory;
 using Xbim.Ifc;
@@ -64,6 +65,8 @@ namespace XbimXplorer.ThBIMEngine
             var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out allGeoPointNormals);
             bimProject.AddGeoMeshModels(allGeoModels, allGeoPointNormals);
             THBimScene.Instance.AddProject(bimProject);
+            var tempData = new TempModel();
+            tempData.ModelConvert(bimProject);
             WriteToMidDataByFloor();
         }
         public Dictionary<string, object> GetSelectEntityProperties(int index) 

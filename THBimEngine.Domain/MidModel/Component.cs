@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace THBimEngine.Domain.MidModel
 {
@@ -18,8 +14,15 @@ namespace THBimEngine.Domain.MidModel
 			name = type;
 			type_id = componentIndex;
 			color = new Color();
-			//unique_id = -1;
-			//hori = false;
+		}
+
+		public void WriteToFile(BinaryWriter writer)
+        {
+			writer.Write(name.Length);
+			writer.Write(name);
+			writer.Write(type_id);
+			color.Write(writer);
+			writer.Write(hori);
 		}
 	}
 }

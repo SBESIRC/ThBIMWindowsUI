@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Xbim.Ifc;
 using Xbim.Ifc4.Interfaces;
@@ -132,7 +133,7 @@ namespace THBimEngine.Domain.MidModel
             foreach (var storey in storeys)
             {
                 var buildingStorey = new Buildingstorey(storey,ref buildingIndex);
-                buildingStorey.element_index_s = uniComponentIndex;
+                buildingStorey.element_index_s[0] = uniComponentIndex;
 
                 foreach(var relation in storey.FloorEntityRelations.Values)
                 {
@@ -148,8 +149,45 @@ namespace THBimEngine.Domain.MidModel
                     uniComponent.edge_ind_e = edgeIndex - 1;
                     uniComponent.tri_ind_e = triangleIndex - 1;
                 }
-                buildingStorey.element_index_e = uniComponentIndex-1;
+                buildingStorey.element_index_e[0] = uniComponentIndex-1;
                 Buildingstoreys.Add(buildingStorey);
+            }
+        }
+
+        public void WriteMidFile()
+        {
+            string fileName = Path.Combine(System.IO.Path.GetTempPath(), "BimEngineData.txt");
+            FileStream fileStream = new FileStream(fileName,FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+            BinaryWriter writer = new BinaryWriter(fileStream);
+            int cnt = OutingPolygons.Count;
+            writer.Write(cnt * 4);
+            foreach (var trangle in OutingPolygons)
+            {
+                trangle.WriteToFile(writer, Points);
+            }
+            cnt = Edges.Count;
+            writer.Write(cnt * 4);
+            foreach (var edge in Edges)
+            {
+                edge.WriteToFile(writer, Points);
+            }
+            cnt = Components.Count;
+            writer.Write(cnt * 4);
+            foreach (var component in Components)
+            {
+                component.WriteToFile(writer);
+            }
+            cnt = UniComponents.Count;
+            writer.Write(cnt * 4);
+            foreach (var uniComponent in UniComponents)
+            {
+                uniComponent.WriteToFile(writer);
+            }
+            cnt = Buildingstoreys.Count;
+            writer.Write(cnt * 4);
+            foreach (var storey in Buildingstoreys)
+            {
+                storey.WriteToFile(writer);
             }
         }
 

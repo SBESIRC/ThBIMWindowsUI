@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xbim.Common.Geometry;
+﻿using System.Collections.Generic;
+using System.IO;
 
 namespace THBimEngine.Domain.MidModel
 {
@@ -13,8 +9,6 @@ namespace THBimEngine.Domain.MidModel
         public int group_id;   //	构件id
         public int type_id;    //	类型id
         public int id;         //	自身id
-                               //public bool clip_flag; //	径向三角片，已无用
-
         public List<int> ptsIndex = new List<int>();   // 顶点位置数组（vec3）某个三角面片的顶点(vec3)信息（一般长度为3）
 
         public OutingPolygon(FaceTriangle triangle, List<PointNormal> allPoints, ref int triangleIndex,
@@ -31,6 +25,17 @@ namespace THBimEngine.Domain.MidModel
                 Points.Add(new vec3(pt));
                 ptsIndex.Add(ptIndex);
                 ptIndex++;
+            }
+        }
+
+        public void WriteToFile(BinaryWriter writer,List<vec3> points)
+        {
+            writer.Write(type_id);
+            writer.Write(group_id);
+            writer.Write(id);
+            foreach(var pt in points)
+            {
+                pt.Write(writer);
             }
         }
     }

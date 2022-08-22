@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.IO;
 
 namespace THBimEngine.Domain.MidModel
 {
@@ -18,8 +15,6 @@ namespace THBimEngine.Domain.MidModel
 		public string floor_name; // 楼层名
 		public int floor_num;      // 楼层序号
 		public double[] rgb;//use for SkecthUp-out's ifc, to determine the priority
-
-
 
 		public double depth;       // depth = z_r - z_l 深度值，由bbx决定
 		public double depth_t;     // z_len？？？？？？？？？？？？？？？？？？？？？？？？？
@@ -60,6 +55,63 @@ namespace THBimEngine.Domain.MidModel
 			floor_name = buildingStorey.floor_name;
 			floor_num = buildingStorey.floorNo;
 			rgb = new double[3] { bimMaterial.KS_R, bimMaterial.KS_G, bimMaterial.KS_B };
+		}
+
+		public new void WriteToFile(BinaryWriter writer)
+        {
+			writer.Write(name.Length);
+			writer.Write(name);
+			writer.Write(type_id);
+			color.Write(writer);
+			writer.Write(hori);
+			writer.Write(unique_id);
+			writer.Write(depth);
+			writer.Write(depth_t);
+			writer.Write(x_len);
+			writer.Write(y_len);
+			writer.Write(floor_name.Length);
+			writer.Write(floor_name);
+			writer.Write(material.Length);
+			writer.Write(material);
+			writer.Write(openmethod.Length);
+			writer.Write(openmethod);
+			writer.Write(description.Length);
+			writer.Write(description);
+			writer.Write(guid.Length);
+			writer.Write(guid);
+			writer.Write(tri_ind_s);
+			writer.Write(tri_ind_e);
+			writer.Write(x_l);
+			writer.Write(x_r);
+			writer.Write(y_l);
+			writer.Write(y_r);
+			writer.Write(z_l);
+			writer.Write(z_r);
+			writer.Write(bg);
+			writer.Write(floor_num);
+            writer.Write(direction[0]);
+			writer.Write(direction[1]);
+			writer.Write(direction[2]);
+			writer.Write(rgb[0]);
+			writer.Write(rgb[1]);
+			writer.Write(rgb[2]);
+			writer.Write(_height);
+			writer.Write(_width);
+			writer.Write(properties.Count);
+			foreach(var property in properties)
+            {
+				var key = property.Key;
+				var value = property.Value;
+				writer.Write(key.Length);
+				writer.Write(key);
+				writer.Write(value.Length);
+				writer.Write(value);
+			}
+			writer.Write(OpenDirIndex);
+			writer.Write(comp_name.Length);
+			writer.Write(comp_name);
+			writer.Write(edge_ind_s);
+			writer.Write(edge_ind_e);
 		}
 	}
 }

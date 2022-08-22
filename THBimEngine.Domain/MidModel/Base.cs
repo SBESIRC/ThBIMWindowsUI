@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xbim.Common.Geometry;
+﻿using System.Collections.Generic;
+using System.IO;
 
 namespace THBimEngine.Domain.MidModel
 {
-	public struct Color
-	{ // 颜色信息rgba
+    public struct Color// 颜色信息rgba
+    { 
 		public float r, g, b, a;
 
 		public Color(float _r, float _g, float _b, float _a)
@@ -18,7 +14,16 @@ namespace THBimEngine.Domain.MidModel
             b = _b;
             a = _a;
         }
+
+        public void Write(BinaryWriter writer)
+        {
+            writer.Write(r);
+            writer.Write(g);
+            writer.Write(b);
+            writer.Write(a);
+        }
 	};
+
     public struct vec3
     {
         public float x, y, z;
@@ -28,6 +33,7 @@ namespace THBimEngine.Domain.MidModel
             y = _y;
             z = _z;
         }
+
         public vec3(PointVector pt)
         {
             x = (float)pt.X;
@@ -35,8 +41,14 @@ namespace THBimEngine.Domain.MidModel
             z = (float)pt.Z;
         }
 
-
+        public void Write(BinaryWriter writer)
+        {
+            writer.Write(x);
+            writer.Write(y);
+            writer.Write(z);
+        }
     };
+
     public class Compute
     {
         public vec3 cross(vec3 a, vec3 b)
@@ -57,6 +69,4 @@ namespace THBimEngine.Domain.MidModel
             triangles = allGeoMeshModels[uid].FaceTriangles;
         }
     }
-    
-
 }

@@ -12,9 +12,10 @@ namespace THBimEngine.Domain.MidModel
 		public double bottom_elevation;    // 底高
 		public int stdFlrNo, floorNo;// new feature of building storey
 		public double height;      // 层高
-		public List<int> element_index_s, element_index_e;// the start and the end of current building storey's elements' indices // group_id也就是一个构件一次while循环对应的iterator，每次循环增加1//多段连续的物件id（用于合模）
+		public List<int> element_index_s = new List<int>();// the start and the end of current building storey's elements' indices
+		public List<int> element_index_e = new List<int>(); // group_id也就是一个构件一次while循环对应的iterator，每次循环增加1//多段连续的物件id（用于合模）
 		public string description;
-		public Dictionary<string, string> properties;  // 属性对
+		public Dictionary<string, string> properties = new Dictionary<string, string>();  // 属性对
 
 		public Buildingstorey(THBimStorey storey,ref int buildingIndex)
         {

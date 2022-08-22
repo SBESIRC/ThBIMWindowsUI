@@ -10,7 +10,7 @@ namespace THBimEngine.Domain.MidModel
     {
         public List<vec3> Points; 
         public List<Buildingstorey> Buildingstoreys;
-        public List<Component> Components;
+        public Dictionary<string,Component> Components;
         public List<Edge> Edges;
         public List<OutingPolygon> OutingPolygons;
         public List<UniComponent> UniComponents;
@@ -19,7 +19,7 @@ namespace THBimEngine.Domain.MidModel
         {
             Points = new List<vec3>();
             Buildingstoreys = new List<Buildingstorey>();
-            Components = new List<Component>();
+            Components = new Dictionary<string, Component>();
             Edges = new List<Edge>();
             OutingPolygons = new List<OutingPolygon>();
             UniComponents = new List<UniComponent>();
@@ -61,7 +61,15 @@ namespace THBimEngine.Domain.MidModel
                                 var elements = spatialStructure.RelatedElements;
                                 if (elements.Count == 0) continue;
                                 var ifcType = elements.First().ToString();
-                                buildingStorey.element_index_s = uniComponentIndex;
+                                var type = ifcType.Split('.').Last();
+                                var component = new Component(type, componentIndex);
+
+                                if (!Components.ContainsKey(type))
+                                {
+                                    Components.Add(type, component);
+                                    componentIndex++;
+                                }
+                                buildingStorey.element_index_s.Add(uniComponentIndex);
 
                                 foreach (var item in elements)
                                 {
@@ -71,18 +79,20 @@ namespace THBimEngine.Domain.MidModel
                                     {
                                         material = THBimMaterial.GetTHBimEntityMaterial(bimProject.PrjAllEntitys[uid].FriendlyTypeName, true);
                                     }
-                                    var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, buildingStorey);
-                                    UniComponents.Add(uniComponent);
+                                    var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, buildingStorey, component);
+                                    
 
                                     uniComponent.edge_ind_s = edgeIndex;
                                     uniComponent.tri_ind_s = triangleIndex;
                                     var triangles = allGeoModels[uid].FaceTriangles;
-                                    GetTrianglesAndEdges(triangles, allPoints, ref triangleIndex, ref edgeIndex, uniComponent.unique_id, ref ptIndex);
+                                    GetTrianglesAndEdges(triangles, allPoints, ref triangleIndex, ref edgeIndex, uniComponent, ref ptIndex);
                                     uniComponent.edge_ind_e = edgeIndex - 1;
                                     uniComponent.tri_ind_e = triangleIndex - 1;
+
+                                    UniComponents.Add(uniComponent);
                                 }
                             }
-                            buildingStorey.element_index_e = uniComponentIndex - 1;
+                            buildingStorey.element_index_e.Add(uniComponentIndex - 1);
                             Buildingstoreys.Add(buildingStorey);
                         }
                         else
@@ -97,23 +107,32 @@ namespace THBimEngine.Domain.MidModel
                                 var elements = spatialStructure.RelatedElements;
                                 if (elements.Count == 0) continue;
                                 var ifcType = elements.First().ToString();
-                                buildingStorey.element_index_s = uniComponentIndex;
+                                var type = ifcType.Split('.').Last();
+                                var component = new Component(type, componentIndex);
+
+                                if (!Components.ContainsKey(type))
+                                {
+                                    Components.Add(type, component);
+                                    componentIndex++;
+
+                                }
+                                buildingStorey.element_index_s.Add(uniComponentIndex);
                                 foreach (var item in elements)
                                 {
                                     var uid = item.EntityLabel.ToString();
                                     var material = THBimMaterial.GetTHBimEntityMaterial(bimProject.PrjAllEntitys[uid].FriendlyTypeName, true);
-                                    var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, buildingStorey);
+                                    var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, buildingStorey,component);
                                     UniComponents.Add(uniComponent);
 
                                     uniComponent.edge_ind_s = edgeIndex;
                                     uniComponent.tri_ind_s = triangleIndex;
                                     var triangles = allGeoModels[uid].FaceTriangles;
-                                    GetTrianglesAndEdges(triangles, allPoints, ref triangleIndex, ref edgeIndex, uniComponent.unique_id, ref ptIndex);
+                                    GetTrianglesAndEdges(triangles, allPoints, ref triangleIndex, ref edgeIndex, uniComponent, ref ptIndex);
                                     uniComponent.edge_ind_e = edgeIndex - 1;
                                     uniComponent.tri_ind_e = triangleIndex - 1;
                                 }
                             }
-                            buildingStorey.element_index_e = uniComponentIndex - 1;
+                            buildingStorey.element_index_e.Add(uniComponentIndex - 1);
                             Buildingstoreys.Add(buildingStorey);
                         }
 
@@ -127,13 +146,13 @@ namespace THBimEngine.Domain.MidModel
             foreach (var type in typeLs)
             {
                 var component = new Component(type, componentIndex);
-                Components.Add(component);
+                Components.Add(type, component);
                 componentIndex++;
             }
             foreach (var storey in storeys)
             {
                 var buildingStorey = new Buildingstorey(storey,ref buildingIndex);
-                buildingStorey.element_index_s[0] = uniComponentIndex;
+                buildingStorey.element_index_s.Add(uniComponentIndex);
 
                 foreach(var relation in storey.FloorEntityRelations.Values)
                 {
@@ -145,11 +164,11 @@ namespace THBimEngine.Domain.MidModel
                     uniComponent.edge_ind_s = edgeIndex;
                     uniComponent.tri_ind_s = triangleIndex;
                     var triangles = allGeoModels[relation.RelationElementUid].FaceTriangles;
-                    GetTrianglesAndEdges(triangles, allPoints, ref triangleIndex, ref edgeIndex, uniComponent.unique_id, ref ptIndex);
+                    GetTrianglesAndEdges(triangles, allPoints, ref triangleIndex, ref edgeIndex, uniComponent, ref ptIndex);
                     uniComponent.edge_ind_e = edgeIndex - 1;
                     uniComponent.tri_ind_e = triangleIndex - 1;
                 }
-                buildingStorey.element_index_e[0] = uniComponentIndex-1;
+                buildingStorey.element_index_e.Add(uniComponentIndex -1);
                 Buildingstoreys.Add(buildingStorey);
             }
         }
@@ -173,7 +192,7 @@ namespace THBimEngine.Domain.MidModel
             }
             cnt = Components.Count;
             writer.Write(cnt * 4);
-            foreach (var component in Components)
+            foreach (var component in Components.Values)
             {
                 component.WriteToFile(writer);
             }
@@ -260,12 +279,12 @@ namespace THBimEngine.Domain.MidModel
         }
 
         public void GetTrianglesAndEdges(List<FaceTriangle> triangles, List<PointNormal> allPoints, ref int triangleIndex, ref int edgeIndex,
-            int parentId, ref int ptIndex)
+            UniComponent uniComponent, ref int ptIndex)
         {
             foreach(var triangle in triangles)
             {
-                var outingPolygon = new OutingPolygon(triangle, allPoints, ref triangleIndex, parentId, ref ptIndex, Points);
-                var edges = GetEdges(outingPolygon, ref edgeIndex, parentId);
+                var outingPolygon = new OutingPolygon(triangle, allPoints, ref triangleIndex, uniComponent, ref ptIndex, Points);
+                var edges = GetEdges(outingPolygon, ref edgeIndex, uniComponent.unique_id);
                 OutingPolygons.Add(outingPolygon);
                 Edges.AddRange(edges);
             }

@@ -18,8 +18,8 @@ namespace THBimEngine.Domain.MidModel
 
 		public double depth;       // depth = z_r - z_l 深度值，由bbx决定
 		public double depth_t;     // z_len？？？？？？？？？？？？？？？？？？？？？？？？？
-		public double x_len;
-		public double y_len;
+		public double x_len=0;
+		public double y_len=0;
 		public double x_l, x_r;    // bbx信息
 		public double y_l, y_r;    // bbx信息	
 		public double z_l, z_r;    // bbx信息
@@ -46,7 +46,7 @@ namespace THBimEngine.Domain.MidModel
 			rgb = new double[3] { bimMaterial.KS_R, bimMaterial.KS_G, bimMaterial.KS_B };
 		}
 
-		public UniComponent(string uid, THBimMaterial bimMaterial, ref int uniComponentIndex, Buildingstorey buildingStorey) : base("", 0)
+		public UniComponent(string uid, THBimMaterial bimMaterial, ref int uniComponentIndex, Buildingstorey buildingStorey,Component component) : base("", 0)
 		{
 			unique_id = uniComponentIndex;
 			uniComponentIndex++;
@@ -55,6 +55,9 @@ namespace THBimEngine.Domain.MidModel
 			floor_name = buildingStorey.floor_name;
 			floor_num = buildingStorey.floorNo;
 			rgb = new double[3] { bimMaterial.KS_R, bimMaterial.KS_G, bimMaterial.KS_B };
+
+			name = component.name;
+			type_id = component.type_id;
 		}
 
 		public new void WriteToFile(BinaryWriter writer)

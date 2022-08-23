@@ -7,6 +7,7 @@
         xmlns:etb="clr-namespace:XbimXplorer.EditableTextBlock"
         xmlns:avalonDock="http://schemas.xceed.com/wpf/xaml/avalondock"
         xmlns:viewModels="clr-namespace:Xbim.Ifc.ViewModels;assembly=Xbim.Ifc"
+        xmlns:thGControl="clr-namespace:THBimEngine.Presention;assembly=THBimEngine.Presention"
         AllowsTransparency="False"
         Title="TianHua Bim Xplorer"
         Height="600"
@@ -61,6 +62,15 @@
                 <TextBlock Grid.Column="1" Text="{Binding Name}"/>
             </Grid>
         </DataTemplate>
+
+        <Style x:Key="TempHostStyle" TargetType="{x:Type WindowsFormsHost}">
+            <Style.Setters>
+                <Setter Property="Margin" Value="22,0,0,0"></Setter>
+                <Setter Property="HorizontalAlignment" Value="Left"></Setter>
+                <Setter Property="VerticalAlignment" Value="Stretch"></Setter>
+                <Setter Property="Background" Value="Transparent"></Setter>
+            </Style.Setters>
+        </Style>
     </Window.Resources>
 
     <Window.CommandBindings>
@@ -178,23 +188,40 @@
                       VerticalContentAlignment="Center"
                       HorizontalContentAlignment="Center"></MenuItem>
         </Menu>
+        <Grid Grid.Row="1" x:Name="mainGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal" Background="Transparent"  HorizontalAlignment="Left" VerticalAlignment="Stretch" Panel.ZIndex="100000001">
+                <TabControl TabStripPlacement="Left" Margin="-2,0,0,0" Background="Transparent" 
+                            BorderThickness="0" SelectionChanged="TabControl_SelectionChanged" Panel.ZIndex="1000000001"
+                            x:Name="leftTabControl" ItemsSource="{Binding LeftTabItems}"
+                            VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch">
+                    <TabControl.ItemContainerStyle>
+                        <Style TargetType="{x:Type TabItem}">
+                            <Setter Property="Header" Value="{Binding ItemHead}" />
+                            <Setter Property="Content" Value=""></Setter>
+                        </Style>
+                    </TabControl.ItemContainerStyle>
+                </TabControl>
+            </StackPanel>
 
-        <avalonDock:DockingManager Grid.Row="1" x:Name="DockingManager">
-            <avalonDock:LayoutRoot>
-                <avalonDock:LayoutPanel x:Name="MainPanel" Orientation="Horizontal">
-                    <avalonDock:LayoutAnchorablePaneGroup DockWidth="150" Orientation="Vertical">
-                        <avalonDock:LayoutAnchorablePane >
-                            <avalonDock:LayoutAnchorable Title="Spatial view" CanClose="False" CanHide="False">
-                                <xbim:XbimTreeview x:Name="SpatialControl"    
+            <avalonDock:DockingManager Grid.Column="0" x:Name="DockingManager" Margin="25,0,0,0">
+                <avalonDock:LayoutRoot>
+                    <avalonDock:LayoutPanel x:Name="MainPanel" Orientation="Horizontal">
+                        <!--<avalonDock:LayoutAnchorablePaneGroup DockWidth="150" Orientation="Vertical">
+                            <avalonDock:LayoutAnchorablePane >
+                                <avalonDock:LayoutAnchorable Title="Spatial view" CanClose="False" CanHide="False">
+                                    <xbim:XbimTreeview x:Name="SpatialControl"    
                             Indentation="10"
                             BorderThickness="1"
                             Model="{Binding}"  
                             SelectedEntity="{Binding Path=SelectedItem, ElementName=MainWindow, Mode=TwoWay}"
                             SelectionMode="Single"
                             MouseDoubleClick="SpatialControl_MouseDoubleClick"  FontSize="10" />
-                            </avalonDock:LayoutAnchorable>
-                            <avalonDock:LayoutAnchorable Title="Groups" CanClose="False" >
-                                <xbim:XbimTreeview x:Name="GroupControl"    
+                                </avalonDock:LayoutAnchorable>
+                                <avalonDock:LayoutAnchorable Title="Groups" CanClose="False" >
+                                    <xbim:XbimTreeview x:Name="GroupControl"    
                             ViewDefinition ="Groups"
                             Indentation="10"
                             BorderThickness="1"
@@ -202,26 +229,40 @@
                             SelectedEntity="{Binding Path=SelectedItem, ElementName=MainWindow, Mode=TwoWay}"
                             SelectionMode="Single"
                             MouseDoubleClick="SpatialControl_MouseDoubleClick"  FontSize="10" />
-                            </avalonDock:LayoutAnchorable>
-                        </avalonDock:LayoutAnchorablePane>
-                        <avalonDock:LayoutAnchorablePane>
-                            <avalonDock:LayoutAnchorable Title="Properties" CanClose="False" >
-                                <xbim:IfcMetaDataControl x:Name="PropertiesControl" BorderThickness="1" Grid.Row="2"  
+                                </avalonDock:LayoutAnchorable>
+                            </avalonDock:LayoutAnchorablePane>
+                            <avalonDock:LayoutAnchorablePane>
+                                <avalonDock:LayoutAnchorable Title="Properties" CanClose="False" >
+                                    <xbim:IfcMetaDataControl x:Name="PropertiesControl" BorderThickness="1" Grid.Row="2"  
                                                          SelectedEntity="{Binding Path=SelectedItem, ElementName=MainWindow, Mode=TwoWay}"
                                                          Model="{Binding}" />
-                            </avalonDock:LayoutAnchorable>
-                        </avalonDock:LayoutAnchorablePane>
-                    </avalonDock:LayoutAnchorablePaneGroup>
-                    <avalonDock:LayoutDocumentPane x:Name="MainDocPane">
-                        <avalonDock:LayoutDocument  CanClose="False" Title="3D View">
-                            <Grid Background="White" x:Name ="GridEngine" GotFocus="GridEngine_GotFocus">
+                                </avalonDock:LayoutAnchorable>
+                            </avalonDock:LayoutAnchorablePane>
+                        </avalonDock:LayoutAnchorablePaneGroup>-->
+                        <avalonDock:LayoutDocumentPane x:Name="MainDocPane">
+                            <avalonDock:LayoutDocument  CanClose="False" Title="3D View">
+                                <Grid>
+                                    <WindowsFormsHost x:Name="winFormHost" Background="White">
+                                        <thGControl:GLControl BackColor="White"/>
+                                    </WindowsFormsHost>
+                                    <WindowsFormsHost x:Name="winFormHost1"  Width="150"  Background="Transparent" HorizontalAlignment="Right" VerticalAlignment="Top" Visibility="Collapsed">
+                                        <ElementHost>
+                                            <StackPanel Orientation="Vertical" Background="Red" Margin="0,0,0,10">
+                                                <Button Content="11111"></Button>
+                                                <Button Content="11111"></Button>
+                                                <Button Content="11111"></Button>
+                                            </StackPanel>
+                                        </ElementHost>
+                                    </WindowsFormsHost>
+                                </Grid>
 
-                            </Grid>
-                        </avalonDock:LayoutDocument>
-                    </avalonDock:LayoutDocumentPane>
-                </avalonDock:LayoutPanel>
-            </avalonDock:LayoutRoot>
-        </avalonDock:DockingManager>
+                            </avalonDock:LayoutDocument>
+                        </avalonDock:LayoutDocumentPane>
+                    </avalonDock:LayoutPanel>
+                </avalonDock:LayoutRoot>
+            </avalonDock:DockingManager>
+        </Grid>
+        
 
         <Grid Grid.Row="2" Margin="0,5" x:Name="CommandBox" Visibility="Collapsed" >
             <Grid.ColumnDefinitions>

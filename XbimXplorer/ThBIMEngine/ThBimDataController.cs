@@ -31,7 +31,6 @@ namespace XbimXplorer.ThBIMEngine
                 if (null != convertResult) 
                 {
                     convertResult.BimProject.HaveChange = true;
-                    THBimScene.Instance.AllBimProjects.Add(convertResult.BimProject);
                     THBimScene.Instance.UpdateCatchStoreyRelation();
                     WriteToMidDataByFloor();
                 }
@@ -63,17 +62,13 @@ namespace XbimXplorer.ThBIMEngine
             var readGeomtry = new IfcStoreReadGeomtry();
             var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out allGeoPointNormals);
             bimProject.AddGeoMeshModels(allGeoModels, allGeoPointNormals);
-            THBimScene.Instance.AllBimProjects.Add(bimProject);
-            //出来的数据是包含Mesh的，后续不需要创建Solid的步骤了
-            //var convertResult = convertFactory.ProjectConvert(ifcStore,false);
-            //if (null != convertResult)
-            //{
-            //    THBimScene.Instance.AllBimProjects.Add(convertResult.BimProject);
-            //    AddProjectEntitys(convertResult.ProjectEntitys);
-            //}
+            THBimScene.Instance.AddProject(bimProject);
             WriteToMidDataByFloor();
         }
-
+        public Dictionary<string, object> GetSelectEntityProperties(int index) 
+        {
+            return THBimScene.Instance.SelectEntityProperties(index);
+        }
         public void DeleteProject()
         {
 
@@ -334,7 +329,6 @@ namespace XbimXplorer.ThBIMEngine
                 if (string.IsNullOrEmpty(pid) || !building.BuildingStoreys.ContainsKey(pid))
                     continue;
                 entityKeyValue.Value.Id = idOffSet;
-                //THBimScene.Instance.AllEntitys.Add(entity.Uid, entity);
                 foreach (var storeyKeyValue in building.BuildingStoreys)
                 {
                     var storey = storeyKeyValue.Value;
@@ -354,16 +348,7 @@ namespace XbimXplorer.ThBIMEngine
                 }
             }
         }
-        //private void AddEntitys(Dictionary<string, THBimEntity> addEntitys)
-        //{
-        //    var idOffSet = LastEntityIntId() + 1;
-        //    foreach (var entityKeyValue in addEntitys)
-        //    {
-        //        var entity = entityKeyValue.Value;
-        //        entityKeyValue.Value.Id = idOffSet;
-        //        THBimScene.Instance.AllEntitys.Add(entity.Uid, entity);
-        //    }
-        //}
+        
         private void UpdateEntitys(Dictionary<string, THBimEntity> updateEntitys)
         {
             if (null == updateEntitys || updateEntitys.Count < 1)
@@ -401,21 +386,6 @@ namespace XbimXplorer.ThBIMEngine
                 return;
             convertFactory.CreateSolidMesh(updateEntitys);
         }
-        //private void AddProjectEntitys(Dictionary<string, THBimEntity> addBimEntitys) 
-        //{
-        //    int idOffset = LastEntityIntId() + 1;
-        //    foreach (var keyValue in addBimEntitys) 
-        //    {
-        //        keyValue.Value.Id += idOffset;
-        //        THBimScene.Instance.AllEntitys.Add(keyValue.Key, keyValue.Value);
-        //    }
-        //}
-        //private int LastEntityIntId() 
-        //{
-        //    int idOffset = 0;
-        //    if (THBimScene.Instance.AllEntitys.Count > 0)
-        //        idOffset = THBimScene.Instance.AllEntitys.Last().Value.Id;
-        //    return idOffset;
-        //}
+        
     }
 }

@@ -14,7 +14,6 @@ namespace THBimEngine.Geometry
         /// </summary>
         /// <param name="s0"></param>
         /// <param name="dir1"></param>
-        /// <param name="isRay"></param>
         /// <param name="s1"></param>
         /// <param name="dir2"></param>
         /// <param name="intersectionPoint"></param>

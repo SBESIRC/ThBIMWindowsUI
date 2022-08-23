@@ -47,6 +47,8 @@ using XbimXplorer.ThBIMEngine;
 using THBimEngine.Domain.Model;
 using System.IO.Pipes;
 using ProtoBuf;
+using System.Windows.Media;
+using XbimXplorer.LeftTabItme;
 #endregion
 
 namespace XbimXplorer
@@ -143,7 +145,7 @@ namespace XbimXplorer
             backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
             backgroundWorker.RunWorkerAsync();
 
-            
+           
         }
 
         #region 接收数据并解析数据渲染
@@ -203,38 +205,12 @@ namespace XbimXplorer
         #endregion
         private void DispatcherTimer_Tick(object sender, EventArgs e)
 		{
-            if (_geoIndexIfcIndexMap == null || _geoIndexIfcIndexMap.Count < 1)
-                return;
             var selectId = ExampleScene.GetCurrentCompID();
             if (selectId < 0)
                 return;
-            var ifcIndex = _geoIndexIfcIndexMap[selectId];
-            if (_selectIndex == ifcIndex)
-                return;
-            if (Mouse.LeftButton == MouseButtonState.Pressed || Mouse.RightButton == MouseButtonState.Pressed
-                || Mouse.MiddleButton == MouseButtonState.Pressed || Mouse.XButton1 == MouseButtonState.Pressed ||
-                Mouse.XButton2 == MouseButtonState.Pressed)
-                return;
-            _selectIndex = ifcIndex;
-            if (Model.IsFederation)
-            {
-                int count = 0;
-                foreach (var item in Model.ReferencedModels) 
-                {
-                    var thisCount = item.Model.Instances.Count();
-                    count += thisCount;
-                    if (count < ifcIndex)
-                        continue;
-                    var realIndex = ifcIndex - count + thisCount;
-                    SelectedItem = item.Model.Instances[realIndex];
-                    break;
-                }
-            }
-            else 
-            {
-                SelectedItem = Model.Instances[ifcIndex];
-            }
-            
+            //var pro = bimDataController.GetSelectEntityProperties(selectId);
+
+
         }
         
         public Visibility DeveloperVisible => Settings.Default.DeveloperMode 
@@ -274,11 +250,11 @@ namespace XbimXplorer
 
         void XplorerMainWindow_Closing(object sender, CancelEventArgs e)
         {
-            var glControl = GetEnginWindowGLControl();
-            if (glControl != null)
-            {
-                Win32.CloseRender(glControl.Handle);
-            }
+            //var glControl = GetEnginWindowGLControl();
+            //if (glControl != null)
+            //{
+            //    Win32.CloseRender(glControl.Handle);
+            //}
             if(null != backgroundWorker) 
             {
                 backgroundWorker.Dispose();
@@ -306,7 +282,11 @@ namespace XbimXplorer
             var hier = LogManager.GetRepository() as Hierarchy;
             hier?.Root.AddAppender(_appender);
 
-            InitGLControl();
+            //GMap.NET.WindowsForms.GMapControl mapControl = new GMap.NET.WindowsForms.GMapControl();
+            //winFormHost.Child = mapControl;
+
+            //InitGLControl();
+            InitLeftTabItemValues();
         }
 
         private void XplorerMainWindow_Closed(object sender, EventArgs e)
@@ -445,7 +425,7 @@ namespace XbimXplorer
             _dispatcherTimer.Stop();
             _selectIndex = -1;
             _geoIndexIfcIndexMap.Clear();
-            InitGLControl();
+            //InitGLControl();
             var ext = fInfo.Extension.ToLower();
             if (ext == ".midfile")
             {
@@ -1307,14 +1287,6 @@ namespace XbimXplorer
             //{
             //    DrawingControl.SelectionColor = Colors.Blue;
             //}
-
-
-        }
-        private void formHost_Initialized(object sender, EventArgs e)
-        {
-            var glControl = new GLControl();
-            glControl.SwapBuffers();
-            (sender as WindowsFormsHost).Child = glControl;
         }
 		private void LoadIfcFile(string path)
 		{
@@ -1322,7 +1294,7 @@ namespace XbimXplorer
             StatusMsg.Text = "";
             //if (string.IsNullOrEmpty(path))
             //	return;
-            var formHost = GridEngine.Children[0] as WindowsFormsHost;
+            var formHost = winFormHost;
 			var childConrol = formHost.Child as GLControl;
 			childConrol.EnableNativeInput();
 			childConrol.MakeCurrent();
@@ -1330,41 +1302,83 @@ namespace XbimXplorer
             _dispatcherTimer.Start();
             ExampleScene.Render();
 		}
-        private GLControl GetEnginWindowGLControl() 
-        {
-            if (GridEngine.Children.Count < 1)
-                return null;
-            var formHost = GridEngine.Children[0] as WindowsFormsHost;
-            var childControl = formHost.Child as GLControl;
-            return childControl;
-        }
-        private void InitGLControl()
-        {
-            if (GridEngine.Children.Count > 0)
-            {
-                return;
-            }
-            WindowsFormsHost windowsForm = new WindowsFormsHost();
-            windowsForm.Name = "formHost";
-            windowsForm.Initialized += formHost_Initialized;
-            GridEngine.Children.Add(windowsForm);
-        }
-		private void GridEngine_GotFocus(object sender, RoutedEventArgs e)
-		{
-            var grid = sender as Grid;
-            if (grid.Children.Count < 1)
-                return;
-            var formsHost = grid.Children[0] as WindowsFormsHost;
-            if (formsHost.Child == null)
-                return;
-            var glControl = formsHost.Child as GLControl;
-            glControl.Focus();
-		}
         private void MenuItem_Click_2(object sender, RoutedEventArgs e)
         {
             bimDataController.ClearAllProject();
             //ExampleScene.ifcre_clear_model_data();
             //LoadIfcFile(_tempMidFileName);
+        }
+        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var tab = sender as TabControl;
+            if (tab.SelectedItem != null)
+            {
+                var tabSelect = tab.SelectedItem as LeftTabItemBtn;
+                tabSelect.PanelControl.Visibility = Visibility.Visible;
+                var winHost = GetOrAddLeftHost();
+                if (winHost.Child != null)
+                {
+                    var tempHost = winHost.Child as ElementHost;
+                    tempHost.Child = null;
+                    tempHost.Dispose();
+                    winHost.Child = null;
+                }
+                ElementHost elementHost = new ElementHost();
+                elementHost.Child = tabSelect.PanelControl;
+                elementHost.Child.IsVisibleChanged += Child_IsVisibleChanged;
+                winHost.Child = elementHost;
+            }
+        }
+        private void Child_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if ((bool)e.NewValue)
+                return;
+            var winHost = GetOrAddLeftHost();
+            if (winHost.Child == null)
+                return;
+            var elemHost = (winHost.Child as ElementHost);
+            if (elemHost.Child == null)
+                return;
+            bool isClose = false;
+            if (leftTabControl.SelectedItem != null) 
+            {
+                var tabSelect = leftTabControl.SelectedItem as LeftTabItemBtn;
+                isClose = tabSelect.PanelControl == elemHost.Child;
+            }
+            elemHost.Child.IsVisibleChanged -= Child_IsVisibleChanged;
+            elemHost.Child = null;
+            elemHost.Dispose();
+            winHost.Child = null;
+            if(isClose)
+                leftTabControl.SelectedItem = null;
+        }
+        WindowsFormsHost GetOrAddLeftHost() 
+        {
+            var winFormName = "TempShowFormHost";
+            WindowsFormsHost winHost = null;
+            foreach (var item in mainGrid.Children)
+            {
+                if (item is WindowsFormsHost host)
+                {
+                    if (host.Name == winFormName)
+                    {
+                        winHost = host;
+                    }
+                }
+            }
+            if (winHost == null)
+            {
+                winHost = new WindowsFormsHost();
+                winHost.Name = winFormName;
+                winHost.Style = this.Resources["TempHostStyle"] as Style;
+                mainGrid.Children.Add(winHost);
+            }
+            return winHost;
+        }
+        void InitLeftTabItemValues() 
+        {
+            MainViewModel mainViewModel = new MainViewModel();
+            leftTabControl.DataContext = mainViewModel;
         }
     }
 }

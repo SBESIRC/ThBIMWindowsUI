@@ -198,25 +198,21 @@ namespace THBimEngine.Domain
             PrjAllStoreys.Clear();
 			PrjAllRelations.Clear();
 			PrjAllEntitys.Clear();
-			if (ProjectSite == null || ProjectSite.SiteBuildings.Count<1)
-				return;
-			foreach (var build in ProjectSite.SiteBuildings)
+			var storeys = this.ProjectAllStorey();
+			foreach (var storey in storeys)
 			{
-				foreach (var storeyKeyValue in build.Value.BuildingStoreys)
+				PrjAllStoreys.Add(storey.Uid, storey);
+				foreach (var relation in storey.FloorEntityRelations)
 				{
-					PrjAllStoreys.Add(storeyKeyValue.Key, storeyKeyValue.Value);
-					foreach (var relation in storeyKeyValue.Value.FloorEntityRelations)
-					{
-						if (PrjAllRelations.ContainsKey(relation.Key))
-							continue;
-						PrjAllRelations.Add(relation.Key, relation.Value);
-					}
-					foreach (var relation in storeyKeyValue.Value.FloorEntitys)
-					{
-						if (PrjAllEntitys.ContainsKey(relation.Key))
-							continue;
-						PrjAllEntitys.Add(relation.Key, relation.Value);
-					}
+					if (PrjAllRelations.ContainsKey(relation.Key))
+						continue;
+					PrjAllRelations.Add(relation.Key, relation.Value);
+				}
+				foreach (var relation in storey.FloorEntitys)
+				{
+					if (PrjAllEntitys.ContainsKey(relation.Key))
+						continue;
+					PrjAllEntitys.Add(relation.Key, relation.Value);
 				}
 			}
 		}

@@ -19,7 +19,7 @@ namespace THBimEngine.Domain
 			AllRelations = new Dictionary<string, THBimElementRelation>();
 			AllGeoModels = new List<GeometryMeshModel>();
 			AllGeoPointNormals = new List<PointNormal>();
-			MeshEntiyRelationIndexs = new Dictionary<int, string>();
+			MeshEntiyRelationIndexs = new Dictionary<int, MeshEntityIdentifier>();
 			UnShowEntityTypes = new List<string>();
 		}
 		public static readonly THBimScene Instance = new THBimScene();
@@ -49,7 +49,14 @@ namespace THBimEngine.Domain
 		/// 所有物体的顶点集合
 		/// </summary>
 		public List<PointNormal> AllGeoPointNormals { get; }
-		Dictionary<int, string> MeshEntiyRelationIndexs { get; }//relationId
+		Dictionary<int, MeshEntityIdentifier> MeshEntiyRelationIndexs { get; }//relationId
+		
+		public void AddProject(THBimProject project) 
+		{
+			if(project.SourceProject is IfcStore)
+				project.UpdateCatchStoreyRelation();
+			this.AllBimProjects.Add(project);
+		}
 		public void ClearAllData() 
 		{
 			AllBimProjects.Clear();
@@ -141,6 +148,7 @@ namespace THBimEngine.Domain
 						for (int i = 0; i < tr.ptIndex.Count; i++)
 							tr.ptIndex[i] += ptOffSet;
 					}
+					MeshEntiyRelationIndexs.Add(item.CIndex, new MeshEntityIdentifier(item.CIndex, project.ProjectIdentity, item.EntityLable));
 					gOffSet += 1;
 				}
 				meshResult.AllGeoPointNormals.AddRange(points);
@@ -150,14 +158,40 @@ namespace THBimEngine.Domain
 			AllGeoPointNormals.AddRange(meshResult.AllGeoPointNormals);
 			AllGeoModels.AddRange(meshResult.AllGeoModels);
 		}
+		public Dictionary<string, object> SelectEntityProperties(int index) 
+		{
+			var properties = new Dictionary<string, object>();
+			if (index < 0)
+				return properties;
+			var meshRelation = MeshEntiyRelationIndexs[index];
+			foreach (var project in AllBimProjects) 
+			{
+				if (project.ProjectIdentity != meshRelation.ProjectId)
+					continue;
+				if (project.SourceProject != null && project.SourceProject is IfcStore ifcStore)
+				{
+					var ifcLable = Convert.ToInt32(meshRelation.GlobalMeshIndex);
+					var ifcEntity = ifcStore.Instances[ifcLable];
+				}
+				else 
+				{
+					var relaton = project.PrjAllRelations[meshRelation.ProjectEntityId];
+					var entity = project.PrjAllEntitys[relaton.RelationElementUid];
+					foreach (var item in entity.Properties) 
+					{
+						properties.Add(item.Key,item.Value);
+					}
+				}
+			}
+			return properties;
+		}
 		private void CheckUpdateCatchMesh()
 		{
 			foreach (var project in AllBimProjects)
 			{
-				if (project.HaveChange)
-				{
-					project.UpdataGeometryMeshModel();
-				}
+				if (!project.HaveChange)
+					continue;
+				project.UpdataGeometryMeshModel();
 			}
 		}
 	}
@@ -169,6 +203,19 @@ namespace THBimEngine.Domain
 		{
 			AllGeoModels = new List<GeometryMeshModel>();
 			AllGeoPointNormals = new List<PointNormal>();
+		}
+	}
+
+	public class MeshEntityIdentifier 
+	{
+		public int GlobalMeshIndex { get;  }
+		public string ProjectId { get;  }
+		public string ProjectEntityId { get; }
+		public MeshEntityIdentifier(int meshGId,string prjectId,string entityId) 
+		{
+			GlobalMeshIndex = meshGId;
+			ProjectId = prjectId;
+			ProjectEntityId = entityId;
 		}
 	}
 }

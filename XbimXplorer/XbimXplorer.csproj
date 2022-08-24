@@ -310,6 +310,7 @@
     </Compile>
     <Compile Include="EditableTextBlock\EditableTextBlock.cs" />
     <Compile Include="EditableTextBlock\EditableTextBlockAdorner.cs" />
+    <Compile Include="LeftTabItme\FilterViewModel.cs" />
     <Compile Include="LeftTabItme\LeftTabControls\MainFilterUControl.xaml.cs">
       <DependentUpon>MainFilterUControl.xaml</DependentUpon>
     </Compile>

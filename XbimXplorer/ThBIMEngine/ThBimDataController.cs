@@ -262,7 +262,6 @@ namespace XbimXplorer.ThBIMEngine
             DateTime end = DateTime.Now;
             var totalTime = (end - start).TotalSeconds;
         }
-        
         private bool IsAddProject(string prjIdentity) 
         {
             bool isAdd = true;

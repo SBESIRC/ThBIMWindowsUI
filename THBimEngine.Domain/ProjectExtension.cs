@@ -103,6 +103,26 @@ namespace THBimEngine.Domain
                     {
                         realName = "梁";
                     }
+                    else if (name.Contains("slab"))
+                    {
+                        realName = "板";
+                    }
+                    else if (name.Contains("column"))
+                    {
+                        realName = "柱";
+                    }
+                    else if (name.Contains("door"))
+                    {
+                        realName = "门";
+                    }
+                    else if (name.Contains("window"))
+                    {
+                        realName = "窗";
+                    }
+                    else if (name.Contains("openging"))
+                    {
+                        realName = "洞口";
+                    }
                     if (resTypes.ContainsKey(realName))
                     {
                         resTypes[realName].Add(item);
@@ -249,41 +269,61 @@ namespace THBimEngine.Domain
 
         public static void PorjectFilterEntitys(this THBimProject project,List<FilterBase> allFilters) 
         {
+            int validFilterCount = 0;
             foreach (var filter in allFilters)
             {
                 filter.CheckProject(project);
             }
             if (project.SourceProject != null && project.SourceProject is IfcStore ifcStore)
             {
-                //var ifcProject = ifcStore.Instances.FirstOrDefault<IIfcProject>();
-                //if (ifcProject.Sites == null || ifcProject.Sites.Count() < 1)
-                //    return;
-                //var site = ifcProject.Sites.First();
-                //foreach (var building in site.Buildings)
-                //{
-                //    foreach (var ifcStorey in building.BuildingStoreys)
-                //    {
-                //        var storey = ifcStorey as Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey;
-                //        foreach (var spatialStructure in storey.ContainsElements)
-                //        {
-                //            var elements = spatialStructure.RelatedElements;
-                //            if (elements.Count == 0)
-                //                continue;
-                //            foreach (var item in elements)
-                //            {
-                //                var ifcType = item.GetType();
-                //                if (!types.Contains(ifcType))
-                //                    types.Add(ifcType);
-                //            }
-                //        }
-                //    }
-                //}
+                var ifcProject = ifcStore.Instances.FirstOrDefault<IIfcProject>();
+                if (ifcProject.Sites == null || ifcProject.Sites.Count() < 1)
+                    return;
+                var site = ifcProject.Sites.First();
+                foreach (var building in site.Buildings)
+                {
+                    foreach (var ifcStorey in building.BuildingStoreys)
+                    {
+                        var storeyId = ifcStorey.GlobalId;
+                        var storey = project.PrjAllStoreys[storeyId];
+                        validFilterCount = 0;
+                        foreach (var filter in allFilters)
+                        {
+                            if (!filter.ProjectValid)
+                                continue;
+                            filter.CheckStory(storey);
+                            if (filter.StoreyValid)
+                                validFilterCount += 1;
+                        }
+                        if (validFilterCount < 1)
+                            continue;
+                        foreach (var spatialStructure in ifcStorey.ContainsElements)
+                        {
+                            var elements = spatialStructure.RelatedElements;
+                            if (elements.Count == 0)
+                                continue;
+                            foreach (var item in elements)
+                            {
+                                var ifcType = item.GetType();
+                                foreach (var filter in allFilters)
+                                {
+                                    if (!filter.ProjectValid)
+                                        continue;
+                                    if (!filter.StoreyValid)
+                                        continue;
+                                    if (filter.CheckType(ifcType))
+                                        filter.ResultElementUids.Add(item.EntityLabel.ToString());
+                                }
+                            }
+                        }
+                    }
+                }
             }
             else 
             {
                 if (project.ProjectSite == null || project.ProjectSite.SiteBuildings.Count < 1)
                     return;
-                int validFilterCount = 0;
+                validFilterCount = 0;
                 foreach (var building in project.ProjectSite.SiteBuildings)
                 {
                     foreach (var filter in allFilters)

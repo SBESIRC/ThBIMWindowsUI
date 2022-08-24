@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace THBimEngine.Domain
 {
-    public abstract class FilterBase 
+    public abstract class FilterBase: ICloneable
     {
         public string Describe { get; set; }
         protected HashSet<string> acceptProjectIds{ get; }
@@ -65,6 +66,15 @@ namespace THBimEngine.Domain
             var type = bimEntity.GetType();
             return acceptElementTypes.Contains(type);
         }
+
+        public virtual bool CheckType(Type type)
+        {
+            if (acceptElementTypes.Count < 1)
+                return true;
+            return acceptElementTypes.Contains(type);
+        }
+
+        public abstract object Clone();
     }
     public class ProjectFilter : FilterBase
     {
@@ -76,6 +86,12 @@ namespace THBimEngine.Domain
         {
             AcceptProjectIds(prjIds);
         }
+
+        public override object Clone()
+        {
+            throw new NotImplementedException();
+        }
+
         void AcceptProjectIds(List<string> prjIds)
         {
             if (null == prjIds || prjIds.Count < 1)
@@ -98,6 +114,13 @@ namespace THBimEngine.Domain
         {
             AcceptSiteIds(storeyIds);
         }
+
+        public override object Clone()
+        {
+            var storeyFilter = new StoreyFilter(this.acceptStoreyIds.ToList());
+            return storeyFilter;
+        }
+
         void AcceptSiteIds(List<string> storeyIds)
         {
             if (null == storeyIds || storeyIds.Count < 1)
@@ -120,6 +143,13 @@ namespace THBimEngine.Domain
         {
             AcceptTypes(targetTypes);
         }
+
+        public override object Clone()
+        {
+            var filter = new TypeFilter(this.acceptElementTypes.ToList());
+            return filter;
+        }
+
         void AcceptTypes(List<Type> targetTypes) 
         {
             if (null == targetTypes || targetTypes.Count < 1)

@@ -1,10 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Xbim.Common.Geometry;
-using Xbim.Common.XbimExtensions;
 using Xbim.Ifc;
 
 namespace THBimEngine.Domain
@@ -49,7 +44,7 @@ namespace THBimEngine.Domain
 		/// 所有物体的顶点集合
 		/// </summary>
 		public List<PointNormal> AllGeoPointNormals { get; }
-		Dictionary<int, MeshEntityIdentifier> MeshEntiyRelationIndexs { get; }//relationId
+		public Dictionary<int, MeshEntityIdentifier> MeshEntiyRelationIndexs { get; }//relationId
 		
 		public void AddProject(THBimProject project) 
 		{

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Xbim.Ifc;
 using Xbim.Ifc4.Interfaces;
 
@@ -8,7 +9,7 @@ namespace THBimEngine.Domain.MidModel
 {
     public class TempModel
     {
-        public List<vec3> Points; 
+        public List<Vec3> Points; 
         public List<Buildingstorey> Buildingstoreys;
         public Dictionary<string,Component> Components;
         public List<Edge> Edges;
@@ -17,7 +18,7 @@ namespace THBimEngine.Domain.MidModel
 
         public TempModel()
         {
-            Points = new List<vec3>();
+            Points = new List<Vec3>();
             Buildingstoreys = new List<Buildingstorey>();
             Components = new Dictionary<string, Component>();
             Edges = new List<Edge>();
@@ -53,6 +54,8 @@ namespace THBimEngine.Domain.MidModel
                         {
                             var storey = ifcStorey as Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey;
                             var buildingStorey = new Buildingstorey(storey, ref buildingIndex);
+                            buildingStorey.element_index_s.Add(uniComponentIndex);
+
                             var height = GetIfcStoreyHeight(storey);
                             buildingStorey.height = height;
                             buildingStorey.top_elevation += height;
@@ -69,7 +72,6 @@ namespace THBimEngine.Domain.MidModel
                                     Components.Add(type, component);
                                     componentIndex++;
                                 }
-                                buildingStorey.element_index_s.Add(uniComponentIndex);
 
                                 foreach (var item in elements)
                                 {
@@ -120,14 +122,24 @@ namespace THBimEngine.Domain.MidModel
                                 foreach (var item in elements)
                                 {
                                     var uid = item.EntityLabel.ToString();
-                                    var material = THBimMaterial.GetTHBimEntityMaterial(bimProject.PrjAllEntitys[uid].FriendlyTypeName, true);
+                                    var material = THBimMaterial.GetTHBimEntityMaterial("Default", true);
+                                    if (bimProject.PrjAllEntitys.ContainsKey(uid))
+                                        material = THBimMaterial.GetTHBimEntityMaterial(bimProject.PrjAllEntitys[uid].FriendlyTypeName, true);
                                     var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, buildingStorey,component);
                                     UniComponents.Add(uniComponent);
 
                                     uniComponent.edge_ind_s = edgeIndex;
                                     uniComponent.tri_ind_s = triangleIndex;
-                                    var triangles = allGeoModels[uid].FaceTriangles;
-                                    GetTrianglesAndEdges(triangles, allPoints, ref triangleIndex, ref edgeIndex, uniComponent, ref ptIndex);
+                                    if(allGeoModels.ContainsKey(uid))
+                                    {
+                                        var triangles = allGeoModels[uid].FaceTriangles;
+                                        GetTrianglesAndEdges(triangles, allPoints, ref triangleIndex, ref edgeIndex, uniComponent, ref ptIndex);
+                                    }
+                                    else
+                                    {
+                                        ;
+                                    }
+    
                                     uniComponent.edge_ind_e = edgeIndex - 1;
                                     uniComponent.tri_ind_e = triangleIndex - 1;
                                 }
@@ -135,7 +147,6 @@ namespace THBimEngine.Domain.MidModel
                             buildingStorey.element_index_e.Add(uniComponentIndex - 1);
                             Buildingstoreys.Add(buildingStorey);
                         }
-
                     }
                 }
                 return;
@@ -175,39 +186,51 @@ namespace THBimEngine.Domain.MidModel
 
         public void WriteMidFile()
         {
-            string fileName = Path.Combine(System.IO.Path.GetTempPath(), "BimEngineData.txt");
+            string fileName = Path.Combine(System.IO.Path.GetTempPath(), "BimEngineData.get");
             FileStream fileStream = new FileStream(fileName,FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
-            BinaryWriter writer = new BinaryWriter(fileStream);
+            BinaryWriter writer = new BinaryWriter(fileStream,Encoding.UTF8);
             int cnt = OutingPolygons.Count;
-            writer.Write(cnt * 4);
+            writer.Write(cnt);
             foreach (var trangle in OutingPolygons)
             {
                 trangle.WriteToFile(writer, Points);
             }
+            //writer.Write("triaOK".ToCharArray());
             cnt = Edges.Count;
-            writer.Write(cnt * 4);
+            writer.Write(cnt);
             foreach (var edge in Edges)
             {
                 edge.WriteToFile(writer, Points);
             }
+            //writer.Write("edgeOK".ToCharArray());
             cnt = Components.Count;
-            writer.Write(cnt * 4);
+            writer.Write(cnt);
             foreach (var component in Components.Values)
             {
                 component.WriteToFile(writer);
             }
+            //writer.Write("compOK".ToCharArray());
             cnt = UniComponents.Count;
-            writer.Write(cnt * 4);
+            writer.Write(cnt);
             foreach (var uniComponent in UniComponents)
             {
                 uniComponent.WriteToFile(writer);
             }
+            //writer.Write("unicOK".ToCharArray());
             cnt = Buildingstoreys.Count;
-            writer.Write(cnt * 4);
+            writer.Write(cnt);
+            int index = 0;
             foreach (var storey in Buildingstoreys)
             {
+                if(index==12)
+                {
+                    ;
+                }
                 storey.WriteToFile(writer);
+                index++;
             }
+            //writer.Write("storOK".ToCharArray());
+            writer.Close();
         }
 
         public double GetIfcStoreyHeight(Xbim.Ifc4.ProductExtension.IfcBuildingStorey storey)

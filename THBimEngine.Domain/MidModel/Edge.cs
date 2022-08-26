@@ -19,7 +19,7 @@ namespace THBimEngine.Domain.MidModel
             ptsIndex.Add(index2);
         }
 
-        public void WriteToFile(BinaryWriter writer,List<vec3> points)
+        public void WriteToFile(BinaryWriter writer,List<Vec3> points)
         {
             writer.Write(type_id);
             writer.Write(group_id);

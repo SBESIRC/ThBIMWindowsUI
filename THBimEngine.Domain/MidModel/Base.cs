@@ -24,21 +24,21 @@ namespace THBimEngine.Domain.MidModel
         }
 	};
 
-    public struct vec3
+    public struct Vec3
     {
         public float x, y, z;
-        public vec3(float _x, float _y, float _z)
+        public Vec3(float _x, float _y, float _z)
         {
             x = _x;
             y = _y;
             z = _z;
         }
 
-        public vec3(PointVector pt)
+        public Vec3(PointVector pt)
         {
-            x = (float)pt.X;
-            y = (float)pt.Y;
-            z = (float)pt.Z;
+            x = pt.X;
+            y = pt.Y;
+            z = pt.Z;
         }
 
         public void Write(BinaryWriter writer)
@@ -48,25 +48,4 @@ namespace THBimEngine.Domain.MidModel
             writer.Write(z);
         }
     };
-
-    public class Compute
-    {
-        public vec3 cross(vec3 a, vec3 b)
-        {
-            return new vec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
-        }
-    }
-
-    public class InputEntity
-    {
-        public int Id;
-        public List<FaceTriangle> triangles;
-        public List<int> ptsIndex;
-
-        public InputEntity(int id, string uid, Dictionary<string, GeometryMeshModel> allGeoMeshModels)
-        {
-            Id = id;
-            triangles = allGeoMeshModels[uid].FaceTriangles;
-        }
-    }
 }

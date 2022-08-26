@@ -67,6 +67,15 @@ namespace XbimXplorer.ThBIMEngine
             THBimScene.Instance.AddProject(bimProject);
             var tempData = new TempModel();
             tempData.ModelConvert(bimProject);
+            tempData.WriteMidFile();
+            ;
+            //出来的数据是包含Mesh的，后续不需要创建Solid的步骤了
+            //var convertResult = convertFactory.ProjectConvert(ifcStore,false);
+            //if (null != convertResult)
+            //{
+            //    THBimScene.Instance.AllBimProjects.Add(convertResult.BimProject);
+            //    AddProjectEntitys(convertResult.ProjectEntitys);
+            //}
             WriteToMidDataByFloor();
         }
         public Dictionary<string, object> GetSelectEntityProperties(int index) 

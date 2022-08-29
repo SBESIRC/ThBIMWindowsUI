@@ -31,6 +31,7 @@ namespace XbimXplorer.ThBIMEngine
                 if (null != convertResult) 
                 {
                     convertResult.BimProject.HaveChange = true;
+                    THBimScene.Instance.AddProject(convertResult.BimProject);
                     THBimScene.Instance.UpdateCatchStoreyRelation();
                     WriteToMidDataByFloor();
                 }

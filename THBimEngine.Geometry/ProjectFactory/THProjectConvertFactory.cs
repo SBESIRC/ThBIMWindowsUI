@@ -27,6 +27,18 @@ namespace THBimEngine.Geometry.ProjectFactory
             {
                 CreateSolidMesh(allEntitys.Values.ToList());
             }
+            foreach (var item in allStoreys) 
+            {
+                bimProject.PrjAllStoreys.Add(item.Key,item.Value);
+                foreach (var entity in item.Value.FloorEntitys) 
+                {
+                    bimProject.PrjAllEntitys.Add(entity.Key, entity.Value);
+                }
+                foreach (var relation in item.Value.FloorEntityRelations)
+                {
+                    bimProject.PrjAllRelations.Add(relation.Key, relation.Value);
+                }
+            }
             convertResult = new ConvertResult(bimProject, allStoreys, allEntitys);
             return convertResult;
         }

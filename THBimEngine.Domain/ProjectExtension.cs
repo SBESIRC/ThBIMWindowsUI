@@ -81,7 +81,10 @@ namespace THBimEngine.Domain
             }
             else
             {
-                storeys = project.PrjAllStoreys.Values.ToList();
+                foreach (var item in project.ProjectSite.SiteBuildings) 
+                {
+                    storeys.AddRange(item.Value.BuildingStoreys.Values);
+                }
             }
             return storeys;
         }

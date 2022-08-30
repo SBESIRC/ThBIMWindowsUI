@@ -14,11 +14,11 @@ namespace XbimXplorer.ThBIMEngine
 		{
 			PrjAllFilters = new Dictionary<string, List<FilterBase>>();
 		}
-		public void UpdataProjectFilter()
+		public void UpdataProjectFilter() // 预缓存
 		{
 			PrjAllFilters.Clear();
-			var storeyFilters = ProjectExtension.GetProjectStoreyFilters(THBimScene.Instance.AllBimProjects);
-			var typeFilters = ProjectExtension.GetProjectTypeFilters(THBimScene.Instance.AllBimProjects);
+			var storeyFilters = ProjectExtension.GetProjectStoreyFilters(THBimScene.Instance.AllBimProjects); // 获取所有的 storey filter
+			var typeFilters = ProjectExtension.GetProjectTypeFilters(THBimScene.Instance.AllBimProjects); // 获取所有的 type filter
 			foreach (var project in THBimScene.Instance.AllBimProjects)
 			{
 				var filter = new ProjectFilter(new List<string> { project.ProjectIdentity });
@@ -33,7 +33,7 @@ namespace XbimXplorer.ThBIMEngine
 					var copyItem = typeFilter.Clone() as TypeFilter;
 					listFilters.Add(copyItem);
 				}
-				ProjectExtension.PorjectFilterEntitys(project, listFilters);
+				ProjectExtension.PorjectFilterEntitys(project, listFilters); // 获取所有的数据
 				PrjAllFilters.Add(project.ProjectIdentity, listFilters);
 			}
 		}
@@ -55,7 +55,7 @@ namespace XbimXplorer.ThBIMEngine
 
 		public void ShowEntityByFilter() 
 		{
-		
+			// 在此传输数据给viewer
 		}
 	}
 }

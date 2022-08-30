@@ -174,11 +174,12 @@ namespace THBimEngine.Domain
         public static List<StoreyFilter> GetProjectStoreyFilters(List<THBimProject> allProjects)
         {
             var filters = new List<StoreyFilter>();
-            var allTypes = AllProjectTypes(allProjects);
-            foreach (var item in allTypes)
+            var allStoreys = AllProjectStoreys(allProjects); // storeyId--eachProjectStorey
+            foreach (var item in allStoreys)
             {
-                var newFilter = new TypeFilter(item.Value);
+                var newFilter = new StoreyFilter(item.Value.Select(c=>c.Uid).ToList());
                 newFilter.Describe = item.Key;
+                filters.Add(newFilter);
             }
             return filters;
         }
@@ -272,48 +273,49 @@ namespace THBimEngine.Domain
 
         public static void PorjectFilterEntitys(this THBimProject project,List<FilterBase> allFilters) 
         {
-            int validFilterCount = 0;
+            bool validFilter = false;
             foreach (var filter in allFilters)
             {
-                filter.CheckProject(project);
+                if (filter.CheckProject(project))
+                {
+                    validFilter = true;
+                }
             }
+            if (!validFilter) { return; }
             if (project.SourceProject != null && project.SourceProject is IfcStore ifcStore)
             {
                 var ifcProject = ifcStore.Instances.FirstOrDefault<IIfcProject>();
-                if (ifcProject.Sites == null || ifcProject.Sites.Count() < 1)
-                    return;
-                var site = ifcProject.Sites.First();
-                foreach (var building in site.Buildings)
+                if (ifcProject.Sites == null || ifcProject.Sites.Count() < 1) { return; }
+                var site = ifcProject.Sites.First(); // 对项目的每一个site遍历
+                foreach (var building in site.Buildings) // 遍历site中的每一个building
                 {
-                    foreach (var ifcStorey in building.BuildingStoreys)
+                    foreach (var ifcStorey in building.BuildingStoreys) // 遍历building中的每一楼层
                     {
-                        var storeyId = ifcStorey.GlobalId;
-                        var storey = project.PrjAllStoreys[storeyId];
-                        validFilterCount = 0;
+                        //check valid
+                        var storeyId = ifcStorey.GlobalId; // 楼层id
+                        var storey = project.PrjAllStoreys[storeyId]; // 通过PrjAllStoreys找到这个楼层
+                        validFilter = false;
                         foreach (var filter in allFilters)
                         {
-                            if (!filter.ProjectValid)
-                                continue;
-                            filter.CheckStory(storey);
-                            if (filter.StoreyValid)
-                                validFilterCount += 1;
+                            if (!filter.ProjectValid) { continue; }
+                            if (!filter.CheckStory(storey))
+                            {
+                                validFilter = false;
+                                break;
+                            }
                         }
-                        if (validFilterCount < 1)
-                            continue;
-                        foreach (var spatialStructure in ifcStorey.ContainsElements)
+                        if (!validFilter) { continue; }
+
+                        foreach (var spatialStructure in ifcStorey.ContainsElements) // 遍历楼层中每一个构件
                         {
                             var elements = spatialStructure.RelatedElements;
-                            if (elements.Count == 0)
-                                continue;
+                            if (elements.Count == 0) { continue; }
                             foreach (var item in elements)
                             {
                                 var ifcType = item.GetType();
                                 foreach (var filter in allFilters)
                                 {
-                                    if (!filter.ProjectValid)
-                                        continue;
-                                    if (!filter.StoreyValid)
-                                        continue;
+                                    if (!filter.ProjectValid || !filter.StoreyValid) { continue; }
                                     if (filter.CheckType(ifcType))
                                         filter.ResultElementUids.Add(item.EntityLabel.ToString());
                                 }
@@ -324,49 +326,37 @@ namespace THBimEngine.Domain
             }
             else 
             {
-                if (project.ProjectSite == null || project.ProjectSite.SiteBuildings.Count < 1)
-                    return;
-                validFilterCount = 0;
-                foreach (var building in project.ProjectSite.SiteBuildings)
+                if (project.ProjectSite == null || project.ProjectSite.SiteBuildings.Count < 1) { return; }
+                validFilter = false;
+                foreach (var building in project.ProjectSite.SiteBuildings)  // 遍历site中的每一个building
                 {
+                    //check valid
                     foreach (var filter in allFilters)
                     {
-                        if (!filter.ProjectValid)
-                            continue;
-                        if (!filter.SiteValid)
-                            continue;
-                        validFilterCount += 1;
+                        if (!filter.ProjectValid || !filter.SiteValid) { continue; }
+                        validFilter = true;
                         filter.CheckBuilding(building.Value);
                     }
-                    if (validFilterCount < 1)
-                        break;
-                    validFilterCount = 0;
-                    foreach (var story in building.Value.BuildingStoreys)
+                    if (!validFilter) { break; }
+                    validFilter = false;
+
+                    foreach (var story in building.Value.BuildingStoreys) // 遍历building中的每一楼层
                     {
+                        //check valid
                         foreach (var filter in allFilters)
                         {
-                            if (!filter.ProjectValid)
-                                continue;
-                            if (!filter.SiteValid)
-                                continue;
-                            if (!filter.BuildingValid)
-                                continue;
-                            validFilterCount += 1;
+                            if (!filter.ProjectValid || !filter.SiteValid || !filter.BuildingValid) { continue; }
+                            validFilter = true;
                             filter.CheckStory(story.Value);
                         }
-                        if (validFilterCount < 1)
-                            break;
-                        foreach (var relation in story.Value.FloorEntityRelations)
+                        if (!validFilter) { break; }
+
+                        foreach (var relation in story.Value.FloorEntityRelations) // 遍历楼层中每一个构件
                         {
                             var entity = project.PrjAllEntitys[relation.Value.RelationElementUid];
                             foreach (var filter in allFilters)
                             {
-                                if (!filter.ProjectValid)
-                                    continue;
-                                if (!filter.BuildingValid)
-                                    continue;
-                                if (!filter.StoreyValid)
-                                    continue;
+                                if (!filter.ProjectValid || !filter.BuildingValid || !filter.StoreyValid) { continue; }
                                 if (filter.CheckType(entity))
                                 {
                                     filter.ResultElementUids.Add(relation.Key);

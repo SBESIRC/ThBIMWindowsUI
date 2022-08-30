@@ -12,21 +12,38 @@ namespace THBimEngine.Domain.MidModel
         public List<int> ptsIndex = new List<int>();
 
         public OutingPolygon(FaceTriangle triangle, List<PointNormal> allPoints, ref int triangleIndex,
-            UniComponent uniComponent, ref int ptIndex, List<Vec3> Points)
+            UniComponent uniComponent, ref int ptIndex, List<Vec3> Points,bool firstTriangles)
         {
             id = triangleIndex;
             triangleIndex++;
             group_id = uniComponent.unique_id;
-
+            type_id = uniComponent.type_id;
             var cnt = triangle.ptIndex.Count;
             for (int i = 0; i < cnt; i++)
             {
                 var pt = allPoints[triangle.ptIndex[i]].Point;
-                UpdateBbx(pt,uniComponent);
+                if(firstTriangles&&i==0)//第一个三角面片的第一个点
+                {
+                    GetBbx(pt, uniComponent);
+                }
+                else
+                {
+                    UpdateBbx(pt, uniComponent);
+                }
                 Points.Add(new Vec3(pt));
                 ptsIndex.Add(ptIndex);
                 ptIndex++;
             }
+        }
+
+        public void GetBbx(PointVector pt, UniComponent uniComponent)
+        {
+            uniComponent.x_l = pt.X;
+            uniComponent.x_r = pt.X;
+            uniComponent.y_l = pt.Y;
+            uniComponent.y_r = pt.Y;
+            uniComponent.z_l = pt.Z;
+            uniComponent.z_r = pt.Z;
         }
 
         public void UpdateBbx(PointVector pt,UniComponent uniComponent)

@@ -14,12 +14,19 @@ namespace THBimEngine.Domain.MidModel
 			name = type;
 			type_id = componentIndex;
 			color = new Color((float)0.7, (float)0.2, (float)0.2, (float)1);
-			hori = false;
+			if(type.Contains("Beam")||type.Contains("Slab"))
+            {
+				hori = true;
+            }
+			else
+            {
+				hori = false;
+			}
 		}
 
 		public void WriteToFile(BinaryWriter writer)
         {
-			writer.Write((System.UInt64)name.Length);
+			writer.Write((ulong)name.Length);
 			writer.Write(name.ToCharArray());
 			writer.Write(type_id);
 			color.Write(writer);

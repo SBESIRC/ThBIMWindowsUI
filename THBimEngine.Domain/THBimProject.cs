@@ -161,12 +161,20 @@ namespace THBimEngine.Domain
 			}
 			return resList;
 		}
-        public List<PointNormal> AllGeoPointNormals()
+        public List<PointNormal> AllGeoPointNormals(bool yzExchange = false)
         {
 			var resList = new List<PointNormal>();
 			foreach (var item in _allGeoPointNormals) 
 			{
-				resList.Add(item.Clone() as PointNormal);
+				var clonedPt = item.Clone() as PointNormal;
+				if(yzExchange)
+                {
+					float y = clonedPt.Point.Y;
+					float z = clonedPt.Point.Z;
+					clonedPt.Point.Y = z;
+					clonedPt.Point.Z = y;
+				}
+				resList.Add(clonedPt);
 			}
 			return resList;
         }

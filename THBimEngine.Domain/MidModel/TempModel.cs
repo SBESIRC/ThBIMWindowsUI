@@ -47,6 +47,26 @@ namespace THBimEngine.Domain.MidModel
             }
         }
 
+        public void AddProject(THBimProject bimProject)
+        {
+            var ifcStore = bimProject.SourceProject as IfcStore;
+            if (ifcStore != null)
+            {
+                if (ifcStore.SchemaVersion.ToString() == "Ifc2x3")
+                {
+                    GetFromIfc2x3(ifcStore, bimProject);
+                }
+                else
+                {
+                    AddFromIfc4(ifcStore, bimProject);
+                }
+            }
+            else
+            {
+                GetFromBimData(bimProject);
+            }
+        }
+
         public void GetFromIfc2x3(IfcStore ifcStore, THBimProject bimProject)
         {
             int ptIndex = 0;//点索引
@@ -95,7 +115,7 @@ namespace THBimEngine.Domain.MidModel
                             {
                                 material = THBimMaterial.GetTHBimEntityMaterial(bimProject.PrjAllEntitys[uid].FriendlyTypeName, true);
                             }
-                            var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, buildingStorey, Components[type],"");
+                            var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, buildingStorey, Components[type]);
 
                             uniComponent.edge_ind_s = edgeIndex;
                             uniComponent.tri_ind_s = triangleIndex;
@@ -122,6 +142,9 @@ namespace THBimEngine.Domain.MidModel
             int triangleIndex = 0;//三角面片索引
             int uniComponentIndex = 0;//物体索引
 
+
+            
+
             var allGeoModels = bimProject.AllGeoModels();
             var allPoints = bimProject.AllGeoPointNormals(true);
 
@@ -133,6 +156,7 @@ namespace THBimEngine.Domain.MidModel
             {
                 foreach (var ifcStorey in building.BuildingStoreys)
                 {
+                    int beamNum = 0;
                     var storey = ifcStorey as Xbim.Ifc4.ProductExtension.IfcBuildingStorey;
                     var height = GetIfcStoreyHeight(storey);
                     var elevation = storey.Elevation.Value;
@@ -144,8 +168,9 @@ namespace THBimEngine.Domain.MidModel
                         buildingStorey.element_index_s.Add(uniComponentIndex);
                         foreach (var item in elements)
                         {
-                            var profileName = GetProfileName(item);
                             var type = item.ToString().Split('.').Last();
+                            if (item.Name.ToString().Contains("Beam_169763"))
+                                beamNum++;
                             var component = new Component(type, componentIndex);
 
                             if (!Components.ContainsKey(type))
@@ -158,7 +183,8 @@ namespace THBimEngine.Domain.MidModel
                             var material = THBimMaterial.GetTHBimEntityMaterial(type, true);
                             if (bimProject.PrjAllEntitys.ContainsKey(uid))
                                 material = THBimMaterial.GetTHBimEntityMaterial(bimProject.PrjAllEntitys[uid].FriendlyTypeName, true);
-                            var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, buildingStorey, Components[type], profileName);
+                            var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, buildingStorey, Components[type]);
+                            GetProfileName(item, uniComponent);
 
                             uniComponent.edge_ind_s = edgeIndex;
                             uniComponent.tri_ind_s = triangleIndex;
@@ -226,6 +252,78 @@ namespace THBimEngine.Domain.MidModel
                 }
                 buildingStorey.element_index_e.Add(uniComponentIndex - 1);
                 Buildingstoreys.Add(buildingStorey);
+            }
+        }
+
+        public void AddFromIfc4(IfcStore ifcStore, THBimProject bimProject)
+        {
+            int ptIndex = Points.Count;//点索引
+            int buildingIndex = 0;//建筑物索引
+            int componentIndex = Components.Count;//属性索引(门、窗等)
+            int edgeIndex = Edges.Count;//边索引
+            int triangleIndex = OutingPolygons.Count;//三角面片索引
+            int uniComponentIndex = UniComponents.Count;//物体索引
+
+            var allGeoModels = bimProject.AllGeoModels();
+            var allPoints = bimProject.AllGeoPointNormals(true);
+
+            var ifcProject = ifcStore.Instances.FirstOrDefault<Xbim.Ifc4.Interfaces.IIfcProject>();
+            var site = ifcProject.Sites.First();
+            var buildings = site.Buildings.ToList();
+
+            foreach (var building in buildings)
+            {
+                foreach (var ifcStorey in building.BuildingStoreys)
+                {
+                    var storey = ifcStorey as Xbim.Ifc4.ProductExtension.IfcBuildingStorey;
+                    var height = GetIfcStoreyHeight(storey);
+                    var elevation = storey.Elevation.Value;
+                    var buildingStorey = new Buildingstorey(storey, height, ref buildingIndex);
+                    foreach (var spatialStructure in storey.ContainsElements)
+                    {
+                        var elements = spatialStructure.RelatedElements;
+                        if (elements.Count == 0) continue;
+                        buildingStorey.element_index_s.Add(uniComponentIndex);
+                        foreach (var item in elements)
+                        {
+                            var type = item.ToString().Split('.').Last();
+                            var component = new Component(type, componentIndex);
+
+                            if (!Components.ContainsKey(type))
+                            {
+                                Components.Add(type, component);
+                                componentIndex++;
+                            }
+
+                            var uid = item.EntityLabel.ToString();
+                            var material = THBimMaterial.GetTHBimEntityMaterial(type, true);
+                            if (bimProject.PrjAllEntitys.ContainsKey(uid))
+                                material = THBimMaterial.GetTHBimEntityMaterial(bimProject.PrjAllEntitys[uid].FriendlyTypeName, true);
+                            var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, buildingStorey, Components[type]);
+                            GetProfileName(item, uniComponent);
+
+                            uniComponent.edge_ind_s = edgeIndex;
+                            uniComponent.tri_ind_s = triangleIndex;
+                            if (allGeoModels.ContainsKey(uid))
+                            {
+                                var triangles = allGeoModels[uid].FaceTriangles;
+                                GetTrianglesAndEdges(triangles, allPoints, ref triangleIndex, ref edgeIndex, uniComponent, ref ptIndex);
+                            }
+                            else
+                            {
+                                ;
+                            }
+
+                            uniComponent.edge_ind_e = edgeIndex - 1;
+                            uniComponent.tri_ind_e = triangleIndex - 1;
+                            uniComponent.bg = uniComponent.z_r - buildingStorey.elevation;
+                            UniComponents.Add(uniComponent);
+
+                        }
+                    }
+                    buildingStorey.element_index_e.Add(uniComponentIndex - 1);
+                    Buildingstoreys.Add(buildingStorey);
+                }
             }
         }
 
@@ -300,8 +398,11 @@ namespace THBimEngine.Domain.MidModel
             return 0;
         }
 
-        public string GetProfileName(Xbim.Ifc4.Kernel.IfcProduct ifcProduct)
+        public void GetProfileName(Xbim.Ifc4.Kernel.IfcProduct ifcProduct, UniComponent uniComponent)
         {
+            var profileName = "";
+            double depth = 0;
+
             var item = ifcProduct.Representation.Representations.First().Items[0];
             var solid = item as Xbim.Ifc4.GeometricModelResource.IfcExtrudedAreaSolid;
             if (solid is null)
@@ -309,12 +410,28 @@ namespace THBimEngine.Domain.MidModel
                 var rst = item as Xbim.Ifc4.GeometricModelResource.IfcBooleanResult;
                 if(rst is null)
                 {
-                    return "";
+                    return;
                 }
                 var solid2 = rst.FirstOperand as Xbim.Ifc4.GeometricModelResource.IfcSweptAreaSolid;
-                return solid2.SweptArea.ProfileName.ToString();
+                profileName = solid2.SweptArea.ProfileName.ToString();
             }
-            return solid.SweptArea.ProfileName.ToString();
+            else
+            {
+                profileName = solid.SweptArea.ProfileName.ToString();
+                depth = (double)solid.Depth.Value;
+            }
+
+            if (profileName.Contains("_") && profileName.Contains("*"))
+            {
+                string[] xyLen = profileName.Split('_')[1].Split('*');
+                uniComponent.x_len = Convert.ToDouble(xyLen[0]);
+                uniComponent.y_len = Convert.ToDouble(xyLen[1]);
+            }
+            else
+            {
+                ;
+            }
+            uniComponent.depth = depth;
             ;
         }
 

@@ -18,8 +18,8 @@ namespace THBimEngine.Domain.MidModel
 		public int floor_num;      // 楼层序号
 		public double[] rgb;//use for SkecthUp-out's ifc, to determine the priority
 
-		public double depth= 5300.00000000;       // slab厚度  zr-zl
-		public double depth_t= 5300.00000000;     //
+		public double depth= 0;       // slab厚度  zr-zl
+		public double depth_t= 0;     //
 		public double x_len=0.0;
 		public double y_len=0.0;
 		public double x_l, x_r;    // bbx信息
@@ -54,7 +54,7 @@ namespace THBimEngine.Domain.MidModel
 	
 		}
 
-		public UniComponent(string uid, THBimMaterial bimMaterial, ref int uniComponentIndex, Buildingstorey buildingStorey,Component component,string profileName) : base(component.name, component.type_id)
+		public UniComponent(string uid, THBimMaterial bimMaterial, ref int uniComponentIndex, Buildingstorey buildingStorey,Component component) : base(component.name, component.type_id)
 		{
 			unique_id = uniComponentIndex;
 			uniComponentIndex++;
@@ -65,16 +65,7 @@ namespace THBimEngine.Domain.MidModel
 			rgb = new double[3] { bimMaterial.Color_R, bimMaterial.Color_G, bimMaterial.Color_B };
 
 			comp_name = component.name;
-			if(profileName.Contains("_") && profileName.Contains("*"))
-            {
-				string[] xyLen = profileName.Split('_')[1].Split('*');
-				x_len = Convert.ToDouble(xyLen[0]);
-				y_len = Convert.ToDouble(xyLen[1]);
-			}
-			else
-            {
-				;
-            }
+			
 
 			properties.Add("type", name);
 		}

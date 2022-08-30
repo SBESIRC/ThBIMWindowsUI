@@ -23,7 +23,7 @@ namespace XbimXplorer.LeftTabItme.LeftTabControls
         public MainFilterUControl()
         {
             InitializeComponent();
-           
+            mainGrid.DataContext = FilterViewModel.Instance;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

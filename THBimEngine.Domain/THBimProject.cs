@@ -14,6 +14,7 @@ namespace THBimEngine.Domain
         public BuildingCatagory Catagory { get; set; }
         public THBimSite ProjectSite { get; set; }
         public object SourceProject { get; set; }
+		public bool NeedCreateMesh { get; set; }
 		public bool HaveChange { get; set; }
 		private Dictionary<string,GeometryMeshModel> _allGeoMeshModels { get; }
 		private List<PointNormal> _allGeoPointNormals { get; }
@@ -24,6 +25,7 @@ namespace THBimEngine.Domain
 		public THBimProject(int id, string name, string describe = "", string uid = "") : base(id, name, describe, uid)
         {
 			HaveChange = false;
+			NeedCreateMesh = true;
 			_allGeoMeshModels = new Dictionary<string, GeometryMeshModel>();
 			_allGeoPointNormals = new List<PointNormal>();
 			PrjAllEntitys = new Dictionary<string, THBimEntity>();
@@ -203,6 +205,8 @@ namespace THBimEngine.Domain
 		}
 		public void UpdateCatchStoreyRelation()
 		{
+			if (!NeedCreateMesh && PrjAllStoreys.Count>0)
+				return;
             PrjAllStoreys.Clear();
 			PrjAllRelations.Clear();
 			PrjAllEntitys.Clear();

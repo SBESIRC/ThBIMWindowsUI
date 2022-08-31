@@ -44,6 +44,7 @@ namespace THBimEngine.Domain
         public bool BuildingValid { get; protected set; }
         public virtual bool CheckBuilding(THBimBuilding bimBuilding)
         {
+            BuildingValid = true;
             if (acceptBuildingIds.Count < 1)
                 return true;
             var id = bimBuilding.Uid;
@@ -53,6 +54,7 @@ namespace THBimEngine.Domain
         public bool StoreyValid { get; protected set; }
         public virtual bool CheckStory(THBimStorey bimStorey) 
         {
+            StoreyValid = true;
             if (acceptStoreyIds.Count < 1)
                 return true;
             var id = bimStorey.Uid;
@@ -147,6 +149,11 @@ namespace THBimEngine.Domain
         public override object Clone()
         {
             var filter = new TypeFilter(this.acceptElementTypes.ToList());
+            filter.Describe = this.Describe;
+            foreach (var item in this.ResultElementUids) 
+            {
+                filter.ResultElementUids.Add(item);
+            }
             return filter;
         }
 

@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Input;
 using THBimEngine.Domain;
 using XbimXplorer.ThBIMEngine;
@@ -58,10 +59,11 @@ namespace XbimXplorer.LeftTabItme
 
             //更新 //AllFloorFilters //AllTypeFilters //AllFileFilters
 
+            CalcTypeFilter();
             //bimFilterController.PrjAllFilters
             // 1、
             // 文件载入时更新 显示的全选内容 & PrjAllFilters
-            Dictionary<string, List<FilterBase>> PrjAllFilters; 
+            //Dictionary<string, List<FilterBase>> PrjAllFilters; 
             //AllFloorFilters
             //AllTypeFilters
             //AllFileFilters
@@ -72,17 +74,69 @@ namespace XbimXplorer.LeftTabItme
             Dictionary<string, HashSet<string>> prjFilterIds = new Dictionary<string, HashSet<string>>();
             
         }
+        private void CalcFloorFilter() 
+        {
+            var allFloors = ProjectExtension.AllProjectStoreys(THBimScene.Instance.AllBimProjects);
+        }
+        private void CalcTypeFilter() 
+        {
+            AllTypeFilters.Clear();
+            foreach (var item in bimFilterController.PrjAllFilters) 
+            {
+                var typeFilters = item.Value.OfType<TypeFilter>().ToList();
+                if (typeFilters.Count < 1)
+                    continue;
+                foreach (var type in typeFilters) 
+                {
+                    var strTypeName = type.Describe;
+                    var hisFile = AllTypeFilters.Where(c => c.TypeName == strTypeName).FirstOrDefault();
+                    if (hisFile == null) 
+                    {
+                        hisFile = new EntityTypeFilterViewModel();
+                        hisFile.TypeName = strTypeName;
+                        hisFile.IsChecked = true;
+                        AllTypeFilters.Add(hisFile);
+                    }
+                    if (hisFile.ProjectFilters.ContainsKey(item.Key))
+                    {
+                        continue;
+                    }
+                    else 
+                    {
+                        hisFile.ProjectFilters.Add(item.Key, type);
+                    }
+                }
+            }
+        }
+        private void CalcFileFilter() 
+        {
+            
+        }
 
-        RelayCommand listCheckedChange;
+        RelayCommand<CheckBox> listCheckedChange;
         public ICommand CheckedCommond
         {
             get
             {
                 if (listCheckedChange == null)
-                    listCheckedChange = new RelayCommand(() => UpdateSelectAllState());
+                    listCheckedChange = new RelayCommand<CheckBox>((checkBox) => UpdateTypeState(checkBox));
 
                 return listCheckedChange;
             }
+        }
+        private void UpdateTypeState(CheckBox typeCheckBox)
+        {
+            var typeFilter = typeCheckBox.DataContext as EntityTypeFilterViewModel;
+            var tempIds = bimFilterController.GetGlobalIndexByFilter(typeFilter.ProjectFilters);
+            if (typeFilter.IsChecked == true)
+            {
+                //新增显示
+            }
+            else 
+            {
+                //移除显示
+            }
+
         }
         private void UpdateSelectAllState()
         {
@@ -99,6 +153,10 @@ namespace XbimXplorer.LeftTabItme
     }
     public class EntityTypeFilterViewModel : NotifyPropertyChangedBase
     {
+        public EntityTypeFilterViewModel() 
+        {
+            ProjectFilters = new Dictionary<string, FilterBase>();
+        }
         private bool? _isChecked { get; set; }
         public bool? IsChecked 
         { 
@@ -125,7 +183,7 @@ namespace XbimXplorer.LeftTabItme
                 this.RaisePropertyChanged();
             }
         }
-        public Dictionary<string, FilterBase> ProjectFilters { get; set; }
+        public Dictionary<string, FilterBase> ProjectFilters { get; }
     }
     public class FileFilterViewModel : NotifyPropertyChangedBase
     {

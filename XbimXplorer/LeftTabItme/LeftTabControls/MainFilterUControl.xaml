@@ -6,20 +6,19 @@
              xmlns:local="clr-namespace:XbimXplorer.LeftTabItme.LeftTabControls"
              x:Name="mainUControl"
              mc:Ignorable="d" >
-    <Grid x:Name="mainGrid" Background="White" Width="200" Margin="2,0,0,1"  Visibility="{Binding ElementName=mainUControl,Path=Visibility}" Height="158" >
+    <Grid x:Name="mainGrid" Background="White" Width="200" Margin="2,0,0,1"  
+          Visibility="{Binding ElementName=mainUControl,Path=Visibility}">
 
-        <TabControl Margin="0,0,1,-23" BorderThickness="1" >
-
-            <TabItem Header="楼层" Height="25">
-                
-            </TabItem>
+        <TabControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  BorderThickness="1" >
+            <TabItem Header="楼层" Height="25"/>
             <TabItem Header="类别" Height="25">
-                <ListView x:Name="list" Grid.Row="1" Height="100" ItemsSource="{Binding AllTypeFilters}">
+                <ListView x:Name="list" Grid.Row="1" ItemsSource="{Binding AllTypeFilters}">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <CheckBox Content="{Binding TypeName,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Command="{Binding Path=DataContext.CheckedCommond, 
-                        RelativeSource={RelativeSource Mode=FindAncestor,      
-                        AncestorType={x:Type ItemsControl}} }" IsChecked="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                            <CheckBox Content="{Binding TypeName,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
+                                      IsChecked="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                      Command="{Binding Path=DataContext.CheckedCommond,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ItemsControl}} }"
+                                      CommandParameter="{Binding RelativeSource={x:Static RelativeSource.Self}}">
                             </CheckBox>
                         </DataTemplate>
                     </ListView.ItemTemplate>

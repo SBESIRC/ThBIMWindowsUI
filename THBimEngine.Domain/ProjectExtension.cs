@@ -294,18 +294,12 @@ namespace THBimEngine.Domain
                         //check valid
                         var storeyId = ifcStorey.GlobalId; // 楼层id
                         var storey = project.PrjAllStoreys[storeyId]; // 通过PrjAllStoreys找到这个楼层
-                        validFilter = false;
+                        //validFilter = false;
                         foreach (var filter in allFilters)
                         {
                             if (!filter.ProjectValid) { continue; }
-                            if (!filter.CheckStory(storey))
-                            {
-                                validFilter = false;
-                                break;
-                            }
+                            filter.CheckStory(storey);
                         }
-                        if (!validFilter) { continue; }
-
                         foreach (var spatialStructure in ifcStorey.ContainsElements) // 遍历楼层中每一个构件
                         {
                             var elements = spatialStructure.RelatedElements;

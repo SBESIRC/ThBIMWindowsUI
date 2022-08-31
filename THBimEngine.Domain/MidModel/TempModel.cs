@@ -32,7 +32,7 @@ namespace THBimEngine.Domain.MidModel
             var ifcStore = bimProject.SourceProject as IfcStore;
             if (ifcStore != null)
             {
-                if (ifcStore.SchemaVersion.ToString() == "Ifc2x3")
+                if (ifcStore.SchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
                 {
                     GetFromIfc2x3(ifcStore, bimProject);
                 }
@@ -52,7 +52,7 @@ namespace THBimEngine.Domain.MidModel
             var ifcStore = bimProject.SourceProject as IfcStore;
             if (ifcStore != null)
             {
-                if (ifcStore.SchemaVersion.ToString() == "Ifc2x3")
+                if (ifcStore.SchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
                 {
                     GetFromIfc2x3(ifcStore, bimProject);
                 }
@@ -373,6 +373,8 @@ namespace THBimEngine.Domain.MidModel
 
         public double GetIfcStoreyHeight(Xbim.Ifc4.ProductExtension.IfcBuildingStorey storey)
         {
+            if (null == storey || storey.PropertySets == null)
+                return 0;
             foreach (var item in storey.PropertySets)
             {
                 if (item.PropertySetDefinitions == null) continue;

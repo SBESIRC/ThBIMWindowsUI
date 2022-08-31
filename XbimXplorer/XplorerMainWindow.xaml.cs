@@ -1294,6 +1294,7 @@ namespace XbimXplorer
             StatusMsg.Text = "";
             //if (string.IsNullOrEmpty(path))
             //	return;
+            FilterViewModel.Instance.UpdataFilterByProject();
             var formHost = winFormHost;
 			var childConrol = formHost.Child as GLControl;
 			childConrol.EnableNativeInput();
@@ -1379,6 +1380,11 @@ namespace XbimXplorer
         {
             MainViewModel mainViewModel = new MainViewModel();
             leftTabControl.DataContext = mainViewModel;
+        }
+
+        private void ExportCut_Click(object sender, RoutedEventArgs e)
+        {
+            //导出切图数据
         }
     }
 }

@@ -60,15 +60,16 @@ namespace XbimXplorer.ThBIMEngine
             var bimProject = new THBimProject(0, ifcProject.Name, "", ifcProject.GlobalId);
             bimProject.ProjectIdentity = ifcStore.FileName;
             bimProject.SourceProject = ifcStore;
+            bimProject.NeedCreateMesh = false;
             var allGeoPointNormals = new List<PointNormal>();
             var readGeomtry = new IfcStoreReadGeomtry();
             var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out allGeoPointNormals);
             bimProject.AddGeoMeshModels(allGeoModels, allGeoPointNormals);
             THBimScene.Instance.AddProject(bimProject);
-            var tempData = new TempModel();
-            tempData.ModelConvert(bimProject);
+            //var tempData = new TempModel();
+            //tempData.ModelConvert(bimProject);
             //tempData.AddProject(bimProject);
-            tempData.WriteMidFile();
+            //tempData.WriteMidFile();
 
             WriteToMidDataByFloor();
         }

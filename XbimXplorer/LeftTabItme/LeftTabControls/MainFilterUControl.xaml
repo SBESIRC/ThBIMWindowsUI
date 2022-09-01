@@ -10,14 +10,40 @@
           Visibility="{Binding ElementName=mainUControl,Path=Visibility}">
 
         <TabControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  BorderThickness="1" >
-            <TabItem Header="楼层" Height="25"/>
+            <TabItem Header="楼层" Height="25">
+                <DataGrid AutoGenerateColumns="False" CanUserAddRows="False" SelectionMode="Extended" SelectionUnit="FullRow" RowHeaderWidth="0"
+                          SelectionChanged="DataGrid_SelectionChanged"
+                          ItemsSource="{Binding AllFloorFilters}" Background="Transparent">
+                    <DataGrid.Columns>
+                        <DataGridCheckBoxColumn Binding="{Binding Path=IsSelected,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type DataGridRow}}}">
+
+                        </DataGridCheckBoxColumn>
+                        <DataGridTemplateColumn >
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding Path=IsSelected,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type DataGridRow}}}"
+                                      Command="{Binding Path=DataContext.TypeCheckedCommond, ElementName=mainGrid}"
+                                      CommandParameter="{Binding RelativeSource={x:Static RelativeSource.Self}}">
+                                    </CheckBox>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn CanUserSort="False" Header="楼层名称" Width="2*" IsReadOnly="True" Binding="{Binding FloorName,Mode=OneWay}"></DataGridTextColumn>
+                        <DataGridTextColumn CanUserSort="False" Header="标高" Width="1*" IsReadOnly="True" Binding="{Binding Elevation,Mode=OneWay}"></DataGridTextColumn>
+                        <DataGridTextColumn CanUserSort="False" Header="层高" Width="1*" IsReadOnly="True" Binding="{Binding LevelHeight,Mode=OneWay}"></DataGridTextColumn>
+                    </DataGrid.Columns>
+                    <DataGrid.CommandBindings>
+                        <CommandBinding ></CommandBinding>
+                    </DataGrid.CommandBindings>
+                </DataGrid>
+            </TabItem>
             <TabItem Header="类别" Height="25">
-                <ListView x:Name="list" Grid.Row="1" ItemsSource="{Binding AllTypeFilters}">
+                <ListView x:Name="listType" Grid.Row="1" ItemsSource="{Binding AllTypeFilters}">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <CheckBox Content="{Binding TypeName,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" 
+                            <CheckBox Content="{Binding TypeName,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" 
                                       IsChecked="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                                      Command="{Binding Path=DataContext.CheckedCommond,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ItemsControl}} }"
+                                      Command="{Binding Path=DataContext.TypeCheckedCommond,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ItemsControl}} }"
                                       CommandParameter="{Binding RelativeSource={x:Static RelativeSource.Self}}">
                             </CheckBox>
                         </DataTemplate>
@@ -25,12 +51,19 @@
                 </ListView>
             </TabItem>
             <TabItem Header="文件" Height="25">
-                
+                <ListView x:Name="listFile" Grid.Row="1" ItemsSource="{Binding AllFileFilters}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox Content="{Binding ShowName,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" 
+                                      IsChecked="{Binding IsChecked,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                      Command="{Binding Path=DataContext.FileCheckedCommond,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ItemsControl}} }"
+                                      CommandParameter="{Binding RelativeSource={x:Static RelativeSource.Self}}">
+                            </CheckBox>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
             </TabItem>
         </TabControl>
-        <!--
-        <TextBox Name="textBox" Height="30" Margin="4,151,6,-23" RenderTransformOrigin="0.497,3.51"></TextBox>
-        -->
         <Button Height="25" Width="25" VerticalAlignment="Top" Content="X" HorizontalAlignment="Right" Click="Button_Click"></Button>
     </Grid>
 </UserControl>

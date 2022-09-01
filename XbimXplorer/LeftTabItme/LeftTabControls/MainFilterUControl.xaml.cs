@@ -31,5 +31,10 @@ namespace XbimXplorer.LeftTabItme.LeftTabControls
             //gridMain.Visibility = Visibility.Collapsed;
             this.Visibility = Visibility.Collapsed;
         }
+
+        private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }

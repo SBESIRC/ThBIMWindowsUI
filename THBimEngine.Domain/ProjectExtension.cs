@@ -23,17 +23,34 @@ namespace THBimEngine.Domain
                 {
                     foreach (var ifcStorey in building.BuildingStoreys)
                     {
-                        var storey = ifcStorey as Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey;
-                        foreach (var spatialStructure in storey.ContainsElements)
+                        if (ifcStorey is Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey storey23)
                         {
-                            var elements = spatialStructure.RelatedElements;
-                            if (elements.Count == 0) 
-                                continue;
-                            foreach (var item in elements) 
+                            foreach (var spatialStructure in storey23.ContainsElements)
                             {
-                                var ifcType = item.GetType();
-                                if (!types.Contains(ifcType))
-                                    types.Add(ifcType);
+                                var elements = spatialStructure.RelatedElements;
+                                if (elements.Count == 0)
+                                    continue;
+                                foreach (var item in elements)
+                                {
+                                    var ifcType = item.GetType();
+                                    if (!types.Contains(ifcType))
+                                        types.Add(ifcType);
+                                }
+                            }
+                        }
+                        else if (ifcStorey is Xbim.Ifc4.ProductExtension.IfcBuildingStorey storey4)
+                        {
+                            foreach (var spatialStructure in storey4.ContainsElements)
+                            {
+                                var elements = spatialStructure.RelatedElements;
+                                if (elements.Count == 0)
+                                    continue;
+                                foreach (var item in elements)
+                                {
+                                    var ifcType = item.GetType();
+                                    if (!types.Contains(ifcType))
+                                        types.Add(ifcType);
+                                }
                             }
                         }
                     }
@@ -88,51 +105,59 @@ namespace THBimEngine.Domain
             }
             return storeys;
         }
-        public static Dictionary<string, List<Type>> AllProjectTypes(List<THBimProject> allProjects) 
+        public static Dictionary<BuildingCatagory, List<Type>> AllProjectTypes(List<THBimProject> allProjects) 
         {
-            var resTypes = new Dictionary<string, List<Type>>();
+            var resTypes = new Dictionary<BuildingCatagory, List<Type>>();
             foreach (var project in allProjects) 
             {
                 var prjTypes = project.ProjrctEntityTypes(); 
                 foreach (var item in prjTypes)
                 {
-                    var realName = "未知";
+                    var realType = BuildingCatagory.Unknown;
                     var name = item.Name.ToLower();
                     if (name.Contains("wall"))
                     {
-                        realName = "墙";
+                        realType = BuildingCatagory.Wall;
                     }
                     else if (name.Contains("beam"))
                     {
-                        realName = "梁";
+                        realType = BuildingCatagory.Beam;
                     }
                     else if (name.Contains("slab"))
                     {
-                        realName = "板";
+                        realType = BuildingCatagory.Slab;
                     }
                     else if (name.Contains("column"))
                     {
-                        realName = "柱";
+                        realType = BuildingCatagory.Column;
                     }
                     else if (name.Contains("door"))
                     {
-                        realName = "门";
+                        realType = BuildingCatagory.Door;
                     }
                     else if (name.Contains("window"))
                     {
-                        realName = "窗";
+                        realType = BuildingCatagory.Window;
                     }
                     else if (name.Contains("openging"))
                     {
-                        realName = "洞口";
+                        realType = BuildingCatagory.Opening;
                     }
-                    if (resTypes.ContainsKey(realName))
+                    else if (name.Contains("railing")) 
                     {
-                        resTypes[realName].Add(item);
+                        realType = BuildingCatagory.Railing;
+                    }
+                    else if (name.Contains("roof"))
+                    {
+                        realType = BuildingCatagory.Roof;
+                    }
+                    if (resTypes.ContainsKey(realType))
+                    {
+                        resTypes[realType].Add(item);
                     }
                     else
                     {
-                        resTypes.Add(realName, new List<Type> { item });
+                        resTypes.Add(realType, new List<Type> { item });
                     }
                 }
             }
@@ -163,10 +188,10 @@ namespace THBimEngine.Domain
         {
             var filters = new List<TypeFilter>();
             var allTypes = AllProjectTypes(allProjects);
-            foreach (var item in allTypes) 
+            foreach (var item in allTypes.OrderBy(c => c.Key)) 
             {
                 var newFilter = new TypeFilter(item.Value);
-                newFilter.Describe = item.Key;
+                newFilter.Describe = EnumUtil.GetEnumDescription(item.Key);
                 filters.Add(newFilter);
             }
             return filters;

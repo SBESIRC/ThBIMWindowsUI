@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using THBimEngine.Domain;
+using THBimEngine.Presention;
 
 namespace XbimXplorer.ThBIMEngine
 {
@@ -11,6 +12,7 @@ namespace XbimXplorer.ThBIMEngine
     {
 		public Dictionary<string, List<FilterBase>> PrjAllFilters { get; }
 		public HashSet<int> ShowEntityGIndex { get; protected set; }
+		private int AllEntityCount = 0;
 		public ThBimFilterController() 
 		{
 			PrjAllFilters = new Dictionary<string, List<FilterBase>>();
@@ -20,12 +22,16 @@ namespace XbimXplorer.ThBIMEngine
 		{
 			PrjAllFilters.Clear();
 			ShowEntityGIndex.Clear();
+			ShowEntityGIndex = THBimScene.Instance.MeshEntiyRelationIndexs.Keys.ToHashSet();
+			AllEntityCount = ShowEntityGIndex.Count;
 			var storeyFilters = ProjectExtension.GetProjectStoreyFilters(THBimScene.Instance.AllBimProjects); // 获取所有的 storey filter
 			var typeFilters = ProjectExtension.GetProjectTypeFilters(THBimScene.Instance.AllBimProjects); // 获取所有的 type filter
 			foreach (var project in THBimScene.Instance.AllBimProjects)
 			{
 				var filter = new ProjectFilter(new List<string> { project.ProjectIdentity });
+				filter.Describe = project.Name;
 				var listFilters = new List<FilterBase>();
+				listFilters.Add(filter);
 				foreach (var storeyFilter in storeyFilters)
 				{
 					var copyItem = storeyFilter.Clone() as StoreyFilter;
@@ -46,12 +52,19 @@ namespace XbimXplorer.ThBIMEngine
 			var resIds = new HashSet<int>();
 			Parallel.ForEach(THBimScene.Instance.MeshEntiyRelationIndexs.Values, new ParallelOptions() { }, item =>
 			   {
-				   var prjEntityId = item.ProjectEntityId;
-				   if (!prjFilterIds.ContainsKey(item.ProjectEntityId))
+				   var prjId = item.ProjectId;
+				   if (!prjFilterIds.ContainsKey(prjId))
 					   return;
-				   var filterIds = prjFilterIds[prjEntityId];
+				   var prjEntityId = item.ProjectEntityId;
+				   var filterIds = prjFilterIds[prjId];
 				   if (filterIds.Contains(prjEntityId))
-					   resIds.Add(item.GlobalMeshIndex);
+				   {
+					   lock (resIds) 
+					   {
+						   if(!resIds.Contains(item.GlobalMeshIndex))
+							   resIds.Add(item.GlobalMeshIndex);
+					   }
+				   }
 			   });
 			return resIds;
 		}
@@ -107,7 +120,17 @@ namespace XbimXplorer.ThBIMEngine
 			// 在此传输数据给viewer
 			ShowEntityGIndex = ShowEntityGIndex.Except(delIds).ToHashSet();
 			ShowEntityGIndex = ShowEntityGIndex.Union(addIds).ToHashSet();
-
+			ExampleScene.ifcre_set_config("to_show_states", "0");
+			ExampleScene.ifcre_set_comp_ids(-1);
+			//目前没有结束隔离显示，先全传入
+			//if (ShowEntityGIndex.Count() == AllEntityCount)
+			//	return;
+			ExampleScene.ifcre_set_sleep_time(100);
+			foreach (var id in ShowEntityGIndex) 
+			{
+				ExampleScene.ifcre_set_comp_ids(id);
+			}
+			ExampleScene.ifcre_set_sleep_time(10);
 		}
 	}
 }

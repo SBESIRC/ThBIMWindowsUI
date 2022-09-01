@@ -59,7 +59,7 @@ namespace XbimXplorer.LeftTabItme
 
             //更新 //AllFloorFilters //AllTypeFilters //AllFileFilters
 
-            CalcTypeFilter();
+
             //bimFilterController.PrjAllFilters
             // 1、
             // 文件载入时更新 显示的全选内容 & PrjAllFilters
@@ -68,15 +68,38 @@ namespace XbimXplorer.LeftTabItme
             //AllTypeFilters
             //AllFileFilters
 
-            // 2、
-            // 全选、反选、多选选中：
-            // 将选中内容通过PrjAllFilters为base来过滤入prjFilterIds中
-            Dictionary<string, HashSet<string>> prjFilterIds = new Dictionary<string, HashSet<string>>();
-            
+            CalcTypeFilter();
+            CalcFloorFilter();
+            CalcFileFilter();
         }
         private void CalcFloorFilter() 
         {
             var allFloors = ProjectExtension.AllProjectStoreys(THBimScene.Instance.AllBimProjects);
+            AllFloorFilters.Clear();
+            foreach (var floorKeyValue in allFloors)
+            {
+                var prjStoreyFilters = new Dictionary<string, StoreyFilter>();
+                foreach (var filters in bimFilterController.PrjAllFilters)
+                {
+                    var floorFilters = filters.Value.OfType<StoreyFilter>().ToList();
+                    if (floorFilters.Count < 1)
+                        continue;
+                    foreach (var filter in floorFilters) 
+                    {
+                        if (filter.Describe != floorKeyValue.Key)
+                            continue;
+                        if (prjStoreyFilters.ContainsKey(filters.Key))
+                            continue;
+                        prjStoreyFilters.Add(filters.Key, filter);
+                    }
+                }
+                var addFilter = new FloorFilterViewModel(floorKeyValue.Key, floorKeyValue.Value.First().Elevation.ToString(), floorKeyValue.Value.First().LevelHeight.ToString());
+                foreach (var item in prjStoreyFilters) 
+                {
+                    addFilter.ProjectFilters.Add(item.Key, item.Value);
+                }
+                AllFloorFilters.Add(addFilter);
+            }
         }
         private void CalcTypeFilter() 
         {
@@ -92,9 +115,7 @@ namespace XbimXplorer.LeftTabItme
                     var hisFile = AllTypeFilters.Where(c => c.TypeName == strTypeName).FirstOrDefault();
                     if (hisFile == null) 
                     {
-                        hisFile = new EntityTypeFilterViewModel();
-                        hisFile.TypeName = strTypeName;
-                        hisFile.IsChecked = true;
+                        hisFile = new EntityTypeFilterViewModel(strTypeName);
                         AllTypeFilters.Add(hisFile);
                     }
                     if (hisFile.ProjectFilters.ContainsKey(item.Key))
@@ -110,52 +131,136 @@ namespace XbimXplorer.LeftTabItme
         }
         private void CalcFileFilter() 
         {
-            
+            AllFileFilters.Clear();
+            foreach (var item in bimFilterController.PrjAllFilters)
+            {
+                var prjFilters = item.Value.OfType<ProjectFilter>().ToList();
+                if (prjFilters.Count < 1)
+                    continue;
+                foreach (var type in prjFilters)
+                {
+                    var strName = type.Describe;
+                    var hisFile = AllFileFilters.Where(c => c.ShowName == strName).FirstOrDefault();
+                    if (hisFile == null)
+                    {
+                        hisFile = new FileFilterViewModel(strName,strName);
+                        AllFileFilters.Add(hisFile);
+                    }
+                    if (hisFile.ProjectFilters.ContainsKey(item.Key))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        hisFile.ProjectFilters.Add(item.Key, type);
+                    }
+                }
+            }
         }
+        #region 事件的相应处理
 
-        RelayCommand<CheckBox> listCheckedChange;
-        public ICommand CheckedCommond
+        #region 类别过滤的事件
+        RelayCommand<CheckBox> typeFilterCheckedChange;
+        public ICommand TypeCheckedCommond
         {
             get
             {
-                if (listCheckedChange == null)
-                    listCheckedChange = new RelayCommand<CheckBox>((checkBox) => UpdateTypeState(checkBox));
+                if (typeFilterCheckedChange == null)
+                    typeFilterCheckedChange = new RelayCommand<CheckBox>((checkBox) => UpdataTypeState(checkBox));
 
-                return listCheckedChange;
+                return typeFilterCheckedChange;
             }
         }
-        private void UpdateTypeState(CheckBox typeCheckBox)
+        private void UpdataTypeState(CheckBox typeCheckBox)
         {
             var typeFilter = typeCheckBox.DataContext as EntityTypeFilterViewModel;
             var tempIds = bimFilterController.GetGlobalIndexByFilter(typeFilter.ProjectFilters);
             if (typeFilter.IsChecked == true)
             {
                 //新增显示
+                UpdataSelectAllState(new HashSet<int>(), tempIds);
             }
             else 
             {
                 //移除显示
+                UpdataSelectAllState(tempIds,new HashSet<int>());
             }
-
         }
-        private void UpdateSelectAllState()
+        #endregion
+
+        #region 文件过滤的事件
+        RelayCommand<CheckBox> fileFilterCheckedChange;
+        public ICommand FileCheckedCommond
         {
+            get
+            {
+                if (fileFilterCheckedChange == null)
+                    fileFilterCheckedChange = new RelayCommand<CheckBox>((checkBox) => UpdataFileState(checkBox));
 
+                return fileFilterCheckedChange;
+            }
+        }
+        private void UpdataFileState(CheckBox fileCheckBox) 
+        {
+            var typeFilter = fileCheckBox.DataContext as FileFilterViewModel;
+            var tempIds = bimFilterController.GetGlobalIndexByFilter(typeFilter.ProjectFilters);
+            if (typeFilter.IsChecked == true)
+            {
+                //新增显示
+                UpdataSelectAllState(new HashSet<int>(), tempIds);
+            }
+            else
+            {
+                //移除显示
+                UpdataSelectAllState(tempIds, new HashSet<int>());
+            }
+        }
+        #endregion
+
+        #region 楼层过滤事件
+        #endregion
+        private void UpdataSelectAllState(HashSet<int> delIds,HashSet<int> addIds)
+        {
+            bimFilterController.ShowEntityByFilter(delIds, addIds);
 
         }
+        #endregion
     }
     public class FloorFilterViewModel : NotifyPropertyChangedBase
     {
-        public string FloorName { get; set; }
-        public string Elevation { get; set; }
-        public string LevelHeight { get; set; }
-        public Dictionary<string,FilterBase> ProjectFilters { get; set; }
+        private bool? _isChecked { get; set; }
+        public bool? IsChecked
+        {
+            get
+            {
+                return _isChecked;
+            }
+            set
+            {
+                _isChecked = value;
+                this.RaisePropertyChanged();
+            }
+        }
+        public FloorFilterViewModel(string floorName,string elevation,string levelHeight) 
+        {
+            ProjectFilters = new Dictionary<string, FilterBase>();
+            FloorName = floorName;
+            Elevation = elevation;
+            LevelHeight = levelHeight;
+            IsChecked = true;
+        }
+        public string FloorName { get; }
+        public string Elevation { get;  }
+        public string LevelHeight { get;}
+        public Dictionary<string,FilterBase> ProjectFilters { get;  }
     }
     public class EntityTypeFilterViewModel : NotifyPropertyChangedBase
     {
-        public EntityTypeFilterViewModel() 
+        public EntityTypeFilterViewModel(string typeName) 
         {
             ProjectFilters = new Dictionary<string, FilterBase>();
+            TypeName = typeName;
+            IsChecked = true;
         }
         private bool? _isChecked { get; set; }
         public bool? IsChecked 
@@ -170,25 +275,33 @@ namespace XbimXplorer.LeftTabItme
                 this.RaisePropertyChanged();
             }
         }
-        private string _typeName { get; set; }
-        public string TypeName
-        {
-            get
-            {
-                return _typeName;
-            }
-            set
-            {
-                _typeName = value;
-                this.RaisePropertyChanged();
-            }
-        }
+        public string TypeName { get; }
         public Dictionary<string, FilterBase> ProjectFilters { get; }
     }
     public class FileFilterViewModel : NotifyPropertyChangedBase
     {
-        public string FileName { get; set; }
-        public string ShowName { get; set; }
-        public Dictionary<string, FilterBase> ProjectFilters { get; set; }
+        public FileFilterViewModel(string fileName,string showName) 
+        {
+            ProjectFilters = new Dictionary<string, FilterBase>();
+            FileName = fileName;
+            ShowName = showName;
+            IsChecked = true;
+        }
+        private bool? _isChecked { get; set; }
+        public bool? IsChecked
+        {
+            get
+            {
+                return _isChecked;
+            }
+            set
+            {
+                _isChecked = value;
+                this.RaisePropertyChanged();
+            }
+        }
+        public string FileName { get;}
+        public string ShowName { get;}
+        public Dictionary<string, FilterBase> ProjectFilters { get; }
     }
 }

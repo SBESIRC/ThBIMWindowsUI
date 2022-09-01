@@ -86,6 +86,7 @@
   <ItemGroup>
     <Compile Include="BuildingCatagory.cs" />
     <Compile Include="ElementFilter.cs" />
+    <Compile Include="EnumUtil.cs" />
     <Compile Include="GeometryModel\FaceTriangle.cs" />
     <Compile Include="GeometryModel\GeometryMeshModel.cs" />
     <Compile Include="GeometryParam.cs" />

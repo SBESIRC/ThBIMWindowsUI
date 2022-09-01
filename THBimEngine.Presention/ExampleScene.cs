@@ -21,6 +21,8 @@ namespace THBimEngine.Presention
         public static extern void ifcre_set_config(string key, string value);
         [DllImport("ifc-render-engine.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.None, ExactSpelling = false)]
         public static extern int ifcre_get_comp_id();
+        [DllImport("ifc-render-engine.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.None, ExactSpelling = false)]
+        public static extern int ifcre_set_comp_ids(int val);
 
         [DllImport("ifc-render-engine.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.None, ExactSpelling = false)]
         public static extern void ifcre_clear_model_data();

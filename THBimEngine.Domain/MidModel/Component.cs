@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 
 namespace THBimEngine.Domain.MidModel
 {
@@ -26,8 +27,7 @@ namespace THBimEngine.Domain.MidModel
 
 		public void WriteToFile(BinaryWriter writer)
         {
-			writer.Write((ulong)name.Length);
-			writer.Write(name.ToCharArray());
+			name.WriteStr(writer);
 			writer.Write(type_id);
 			color.Write(writer);
 			writer.Write(hori);

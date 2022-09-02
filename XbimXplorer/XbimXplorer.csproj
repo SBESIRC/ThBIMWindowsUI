@@ -367,6 +367,7 @@
     </Compile>
     <Compile Include="ThBIMEngine\IfcStoreReadGeomtry.cs" />
     <Compile Include="ThBIMEngine\IfcStoreToEngineFile.cs" />
+    <Compile Include="ThBIMEngine\ThBimCutData.cs" />
     <Compile Include="ThBIMEngine\ThBimDataController.cs" />
     <Compile Include="ThBIMEngine\ThBimFilterController.cs" />
     <Compile Include="XplorerMainWindow.Logging.xaml.cs">

@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace THBimEngine.Domain.MidModel
 {
@@ -32,43 +30,35 @@ namespace THBimEngine.Domain.MidModel
 			buildingIndex++;
 		}
 
-		public Buildingstorey(Xbim.Ifc4.ProductExtension.IfcBuildingStorey storey, double h,ref int buildingIndex)
+		public Buildingstorey(Xbim.Ifc4.ProductExtension.IfcBuildingStorey storey, FloorPara floorPara)
         {
 			floor_name = storey.Name;
 			elevation = storey.Elevation.Value;
-			height = h;
-			top_elevation = elevation + h;
+			height = floorPara.Height;
+			top_elevation = elevation + height;
 			bottom_elevation = elevation;
-			stdFlrNo = buildingIndex;///
-			floorNo = buildingIndex;///
-			description = storey.Description;
-			buildingIndex++;
-		}
-
-		public Buildingstorey(Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey storey, ref int buildingIndex)
-		{
-			floor_name = storey.Name;
-			if(!(storey.Elevation is null))
-            {
-				elevation = storey.Elevation.Value;
-				top_elevation = storey.Elevation.Value;// + storey.LevelHeight;
-				bottom_elevation = storey.Elevation.Value;
-			}
-	
-			stdFlrNo = buildingIndex;
-			floorNo = buildingIndex;
-			height = 0;
-
+			stdFlrNo = floorPara.StdNum;///
+			floorNo = floorPara.Num;///
 			if (!(storey.Description is null))
 				description = storey.Description;
+		}
 
-			buildingIndex++;
+		public Buildingstorey(Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey storey, FloorPara floorPara)
+		{
+			floor_name = storey.Name;
+			elevation = storey.Elevation.Value;
+			height = floorPara.Height;
+			top_elevation = elevation + height;
+			bottom_elevation = elevation;
+			stdFlrNo = floorPara.StdNum;///
+			floorNo = floorPara.Num;///
+			if(!(storey.Description is null))
+				description = storey.Description;
 		}
 
 		public void WriteToFile(BinaryWriter writer)
         {
-			writer.Write((System.Int64)floor_name.Length);
-			writer.Write(floor_name.ToCharArray());
+			floor_name.WriteStr(writer);
 			writer.Write(elevation);
 			writer.Write(top_elevation);
 			writer.Write(bottom_elevation);
@@ -86,22 +76,10 @@ namespace THBimEngine.Domain.MidModel
             {
 				var key = property.Key;
 				var value = property.Value;
-				writer.Write((System.UInt64)key.Length);
-				writer.Write(key.ToCharArray());
-				writer.Write((System.UInt64)value.Length);
-				writer.Write(value.ToCharArray());
+				key.WriteStr(writer);
+				value.WriteStr(writer);
 			}
-			if(Regex.IsMatch(description, @"[\u4e00-\u9fa5]"))
-			{
-				writer.Write((System.UInt64)0);
-				writer.Write("".ToCharArray());
-			}
-			else
-            {
-				writer.Write((System.UInt64)description.Count());
-				writer.Write(description.ToCharArray());
-			}
-
+			description.WriteStr(writer);
 		}
 	}
 }

@@ -1385,6 +1385,8 @@ namespace XbimXplorer
         private void ExportCut_Click(object sender, RoutedEventArgs e)
         {
             //导出切图数据
+            ;
+            ThBimCutData.Run();
         }
     }
 }

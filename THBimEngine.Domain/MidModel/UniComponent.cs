@@ -52,6 +52,7 @@ namespace THBimEngine.Domain.MidModel
 			floor_num = buildingStorey.floorNo;
 			rgb = new double[3] { bimMaterial.KS_R, bimMaterial.KS_G, bimMaterial.KS_B };
 	
+
 		}
 
 		public UniComponent(string uid, THBimMaterial bimMaterial, ref int uniComponentIndex, Buildingstorey buildingStorey,Component component) : base(component.name, component.type_id)
@@ -70,10 +71,24 @@ namespace THBimEngine.Domain.MidModel
 			properties.Add("type", name);
 		}
 
+		public UniComponent(string uid, THBimMaterial bimMaterial, ref int uniComponentIndex, Component component) : base(component.name, component.type_id)
+		{
+			unique_id = uniComponentIndex;
+			uniComponentIndex++;
+			guid = uid;
+
+			rgb = new double[3] { bimMaterial.Color_R, bimMaterial.Color_G, bimMaterial.Color_B };
+
+			comp_name = component.name;
+
+
+			properties.Add("type", name);
+		}
+
+
 		public new void WriteToFile(BinaryWriter writer)
         {
-			writer.Write((ulong)name.Length);
-			writer.Write(name.ToCharArray());
+			name.WriteStr(writer);
 			writer.Write(type_id);
 			color.Write(writer);
 			writer.Write(hori);
@@ -82,16 +97,12 @@ namespace THBimEngine.Domain.MidModel
 			writer.Write(depth_t);
 			writer.Write(x_len);
 			writer.Write(y_len);
-			writer.Write((ulong)floor_name.Length);
-			writer.Write(floor_name.ToCharArray());
-			writer.Write((ulong)material.Length);
-			writer.Write(material.ToCharArray());
-			writer.Write((ulong)openmethod.Length);
-			writer.Write(openmethod.ToCharArray());
-			writer.Write((ulong)description.Length);
-			writer.Write(description.ToCharArray());
-			writer.Write((ulong)guid.Length);
-			writer.Write(guid.ToCharArray());
+			floor_name.WriteStr(writer);
+			material.WriteStr(writer);
+			openmethod.WriteStr(writer);
+			description.WriteStr(writer);
+			guid.WriteStr(writer);
+
 			writer.Write(tri_ind_s);
 			writer.Write(tri_ind_e);
 			writer.Write(x_l);
@@ -118,14 +129,11 @@ namespace THBimEngine.Domain.MidModel
             {
 				var key = property.Key;
 				var value = property.Value;
-				writer.Write((ulong)key.Length);
-				writer.Write(key.ToCharArray());
-				writer.Write((ulong)value.Length);
-				writer.Write(value.ToCharArray());
+				key.WriteStr(writer);
+				value.WriteStr(writer);
 			}
 			writer.Write(OpenDirIndex);
-			writer.Write((ulong)comp_name.Length);
-			writer.Write(comp_name.ToCharArray());
+			comp_name.WriteStr(writer);
 			writer.Write(edge_ind_s);
 			writer.Write(edge_ind_e);
 		}

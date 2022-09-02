@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace THBimEngine.Domain.MidModel
 {
+
     public struct Color// 颜色信息rgba
     { 
 		public float r, g, b, a;
@@ -48,4 +50,51 @@ namespace THBimEngine.Domain.MidModel
             writer.Write(z);
         }
     };
+
+    public struct FloorPara
+    {
+        public int Num;
+        public int StdNum;
+        public double Height;
+
+        public FloorPara(int num, int stdNum, double height)
+        {
+            Num = num;
+            StdNum = stdNum;
+            Height = height;
+        }
+    }
+
+    public static class Method
+    {
+
+        /// <summary>
+        /// 删除字符串中的中文
+        /// </summary>
+        public static string DeleteChinese(string str)
+        {
+            string retValue = str;
+            if (System.Text.RegularExpressions.Regex.IsMatch(str, @"[\u4e00-\u9fa5]"))
+            {
+                retValue = string.Empty;
+                var strsStrings = str.ToCharArray();
+                for (int index = 0; index < strsStrings.Length; index++)
+                {
+                    if (strsStrings[index] >= 0x4e00 && strsStrings[index] <= 0x9fa5)
+                    {
+                        continue;
+                    }
+                    retValue += strsStrings[index];
+                }
+            }
+            return retValue;
+        }
+
+        public static void WriteStr(this string str, BinaryWriter writer)
+        {
+            var buffer = Encoding.GetEncoding("utf-8").GetBytes(str);
+            writer.Write((ulong)buffer.Length);
+            writer.Write(buffer);
+        }
+    }
 }

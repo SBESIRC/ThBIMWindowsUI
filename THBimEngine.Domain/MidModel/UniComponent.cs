@@ -44,8 +44,7 @@ namespace THBimEngine.Domain.MidModel
 
 		public UniComponent(THBimElementRelation bimRelation,THBimMaterial bimMaterial, ref int uniComponentIndex, Buildingstorey buildingStorey) : base("",0)
 		{
-			unique_id = uniComponentIndex;
-			uniComponentIndex++;
+			unique_id = uniComponentIndex++;
 			guid = bimRelation.RelationElementUid;
 
 			floor_name = buildingStorey.floor_name;
@@ -57,8 +56,7 @@ namespace THBimEngine.Domain.MidModel
 
 		public UniComponent(string uid, THBimMaterial bimMaterial, ref int uniComponentIndex, Buildingstorey buildingStorey,Component component) : base(component.name, component.type_id)
 		{
-			unique_id = uniComponentIndex;
-			uniComponentIndex++;
+			unique_id = uniComponentIndex++;
 			guid = uid;
 
 			floor_name = buildingStorey.floor_name;
@@ -73,8 +71,7 @@ namespace THBimEngine.Domain.MidModel
 
 		public UniComponent(string uid, THBimMaterial bimMaterial, ref int uniComponentIndex, Component component) : base(component.name, component.type_id)
 		{
-			unique_id = uniComponentIndex;
-			uniComponentIndex++;
+			unique_id = uniComponentIndex++;
 			guid = uid;
 
 			rgb = new double[3] { bimMaterial.Color_R, bimMaterial.Color_G, bimMaterial.Color_B };

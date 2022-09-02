@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -42,6 +43,28 @@ namespace THBimEngine.Domain.MidModel
             y = pt.Y;
             z = pt.Z;
         }
+        public Vec3 Dir(Vec3 vec3)
+        {
+            return new Vec3(x-vec3.x,y-vec3.y,z-vec3.z);
+        }
+
+        public bool Equals(Vec3 vec3)
+        {
+            var dot = x * vec3.x + y * vec3.y + z * vec3.z;
+            var cos = Math.Abs(dot / (this.Norm()*vec3.Norm()));
+            return cos > Math.Cos(0.017);
+        }
+
+        public double Norm()
+        {
+            return Math.Sqrt(x * x + y * y + z * z);
+        }
+
+        public Vec3 ReverseX()
+        {
+            return new Vec3(-x,-y,-z);
+        }
+
 
         public void Write(BinaryWriter writer)
         {

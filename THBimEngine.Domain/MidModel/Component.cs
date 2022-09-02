@@ -15,14 +15,8 @@ namespace THBimEngine.Domain.MidModel
 			name = type;
 			type_id = componentIndex;
 			color = new Color((float)0.7, (float)0.2, (float)0.2, (float)1);
-			if(type.Contains("Beam")||type.Contains("Slab"))
-            {
-				hori = true;
-            }
-			else
-            {
-				hori = false;
-			}
+
+			hori = type.Contains("Beam") || type.Contains("Slab");
 		}
 
 		public void WriteToFile(BinaryWriter writer)

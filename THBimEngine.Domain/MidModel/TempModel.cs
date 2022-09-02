@@ -101,6 +101,10 @@ namespace THBimEngine.Domain.MidModel
                         foreach (var item in elements)
                         {
                             var type = item.ToString().Split('.').Last();
+                            if(type.Contains("IfcVirtualElement"))
+                            {
+                                continue;
+                            }
       
                             var component = new Component(type, componentIndex);
 
@@ -109,7 +113,6 @@ namespace THBimEngine.Domain.MidModel
                                 Components.Add(type, component);
                                 componentIndex++;
                             }
-
                             var uid = item.EntityLabel.ToString();
                             var material = THBimMaterial.GetTHBimEntityMaterial(type, true);
 
@@ -607,8 +610,6 @@ namespace THBimEngine.Domain.MidModel
             ;
         }
 
-
-        
         public List<Edge> GetEdges(OutingPolygon outingPolygon, List<PointNormal> allPoints, ref int edgeIndex, int parentId)
         {
             var edges = new List<Edge>();
@@ -626,18 +627,38 @@ namespace THBimEngine.Domain.MidModel
 
                     if (edgeLen > maxLen)
                     {
-                        maxLen = edgeLen-0.1;
+                        maxLen = edgeLen - 0.1;
                     }
                     tempEdges.Add(edge);
                 }
             }
-            foreach(var edge in tempEdges)
+            foreach (var edge in tempEdges)
             {
-                if(edge.Len< maxLen)
+                if (edge.Len < maxLen)
                 {
                     edge.Id = edgeIndex;
                     edges.Add(edge);
                     edgeIndex++;
+                }
+            }
+            return edges;
+        }
+
+
+        public List<Edge> GetEdges2(OutingPolygon outingPolygon, List<PointNormal> allPoints, ref int edgeIndex, int parentId)
+        {
+            var edges = new List<Edge>();
+            var cnt = outingPolygon.ptsIndex.Count;
+            for (int i = 0; i < cnt - 1; i++)
+            {
+                for (int j = i + 1; j < cnt; j++)
+                {
+                    var ptn1 = allPoints[outingPolygon.ptsIndex[i]];
+                    var ptn2 = allPoints[outingPolygon.ptsIndex[j]];
+                    var edgeLen = GetLength(ptn1.Point, ptn2.Point);
+                    var edge = new Edge(ref edgeIndex, parentId, outingPolygon.ptsIndex[i], outingPolygon.ptsIndex[j], edgeLen);
+
+                    edges.Add(edge);
                 }
             }
             return edges;
@@ -652,13 +673,62 @@ namespace THBimEngine.Domain.MidModel
             UniComponent uniComponent, ref int ptIndex)
         {
             bool firstTriangles = true;
+            var allEdges = new List<Edge>();
             foreach (var triangle in triangles)
             {
                 var outingPolygon = new OutingPolygon(triangle, allPoints, ref triangleIndex, uniComponent, ref ptIndex, Points, firstTriangles);
-                var edges = GetEdges(outingPolygon, allPoints, ref edgeIndex, uniComponent.unique_id);
+                var edges = GetEdges2(outingPolygon, allPoints, ref edgeIndex, uniComponent.unique_id);
                 OutingPolygons.Add(outingPolygon);
-                Edges.AddRange(edges);
+                allEdges.AddRange(edges);
                 if (firstTriangles) firstTriangles = false;
+            }
+            if (uniComponent.name.Contains("Beam"))
+            {
+                var edgeLenDic = new Dictionary<Vec3, double>();
+                var edgeDic = new Dictionary<Vec3, List<Edge>>();
+                int maxCnt = 0;
+                foreach (var edge in allEdges)
+                {
+                    var pt1 = Points[edge.ptsIndex[0]];
+                    var pt2 = Points[edge.ptsIndex[1]];
+                    var vec3 = pt1.Dir(pt2);
+
+                    bool added = false;
+                    foreach(var vec in edgeDic.Keys)
+                    {
+                        if(vec.Equals(vec3))
+                        {
+                            edgeDic[vec].Add(edge);
+                            if (edgeDic[vec].Count > maxCnt) maxCnt = edgeDic[vec].Count;
+                            added = true;
+                            break;
+                        }
+                    }
+                    if (!added)
+                    {
+                        edgeLenDic.Add(vec3, vec3.Norm());
+                        edgeDic.Add(vec3, new List<Edge>() { edge });
+                    }
+                }
+                foreach (var key in edgeDic.Keys)
+                {
+                    if (edgeDic[key].Count == maxCnt)
+                    {
+                        foreach (var edge in edgeDic[key])
+                        {
+                            edge.Id = edgeIndex++;
+                            Edges.Add(edge);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (var edge in allEdges)
+                {
+                    edge.Id = edgeIndex++;
+                    Edges.Add(edge);
+                }
             }
         }
     }

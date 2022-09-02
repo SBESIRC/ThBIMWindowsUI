@@ -14,8 +14,7 @@ namespace THBimEngine.Domain.MidModel
         public OutingPolygon(FaceTriangle triangle, List<PointNormal> allPoints, ref int triangleIndex,
             UniComponent uniComponent, ref int ptIndex, List<Vec3> Points,bool firstTriangles)
         {
-            id = triangleIndex;
-            triangleIndex++;
+            id = triangleIndex++;
             group_id = uniComponent.unique_id;
             type_id = uniComponent.type_id;
             var cnt = triangle.ptIndex.Count;

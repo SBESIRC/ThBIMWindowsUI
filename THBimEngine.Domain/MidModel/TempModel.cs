@@ -89,6 +89,8 @@ namespace THBimEngine.Domain.MidModel
                 foreach (var ifcStorey in building.BuildingStoreys)
                 {
                     var storey = ifcStorey as Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey;
+                    //if (storey.Name != "2")
+                    //    continue;
                     var floorPara = GetIfcStoreyHeight(storey);
                     var buildingStorey = new Buildingstorey(storey, floorPara);
                     buildingStorey.element_index_s.Add(uniComponentIndex);
@@ -101,6 +103,19 @@ namespace THBimEngine.Domain.MidModel
                         foreach (var item in elements)
                         {
                             var type = item.ToString().Split('.').Last();
+
+                            //var itemName = item.Name.ToString();
+                            //if (itemName.Contains("Beam_29019") || 
+                            //    itemName.Contains("Beam_28889") || 
+                            //    itemName.Contains("Beam_28892") || 
+                            //    itemName.Contains("Beam_28913"))
+                            //{
+                            //    ;
+                            //}
+                            //else
+                            //{
+                            //    continue;
+                            //}
                             if(type.Contains("IfcVirtualElement"))
                             {
                                 continue;
@@ -130,6 +145,7 @@ namespace THBimEngine.Domain.MidModel
                             uniComponent.edge_ind_e = edgeIndex - 1;
                             uniComponent.tri_ind_e = triangleIndex - 1;
                             uniComponent.bg = uniComponent.z_r - buildingStorey.elevation;
+                            uniComponent.depth = uniComponent.z_r - uniComponent.z_l;
 
                             UniComponents.Add(uniComponent);
                         }

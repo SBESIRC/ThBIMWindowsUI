@@ -91,8 +91,11 @@ namespace XbimXplorer
             return _openedModelFileName;
         }
         private ThTCHProject thProject=null;
+        private ThSUProjectData suProject = null;
         NamedPipeServerStream pipeServer = null;
+        NamedPipeServerStream SU_pipeServer = null;
         BackgroundWorker backgroundWorker = null;
+        BackgroundWorker SU_backgroundWorker = null;
         private void SetOpenedModelFileName(string ifcFilename)
         {
             _openedModelFileName = ifcFilename;
@@ -145,7 +148,12 @@ namespace XbimXplorer
             backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
             backgroundWorker.RunWorkerAsync();
 
-           
+            //New Code
+            SU_pipeServer = new NamedPipeServerStream("THSU2Viewer_TestPipe", PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
+            SU_backgroundWorker = new BackgroundWorker();
+            SU_backgroundWorker.DoWork += SU_Background_DoWork;
+            SU_backgroundWorker.RunWorkerCompleted += SU_BackgroundWorker_RunWorkerCompleted;
+            SU_backgroundWorker.RunWorkerAsync();
         }
 
         #region 接收数据并解析数据渲染
@@ -166,6 +174,7 @@ namespace XbimXplorer
             }
             pipeServer.Dispose();
         }
+        
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (null != thProject)
@@ -185,6 +194,43 @@ namespace XbimXplorer
                 convertData.DoWork += ConvertData_DoWork;
                 convertData.RunWorkerCompleted += ConvertData_RunWorkerCompleted;
                 convertData.RunWorkerAsync();*/
+            }
+        }
+
+        private void SU_Background_DoWork(object sender, DoWorkEventArgs e)
+        {
+            if (null == SU_pipeServer)
+                SU_pipeServer = new NamedPipeServerStream("THSU2Viewer_TestPipe", PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
+            SU_pipeServer.WaitForConnection();
+            try
+            {
+                //byte[] data = new byte[pipeServer.Length];
+                //pipeServer.Read(data, 0, data.Length);
+                suProject = new ThSUProjectData();
+                Google.Protobuf.MessageExtensions.MergeFrom(suProject, SU_pipeServer);
+            }
+            catch (IOException ioEx)
+            {
+                suProject = null;
+                Log.Error(string.Format("ERROR: {0}", ioEx.Message));
+            }
+            SU_pipeServer.Dispose();
+        }
+
+        private void SU_BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (null != suProject)
+            {
+                ExampleScene.ifcre_set_sleep_time(1000);
+                DateTime startTime = DateTime.Now;
+                bimDataController.AddProject(suProject);
+                suProject = null;
+                SU_pipeServer = null;
+                SU_backgroundWorker.RunWorkerAsync();
+                DateTime endTime = DateTime.Now;
+                var totalTime = (endTime - startTime).TotalSeconds;
+                Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
+                LoadIfcFile(_tempMidFileName);
             }
         }
         private void ConvertData_DoWork(object sender, DoWorkEventArgs e)

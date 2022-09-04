@@ -43,6 +43,32 @@ namespace XbimXplorer.ThBIMEngine
                 UpdateProject(convertResult);
             }
         }
+        
+        public void AddProject(ThSUProjectData project)
+        {
+            convertFactory = new THSUProjectConvertFactory(Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3);
+            bool isAdd = IsAddProject("SU" + project.Root.GlobalId);
+            if (isAdd)
+            {
+                //这里增量跟新没有做，先删除原来的数据，再增加现在的数据
+                THBimScene.Instance.DeleteProjectData("SU" + project.Root.GlobalId);
+            }
+            var convertResult = convertFactory.ProjectConvert(project, false);
+
+            var bimProject = convertResult.BimProject;
+            bimProject.ProjectIdentity = project.Root.Name;
+            bimProject.SourceProject = project;
+            bimProject.NeedCreateMesh = false;
+            bimProject.HaveChange=false;
+            var allGeoPointNormals = new List<PointNormal>();
+            var readGeomtry = new SUProjectReadGeomtry();
+            var allGeoModels = readGeomtry.ReadGeomtry(project, out allGeoPointNormals);
+            bimProject.AddGeoMeshModels(allGeoModels, allGeoPointNormals);
+            THBimScene.Instance.AddProject(bimProject);
+
+            WriteToMidDataByFloor();
+        }
+
         /// <summary>
         /// 这里目前只处理Mesh后的IfcStore
         /// </summary>

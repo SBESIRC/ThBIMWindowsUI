@@ -15,7 +15,6 @@ namespace XbimXplorer.LeftTabItme
         {
             LeftTabItems = new ObservableCollection<LeftTabItemBtn>();
             LeftTabItems.Add(new LeftTabItemBtn("过\r\n滤", 300, new MainFilterUControl()));
-            LeftTabItems.Add(new LeftTabItemBtn("过\r\n滤", 500, new MainFilterUControl()));
         }
     }
 }

@@ -11,31 +11,67 @@
 
         <TabControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  BorderThickness="1" >
             <TabItem Header="楼层" Height="25">
-                <DataGrid AutoGenerateColumns="False" CanUserAddRows="False" SelectionMode="Extended" SelectionUnit="FullRow" RowHeaderWidth="0"
-                          SelectionChanged="DataGrid_SelectionChanged"
-                          ItemsSource="{Binding AllFloorFilters}" Background="Transparent">
-                    <DataGrid.Columns>
-                        <DataGridCheckBoxColumn Binding="{Binding Path=IsSelected,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type DataGridRow}}}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="全选" Height="25" Width="50" Margin="0,5,0,5" Name="BtnSelectAll" Click="BtnSelectAll_Click"></Button>
+                       
+                    </StackPanel>
+                    <DataGrid x:Name="floorDGrid" Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False" 
+                              VerticalAlignment="Stretch"
+                              RowHeight="22" 
+                              SelectionMode="Extended" SelectionUnit="FullRow" RowHeaderWidth="0"
+                              SelectionChanged="DataGrid_SelectionChanged" BorderThickness="1,1,0,0"
+                              ScrollViewer.VerticalScrollBarVisibility="Auto"
+                              ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                              ItemsSource="{Binding AllFloorFilters}" Background="Transparent">
+                        <DataGrid.Columns>
+                            <!--<DataGridTemplateColumn x:Name="test">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate DataType="{x:Type DataGridCell}">
+                                        <Grid>
+                                            <CheckBox x:Name="SelectCheckBox" IsChecked="{Binding Path=IsSelected,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type DataGridRow}}}">
 
-                        </DataGridCheckBoxColumn>
-                        <DataGridTemplateColumn >
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <CheckBox IsChecked="{Binding Path=IsSelected,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type DataGridRow}}}"
-                                      Command="{Binding Path=DataContext.TypeCheckedCommond, ElementName=mainGrid}"
-                                      CommandParameter="{Binding RelativeSource={x:Static RelativeSource.Self}}">
-                                    </CheckBox>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTextColumn CanUserSort="False" Header="楼层名称" Width="2*" IsReadOnly="True" Binding="{Binding FloorName,Mode=OneWay}"></DataGridTextColumn>
-                        <DataGridTextColumn CanUserSort="False" Header="标高" Width="1*" IsReadOnly="True" Binding="{Binding Elevation,Mode=OneWay}"></DataGridTextColumn>
-                        <DataGridTextColumn CanUserSort="False" Header="层高" Width="1*" IsReadOnly="True" Binding="{Binding LevelHeight,Mode=OneWay}"></DataGridTextColumn>
-                    </DataGrid.Columns>
-                    <DataGrid.CommandBindings>
-                        <CommandBinding ></CommandBinding>
-                    </DataGrid.CommandBindings>
-                </DataGrid>
+                                            </CheckBox>
+                                            <CheckBox Margin="30,0,0,0" x:Name="ValueCheckBox">
+
+                                            </CheckBox>
+                                        </Grid>
+                                        <DataTemplate.Triggers>
+                                            -->
+                            <!--<Trigger SourceName="SelectCheckBox" Property="IsChecked" Value="True">
+                                                <Setter TargetName="SelectCheckBox" Property="IsChecked" Value="{Binding Path=IsChecked, Mode=OneWay,NotifyOnSourceUpdated=True,NotifyOnTargetUpdated=True}"></Setter>
+                                            </Trigger>
+                                            <Trigger SourceName="SelectCheckBox" Property="IsChecked" Value="False">
+                                                <Setter TargetName="SelectCheckBox" Property="IsChecked" Value="{Binding Path=IsChecked, Mode=OneWay,NotifyOnSourceUpdated=True,NotifyOnTargetUpdated=True}"></Setter>
+                                            </Trigger>-->
+                            <!--
+                                            <DataTrigger Binding="{Binding Path=IsChecked}" Value="True">
+                                                <Setter TargetName="SelectCheckBox"  Property="IsChecked" Value="True" />
+                                            </DataTrigger>
+                                            -->
+                            <!--<Trigger SourceName="SelectCheckBox" Property="IsChecked" Value="False">
+                                                <Setter TargetName="ValueCheckBox" Property="IsChecked" Value="False"></Setter>
+                                            </Trigger>-->
+                            <!--
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>-->
+                            <DataGridTextColumn CanUserSort="False" Header="楼层名称" Width="2*" IsReadOnly="True"
+                                                Binding="{Binding FloorName,Mode=OneWay}"/>
+                            <DataGridTextColumn CanUserSort="False" Header="标高" Width="1*" IsReadOnly="True" 
+                                                Binding="{Binding Elevation,Mode=OneWay}"></DataGridTextColumn>
+                            <DataGridTextColumn CanUserSort="False" Header="层高" Width="1*" IsReadOnly="True"
+                                                Binding="{Binding LevelHeight,Mode=OneWay}"></DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+                
             </TabItem>
             <TabItem Header="类别" Height="25">
                 <ListView x:Name="listType" Grid.Row="1" ItemsSource="{Binding AllTypeFilters}">

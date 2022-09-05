@@ -76,6 +76,7 @@ namespace XbimXplorer.LeftTabItme
         {
             var allFloors = ProjectExtension.AllProjectStoreys(THBimScene.Instance.AllBimProjects);
             AllFloorFilters.Clear();
+            FloorShowIds.Clear();
             foreach (var floorKeyValue in allFloors)
             {
                 var prjStoreyFilters = new Dictionary<string, StoreyFilter>();
@@ -100,10 +101,16 @@ namespace XbimXplorer.LeftTabItme
                 }
                 AllFloorFilters.Add(addFilter);
             }
+            foreach (var filter in AllFloorFilters)
+            {
+                var tempIds = bimFilterController.GetGlobalIndexByFilter(filter.ProjectFilters);
+                FloorShowIds = TypeShowIds.Union(tempIds).ToHashSet();
+            }
         }
         private void CalcTypeFilter() 
         {
             AllTypeFilters.Clear();
+            TypeShowIds.Clear();
             foreach (var item in bimFilterController.PrjAllFilters) 
             {
                 var typeFilters = item.Value.OfType<TypeFilter>().ToList();
@@ -128,10 +135,16 @@ namespace XbimXplorer.LeftTabItme
                     }
                 }
             }
+            foreach (var filter in AllTypeFilters)
+            {
+                var tempIds = bimFilterController.GetGlobalIndexByFilter(filter.ProjectFilters);
+                TypeShowIds = TypeShowIds.Union(tempIds).ToHashSet();
+            }
         }
         private void CalcFileFilter() 
         {
             AllFileFilters.Clear();
+            ProjectShowIds.Clear();
             foreach (var item in bimFilterController.PrjAllFilters)
             {
                 var prjFilters = item.Value.OfType<ProjectFilter>().ToList();
@@ -156,7 +169,16 @@ namespace XbimXplorer.LeftTabItme
                     }
                 }
             }
+            foreach (var prjFilter in AllFileFilters)
+            {
+                var tempIds = bimFilterController.GetGlobalIndexByFilter(prjFilter.ProjectFilters);
+                ProjectShowIds = ProjectShowIds.Union(tempIds).ToHashSet();
+            }
         }
+
+        private HashSet<int> ProjectShowIds = new HashSet<int>();
+        private HashSet<int> TypeShowIds = new HashSet<int>();
+        private HashSet<int> FloorShowIds = new HashSet<int>();
         #region 事件的相应处理
 
         #region 类别过滤的事件
@@ -178,13 +200,14 @@ namespace XbimXplorer.LeftTabItme
             if (typeFilter.IsChecked == true)
             {
                 //新增显示
-                UpdataSelectAllState(new HashSet<int>(), tempIds);
+                ProjectShowIds = ProjectShowIds.Union(tempIds).ToHashSet();
             }
             else 
             {
                 //移除显示
-                UpdataSelectAllState(tempIds,new HashSet<int>());
+                ProjectShowIds = ProjectShowIds.Except(tempIds).ToHashSet();
             }
+            ShowFilterResult();
         }
         #endregion
 
@@ -207,22 +230,43 @@ namespace XbimXplorer.LeftTabItme
             if (typeFilter.IsChecked == true)
             {
                 //新增显示
-                UpdataSelectAllState(new HashSet<int>(), tempIds);
+                ProjectShowIds = ProjectShowIds.Union(tempIds).ToHashSet();
             }
             else
             {
                 //移除显示
-                UpdataSelectAllState(tempIds, new HashSet<int>());
+                ProjectShowIds = ProjectShowIds.Except(tempIds).ToHashSet();
             }
+            ShowFilterResult();
         }
         #endregion
 
         #region 楼层过滤事件
-        #endregion
-        private void UpdataSelectAllState(HashSet<int> delIds,HashSet<int> addIds)
+        public void UpdataFloorShowIds() 
         {
-            bimFilterController.ShowEntityByFilter(delIds, addIds);
+            FloorShowIds.Clear();
+            foreach (var filter in AllFloorFilters)
+            {
+                if (filter.IsChecked != true)
+                    continue;
+                var tempIds = bimFilterController.GetGlobalIndexByFilter(filter.ProjectFilters);
+                FloorShowIds = FloorShowIds.Union(tempIds).ToHashSet();
+            }
+        }
+        #endregion
+        public void ShowFilterResult()
+        {
+            var showIds = GetAllShowIdByFilters();
+            bimFilterController.ShowEntity(showIds);
 
+        }
+        private HashSet<int> GetAllShowIdByFilters()
+        {
+            HashSet<int> showIds = new HashSet<int>();
+            //step1 项目获取所有Id
+            showIds = ProjectShowIds.Intersect(TypeShowIds).ToHashSet();
+            showIds = showIds.Intersect(FloorShowIds).ToHashSet();
+            return showIds;
         }
         #endregion
     }

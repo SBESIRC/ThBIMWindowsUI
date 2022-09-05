@@ -34,6 +34,9 @@
     <Reference Include="Esent.Interop, Version=1.9.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\ManagedEsent.1.9.4\lib\net40\Esent.Interop.dll</HintPath>
     </Reference>
+    <Reference Include="Google.Protobuf, Version=3.21.5.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
+      <HintPath>..\packages\Google.Protobuf.3.21.5\lib\net45\Google.Protobuf.dll</HintPath>
+    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
@@ -101,6 +104,23 @@
     <Compile Include="GeometryModel\PointNormal.cs" />
     <Compile Include="GeometryModel\PointVector.cs" />
     <Compile Include="ProjectExtension.cs" />
+    <Compile Include="ProtoData\ThSUBuildingElementData.cs" />
+    <Compile Include="ProtoData\ThSUCompDefinitionData.cs" />
+    <Compile Include="ProtoData\ThSUComponentData.cs" />
+    <Compile Include="ProtoData\ThSUFaceData.cs" />
+    <Compile Include="ProtoData\ThSUGeometry.cs" />
+    <Compile Include="ProtoData\ThSUProjectData.cs" />
+    <Compile Include="ProtoData\ThTCHBuildingData.cs" />
+    <Compile Include="ProtoData\ThTCHBuildingStoreyData.cs" />
+    <Compile Include="ProtoData\ThTCHBuiltElementData.cs" />
+    <Compile Include="ProtoData\ThTCHDoorData.cs" />
+    <Compile Include="ProtoData\ThTCHGeometry.cs" />
+    <Compile Include="ProtoData\ThTCHOpeningData.cs" />
+    <Compile Include="ProtoData\ThTCHProjectData.cs" />
+    <Compile Include="ProtoData\ThTCHRootData.cs" />
+    <Compile Include="ProtoData\ThTCHSiteData.cs" />
+    <Compile Include="ProtoData\ThTCHWallData.cs" />
+    <Compile Include="ProtoData\ThTCHWindowData.cs" />
     <Compile Include="THBimBuilding.cs" />
     <Compile Include="THBimDomainCommon.cs" />
     <Compile Include="THBimElement.cs" />

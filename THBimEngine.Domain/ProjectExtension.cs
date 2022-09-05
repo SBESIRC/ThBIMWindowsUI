@@ -346,30 +346,24 @@ namespace THBimEngine.Domain
             else 
             {
                 if (project.ProjectSite == null || project.ProjectSite.SiteBuildings.Count < 1) { return; }
-                validFilter = false;
                 foreach (var building in project.ProjectSite.SiteBuildings)  // 遍历site中的每一个building
                 {
                     //check valid
                     foreach (var filter in allFilters)
                     {
-                        if (!filter.ProjectValid || !filter.SiteValid) { continue; }
-                        validFilter = true;
+                        if (!filter.ProjectValid) 
+                            continue;
                         filter.CheckBuilding(building.Value);
                     }
-                    if (!validFilter) { break; }
-                    validFilter = false;
-
                     foreach (var story in building.Value.BuildingStoreys) // 遍历building中的每一楼层
                     {
                         //check valid
                         foreach (var filter in allFilters)
                         {
-                            if (!filter.ProjectValid || !filter.SiteValid || !filter.BuildingValid) { continue; }
-                            validFilter = true;
+                            if (!filter.ProjectValid || !filter.BuildingValid) 
+                                continue;
                             filter.CheckStory(story.Value);
                         }
-                        if (!validFilter) { break; }
-
                         foreach (var relation in story.Value.FloorEntityRelations) // 遍历楼层中每一个构件
                         {
                             var entity = project.PrjAllEntitys[relation.Value.RelationElementUid];

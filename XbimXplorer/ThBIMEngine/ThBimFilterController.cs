@@ -45,6 +45,8 @@ namespace XbimXplorer.ThBIMEngine
 				ProjectExtension.PorjectFilterEntitys(project, listFilters); // 获取所有的数据
 				PrjAllFilters.Add(project.ProjectIdentity, listFilters);
 			}
+
+			UnFilter();
 		}
 
 		public HashSet<int> GetGlobalIndexByFilterIds(Dictionary<string, HashSet<string>> prjFilterIds)
@@ -120,17 +122,36 @@ namespace XbimXplorer.ThBIMEngine
 			// 在此传输数据给viewer
 			ShowEntityGIndex = ShowEntityGIndex.Except(delIds).ToHashSet();
 			ShowEntityGIndex = ShowEntityGIndex.Union(addIds).ToHashSet();
+			EntityShowByIds();
+		}
+		public void ShowEntity(HashSet<int> showIds)
+		{
+			// 在此传输数据给viewer
+			ShowEntityGIndex = showIds;
+			EntityShowByIds();
+		}
+		private void EntityShowByIds() 
+		{
 			ExampleScene.ifcre_set_config("to_show_states", "0");
 			ExampleScene.ifcre_set_comp_ids(-1);
-			//目前没有结束隔离显示，先全传入
 			//if (ShowEntityGIndex.Count() == AllEntityCount)
+			//{
+			//	UnFilter();
 			//	return;
+			//}
+			
 			ExampleScene.ifcre_set_sleep_time(100);
-			foreach (var id in ShowEntityGIndex) 
+			foreach (var id in ShowEntityGIndex)
 			{
 				ExampleScene.ifcre_set_comp_ids(id);
 			}
 			ExampleScene.ifcre_set_sleep_time(10);
+		}
+
+		private void UnFilter() 
+		{
+			return;
+			ExampleScene.ifcre_set_comp_ids(-2);
 		}
 	}
 }

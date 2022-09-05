@@ -228,7 +228,7 @@ namespace THBimEngine.Domain
                 storey_Elevation = storey.Elevation.Value;
             }
             var bimStorey = new THBimStorey(storey.EntityLabel, storey.Name, storey_Elevation, storey_Height, "", storey.GlobalId);
-            var propSets = storey.PropertySets;
+            var propSets = storey.PropertySets.ToList();
             if (propSets == null || propSets.Count() < 1)
                 return bimStorey;
 
@@ -238,9 +238,9 @@ namespace THBimEngine.Domain
                     continue;
                 foreach (var prop in item.PropertySetDefinitions)
                 {
-                    if (!(prop is IIfcPropertySet))
-                        continue;
                     var propertySet = prop as IIfcPropertySet;
+                    if (propertySet == null) continue;
+                    
                     foreach (var realProp in propertySet.HasProperties)
                     {
                         if (realProp.Name == "Height")

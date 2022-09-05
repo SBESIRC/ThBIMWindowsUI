@@ -1,45 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace THBimEngine.Domain.MidModel
 {
-    public class UniComponent: Component// 各个独一无二的物件
+    public class UniComponent: Component
 	{
-		public int unique_id;      // 独一无二的id
+		public int unique_id;
 		public string guid;
 
-		public int tri_ind_s;      // 当前物件的三角面起始索引
-		public int tri_ind_e;      // 当前物件的三角面结束索引
-		public int edge_ind_s;         // 当前物件的边起始索引
-		public int edge_ind_e;         // 当前物件的边结束索引
-		public string floor_name; // 楼层名
-		public int floor_num;      // 楼层序号
-		public double[] rgb;//use for SkecthUp-out's ifc, to determine the priority
+		public int tri_ind_s;
+		public int tri_ind_e;
+		public int edge_ind_s;
+		public int edge_ind_e;
+		public string floor_name;
+		public int floor_num;
+		public double[] rgb;
 
-		public double depth= 0;       // slab厚度  zr-zl
-		public double depth_t= 0;     //
+		public double depth= 0;
+		public double depth_t= 0;
 		public double x_len=0.0;
 		public double y_len=0.0;
-		public double x_l, x_r;    // bbx信息
-		public double y_l, y_r;    // bbx信息	
-		public double z_l, z_r;    // bbx信息
-		public double bg= -1.7976931348623157e+308;          //    ----标高
+		public double x_l, x_r;
+		public double y_l, y_r;
+		public double z_l, z_r;
+		public double bg= 0;
 
-		/// <summary>
-		/// 门的相关参数
-		/// </summary>
-		public double[] direction=new double[3] {0.0,0.0,0.0};//if the component is IfcDoor, then the direction maps into 2D
-		public string material="";       // 材质名称
-		public string openmethod="";     // 开启方式
-		public string description="";    // 描述信息
-		public Dictionary<string, string> properties=new Dictionary<string, string>();  // 属性信息string to string
+		public double[] direction=new double[3] {0.0,0.0,0.0};
+		public string material="";
+		public string openmethod="";
+		public string description="";
+		public Dictionary<string, string> properties=new Dictionary<string, string>();
 		public double _height=5300;
 		public double _width = 5300;
 		public int OpenDirIndex;
 
-		public string comp_name="ifc";  // 物件名
+		public string comp_name="ifc";
 
 
 		public UniComponent(THBimElementRelation bimRelation,THBimMaterial bimMaterial, ref int uniComponentIndex, Buildingstorey buildingStorey) : base("",0)
@@ -50,35 +45,18 @@ namespace THBimEngine.Domain.MidModel
 			floor_name = buildingStorey.floor_name;
 			floor_num = buildingStorey.floorNo;
 			rgb = new double[3] { bimMaterial.KS_R, bimMaterial.KS_G, bimMaterial.KS_B };
-	
-
 		}
 
 		public UniComponent(string uid, THBimMaterial bimMaterial, ref int uniComponentIndex, Buildingstorey buildingStorey,Component component) : base(component.name, component.type_id)
 		{
 			unique_id = uniComponentIndex++;
 			guid = uid;
-
 			floor_name = buildingStorey.floor_name;
 			floor_num = buildingStorey.floorNo;
 			rgb = new double[3] { bimMaterial.Color_R, bimMaterial.Color_G, bimMaterial.Color_B };
 
 			comp_name = component.name;
 			
-
-			properties.Add("type", name);
-		}
-
-		public UniComponent(string uid, THBimMaterial bimMaterial, ref int uniComponentIndex, Component component) : base(component.name, component.type_id)
-		{
-			unique_id = uniComponentIndex++;
-			guid = uid;
-
-			rgb = new double[3] { bimMaterial.Color_R, bimMaterial.Color_G, bimMaterial.Color_B };
-
-			comp_name = component.name;
-
-
 			properties.Add("type", name);
 		}
 

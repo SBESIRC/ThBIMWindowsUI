@@ -1,20 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Xbim.Ifc4.Interfaces;
 
 namespace THBimEngine.Domain.MidModel
 {
-    public class Buildingstorey// 房屋楼层
+    public class Buildingstorey
 	{
-		public string floor_name;     // 楼层名
-		public double elevation;           // 标高
-		public double top_elevation;       // 顶高
-		public double bottom_elevation;    // 底高
-		public int stdFlrNo, floorNo;// 标准层号，层号
-		public double height;      // 层高
-		public List<int> element_index_s = new List<int>();// the start and the end of current building storey's elements' indices
-		public List<int> element_index_e = new List<int>(); // group_id也就是一个构件一次while循环对应的iterator，每次循环增加1//多段连续的物件id（用于合模）
+		public string floor_name;
+		public double elevation;
+		public double top_elevation;
+		public double bottom_elevation;
+		public int stdFlrNo, floorNo;
+		public double height;
+		public List<int> element_index_s = new List<int>();
+		public List<int> element_index_e = new List<int>();
 		public string description = "";
-		public Dictionary<string, string> properties = new Dictionary<string, string>();  // 属性对
+		public Dictionary<string, string> properties = new Dictionary<string, string>();
 
 		public Buildingstorey(THBimStorey storey,ref int buildingIndex)
         {
@@ -22,28 +23,15 @@ namespace THBimEngine.Domain.MidModel
 			elevation = storey.Elevation;
 			top_elevation = storey.Elevation + storey.LevelHeight;
 			bottom_elevation = storey.Elevation;
-			stdFlrNo = buildingIndex;///
-			floorNo = buildingIndex;///
+			stdFlrNo = buildingIndex;
+			floorNo = buildingIndex;
 			height = storey.LevelHeight;
 			description = storey.Describe;
 
 			buildingIndex++;
 		}
 
-		public Buildingstorey(Xbim.Ifc4.ProductExtension.IfcBuildingStorey storey, FloorPara floorPara)
-        {
-			floor_name = storey.Name;
-			elevation = storey.Elevation.Value;
-			height = floorPara.Height;
-			top_elevation = elevation + height;
-			bottom_elevation = elevation;
-			stdFlrNo = floorPara.StdNum;///
-			floorNo = floorPara.Num;///
-			if (!(storey.Description is null))
-				description = storey.Description;
-		}
-
-		public Buildingstorey(Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey storey, FloorPara floorPara)
+		public Buildingstorey(IIfcBuildingStorey storey, FloorPara floorPara)
 		{
 			floor_name = storey.Name;
 			elevation = storey.Elevation.Value;
@@ -52,7 +40,7 @@ namespace THBimEngine.Domain.MidModel
 			bottom_elevation = elevation;
 			stdFlrNo = floorPara.StdNum;///
 			floorNo = floorPara.Num;///
-			if(!(storey.Description is null))
+			if (!(storey.Description is null))
 				description = storey.Description;
 		}
 

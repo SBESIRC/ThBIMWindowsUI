@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
 namespace THBimEngine.Domain.MidModel
 {
-
     public struct Color// 颜色信息rgba
     { 
 		public float r, g, b, a;
@@ -30,6 +28,7 @@ namespace THBimEngine.Domain.MidModel
     public struct Vec3
     {
         public float x, y, z;
+
         public Vec3(float _x, float _y, float _z)
         {
             x = _x;
@@ -43,6 +42,7 @@ namespace THBimEngine.Domain.MidModel
             y = pt.Y;
             z = pt.Z;
         }
+
         public Vec3 Dir(Vec3 vec3)
         {
             return new Vec3(x-vec3.x,y-vec3.y,z-vec3.z);
@@ -59,12 +59,6 @@ namespace THBimEngine.Domain.MidModel
         {
             return Math.Sqrt(x * x + y * y + z * z);
         }
-
-        public Vec3 ReverseX()
-        {
-            return new Vec3(-x,-y,-z);
-        }
-
 
         public void Write(BinaryWriter writer)
         {
@@ -90,29 +84,6 @@ namespace THBimEngine.Domain.MidModel
 
     public static class Method
     {
-
-        /// <summary>
-        /// 删除字符串中的中文
-        /// </summary>
-        public static string DeleteChinese(string str)
-        {
-            string retValue = str;
-            if (System.Text.RegularExpressions.Regex.IsMatch(str, @"[\u4e00-\u9fa5]"))
-            {
-                retValue = string.Empty;
-                var strsStrings = str.ToCharArray();
-                for (int index = 0; index < strsStrings.Length; index++)
-                {
-                    if (strsStrings[index] >= 0x4e00 && strsStrings[index] <= 0x9fa5)
-                    {
-                        continue;
-                    }
-                    retValue += strsStrings[index];
-                }
-            }
-            return retValue;
-        }
-
         public static void WriteStr(this string str, BinaryWriter writer)
         {
             var buffer = Encoding.GetEncoding("utf-8").GetBytes(str);

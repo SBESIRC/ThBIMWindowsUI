@@ -28,13 +28,30 @@ namespace XbimXplorer.LeftTabItme.LeftTabControls
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            //gridMain.Visibility = Visibility.Collapsed;
             this.Visibility = Visibility.Collapsed;
         }
 
         private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            var selectItems = floorDGrid.SelectedItems.Cast<FloorFilterViewModel>();
+            foreach (var item in FilterViewModel.Instance.AllFloorFilters) 
+            {
+                if (selectItems.Any(c => c == item))
+                {
+                    item.IsChecked = true;
+                }
+                else 
+                {
+                    item.IsChecked = false;
+                }
+            }
+            FilterViewModel.Instance.UpdataFloorShowIds();
+            FilterViewModel.Instance.ShowFilterResult();
+        }
 
+        private void BtnSelectAll_Click(object sender, RoutedEventArgs e)
+        {
+            floorDGrid.SelectAll();
         }
     }
 }

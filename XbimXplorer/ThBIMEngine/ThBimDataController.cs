@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using THBimEngine.Domain;
 using THBimEngine.Domain.MidModel;
@@ -82,8 +83,9 @@ namespace XbimXplorer.ThBIMEngine
                 //这里增量跟新没有做，先删除原来的数据，再增加现在的数据
                 THBimScene.Instance.DeleteProjectData(ifcStore.FileName);
             }
+            var prjName = Path.GetFileNameWithoutExtension(ifcStore.FileName);
             var ifcProject = ifcStore.Instances.FirstOrDefault<IIfcProject>();
-            var bimProject = new THBimProject(0, ifcProject.Name, "", ifcProject.GlobalId);
+            var bimProject = new THBimProject(0, prjName, "", ifcProject.GlobalId);
             bimProject.ProjectIdentity = ifcStore.FileName;
             bimProject.SourceProject = ifcStore;
             bimProject.NeedCreateMesh = false;
@@ -190,7 +192,6 @@ namespace XbimXplorer.ThBIMEngine
                             addEntitys.Add(id, newEntitys[id]);
                         }
                         updateMeshIds.AddRange(thisStoreyEntityIds);
-                        //AddEntitys(addEntitys);
                         foreach (var floorEntity in thisStorey.FloorEntityRelations) 
                         {
                             var entity = addEntitys[floorEntity.Key];
@@ -205,6 +206,10 @@ namespace XbimXplorer.ThBIMEngine
                             foreach (var floorEntity in thisStorey.FloorEntityRelations)
                             {
                                 storey.FloorEntityRelations.Add(floorEntity.Key, floorEntity.Value);
+                            }
+                            foreach (var floorEntity in addEntitys)
+                            {
+                                storey.FloorEntitys.Add(floorEntity.Key, floorEntity.Value);
                             }
                         }
                         else
@@ -264,6 +269,25 @@ namespace XbimXplorer.ThBIMEngine
                             updateMeshIds.AddRange(newUpdatedUids);
                             var updateEntitys = newEntitys.Where(c => newUpdatedUids.Any(x => x == c.Key)).ToDictionary(c => c.Key, x => x.Value);
                             UpdateEntitys(updateEntitys);
+                        }
+                    }
+                    //step6 楼层层高标高变更修改
+                    var tempIds = oldStoreyIds.Intersect(newStoreyIds);
+                    foreach (var storeyId in tempIds) 
+                    {
+                        var oldStorey = building.BuildingStoreys[storeyId];
+                        var newStorey = newBuilding.BuildingStoreys[storeyId];
+                        if (Math.Abs(oldStorey.Elevation - newStorey.Elevation) > 1)
+                        {
+                            needUpdate = true;
+                            oldStorey.Elevation = newStorey.Elevation;
+                            oldStorey.Matrix3D = newStorey.Matrix3D;
+                        }
+                        if (Math.Abs(oldStorey.LevelHeight - newStorey.LevelHeight) > 1) 
+                        {
+                            needUpdate = true;
+                            oldStorey.LevelHeight = newStorey.LevelHeight;
+                            oldStorey.Matrix3D = newStorey.Matrix3D;
                         }
                     }
                 }

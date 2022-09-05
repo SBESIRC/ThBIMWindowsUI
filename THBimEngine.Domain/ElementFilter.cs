@@ -91,7 +91,13 @@ namespace THBimEngine.Domain
 
         public override object Clone()
         {
-            throw new NotImplementedException();
+            var filter = new ProjectFilter(this.acceptProjectIds.ToList());
+            filter.Describe = this.Describe;
+            foreach (var item in this.ResultElementUids)
+            {
+                filter.ResultElementUids.Add(item);
+            }
+            return filter;
         }
 
         void AcceptProjectIds(List<string> prjIds)
@@ -120,6 +126,11 @@ namespace THBimEngine.Domain
         public override object Clone()
         {
             var storeyFilter = new StoreyFilter(this.acceptStoreyIds.ToList());
+            storeyFilter.Describe = this.Describe;
+            foreach (var item in this.ResultElementUids)
+            {
+                storeyFilter.ResultElementUids.Add(item);
+            }
             return storeyFilter;
         }
 

@@ -1336,16 +1336,30 @@ namespace XbimXplorer
         }
 		private void LoadIfcFile(string path)
 		{
+            DateTime startTime = DateTime.Now;
+
             ProgressBar.Value = 0;
             StatusMsg.Text = "";
             //if (string.IsNullOrEmpty(path))
             //	return;
             FilterViewModel.Instance.UpdataFilterByProject();
+
+            DateTime endTime = DateTime.Now;
+            var totalTime = (endTime - startTime).TotalSeconds;
+            Log.Info(string.Format("过虑器初始化，耗时：{0}s", totalTime));
+
+            startTime = DateTime.Now;
             var formHost = winFormHost;
 			var childConrol = formHost.Child as GLControl;
 			childConrol.EnableNativeInput();
 			childConrol.MakeCurrent();
 			ExampleScene.Init(childConrol.Handle, childConrol.Width, childConrol.Height, path);
+
+            endTime = DateTime.Now;
+            totalTime = (endTime - startTime).TotalSeconds;
+
+            Log.Info(string.Format("渲染前准备工作完成，耗时：{0}s", totalTime));
+
             _dispatcherTimer.Start();
             ExampleScene.Render();
 		}

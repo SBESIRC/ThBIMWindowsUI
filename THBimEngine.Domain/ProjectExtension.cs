@@ -228,9 +228,11 @@ namespace THBimEngine.Domain
                 storey_Elevation = storey.Elevation.Value;
             }
             var bimStorey = new THBimStorey(storey.EntityLabel, storey.Name, storey_Elevation, storey_Height, "", storey.GlobalId);
-            if (storey.PropertySets == null || storey.PropertySets.Count() < 1)
+            var propSets = storey.PropertySets;
+            if (propSets == null || propSets.Count() < 1)
                 return bimStorey;
-            foreach (var item in storey.PropertySets)
+
+            foreach (var item in propSets)
             {
                 if (item.PropertySetDefinitions == null)
                     continue;
@@ -248,12 +250,14 @@ namespace THBimEngine.Domain
                                 if (double.TryParse(propValue.NominalValue.ToString(), out double height))
                                 {
                                     storey_Height = height;
+                                    goto StoreyHeightSetted;
                                 }
                             }
                         }
                     }
                 }
             }
+ StoreyHeightSetted:
             bimStorey.LevelHeight = storey_Height;
             return bimStorey;
         }

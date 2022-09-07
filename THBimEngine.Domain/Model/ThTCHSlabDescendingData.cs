@@ -31,9 +31,15 @@ namespace THBimEngine.Domain.Model
         public bool IsDescending { get; set; }
 
         /// <summary>
-        /// 降板轮廓线
+        /// 降板内轮廓线
         /// </summary>
         [ProtoMember(15)]
         public PolylineSurrogate Outline { get; set; }
+
+        /// <summary>
+        /// 降板外轮廓线
+        /// </summary>
+        [ProtoMember(16)]
+        public PolylineSurrogate OutlineBuffer { get; set; }
     }
 }

@@ -31,7 +31,7 @@ namespace THBimEngine.Domain.GeometryModel
             {
                 if (Points.Count != other.Points.Count)
                     return false;
-                for (int i = 0; i < Points.Count; i++) 
+                for (int i = 0; i < Points.Count; i++)
                 {
                     var value = Points[i];
                     var otherValue = other.Points[i];

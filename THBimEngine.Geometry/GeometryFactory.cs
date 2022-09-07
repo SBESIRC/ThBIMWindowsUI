@@ -138,11 +138,11 @@ namespace THBimEngine.Geometry
                         IXbimSolid opening = null;
                         if (ifcVersion == IfcSchemaVersion.Ifc2X3)
                         {
-                            opening = GetXBimSolid2x3(item, moveVector, geometryStretch.ZAxis, geometryStretch.ZAxisLength);
+                            opening = GetXBimSolid2x3(item, moveVector, geometryStretch.ZAxis, geometryStretch.ZAxisLength + geometryStretch.Outline.HolesMaxHeight);
                         }
                         else
                         {
-                            opening = GetXBimSolid4(item, moveVector, geometryStretch.ZAxis, geometryStretch.ZAxisLength);
+                            opening = GetXBimSolid4(item, moveVector, geometryStretch.ZAxis, geometryStretch.ZAxisLength + geometryStretch.Outline.HolesMaxHeight);
                         }
                         if (null == opening || opening.SurfaceArea < minSurfaceArea)
                             continue;

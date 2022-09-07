@@ -80,6 +80,14 @@ namespace THBimEngine.Domain
                     {
                         //洞口
                         outLineGeoParam.Outline.InnerPolylines.Add(item.Outline);
+                        var outline = new PolylineSurrogate
+                        {
+                            Points = outLineGeoParam.Outline.Points,
+                            IsClosed = outLineGeoParam.Outline.IsClosed,
+                            HolesMaxHeight = item.DescendingHeight,
+                            InnerPolylines = outLineGeoParam.Outline.InnerPolylines,
+                        };
+                        outLineGeoParam.Outline = outline;
                     }
                 }
             }

@@ -10,6 +10,7 @@ namespace THBimEngine.Domain.GeometryModel
         {
             this.Points = pts;
             this.IsClosed = closed;
+            this.HolesMaxHeight = 0.0;
             this.InnerPolylines = new List<PolylineSurrogate>();
         }
 
@@ -20,6 +21,9 @@ namespace THBimEngine.Domain.GeometryModel
         public bool IsClosed { get; set; }
         [ProtoMember(3)]
         public List<PolylineSurrogate> InnerPolylines { get; set; }
+        // 洞口最大深度
+        [ProtoMember(4)]
+        public double HolesMaxHeight { get; set; }
         public override bool Equals(object obj)
         {
             if (null == obj || !(obj is PolylineSurrogate))

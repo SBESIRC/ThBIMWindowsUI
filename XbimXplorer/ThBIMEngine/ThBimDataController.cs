@@ -48,16 +48,16 @@ namespace XbimXplorer.ThBIMEngine
         public void AddProject(ThSUProjectData project)
         {
             convertFactory = new THSUProjectConvertFactory(Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3);
-            bool isAdd = IsAddProject("SU" + project.Root.GlobalId);
-            if (isAdd)
+            bool isAdd = IsAddProject(project.Root.GlobalId);
+            if (!isAdd)
             {
                 //这里增量跟新没有做，先删除原来的数据，再增加现在的数据
-                THBimScene.Instance.DeleteProjectData("SU" + project.Root.GlobalId);
+                THBimScene.Instance.DeleteProjectData(project.Root.GlobalId);
             }
             var convertResult = convertFactory.ProjectConvert(project, false);
 
             var bimProject = convertResult.BimProject;
-            bimProject.ProjectIdentity = project.Root.Name;
+            bimProject.ProjectIdentity = project.Root.GlobalId;
             bimProject.SourceProject = project;
             bimProject.NeedCreateMesh = false;
             bimProject.HaveChange=false;

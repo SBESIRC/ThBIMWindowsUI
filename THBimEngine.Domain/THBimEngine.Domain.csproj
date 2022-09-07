@@ -113,12 +113,15 @@
     <Compile Include="ProtoData\ThTCHBuildingData.cs" />
     <Compile Include="ProtoData\ThTCHBuildingStoreyData.cs" />
     <Compile Include="ProtoData\ThTCHBuiltElementData.cs" />
+    <Compile Include="ProtoData\ThTCHDescendingData.cs" />
     <Compile Include="ProtoData\ThTCHDoorData.cs" />
     <Compile Include="ProtoData\ThTCHGeometry.cs" />
     <Compile Include="ProtoData\ThTCHOpeningData.cs" />
     <Compile Include="ProtoData\ThTCHProjectData.cs" />
+    <Compile Include="ProtoData\ThTCHRailingData.cs" />
     <Compile Include="ProtoData\ThTCHRootData.cs" />
     <Compile Include="ProtoData\ThTCHSiteData.cs" />
+    <Compile Include="ProtoData\ThTCHSlabData.cs" />
     <Compile Include="ProtoData\ThTCHWallData.cs" />
     <Compile Include="ProtoData\ThTCHWindowData.cs" />
     <Compile Include="THBimBuilding.cs" />

@@ -25,6 +25,32 @@ namespace THBimEngine.Domain
         /// 类别名称
         /// </summary>
         public virtual string FriendlyTypeName { get { return this.GetType().Name.ToString(); } }
+
+        private static Dictionary<string, string> _nativeTypeName2IFCTypeName = null;
+        public string IfcTypeName 
+        { 
+            get
+            {
+                if(_nativeTypeName2IFCTypeName == null)
+                {
+                    //INit
+                    ;
+                    _nativeTypeName2IFCTypeName = new Dictionary<string, string>();
+                    _nativeTypeName2IFCTypeName.Add("THBimWall","IfcWall");
+                    _nativeTypeName2IFCTypeName.Add("THBimSlab", "IfcSlab");
+                    _nativeTypeName2IFCTypeName.Add("THBimBeam", "IfcBeam");
+                    _nativeTypeName2IFCTypeName.Add("THBimWindow", "IfcWindow");
+
+                }
+
+                if (_nativeTypeName2IFCTypeName.ContainsKey(FriendlyTypeName))
+                    return _nativeTypeName2IFCTypeName[FriendlyTypeName];
+
+                return string.Empty;
+            }
+       }
+
+
         /// <summary>
         /// 父元素Id
         /// </summary>

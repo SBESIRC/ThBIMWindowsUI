@@ -22,6 +22,7 @@ namespace THBimEngine.Domain.MidModel
 		public void WriteToFile(BinaryWriter writer)
         {
 			name.WriteStr(writer);
+
 			writer.Write(type_id);
 			color.Write(writer);
 			writer.Write(hori);

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Xbim.Ifc4.Interfaces;
 
 namespace THBimEngine.Domain.MidModel
@@ -17,18 +19,16 @@ namespace THBimEngine.Domain.MidModel
 		public string description = "";
 		public Dictionary<string, string> properties = new Dictionary<string, string>();
 
-		public Buildingstorey(THBimStorey storey,ref int buildingIndex)
+		public Buildingstorey(THBimStorey storey,int floorNum, int stdFloorIndex)
         {
 			floor_name = storey.Name;
 			elevation = storey.Elevation;
 			top_elevation = storey.Elevation + storey.LevelHeight;
 			bottom_elevation = storey.Elevation;
-			stdFlrNo = buildingIndex;
-			floorNo = buildingIndex;
+			stdFlrNo = stdFloorIndex;
+			floorNo = floorNum;
 			height = storey.LevelHeight;
 			description = storey.Describe;
-
-			buildingIndex++;
 		}
 
 		public Buildingstorey(IIfcBuildingStorey storey, FloorPara floorPara)

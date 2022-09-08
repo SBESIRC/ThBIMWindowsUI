@@ -132,8 +132,19 @@ namespace THBimEngine.Domain.MidModel
 
         public void GetFromBimData(THBimProject bimProject)
         {
+            var typeName2IFCTypeName = new Dictionary<string, string>();
+            typeName2IFCTypeName.Add("THBimWall", "IfcWall");
+            typeName2IFCTypeName.Add("THBimSlab", "IfcSlab");
+            typeName2IFCTypeName.Add("THBimBeam", "IfcBeam");
+            typeName2IFCTypeName.Add("THBimWindow", "IfcWindow");
+            typeName2IFCTypeName.Add("THBimColumn", "IfcColumn");
+            typeName2IFCTypeName.Add("THBimRailing", "IfcRailing");
+            typeName2IFCTypeName.Add("THBimDoor", "IfcDoor");
+
+
             int ptIndex = 0;//点索引
-            int buildingIndex = 0;//建筑物索引
+            int stdFloorIndex = 0;//标准层索引
+            var floorStdDic = new Dictionary<string, int>();//楼层对应的标准层号
             int componentIndex = 0;//属性索引(门、窗等)
             int edgeIndex = 0;//边索引
             int triangleIndex = 0;//三角面片索引
@@ -142,35 +153,95 @@ namespace THBimEngine.Domain.MidModel
             var allGeoModels = bimProject.AllGeoModels();
             var allPoints = bimProject.AllGeoPointNormals(true);
 
-            var typeLs = new List<string>();
             var storeys = bimProject.ProjectSite.SiteBuildings.Values.First().BuildingStoreys.Values;
-            foreach (var type in typeLs)
+            foreach(var storey in storeys)
             {
-                var component = new Component(type, componentIndex);
-                Components.Add(type, component);
-                componentIndex++;
+                int floorNum = Convert.ToInt32(storey.Name.Split('F').First());
+
+                if (storey.MemoryStoreyId=="")
+                {
+                    var buildingStorey = new Buildingstorey(storey, floorNum, stdFloorIndex);
+                    floorStdDic.Add(storey.Uid, stdFloorIndex);
+                    stdFloorIndex++;
+                    buildingStorey.element_index_s.Add(uniComponentIndex);
+
+                    foreach (var relation in storey.FloorEntityRelations.Values)
+                    {
+                        var uid = relation.Uid;
+
+                        var type = bimProject.PrjAllEntitys[uid].FriendlyTypeName;
+
+                        if(!typeName2IFCTypeName.ContainsKey(type))
+                        {
+                            continue;
+                        }
+                        var ifcType = typeName2IFCTypeName[type];
+                        if (!bimProject.PrjAllEntitys.ContainsKey(uid)) continue;
+                        
+                        var component = new Component(ifcType, componentIndex);
+                        if (!Components.ContainsKey(ifcType))
+                        {
+                            Components.Add(ifcType, component);
+                            componentIndex++;
+                        }
+                        var material = THBimMaterial.GetTHBimEntityMaterial(ifcType, true);
+                        var uniComponent = new UniComponent(relation, material, ref uniComponentIndex, buildingStorey, Components[ifcType]);
+                        uniComponent.edge_ind_s = edgeIndex;
+                        uniComponent.tri_ind_s = triangleIndex;
+                        if (allGeoModels.ContainsKey(uid))
+                        {
+                            var triangles = allGeoModels[relation.RelationElementUid].FaceTriangles;
+                            GetTrianglesAndEdges(triangles, allPoints, ref triangleIndex, ref edgeIndex, uniComponent, ref ptIndex);
+                        }
+                        uniComponent.edge_ind_e = edgeIndex - 1;
+                        uniComponent.tri_ind_e = triangleIndex - 1;
+                        uniComponent.bg = uniComponent.z_r - buildingStorey.elevation;
+                        uniComponent.depth = uniComponent.z_r - uniComponent.z_l;
+
+                        UniComponents.Add(uniComponent);
+
+                    }
+                    buildingStorey.element_index_e.Add(uniComponentIndex - 1);
+                    Buildingstoreys.Add(buildingStorey);
+                }
             }
             foreach (var storey in storeys)
             {
-                var buildingStorey = new Buildingstorey(storey, ref buildingIndex);
-                buildingStorey.element_index_s.Add(uniComponentIndex);
+                int floorNum = Convert.ToInt32(storey.Name.Split('F').First());
 
-                foreach (var relation in storey.FloorEntityRelations.Values)
+                if (storey.MemoryStoreyId != "")
                 {
-                    var uid = relation.RelationElementUid;
-                    var material = THBimMaterial.GetTHBimEntityMaterial(bimProject.PrjAllEntitys[uid].FriendlyTypeName, true);
-                    var uniComponent = new UniComponent(relation, material, ref uniComponentIndex, buildingStorey);
-                    UniComponents.Add(uniComponent);
+                    var buildingStorey = new Buildingstorey(storey, floorNum, floorStdDic[storey.MemoryStoreyId]);
+                    buildingStorey.element_index_s.Add(uniComponentIndex);
 
-                    uniComponent.edge_ind_s = edgeIndex;
-                    uniComponent.tri_ind_s = triangleIndex;
-                    var triangles = allGeoModels[relation.RelationElementUid].FaceTriangles;
-                    GetTrianglesAndEdges(triangles, allPoints, ref triangleIndex, ref edgeIndex, uniComponent, ref ptIndex);
-                    uniComponent.edge_ind_e = edgeIndex - 1;
-                    uniComponent.tri_ind_e = triangleIndex - 1;
+                    foreach (var relation in storey.FloorEntityRelations.Values)
+                    {
+                        var uid = relation.RelationElementUid;
+                        if (!bimProject.PrjAllEntitys.ContainsKey(uid)) continue;
+                        var type = bimProject.PrjAllEntitys[uid].FriendlyTypeName;
+                        if (!typeName2IFCTypeName.ContainsKey(type))
+                        {
+                            continue;
+                        }
+                        var ifcType = typeName2IFCTypeName[type];
+                        var material = THBimMaterial.GetTHBimEntityMaterial(ifcType, true);
+                        var uniComponent = new UniComponent(relation, material, ref uniComponentIndex, buildingStorey, Components[ifcType]);
+                        uniComponent.edge_ind_s = edgeIndex;
+                        uniComponent.tri_ind_s = triangleIndex;
+                        if (allGeoModels.ContainsKey(uid))
+                        {
+                            var triangles = allGeoModels[relation.Uid].FaceTriangles;
+                            GetTrianglesAndEdges(triangles, allPoints, ref triangleIndex, ref edgeIndex, uniComponent, ref ptIndex);
+                        }
+                        uniComponent.edge_ind_e = edgeIndex - 1;
+                        uniComponent.tri_ind_e = triangleIndex - 1;
+                        uniComponent.bg = uniComponent.z_r - buildingStorey.elevation;
+                        uniComponent.depth = uniComponent.z_r - uniComponent.z_l;
+                        UniComponents.Add(uniComponent);
+                    }
+                    buildingStorey.element_index_e.Add(uniComponentIndex - 1);
+                    Buildingstoreys.Add(buildingStorey);
                 }
-                buildingStorey.element_index_e.Add(uniComponentIndex - 1);
-                Buildingstoreys.Add(buildingStorey);
             }
         }
 

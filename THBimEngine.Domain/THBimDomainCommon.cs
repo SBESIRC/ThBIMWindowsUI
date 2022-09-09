@@ -63,7 +63,8 @@ namespace THBimEngine.Domain
         public static GeometryParam SlabGeometryParam(this ThTCHSlab tchElement, out List<GeometryStretch> slabDescendingData)
         {
             slabDescendingData = new List<GeometryStretch>();
-            var outLineGeoParam = new GeometryStretch(tchElement.Outline, XAxis, ZAxis.Negated(), tchElement.Height);
+            //楼板因为向下拉伸了，这里ZOffSet给相反的值
+            var outLineGeoParam = new GeometryStretch(tchElement.Outline, XAxis, ZAxis.Negated(), tchElement.Height,-tchElement.ZOffSet);
             if (null != tchElement.Descendings)
             {
                 foreach (var item in tchElement.Descendings)

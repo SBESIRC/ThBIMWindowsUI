@@ -111,22 +111,21 @@ namespace THBimEngine.Geometry
             {
                 using (var txn = memoryModel.BeginTransaction("Create solid"))
                 {
+                    var thisMove = moveVector + geometryStretch.ZAxis * geometryStretch.ZAxisOffSet;
                     foreach (var item in slabDes)
                     {
-                        //var outLine = item.OutLine.Buffer(item.YAxisLength);
                         var outLine = item.OutlineBuffer;
                         IXbimSolid opening = null;
                         IXbimSolid geoSolid = null;
-                        var thisMove = moveVector + geometryStretch.ZAxis * item.ZAxisOffSet;
                         if (ifcVersion == IfcSchemaVersion.Ifc2X3)
                         {
-                            geoSolid = GetXBimSolid2x3(outLine, moveVector, geometryStretch.ZAxis, item.ZAxisOffSet + item.ZAxisLength);
-                            opening = GetXBimSolid2x3(item.Outline, moveVector, geometryStretch.ZAxis, item.ZAxisOffSet);
+                            geoSolid = GetXBimSolid2x3(outLine, thisMove, geometryStretch.ZAxis, item.ZAxisOffSet + item.ZAxisLength);
+                            opening = GetXBimSolid2x3(item.Outline, thisMove, geometryStretch.ZAxis, item.ZAxisOffSet);
                         }
                         else
                         {
-                            geoSolid = GetXBimSolid4(outLine, moveVector, geometryStretch.ZAxis, item.ZAxisOffSet + item.ZAxisLength);
-                            opening = GetXBimSolid4(item.Outline, moveVector, geometryStretch.ZAxis, item.ZAxisOffSet);
+                            geoSolid = GetXBimSolid4(outLine, thisMove, geometryStretch.ZAxis, item.ZAxisOffSet + item.ZAxisLength);
+                            opening = GetXBimSolid4(item.Outline, thisMove, geometryStretch.ZAxis, item.ZAxisOffSet);
                         }
                         if (null == geoSolid || geoSolid.SurfaceArea < minSurfaceArea)
                             continue;
@@ -138,11 +137,11 @@ namespace THBimEngine.Geometry
                         IXbimSolid opening = null;
                         if (ifcVersion == IfcSchemaVersion.Ifc2X3)
                         {
-                            opening = GetXBimSolid2x3(item, moveVector, geometryStretch.ZAxis, geometryStretch.ZAxisLength + geometryStretch.Outline.HolesMaxHeight);
+                            opening = GetXBimSolid2x3(item, thisMove, geometryStretch.ZAxis, geometryStretch.ZAxisLength + geometryStretch.Outline.HolesMaxHeight);
                         }
                         else
                         {
-                            opening = GetXBimSolid4(item, moveVector, geometryStretch.ZAxis, geometryStretch.ZAxisLength + geometryStretch.Outline.HolesMaxHeight);
+                            opening = GetXBimSolid4(item, thisMove, geometryStretch.ZAxis, geometryStretch.ZAxisLength + geometryStretch.Outline.HolesMaxHeight);
                         }
                         if (null == opening || opening.SurfaceArea < minSurfaceArea)
                             continue;

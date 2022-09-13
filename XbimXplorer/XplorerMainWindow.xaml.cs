@@ -49,6 +49,7 @@ using System.IO.Pipes;
 using ProtoBuf;
 using System.Windows.Media;
 using XbimXplorer.LeftTabItme;
+using System.Threading;
 #endregion
 
 namespace XbimXplorer
@@ -1342,11 +1343,20 @@ namespace XbimXplorer
             StatusMsg.Text = "";
             //if (string.IsNullOrEmpty(path))
             //	return;
-            FilterViewModel.Instance.UpdataFilterByProject();
 
-            DateTime endTime = DateTime.Now;
-            var totalTime = (endTime - startTime).TotalSeconds;
-            Log.Info(string.Format("过虑器初始化，耗时：{0}s", totalTime));
+            ThreadPool.QueueUserWorkItem(delegate
+            {
+                SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(System.Windows.Application.Current.Dispatcher));
+                SynchronizationContext.Current.Post(pl =>
+                {
+                    DateTime tempStart = DateTime.Now;
+                    FilterViewModel.Instance.UpdataFilterByProject();
+
+                    DateTime tempEnd = DateTime.Now;
+                    var tempTotal = (tempEnd - tempStart).TotalSeconds;
+                    Log.Info(string.Format("过虑器初始化，耗时(异步)：{0}s", tempTotal));
+                }, null);
+            });
 
             startTime = DateTime.Now;
             var formHost = winFormHost;
@@ -1354,10 +1364,8 @@ namespace XbimXplorer
 			childConrol.EnableNativeInput();
 			childConrol.MakeCurrent();
 			ExampleScene.Init(childConrol.Handle, childConrol.Width, childConrol.Height, path);
-
-            endTime = DateTime.Now;
-            totalTime = (endTime - startTime).TotalSeconds;
-
+            DateTime endTime = DateTime.Now;
+            var totalTime = (endTime - startTime).TotalSeconds;
             Log.Info(string.Format("渲染前准备工作完成，耗时：{0}s", totalTime));
 
             _dispatcherTimer.Start();

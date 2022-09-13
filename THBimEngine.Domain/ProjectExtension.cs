@@ -19,9 +19,11 @@ namespace THBimEngine.Domain
                 if (ifcProject.Sites == null || ifcProject.Sites.Count() < 1)
                     return types.ToList();
                 var site = ifcProject.Sites.First();
-                foreach (var building in site.Buildings)
+                var allBildings = site.Buildings.ToList();
+                foreach (var building in allBildings)
                 {
-                    foreach (var ifcStorey in building.BuildingStoreys)
+                    var allStoreys = building.BuildingStoreys.ToList();
+                    foreach (var ifcStorey in allStoreys)
                     {
                         if (ifcStorey is Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey storey23)
                         {
@@ -168,7 +170,7 @@ namespace THBimEngine.Domain
             var resStoreys = new Dictionary<string, List<THBimStorey>>();
             foreach (var project in allProjects) 
             {
-                var storeys = project.ProjectAllStorey();
+                var storeys = project.PrjAllStoreys.Count()<1 ? project.ProjectAllStorey() : project.PrjAllStoreys.Values.ToList();
                 foreach (var storey in storeys) 
                 {
                     if (resStoreys.ContainsKey(storey.Name)) 
@@ -228,19 +230,21 @@ namespace THBimEngine.Domain
                 storey_Elevation = storey.Elevation.Value;
             }
             var bimStorey = new THBimStorey(storey.EntityLabel, storey.Name, storey_Elevation, storey_Height, "", storey.GlobalId);
-            var propSets = storey.PropertySets.ToList();
-            if (propSets == null || propSets.Count() < 1)
+            if (storey.PropertySets == null)
                 return bimStorey;
-
+            var propSets = storey.PropertySets.ToList();
+            if (propSets.Count<1)
+                return bimStorey;
             foreach (var item in propSets)
             {
                 if (item.PropertySetDefinitions == null)
                     continue;
-                foreach (var prop in item.PropertySetDefinitions)
+                var defs = item.PropertySetDefinitions.ToList();
+                foreach (var prop in defs)
                 {
                     var propertySet = prop as IIfcPropertySet;
-                    if (propertySet == null) continue;
-                    
+                    if (propertySet == null) 
+                        continue;
                     foreach (var realProp in propertySet.HasProperties)
                     {
                         if (realProp.Name == "Height")
@@ -270,19 +274,29 @@ namespace THBimEngine.Domain
                 storey_Elevation = storey.Elevation.Value;
             }
             var bimStorey = new THBimStorey(storey.EntityLabel, storey.Name, storey_Elevation, storey_Height, "", storey.GlobalId);
-            if (storey.PropertySets == null || storey.PropertySets.Count() < 1)
+            if (storey.PropertySets == null)
                 return bimStorey;
-            foreach (var item in storey.PropertySets)
+            var propSets = storey.PropertySets.ToList();
+            if (propSets.Count() < 1)
+                return bimStorey;
+            bool isBreak = false;
+            foreach (var item in propSets)
             {
                 if (item.PropertySetDefinitions == null)
                     continue;
+                if (isBreak)
+                    break;
                 foreach (var prop in item.PropertySetDefinitions)
                 {
+                    if (isBreak)
+                        break;
                     if (!(prop is IIfcPropertySet))
                         continue;
                     var propertySet = prop as IIfcPropertySet;
                     foreach (var realProp in propertySet.HasProperties)
                     {
+                        if (isBreak)
+                            break;
                         if (realProp.Name == "Height")
                         {
                             if (realProp is IIfcPropertySingleValue propValue)
@@ -290,6 +304,8 @@ namespace THBimEngine.Domain
                                 if (double.TryParse(propValue.NominalValue.ToString(), out double height))
                                 {
                                     storey_Height = height;
+                                    isBreak = true;
+                                    break;
                                 }
                             }
                         }

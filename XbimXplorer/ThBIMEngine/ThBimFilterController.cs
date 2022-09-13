@@ -13,6 +13,7 @@ namespace XbimXplorer.ThBIMEngine
 		public Dictionary<string, List<FilterBase>> PrjAllFilters { get; }
 		public HashSet<int> ShowEntityGIndex { get; protected set; }
 		private int AllEntityCount = 0;
+		private object inUpdata = false;
 		public ThBimFilterController() 
 		{
 			PrjAllFilters = new Dictionary<string, List<FilterBase>>();
@@ -20,33 +21,38 @@ namespace XbimXplorer.ThBIMEngine
 		}
 		public void UpdataProjectFilter() // 预缓存
 		{
-			PrjAllFilters.Clear();
-			ShowEntityGIndex.Clear();
-			ShowEntityGIndex = THBimScene.Instance.MeshEntiyRelationIndexs.Keys.ToHashSet();
-			AllEntityCount = ShowEntityGIndex.Count;
-			var storeyFilters = ProjectExtension.GetProjectStoreyFilters(THBimScene.Instance.AllBimProjects); // 获取所有的 storey filter
-			var typeFilters = ProjectExtension.GetProjectTypeFilters(THBimScene.Instance.AllBimProjects); // 获取所有的 type filter
-			foreach (var project in THBimScene.Instance.AllBimProjects)
-			{
-				var filter = new ProjectFilter(new List<string> { project.ProjectIdentity });
-				filter.Describe = project.Name;
-				var listFilters = new List<FilterBase>();
-				listFilters.Add(filter);
-				foreach (var storeyFilter in storeyFilters)
+            lock (inUpdata)
+            {
+				inUpdata = true;
+				PrjAllFilters.Clear();
+				ShowEntityGIndex.Clear();
+				ShowEntityGIndex = THBimScene.Instance.MeshEntiyRelationIndexs.Keys.ToHashSet();
+				AllEntityCount = ShowEntityGIndex.Count;
+				var storeyFilters = ProjectExtension.GetProjectStoreyFilters(THBimScene.Instance.AllBimProjects); // 获取所有的 storey filter
+				var typeFilters = ProjectExtension.GetProjectTypeFilters(THBimScene.Instance.AllBimProjects); // 获取所有的 type filter
+				foreach (var project in THBimScene.Instance.AllBimProjects)
 				{
-					var copyItem = storeyFilter.Clone() as StoreyFilter;
-					listFilters.Add(copyItem);
+					var filter = new ProjectFilter(new List<string> { project.ProjectIdentity });
+					filter.Describe = project.Name;
+					var listFilters = new List<FilterBase>();
+					listFilters.Add(filter);
+					foreach (var storeyFilter in storeyFilters)
+					{
+						var copyItem = storeyFilter.Clone() as StoreyFilter;
+						listFilters.Add(copyItem);
+					}
+					foreach (var typeFilter in typeFilters)
+					{
+						var copyItem = typeFilter.Clone() as TypeFilter;
+						listFilters.Add(copyItem);
+					}
+					ProjectExtension.PorjectFilterEntitys(project, listFilters); // 获取所有的数据
+					PrjAllFilters.Add(project.ProjectIdentity, listFilters);
 				}
-				foreach (var typeFilter in typeFilters)
-				{
-					var copyItem = typeFilter.Clone() as TypeFilter;
-					listFilters.Add(copyItem);
-				}
-				ProjectExtension.PorjectFilterEntitys(project, listFilters); // 获取所有的数据
-				PrjAllFilters.Add(project.ProjectIdentity, listFilters);
-			}
 
-			UnFilter();
+				UnFilter();
+				inUpdata = false;
+			}
 		}
 
 		public HashSet<int> GetGlobalIndexByFilterIds(Dictionary<string, HashSet<string>> prjFilterIds)
@@ -132,6 +138,8 @@ namespace XbimXplorer.ThBIMEngine
 		}
 		private void EntityShowByIds() 
 		{
+			if ((bool)inUpdata)
+				return;
 			ExampleScene.ifcre_set_config("to_show_states", "0");
 			ExampleScene.ifcre_set_comp_ids(-1);
 			//if (ShowEntityGIndex.Count() == AllEntityCount)

@@ -15,6 +15,7 @@ namespace XbimXplorer.ThBIMEngine
     {
         
         ConvertFactoryBase convertFactory;
+        public bool HaveMeshData { get; protected set; }
         public ThBimDataController()
         {
             THBimScene.Instance.UnShowEntityTypes.Add(typeof(THBimOpening).Name.ToString());
@@ -311,14 +312,18 @@ namespace XbimXplorer.ThBIMEngine
         }
         public void WriteToMidDataByFloor()
         {
+            HaveMeshData = false;
             if (THBimScene.Instance.AllBimProjects.Count < 1)
                 return;
             THBimScene.Instance.ReadGeometryMesh();
+            if (THBimScene.Instance.AllGeoModels.Count < 1)
+                return;
             DateTime start = DateTime.Now;
             var storeToEngineFile = new IfcStoreToEngineFile();
             storeToEngineFile.WriteMidDataMultithreading(THBimScene.Instance.AllGeoModels, THBimScene.Instance.AllGeoPointNormals);
             DateTime end = DateTime.Now;
             var totalTime = (end - start).TotalSeconds;
+            HaveMeshData = true;
         }
         private bool IsAddProject(string prjIdentity) 
         {

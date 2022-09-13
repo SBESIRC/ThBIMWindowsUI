@@ -1337,8 +1337,13 @@ namespace XbimXplorer
         }
 		private void LoadIfcFile(string path)
 		{
+            if (!bimDataController.HaveMeshData) 
+            {
+                //没有任何需要渲染的数据
+                Log.Info("无几何信息，不进行渲染");
+                return;
+            }
             DateTime startTime = DateTime.Now;
-
             ProgressBar.Value = 0;
             StatusMsg.Text = "";
             //if (string.IsNullOrEmpty(path))

@@ -35,23 +35,27 @@ namespace THBimEngine.Domain.MidModel
         public string comp_name = "ifc";
 
 
-        public UniComponent(THBimElementRelation bimRelation, THBimMaterial bimMaterial, ref int uniComponentIndex, Buildingstorey buildingStorey, Component component) : base(component.name, component.type_id)
+        public UniComponent(THBimElement entity, THBimMaterial bimMaterial, ref int uniComponentIndex, Buildingstorey buildingStorey, Component component) : base(component.name, component.type_id)
         {
             unique_id = uniComponentIndex++;
-            guid = bimRelation.Uid;
+            guid = entity.Uid;
 
             floor_name = buildingStorey.floor_name;
             floor_num = buildingStorey.floorNo;
             comp_name = component.name;
             rgb = new double[3] { bimMaterial.KS_R, bimMaterial.KS_G, bimMaterial.KS_B };
             properties.Add("type", name);
-            if (name.Contains("Door"))
+            if (name.Contains("Door") )
             {
                 openmethod = "";
                 _height = 2500;
                 _width = 800;
-                OpenDirIndex = 0;
-                properties.Add("二维门窗块名", "$DorLib2D$00000001") ;
+                OpenDirIndex = (int)(entity as THBimDoor).Swing;
+                properties.Add("二维门窗块名", (entity as THBimDoor).OperationType.ToString()) ;
+            }
+            if(name.Contains("Window"))
+            {
+                properties.Add("二维门窗块名", (entity as THBimWindow).WindowType.ToString());
             }
         }
 

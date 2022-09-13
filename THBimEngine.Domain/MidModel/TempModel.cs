@@ -185,7 +185,7 @@ namespace THBimEngine.Domain.MidModel
                             componentIndex++;
                         }
                         var material = THBimMaterial.GetTHBimEntityMaterial(ifcType, true);
-                        var uniComponent = new UniComponent(relation, material, ref uniComponentIndex, buildingStorey, Components[ifcType]);
+                        var uniComponent = new UniComponent(bimProject.PrjAllEntitys[uid], material, ref uniComponentIndex, buildingStorey, Components[ifcType]);
                         uniComponent.edge_ind_s = edgeIndex;
                         uniComponent.tri_ind_s = triangleIndex;
                         if (allGeoModels.ContainsKey(uid))
@@ -225,7 +225,7 @@ namespace THBimEngine.Domain.MidModel
                         }
                         var ifcType = typeName2IFCTypeName[type];
                         var material = THBimMaterial.GetTHBimEntityMaterial(ifcType, true);
-                        var uniComponent = new UniComponent(relation, material, ref uniComponentIndex, buildingStorey, Components[ifcType]);
+                        var uniComponent = new UniComponent(bimProject.PrjAllEntitys[uid], material, ref uniComponentIndex, buildingStorey, Components[ifcType]);
                         uniComponent.edge_ind_s = edgeIndex;
                         uniComponent.tri_ind_s = triangleIndex;
                         if (allGeoModels.ContainsKey(uid))

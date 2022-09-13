@@ -4,8 +4,14 @@ namespace THBimEngine.Domain
 {
     public class THBimWindow : THBimEntity, IEquatable<THBimOpening>
     {
-        public THBimWindow(int id, string name, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, geometryParam, describe, uid)
+        /// <summary>
+        /// 窗类型
+        /// </summary>
+        public uint WindowType { get; set; }
+
+        public THBimWindow(int id, string name, GeometryParam geometryParam, uint windowType, string describe = "", string uid = "") : base(id, name, geometryParam, describe, uid)
         {
+            WindowType = windowType;
         }
 
         public override object Clone()

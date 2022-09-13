@@ -94,7 +94,7 @@ namespace THBimEngine.Geometry.ProjectFactory
                             foreach (var door in wall.Doors)
                             {
                                 var doorId = CurrentGIndex();
-                                var bimDoor = new THBimDoor(doorId, string.Format("door#{0}", doorId), door.THTCHGeometryParam(), "", door.Uuid);
+                                var bimDoor = new THBimDoor(doorId, string.Format("door#{0}", doorId), door.THTCHGeometryParam(), door.Swing, door.OperationType, "", door.Uuid);
                                 bimDoor.ParentUid = bimWall.Uid;
                                 var doorRelation = new THBimElementRelation(bimDoor.Id, bimDoor.Name, bimDoor, bimDoor.Describe, bimDoor.Uid);
                                 doorRelation.ParentUid = storey.Uuid;
@@ -125,7 +125,7 @@ namespace THBimEngine.Geometry.ProjectFactory
                             foreach (var window in wall.Windows)
                             {
                                 var windowId = CurrentGIndex();
-                                var bimWindow = new THBimWindow(windowId, string.Format("door#{0}", windowId), window.THTCHGeometryParam(), "", window.Uuid);
+                                var bimWindow = new THBimWindow(windowId, string.Format("door#{0}", windowId), window.THTCHGeometryParam(), window.WindowType, "", window.Uuid);
                                 bimWindow.ParentUid = bimWall.Uid;
                                 var windowRelation = new THBimElementRelation(bimWindow.Id, bimWindow.Name, bimWindow, bimWindow.Describe, bimWindow.Uid);
                                 windowRelation.ParentUid = storey.Uuid;

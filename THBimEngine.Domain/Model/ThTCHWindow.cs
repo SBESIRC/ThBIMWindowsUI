@@ -3,8 +3,11 @@
 namespace THBimEngine.Domain.Model
 {
     [ProtoContract]
-    public class ThTCHWindow: ThTCHElement
+    public class ThTCHWindow : ThTCHElement
     {
-        private ThTCHWindow() {  }
+        [ProtoMember(21)]
+        public uint WindowType { get; set; }
+
+        private ThTCHWindow() { }
     }
 }

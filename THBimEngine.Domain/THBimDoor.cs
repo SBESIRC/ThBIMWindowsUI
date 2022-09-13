@@ -2,10 +2,21 @@
 
 namespace THBimEngine.Domain
 {
-    public class THBimDoor : THBimEntity,IEquatable<THBimDoor>
+    public class THBimDoor : THBimEntity, IEquatable<THBimDoor>
     {
-        public THBimDoor(int id, string name, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, geometryParam, describe, uid)
+        /// <summary>
+        /// 门开启方向
+        /// </summary>
+        public uint Swing { get; set; }
+        /// <summary>
+        /// 门类型
+        /// </summary>
+        public uint OperationType { get; set; }
+
+        public THBimDoor(int id, string name, GeometryParam geometryParam, uint swing, uint operationType, string describe = "", string uid = "") : base(id, name, geometryParam, describe, uid)
         {
+            Swing = swing;
+            OperationType = operationType;
         }
 
         public override object Clone()

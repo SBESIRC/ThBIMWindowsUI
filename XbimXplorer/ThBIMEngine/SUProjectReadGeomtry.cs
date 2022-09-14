@@ -29,9 +29,16 @@ namespace XbimXplorer.ThBIMEngine
                     );
 
                 GeometryMeshModel mesh = new GeometryMeshModel(_meshIndex++, building.Root.GlobalId);
-                mesh.TriangleMaterial = THBimMaterial.GetTHBimEntityMaterial("");
+                
+                ThSUMaterialData ProtoMaterial = null;
+                ProtoMaterial = building.Component.Material;
                 foreach (var face in building.Component.Definition.Faces)
                 {
+                    var FaceMaterial = face.Material;
+                    if (FaceMaterial != null)
+                    {
+                        ProtoMaterial = FaceMaterial;
+                    }
                     var faceTriangleCount = face.Mesh.Polygons.Count;
                     for (int i = 0; i < faceTriangleCount; i++)
                     {
@@ -48,6 +55,29 @@ namespace XbimXplorer.ThBIMEngine
                         mesh.FaceTriangles.Add(faceTriangle);
                     }
                 }
+                var TriangleMaterial = new THBimMaterial();
+                TriangleMaterial.MaterialName = ProtoMaterial?.MaterialName;
+                TriangleMaterial.Alpha = 1;
+                TriangleMaterial.Color_R = 233 / 255f;
+                TriangleMaterial.Color_G = 218 / 255f;
+                TriangleMaterial.Color_B = 217 / 255f;
+                mesh.TriangleMaterial = TriangleMaterial;
+                //if (ProtoMaterial == null)
+                //{
+                //    mesh.TriangleMaterial = THBimMaterial.GetTHBimEntityMaterial("");
+                //}
+                //else
+                //{
+                //    mesh.TriangleMaterial = new THBimMaterial();
+                //    mesh.TriangleMaterial.MaterialName = ProtoMaterial.MaterialName;
+                //    mesh.TriangleMaterial.Alpha = ProtoMaterial.Alpha > 0 ? 1 : 0;
+                //    if (ProtoMaterial.HasRGB)
+                //    {
+                //        mesh.TriangleMaterial.Color_R = ProtoMaterial.ColorR / 255f;
+                //        mesh.TriangleMaterial.Color_G = ProtoMaterial.ColorG / 255f;
+                //        mesh.TriangleMaterial.Color_B = ProtoMaterial.ColorB / 255f;
+                //    }
+                //}
                 AllModels.Add(mesh);
             }
             return AllModels;

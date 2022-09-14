@@ -478,6 +478,11 @@ namespace XbimXplorer
             {
                 //LoadIfcFile(modelFileName);
             }
+            else if (ext ==".protof")
+            {
+                LoadProtoFFile(modelFileName);
+                LoadIfcFile("");
+            }
             else 
             {
                 // there's no going back; if it fails after this point the current file should be closed anyway
@@ -499,6 +504,24 @@ namespace XbimXplorer
                         Log.WarnFormat("Extension '{0}' has not been recognised.", ext);
                         break;
                 }
+            }
+        }
+
+        private void LoadProtoFFile(string fileName)
+        {
+            FileStream fsRead = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+            BinaryReader r = new BinaryReader(fsRead);
+            byte[] fileArray = r.ReadBytes((int)fsRead.Length);
+            fsRead.Dispose();
+            try
+            {
+                var su_Project = new ThSUProjectData();
+                Google.Protobuf.MessageExtensions.MergeFrom(su_Project, fileArray);
+                bimDataController.AddProject(su_Project);
+            }
+            catch (Exception ex)
+            {
+
             }
         }
 
@@ -692,9 +715,10 @@ namespace XbimXplorer
         private void CommandBinding_Open(object sender, ExecutedRoutedEventArgs e)
         {
             var corefilters = new[] {
-                "IFC Files|*.ifc;*.midfile",
+                "IFC Files|*.ifc;*.midfile;*.protof",
                 "Ifc File (*.ifc)|*.ifc",
-                "Engin Midel File (*.midfile)|*.midfile"
+                "Engin Midel File (*.midfile)|*.midfile",
+                "protof File (*.protof)|*.protof"
             };
 
             // Filter files by extension 

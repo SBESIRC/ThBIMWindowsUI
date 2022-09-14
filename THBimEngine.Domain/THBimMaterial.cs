@@ -76,5 +76,10 @@ namespace THBimEngine.Domain
         /// cos的指数（specularity）
         /// </summary>
 		public int NS { get; set; }
+
+        /// <summary>
+        /// 材质名称
+        /// </summary>
+        public string MaterialName { get; set; }
     }
 }

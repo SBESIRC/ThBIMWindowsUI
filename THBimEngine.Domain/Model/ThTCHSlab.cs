@@ -4,13 +4,13 @@ using System.Collections.Generic;
 namespace THBimEngine.Domain.Model
 {
     [ProtoContract]
-    public class ThTCHSlab: ThTCHElement
+    public class ThTCHSlab : ThTCHElement
     {
         /// <summary>
         /// 降板信息
         /// </summary>
         [ProtoMember(21)]
-        public List<ThTCHSlabDescendingData> Descendings { get; set; }
+        public List<ThTCHDescending> Descendings { get; set; }
 
         private ThTCHSlab()
         {

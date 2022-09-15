@@ -57,6 +57,9 @@ namespace THBimEngine.Domain.Model
         /// </summary>
         [ProtoMember(10)]
         public double ZOffSet { get; set; }
+        /// <summary>
+        /// 材质
+        /// </summary>
         [ProtoMember(11)]
         public string Material { get; set; }
         #endregion

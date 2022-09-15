@@ -189,12 +189,7 @@ namespace XbimXplorer
                 DateTime endTime = DateTime.Now;
                 var totalTime = (endTime - startTime).TotalSeconds;
                 Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
-                LoadIfcFile(_tempMidFileName);
-                /* Engine在卡UI线程，会报错
-                BackgroundWorker convertData = new BackgroundWorker();
-                convertData.DoWork += ConvertData_DoWork;
-                convertData.RunWorkerCompleted += ConvertData_RunWorkerCompleted;
-                convertData.RunWorkerAsync();*/
+                LoadIfcFile("");
             }
         }
 
@@ -231,23 +226,8 @@ namespace XbimXplorer
                 DateTime endTime = DateTime.Now;
                 var totalTime = (endTime - startTime).TotalSeconds;
                 Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
-                LoadIfcFile(_tempMidFileName);
+                LoadIfcFile("");
             }
-        }
-        private void ConvertData_DoWork(object sender, DoWorkEventArgs e)
-        {
-            DateTime startTime = DateTime.Now;
-            bimDataController.AddProject(thProject);
-            thProject = null;
-            pipeServer = null;
-            backgroundWorker.RunWorkerAsync();
-            DateTime endTime = DateTime.Now;
-            var totalTime = (endTime - startTime).TotalSeconds;
-            Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
-        }
-        private void ConvertData_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            LoadIfcFile(_tempMidFileName);
         }
         #endregion
         private void DispatcherTimer_Tick(object sender, EventArgs e)
@@ -297,12 +277,12 @@ namespace XbimXplorer
 
         void XplorerMainWindow_Closing(object sender, CancelEventArgs e)
         {
-            //var glControl = GetEnginWindowGLControl();
-            //if (glControl != null)
-            //{
-            //    Win32.CloseRender(glControl.Handle);
-            //}
-            if(null != backgroundWorker) 
+            if (null != winFormHost.Child) 
+            {
+                if (winFormHost.Child is GLControl glControl)
+                    Win32.CloseRender(glControl.Handle);
+            }
+            if (null != backgroundWorker) 
             {
                 backgroundWorker.Dispose();
             }
@@ -450,12 +430,12 @@ namespace XbimXplorer
             var dlg = sender as OpenFileDialog;
             if (dlg != null) 
                 LoadAnyModel(dlg.FileName);
-            var fInfo = new FileInfo(dlg.FileName);
-            var ext = fInfo.Extension.ToLower();
-            if (ext == ".midfile")
-            {
-                LoadIfcFile(dlg.FileName);
-            }
+            //var fInfo = new FileInfo(dlg.FileName);
+            //var ext = fInfo.Extension.ToLower();
+            //if (ext == ".midfile")
+            //{
+            //    LoadIfcFile(dlg.FileName);
+            //}
         }
 
         /// <summary>
@@ -645,7 +625,7 @@ namespace XbimXplorer
             ModelProvider.Refresh();
             ProgressBar.Value = 0;
             StatusMsg.Text = "";
-            LoadIfcFile(_tempMidFileName);
+            LoadIfcFile("");
             AddRecentFile();
         }
         private void OnProgressChanged(object s, ProgressChangedEventArgs args)
@@ -1398,12 +1378,12 @@ namespace XbimXplorer
         }
 		private void LoadIfcFile(string path)
 		{
-            if (!bimDataController.HaveMeshData) 
-            {
-                //没有任何需要渲染的数据
-                Log.Info("无几何信息，不进行渲染");
-                return;
-            }
+            //if (!bimDataController.HaveMeshData) 
+            //{
+            //    //没有任何需要渲染的数据
+            //    Log.Info("无几何信息，不进行渲染");
+            //    return;
+            //}
             DateTime startTime = DateTime.Now;
             ProgressBar.Value = 0;
             StatusMsg.Text = "";
@@ -1440,8 +1420,8 @@ namespace XbimXplorer
         private void MenuItem_Click_2(object sender, RoutedEventArgs e)
         {
             bimDataController.ClearAllProject();
-            //ExampleScene.ifcre_clear_model_data();
-            //LoadIfcFile(_tempMidFileName);
+            ExampleScene.ifcre_clear_model_data();
+            LoadIfcFile("");
         }
         private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

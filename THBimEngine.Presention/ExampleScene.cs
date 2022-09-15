@@ -46,7 +46,10 @@ namespace THBimEngine.Presention
             ifcre_set_config("height", height.ToString());
             ifcre_set_config("model_type", "ifc");
             ifcre_set_config("use_transparency", "true");
-            ifcre_set_config("file", ifcPath); //".\\ff.ifc");
+            if(string.IsNullOrEmpty(ifcPath))
+                ifcre_set_config("file", "nil");
+            else
+                ifcre_set_config("file", ifcPath); //".\\ff.ifc");
             ifcre_set_config("render_api", "opengl");
             //ifcre_set_config("render_api", "vulkan");
             TWindow* ptrToWnd = (TWindow*)wndPtr.ToPointer();

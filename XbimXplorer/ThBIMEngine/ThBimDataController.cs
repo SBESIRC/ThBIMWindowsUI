@@ -313,11 +313,11 @@ namespace XbimXplorer.ThBIMEngine
         public void WriteToMidDataByFloor()
         {
             HaveMeshData = false;
-            if (THBimScene.Instance.AllBimProjects.Count < 1)
-                return;
+            //if (THBimScene.Instance.AllBimProjects.Count < 1)
+            //    return;
             THBimScene.Instance.ReadGeometryMesh();
-            if (THBimScene.Instance.AllGeoModels.Count < 1)
-                return;
+            //if (THBimScene.Instance.AllGeoModels.Count < 1)
+            //    return;
             DateTime start = DateTime.Now;
             var storeToEngineFile = new IfcStoreToEngineFile();
             storeToEngineFile.WriteMidDataMultithreading(THBimScene.Instance.AllGeoModels, THBimScene.Instance.AllGeoPointNormals);

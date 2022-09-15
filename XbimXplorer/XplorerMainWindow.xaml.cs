@@ -50,6 +50,7 @@ using ProtoBuf;
 using System.Windows.Media;
 using XbimXplorer.LeftTabItme;
 using System.Threading;
+using Xbim.Common.Geometry;
 #endregion
 
 namespace XbimXplorer
@@ -81,6 +82,7 @@ namespace XbimXplorer
         private string _openedModelFileName;
 		private string _tempMidFileName;
         private ThBimDataController bimDataController = new ThBimDataController();
+        private XbimMatrix3D projectMatrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero);
 
         /// <summary>
         /// Deals with the user-defined model file name.
@@ -219,7 +221,7 @@ namespace XbimXplorer
             {
                 ExampleScene.ifcre_set_sleep_time(1000);
                 DateTime startTime = DateTime.Now;
-                bimDataController.AddProject(suProject);
+                bimDataController.AddProject(suProject, projectMatrix3D);
                 suProject = null;
                 SU_pipeServer = null;
                 SU_backgroundWorker.RunWorkerAsync();
@@ -442,8 +444,16 @@ namespace XbimXplorer
         /// 
         /// </summary>
         /// <param name="modelFileName"></param>
-        public void LoadAnyModel(string modelFileName)
+        public void LoadAnyModel(string modelFileName, XbimMatrix3D? prjMatrix3D =null)
         {
+            if (prjMatrix3D.HasValue)
+            {
+                projectMatrix3D = prjMatrix3D.Value;
+            }
+            else 
+            {
+                projectMatrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero);
+            }
             var fInfo = new FileInfo(modelFileName);
             if (!fInfo.Exists) // file does not exist; do nothing
                 return;
@@ -486,7 +496,11 @@ namespace XbimXplorer
                 }
             }
         }
-
+        public void RemoveModel(string projectId) 
+        {
+            bimDataController.DeleteProject(new List<string> { projectId });
+            LoadIfcFile("");
+        }
         private void LoadTHBimFile(string fileName)
         {
             FileStream fsRead = new FileStream(fileName, FileMode.Open, FileAccess.Read);
@@ -523,7 +537,7 @@ namespace XbimXplorer
                                 var DataBody = fileArray.Skip(10).ToArray();
                                 var su_Project = new ThSUProjectData();
                                 Google.Protobuf.MessageExtensions.MergeFrom(su_Project, DataBody);
-                                bimDataController.AddProject(su_Project);
+                                bimDataController.AddProject(su_Project, projectMatrix3D);
                                 break;
                             }
                         default:
@@ -579,7 +593,7 @@ namespace XbimXplorer
             if (args.Result is IfcStore ifcStore) //all ok
             {
                 DateTime startTime = DateTime.Now;
-                bimDataController.AddProject(ifcStore);
+                bimDataController.AddProject(ifcStore, projectMatrix3D);
                 DateTime endTime = DateTime.Now;
                 var totalTime = (endTime - startTime).TotalSeconds;
                 Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
@@ -1378,6 +1392,7 @@ namespace XbimXplorer
         }
 		private void LoadIfcFile(string path)
 		{
+            projectMatrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero);
             //if (!bimDataController.HaveMeshData) 
             //{
             //    //没有任何需要渲染的数据
@@ -1492,7 +1507,7 @@ namespace XbimXplorer
         }
         void InitLeftTabItemValues() 
         {
-            MainViewModel mainViewModel = new MainViewModel();
+            MainViewModel mainViewModel = new MainViewModel(MainWindow);
             leftTabControl.DataContext = mainViewModel;
         }
 

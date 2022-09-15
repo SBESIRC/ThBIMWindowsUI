@@ -6,6 +6,7 @@ using THBimEngine.Domain;
 using THBimEngine.Domain.MidModel;
 using THBimEngine.Domain.Model;
 using THBimEngine.Geometry.ProjectFactory;
+using Xbim.Common.Geometry;
 using Xbim.Ifc;
 using Xbim.Ifc4.Interfaces;
 
@@ -46,7 +47,7 @@ namespace XbimXplorer.ThBIMEngine
             }
         }
         
-        public void AddProject(ThSUProjectData project)
+        public void AddProject(ThSUProjectData project, XbimMatrix3D matrix3D)
         {
             convertFactory = new THSUProjectConvertFactory(Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3);
             bool isAdd = IsAddProject(project.Root.GlobalId);
@@ -64,7 +65,7 @@ namespace XbimXplorer.ThBIMEngine
             bimProject.HaveChange=false;
             var allGeoPointNormals = new List<PointNormal>();
             var readGeomtry = new SUProjectReadGeomtry();
-            var allGeoModels = readGeomtry.ReadGeomtry(project, out allGeoPointNormals);
+            var allGeoModels = readGeomtry.ReadGeomtry(project, matrix3D, out allGeoPointNormals);
             bimProject.AddGeoMeshModels(allGeoModels, allGeoPointNormals);
             THBimScene.Instance.AddProject(bimProject);
 
@@ -75,7 +76,7 @@ namespace XbimXplorer.ThBIMEngine
         /// 这里目前只处理Mesh后的IfcStore
         /// </summary>
         /// <param name="ifcStore"></param>
-        public void AddProject(IfcStore ifcStore) 
+        public void AddProject(IfcStore ifcStore, XbimMatrix3D matrix3D) 
         {
             convertFactory = new THIfcStoreMeshConvertFactory(ifcStore.IfcSchemaVersion);
             var isAdd = IsAddProject(ifcStore.FileName);
@@ -91,7 +92,7 @@ namespace XbimXplorer.ThBIMEngine
             bimProject.SourceProject = ifcStore;
             bimProject.NeedCreateMesh = false;
             var allGeoPointNormals = new List<PointNormal>();
-            var readGeomtry = new IfcStoreReadGeomtry();
+            var readGeomtry = new IfcStoreReadGeomtry(matrix3D);
             var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out allGeoPointNormals);
             bimProject.AddGeoMeshModels(allGeoModels, allGeoPointNormals);
             THBimScene.Instance.AddProject(bimProject);
@@ -106,11 +107,15 @@ namespace XbimXplorer.ThBIMEngine
         {
             return THBimScene.Instance.SelectEntityProperties(index);
         }
-        public void DeleteProject()
+        public void DeleteProject(List<string> delPrjIds)
         {
-
+            foreach (var item in delPrjIds) 
+            {
+                THBimScene.Instance.DeleteProjectData(item);
+            }
+            WriteToMidDataByFloor();
         }
-        public void UpdateProject(ConvertResult projectResult)
+        private void UpdateProject(ConvertResult projectResult)
         {
             var prjId = projectResult.BimProject.Uid;
             var newBimProject = projectResult.BimProject;

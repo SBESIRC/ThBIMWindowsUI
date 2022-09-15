@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using THBimEngine.Domain;
+using Xbim.Common.Geometry;
 
 namespace XbimXplorer.ThBIMEngine
 {
     class SUProjectReadGeomtry
     {
-        public List<GeometryMeshModel> ReadGeomtry(ThSUProjectData project, out List<PointNormal> allPointNormals)
+        public List<GeometryMeshModel> ReadGeomtry(ThSUProjectData project, XbimMatrix3D projectMatrix3D, out List<PointNormal> allPointNormals)
         {
             List<GeometryMeshModel> AllModels = new List<GeometryMeshModel>();
             allPointNormals = new List<PointNormal>();
@@ -27,7 +26,7 @@ namespace XbimXplorer.ThBIMEngine
                     matrix.Data31,matrix.Data32,matrix.Data33,matrix.Data34,
                     matrix.Data41,matrix.Data42,matrix.Data43,matrix.Data44
                     );
-
+                bimMaterial *= projectMatrix3D;
                 GeometryMeshModel mesh = new GeometryMeshModel(_meshIndex++, building.Root.GlobalId);
                 
                 ThSUMaterialData ProtoMaterial = null;

@@ -27,7 +27,11 @@ namespace XbimXplorer.ThBIMEngine
 		protected IfcStore ifcModel;
 		private ReadTaskInfo readTaskInfo;
 		readonly XbimColourMap _colourMap = new XbimColourMap();
-		public IfcStoreReadGeomtry(){}
+		protected XbimMatrix3D projectMatrix3D;
+		public IfcStoreReadGeomtry(XbimMatrix3D prjMatrix3D) 
+		{
+			projectMatrix3D = prjMatrix3D;
+		}
 		public List<GeometryMeshModel> ReadGeomtry(IfcStore model,out List<PointNormal> allPointNormals) 
 		{
 			ifcModel = model;

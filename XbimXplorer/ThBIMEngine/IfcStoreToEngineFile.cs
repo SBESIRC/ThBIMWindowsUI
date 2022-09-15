@@ -28,7 +28,7 @@ namespace XbimXplorer.ThBIMEngine
 		}
 		public Dictionary<int, int> LoadGeometry(IfcStore model, string midFilePath)
 		{
-			var readGeomtry = new IfcStoreReadGeomtry();
+			var readGeomtry = new IfcStoreReadGeomtry(XbimMatrix3D.CreateTranslation(XbimVector3D.Zero));
 			readGeomtry.ProgressChanged += ProgressChanged;
 			var excludedTypes = model.DefaultExclusions(null);
 			var geoIndexIfcIndexMap = new Dictionary<int, int>();

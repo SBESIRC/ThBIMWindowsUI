@@ -342,6 +342,7 @@ namespace THBimEngine.Domain.MidModel
         public void WriteMidFile()
         {
             string fileName = Path.Combine(System.IO.Path.GetTempPath(), "BimEngineData.get");
+            string storeyFileName = Path.Combine(System.IO.Path.GetTempPath(), "BimEngineData.storeys.txt");
             FileStream fileStream = new FileStream(fileName, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
             BinaryWriter writer = new BinaryWriter(fileStream, Encoding.UTF8);
             int cnt = OutingPolygons.Count;
@@ -371,11 +372,17 @@ namespace THBimEngine.Domain.MidModel
             cnt = Buildingstoreys.Count;
             writer.Write(cnt);
             int index = 0;
+            FileStream fs = new FileStream(storeyFileName, FileMode.Create);
+            StreamWriter sw = new StreamWriter(fs);
             foreach (var storey in Buildingstoreys)
             {
                 storey.WriteToFile(writer);
+                storey.WriteToTxt(sw);
                 index++;
             }
+            sw.Flush();
+            sw.Close();
+            fs.Close();
             writer.Close();
         }
 

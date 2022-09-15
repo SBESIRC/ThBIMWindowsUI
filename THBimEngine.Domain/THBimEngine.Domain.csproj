@@ -143,7 +143,7 @@
     <Compile Include="Model\ThTCHRailing.cs" />
     <Compile Include="Model\ThTCHSite.cs" />
     <Compile Include="Model\ThTCHSlab.cs" />
-    <Compile Include="Model\ThTCHSlabDescendingData.cs" />
+    <Compile Include="Model\ThTCHDescending.cs" />
     <Compile Include="Model\ThTCHWall.cs" />
     <Compile Include="Model\ThTCHWindow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

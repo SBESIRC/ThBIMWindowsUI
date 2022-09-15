@@ -69,5 +69,19 @@ namespace THBimEngine.Domain.MidModel
 			}
 			description.WriteStr(writer);
 		}
+
+		public void WriteToTxt(StreamWriter sw)
+		{
+            sw.WriteLine($"storey name:\t {floor_name}");
+            sw.WriteLine($"elevation:\t {elevation}");
+            sw.WriteLine($"top_elevation:\t {top_elevation}");
+            sw.WriteLine($"bottom_elevation:\t {bottom_elevation}");
+            sw.WriteLine($"description:\t {description}");
+            sw.WriteLine($"properties:");
+            sw.WriteLine($"\tFloorNo:\t {floorNo}");
+            sw.WriteLine($"\tHeight:\t {height}");
+            sw.WriteLine($"\tStdFlrNo:\t {stdFlrNo}");
+            sw.WriteLine($"------------------------------------");
+        }
 	}
 }

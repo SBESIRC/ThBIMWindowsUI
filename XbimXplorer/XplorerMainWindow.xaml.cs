@@ -478,9 +478,9 @@ namespace XbimXplorer
             {
                 //LoadIfcFile(modelFileName);
             }
-            else if (ext ==".protof")
+            else if (ext ==".thbim")
             {
-                LoadProtoFFile(modelFileName);
+                LoadTHBimFile(modelFileName);
                 LoadIfcFile("");
             }
             else 
@@ -507,7 +507,7 @@ namespace XbimXplorer
             }
         }
 
-        private void LoadProtoFFile(string fileName)
+        private void LoadTHBimFile(string fileName)
         {
             FileStream fsRead = new FileStream(fileName, FileMode.Open, FileAccess.Read);
             BinaryReader r = new BinaryReader(fsRead);
@@ -515,9 +515,46 @@ namespace XbimXplorer
             fsRead.Dispose();
             try
             {
-                var su_Project = new ThSUProjectData();
-                Google.Protobuf.MessageExtensions.MergeFrom(su_Project, fileArray);
-                bimDataController.AddProject(su_Project);
+                /* 通用准则
+                 * thbim文件分为两部分 10byte长度的头部Head标识和剩余的Data数据
+                 * Head 前两位分别是 'T','H'，用于防错标识
+                 * 第三位 1 -> CAD 配置文件  2 -> SU 配置文件  其余不认
+                 * 剩余七位还未使用
+                 */
+
+                var DataHead = fileArray.Take(10).ToArray();
+                //84 = 'T' 72 = 'H' 
+                if(DataHead[0] == 84 && DataHead[1] == 72)
+                {
+                    switch(DataHead[2])
+                    {
+                        case 1:
+                            {
+                                //CAD THBim 文件
+                                var DataBody = fileArray.Skip(10).ToArray();
+                                var th_Project = new ThTCHProjectData();
+                                Google.Protobuf.MessageExtensions.MergeFrom(th_Project, DataBody);
+                                //bimDataController.AddProject(th_Project);
+                                break;
+                            }
+                        case 2:
+                            {
+                                //SU THBim 文件
+                                var DataBody = fileArray.Skip(10).ToArray();
+                                var su_Project = new ThSUProjectData();
+                                Google.Protobuf.MessageExtensions.MergeFrom(su_Project, DataBody);
+                                bimDataController.AddProject(su_Project);
+                                break;
+                            }
+                        default:
+                            {
+                                //不支持的文件类型
+                                Log.WarnFormat($"{fileName}导入失败，不支持的文件数据");
+                                break;
+                            }
+                    }
+                }
+                
             }
             catch (Exception ex)
             {
@@ -715,10 +752,10 @@ namespace XbimXplorer
         private void CommandBinding_Open(object sender, ExecutedRoutedEventArgs e)
         {
             var corefilters = new[] {
-                "IFC Files|*.ifc;*.midfile;*.protof",
+                "IFC Files|*.ifc;*.midfile;*.thbim",
                 "Ifc File (*.ifc)|*.ifc",
                 "Engin Midel File (*.midfile)|*.midfile",
-                "protof File (*.protof)|*.protof"
+                "thbim File (*.thbim)|*.thbim"
             };
 
             // Filter files by extension 

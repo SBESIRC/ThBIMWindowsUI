@@ -537,6 +537,7 @@ namespace XbimXplorer
                                 var DataBody = fileArray.Skip(10).ToArray();
                                 var su_Project = new ThSUProjectData();
                                 Google.Protobuf.MessageExtensions.MergeFrom(su_Project, DataBody);
+                                su_Project.Root.GlobalId = fileName;
                                 bimDataController.AddProject(su_Project, projectMatrix3D);
                                 break;
                             }

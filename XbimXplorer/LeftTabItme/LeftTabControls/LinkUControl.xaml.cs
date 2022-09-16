@@ -120,5 +120,13 @@ namespace XbimXplorer.LeftTabItme.LeftTabControls
             var linkModel = dataGridLink.SelectedItem as LinkModel;
             RemoveLinkModel(linkModel);
         }
+
+        private void btnSelectDir_Click(object sender, RoutedEventArgs e)
+        {
+            var tempPath = SelectProjectRootPath();
+            if (string.IsNullOrEmpty(tempPath))
+                return;
+            currentPrjRootPath = tempPath;
+        }
     }
 }

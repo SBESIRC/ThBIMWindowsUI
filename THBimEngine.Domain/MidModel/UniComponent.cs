@@ -35,7 +35,7 @@ namespace THBimEngine.Domain.MidModel
         public string comp_name = "ifc";
 
 
-        public UniComponent(THBimElement entity, THBimMaterial bimMaterial, ref int uniComponentIndex, Buildingstorey buildingStorey, Component component,string materialType="") : base(component.name, component.type_id)
+        public UniComponent(THBimEntity entity, THBimMaterial bimMaterial, ref int uniComponentIndex, Buildingstorey buildingStorey, Component component,string materialType="") : base(component.name, component.type_id)
         {
             unique_id = uniComponentIndex++;
             guid = entity.Uid;
@@ -45,20 +45,30 @@ namespace THBimEngine.Domain.MidModel
             comp_name = component.name;
             rgb = new double[3] { bimMaterial.KS_R, bimMaterial.KS_G, bimMaterial.KS_B };
             properties.Add("type", name);
-            material = (entity as THBimEntity).Material;
+            material = entity.Material;
             if (material == "加气混凝土") material = "TH-加气混凝土";
 
             if (name.Contains("Door") )
             {
                 openmethod = "";
-                _height = 2500;
-                _width = 800;
-                OpenDirIndex = (int)(entity as THBimDoor).Swing;
+                _height = (entity.GeometryParam as GeometryStretch).ZAxisLength;
+                _width = (entity.GeometryParam as GeometryStretch).XAxisLength;
+                OpenDirIndex = 2;//(int)(entity as THBimDoor).Swing;
                 properties.Add("二维门窗块名", (entity as THBimDoor).OperationType.ToString()) ;
+
+                properties.Add("开启方向", (entity as THBimDoor).Swing.ToString());
+                //properties.Add("旋转角度", "0");
+                properties.Add("thickness", (entity.GeometryParam as GeometryStretch).YAxisLength.ToString());
+                properties.Add("旋转角度", new Xbim.Common.Geometry.XbimVector3D(1, 0, 0).Angle((entity.GeometryParam as GeometryStretch).XAxis).ToString());
+                //thickness
             }
-            if(name.Contains("Window"))
+            if (name.Contains("Window"))
             {
+                _height = (entity.GeometryParam as GeometryStretch).ZAxisLength;
+                _width = (entity.GeometryParam as GeometryStretch).XAxisLength;
                 properties.Add("二维门窗块名", (entity as THBimWindow).WindowType.ToString());
+                properties.Add("旋转角度", "0");
+                properties.Add("thickness", (entity.GeometryParam as GeometryStretch).YAxisLength.ToString());
             }
         }
 
@@ -123,6 +133,8 @@ namespace THBimEngine.Domain.MidModel
                 key.WriteStr(writer);
                 value.WriteStr(writer);
             }
+            if (OpenDirIndex == 2)
+                ;
             writer.Write(OpenDirIndex);
             comp_name.WriteStr(writer);
             writer.Write(edge_ind_s);

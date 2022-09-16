@@ -301,7 +301,7 @@ namespace THBimEngine.Domain.MidModel
                             var materialType = "";
                             try
                             {
-                                materialType = ((Xbim.Ifc2x3.MaterialResource.IfcMaterialLayerSetUsage)((Xbim.Ifc2x3.Kernel.IfcObjectDefinition)item).Material).ForLayerSet.LayerSetName.Value;
+                                materialType = ((Xbim.Ifc2x3.MaterialResource.IfcMaterialLayerSetUsage)((Xbim.Ifc2x3.Kernel.IfcObjectDefinition)item).Material)?.ForLayerSet.LayerSetName.Value;
                             }
                             catch { }
                             

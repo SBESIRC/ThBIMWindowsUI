@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using Xbim.Common.Geometry;
 
 namespace THBimEngine.Domain.MidModel
 {
@@ -93,6 +94,24 @@ namespace THBimEngine.Domain.MidModel
             var buffer = Encoding.GetEncoding("utf-8").GetBytes(str);
             writer.Write((ulong)buffer.Length);
             writer.Write(buffer);
+        }
+
+        /// <summary>
+        /// 求两个向量的旋转角度
+        /// </summary>
+        /// <returns></returns>
+        public static double GetAngle2(this XbimVector3D orginVector, XbimVector3D targetVector, XbimVector3D axisRotationVector)
+        {
+            var angle = orginVector.Angle(targetVector);
+            var direction = orginVector.CrossProduct(targetVector);
+            if (direction.DotProduct(axisRotationVector) > 0)
+            {
+                return angle;
+            }
+            else
+            {
+                return 2 * Math.PI - angle;
+            }
         }
     }
 }

@@ -50,24 +50,20 @@ namespace THBimEngine.Domain.MidModel
 
             if (name.Contains("Door") )
             {
-                openmethod = "";
                 _height = (entity.GeometryParam as GeometryStretch).ZAxisLength;
                 _width = (entity.GeometryParam as GeometryStretch).XAxisLength;
-                OpenDirIndex = 2;//(int)(entity as THBimDoor).Swing;
                 properties.Add("二维门窗块名", (entity as THBimDoor).OperationType.ToString()) ;
-
                 properties.Add("开启方向", (entity as THBimDoor).Swing.ToString());
-                //properties.Add("旋转角度", "0");
                 properties.Add("thickness", (entity.GeometryParam as GeometryStretch).YAxisLength.ToString());
-                properties.Add("旋转角度", new Xbim.Common.Geometry.XbimVector3D(1, 0, 0).Angle((entity.GeometryParam as GeometryStretch).XAxis).ToString());
-                //thickness
+                //properties.Add("wallThick", ( entity.ParentUid .GeometryParam as GeometryStretch).YAxisLength.ToString());
+                properties.Add("旋转角度", new Xbim.Common.Geometry.XbimVector3D(1, 0, 0).GetAngle2((entity.GeometryParam as GeometryStretch).XAxis, new Xbim.Common.Geometry.XbimVector3D(0,0,1)).ToString() );
             }
             if (name.Contains("Window"))
             {
                 _height = (entity.GeometryParam as GeometryStretch).ZAxisLength;
                 _width = (entity.GeometryParam as GeometryStretch).XAxisLength;
                 properties.Add("二维门窗块名", (entity as THBimWindow).WindowType.ToString());
-                properties.Add("旋转角度", "0");
+                properties.Add("旋转角度", new Xbim.Common.Geometry.XbimVector3D(1, 0, 0).GetAngle2((entity.GeometryParam as GeometryStretch).XAxis, new Xbim.Common.Geometry.XbimVector3D(0, 0, 1)).ToString());
                 properties.Add("thickness", (entity.GeometryParam as GeometryStretch).YAxisLength.ToString());
             }
         }

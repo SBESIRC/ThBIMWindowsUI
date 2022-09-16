@@ -16,7 +16,7 @@ namespace THBimEngine.Domain
         /// YAxisLength -- 降板外扩宽度
         /// </summary>
         public List<GeometryStretch> SlabDescendingDatas { get; }
-        public THBimSlab(int id, string name, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name,geometryParam, describe, uid)
+        public THBimSlab(int id, string name, string material,GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, material,geometryParam, describe, uid)
         {
             SlabDescendingDatas = new List<GeometryStretch>();
         }

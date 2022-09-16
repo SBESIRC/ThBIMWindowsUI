@@ -86,6 +86,10 @@ namespace THBimEngine.Domain.MidModel
     {
         public static void WriteStr(this string str, BinaryWriter writer)
         {
+            if(str is null)
+            {
+                str = "";
+            }
             var buffer = Encoding.GetEncoding("utf-8").GetBytes(str);
             writer.Write((ulong)buffer.Length);
             writer.Write(buffer);

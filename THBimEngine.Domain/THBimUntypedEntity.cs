@@ -18,7 +18,7 @@ namespace THBimEngine.Domain
                 return string.Empty;
             } 
         }
-        public THBimUntypedEntity(int id, string name, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, geometryParam, describe, uid)
+        public THBimUntypedEntity(int id, string name,string material, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, material,geometryParam, describe, uid)
         {
         }
 

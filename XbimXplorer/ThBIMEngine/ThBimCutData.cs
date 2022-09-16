@@ -12,9 +12,7 @@ namespace XbimXplorer.ThBIMEngine
     {
         public static void Run()
         {
-            ;
             var ifcProjects = THBimScene.Instance.AllBimProjects;
-            ;
             bool firstPr = true;
             var tempData = new TempModel();
 

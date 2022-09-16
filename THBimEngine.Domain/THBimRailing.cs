@@ -4,7 +4,7 @@ namespace THBimEngine.Domain
 {
     public class THBimRailing : THBimEntity,IEquatable<THBimRailing>
     {
-        public THBimRailing(int id,string name, GeometryParam geometryParam, string describe,string uid):base(id,name,geometryParam,describe,uid)
+        public THBimRailing(int id,string name,string material,GeometryParam geometryParam, string describe,string uid):base(id,name, material,geometryParam, describe,uid)
         {
             
         }

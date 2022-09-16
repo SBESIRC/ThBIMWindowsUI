@@ -8,7 +8,7 @@ namespace THBimEngine.Domain
 {
     public class THBimOpening : THBimEntity,IEquatable<THBimOpening>
     {
-        public THBimOpening(int id, string name, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, geometryParam, describe, uid)
+        public THBimOpening(int id, string name, string material,GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, material,geometryParam, describe, uid)
         {
         }
 

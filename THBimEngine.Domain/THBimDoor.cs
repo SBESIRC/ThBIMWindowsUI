@@ -13,7 +13,7 @@ namespace THBimEngine.Domain
         /// </summary>
         public uint OperationType { get; set; }
 
-        public THBimDoor(int id, string name, GeometryParam geometryParam, uint swing, uint operationType, string describe = "", string uid = "") : base(id, name, geometryParam, describe, uid)
+        public THBimDoor(int id, string name,string material, GeometryParam geometryParam, uint swing, uint operationType, string describe = "", string uid = "") : base(id, name, material, geometryParam, describe, uid)
         {
             Swing = swing;
             OperationType = operationType;

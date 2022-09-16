@@ -35,7 +35,7 @@ namespace THBimEngine.Domain.MidModel
         public string comp_name = "ifc";
 
 
-        public UniComponent(THBimElement entity, THBimMaterial bimMaterial, ref int uniComponentIndex, Buildingstorey buildingStorey, Component component) : base(component.name, component.type_id)
+        public UniComponent(THBimElement entity, THBimMaterial bimMaterial, ref int uniComponentIndex, Buildingstorey buildingStorey, Component component,string materialType="") : base(component.name, component.type_id)
         {
             unique_id = uniComponentIndex++;
             guid = entity.Uid;
@@ -45,6 +45,9 @@ namespace THBimEngine.Domain.MidModel
             comp_name = component.name;
             rgb = new double[3] { bimMaterial.KS_R, bimMaterial.KS_G, bimMaterial.KS_B };
             properties.Add("type", name);
+            material = (entity as THBimEntity).Material;
+            if (material == "加气混凝土") material = "TH-加气混凝土";
+
             if (name.Contains("Door") )
             {
                 openmethod = "";
@@ -59,14 +62,14 @@ namespace THBimEngine.Domain.MidModel
             }
         }
 
-        public UniComponent(string uid, THBimMaterial bimMaterial, ref int uniComponentIndex, Buildingstorey buildingStorey, Component component) : base(component.name, component.type_id)
+        public UniComponent(string uid, THBimMaterial bimMaterial, ref int uniComponentIndex, Buildingstorey buildingStorey, Component component,string materialType) : base(component.name, component.type_id)
         {
             unique_id = uniComponentIndex++;
             guid = uid;
             floor_name = buildingStorey.floor_name;
             floor_num = buildingStorey.floorNo;
             rgb = new double[3] { bimMaterial.Color_R, bimMaterial.Color_G, bimMaterial.Color_B };
-
+            material = materialType;
             comp_name = component.name;
 
             properties.Add("type", name);
@@ -75,8 +78,6 @@ namespace THBimEngine.Domain.MidModel
 
         public new void WriteToFile(BinaryWriter writer)
         {
-            if (type_id > 4)
-                ;
             name.WriteStr(writer);
             writer.Write(type_id);
             color.Write(writer);
@@ -87,6 +88,7 @@ namespace THBimEngine.Domain.MidModel
             writer.Write(x_len);
             writer.Write(y_len);
             floor_name.WriteStr(writer);
+            
             material.WriteStr(writer);
             openmethod.WriteStr(writer);
             description.WriteStr(writer);

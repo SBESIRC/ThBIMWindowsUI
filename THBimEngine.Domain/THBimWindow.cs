@@ -9,7 +9,7 @@ namespace THBimEngine.Domain
         /// </summary>
         public uint WindowType { get; set; }
 
-        public THBimWindow(int id, string name, GeometryParam geometryParam, uint windowType, string describe = "", string uid = "") : base(id, name, geometryParam, describe, uid)
+        public THBimWindow(int id, string name, string material, GeometryParam geometryParam, uint windowType, string describe = "", string uid = "") : base(id, name,"", geometryParam, describe, uid)
         {
             WindowType = windowType;
         }

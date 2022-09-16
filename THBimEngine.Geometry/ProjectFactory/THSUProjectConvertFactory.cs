@@ -59,7 +59,7 @@ namespace THBimEngine.Geometry.ProjectFactory
                     {
                         var componentId = CurrentGIndex();
 
-                        var bimComponent = new THBimUntypedEntity(componentId, string.Format("component#{0}", componentId), null, "", component.Root.GlobalId);
+                        var bimComponent = new THBimUntypedEntity(componentId, string.Format("component#{0}", "", componentId), "", null, component.Root.GlobalId);
                         bimComponent.ParentUid = bimStorey.Uid;
 
                         var componentRelation = new THBimElementRelation(bimComponent.Id, bimComponent.Name, bimComponent, bimComponent.Describe, bimComponent.Uid);
@@ -89,7 +89,7 @@ namespace THBimEngine.Geometry.ProjectFactory
             {
                 cloneParam.YAxisLength = wallWidth + 120;
             }
-            var bimOpening = new THBimOpening(openingId, string.Format("opening#{0}", openingId), cloneParam);
+            var bimOpening = new THBimOpening(openingId, string.Format("opening#{0}", openingId), "",cloneParam);
             openingRelation = new THBimElementRelation(bimOpening.Id, bimOpening.Name, bimOpening, bimOpening.Describe, bimOpening.Uid);
             return bimOpening;
         }

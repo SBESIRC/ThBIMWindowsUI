@@ -11,7 +11,7 @@ namespace THBimEngine.Domain
     {
         public IList<THBimDoor> Doors { get; private set; }
         public IList<THBimWindow> Windows { get; private set; }
-        public THBimWall(int id, string name, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, geometryParam, describe, uid)
+        public THBimWall(int id, string name, string material, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, material, geometryParam, describe, uid)
         {
         }
 

@@ -80,7 +80,7 @@ namespace THBimEngine.Geometry.ProjectFactory
                     Parallel.ForEach(storey.Walls, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, wall =>
                     {
                         var wallId = CurrentGIndex();
-                        var bimWall = new THBimWall(wallId, string.Format("wall#{0}", wallId), wall.THTCHGeometryParam(), "", wall.Uuid);
+                        var bimWall = new THBimWall(wallId, string.Format("wall#{0}", wallId), wall.Material,wall.THTCHGeometryParam(), "", wall.Uuid);
                         var wallWidth = wall.Width;
                         bimWall.ParentUid = bimStorey.Uid;
                         var wallRelation = new THBimElementRelation(bimWall.Id, bimWall.Name, bimWall, bimWall.Describe, bimWall.Uid);
@@ -94,7 +94,7 @@ namespace THBimEngine.Geometry.ProjectFactory
                             foreach (var door in wall.Doors)
                             {
                                 var doorId = CurrentGIndex();
-                                var bimDoor = new THBimDoor(doorId, string.Format("door#{0}", doorId), door.THTCHGeometryParam(), door.Swing, door.OperationType, "", door.Uuid);
+                                var bimDoor = new THBimDoor(doorId, string.Format("door#{0}", doorId), door.Material,door.THTCHGeometryParam(), door.Swing, door.OperationType, "", door.Uuid);
                                 bimDoor.ParentUid = bimWall.Uid;
                                 var doorRelation = new THBimElementRelation(bimDoor.Id, bimDoor.Name, bimDoor, bimDoor.Describe, bimDoor.Uid);
                                 doorRelation.ParentUid = storey.Uuid;
@@ -125,7 +125,7 @@ namespace THBimEngine.Geometry.ProjectFactory
                             foreach (var window in wall.Windows)
                             {
                                 var windowId = CurrentGIndex();
-                                var bimWindow = new THBimWindow(windowId, string.Format("door#{0}", windowId), window.THTCHGeometryParam(), window.WindowType, "", window.Uuid);
+                                var bimWindow = new THBimWindow(windowId, string.Format("door#{0}", windowId), "",window.THTCHGeometryParam(), window.WindowType, "", window.Uuid);
                                 bimWindow.ParentUid = bimWall.Uid;
                                 var windowRelation = new THBimElementRelation(bimWindow.Id, bimWindow.Name, bimWindow, bimWindow.Describe, bimWindow.Uid);
                                 windowRelation.ParentUid = storey.Uuid;
@@ -156,7 +156,7 @@ namespace THBimEngine.Geometry.ProjectFactory
                             foreach (var opening in wall.Openings)
                             {
                                 var openingId = CurrentGIndex();
-                                var bimOpening = new THBimOpening(openingId, string.Format("opening#{0}", openingId), opening.THTCHGeometryParam(), "", opening.Uuid);
+                                var bimOpening = new THBimOpening(openingId, string.Format("opening#{0}", openingId), "",opening.THTCHGeometryParam(), "", opening.Uuid);
                                 bimOpening.ParentUid = bimWall.Uid;
                                 var openingRelation = new THBimElementRelation(bimOpening.Id, bimOpening.Name, bimOpening, bimOpening.Describe, bimOpening.Uid);
                                 openingRelation.ParentUid = storey.Uuid;
@@ -181,7 +181,7 @@ namespace THBimEngine.Geometry.ProjectFactory
                     {
                         var geoSlab = slab.SlabGeometryParam(out List<GeometryStretch> slabDescendingData);
                         var slabId = CurrentGIndex();
-                        var bimSlab = new THBimSlab(slabId, string.Format("slab#{0}", slabId), geoSlab, "", slab.Uuid);
+                        var bimSlab = new THBimSlab(slabId, string.Format("slab#{0}", slabId), "",geoSlab, "", slab.Uuid);
                         bimSlab.ParentUid = bimStorey.Uid;
                         foreach (var item in slabDescendingData)
                             bimSlab.SlabDescendingDatas.Add(item);
@@ -199,7 +199,7 @@ namespace THBimEngine.Geometry.ProjectFactory
                         if (railingGeo.Outline.Points != null)
                             railingGeo.Outline = railing.Outline.BufferFlatPL(railingGeo.YAxisLength / 2);
                         var railingId = CurrentGIndex();
-                        var bimRailing = new THBimRailing(railingId, string.Format("railing#{0}", railingId), railingGeo, "", railing.Uuid);
+                        var bimRailing = new THBimRailing(railingId, string.Format("railing#{0}", railingId), railing.Material, railingGeo, "", railing.Uuid);
                         bimRailing.ParentUid = bimStorey.Uid;
                         var railingRelation = new THBimElementRelation(bimRailing.Id, bimRailing.Name, bimRailing, bimRailing.Describe, bimRailing.Uid);
                         bimStorey.FloorEntityRelations.Add(bimRailing.Uid, railingRelation);
@@ -225,7 +225,7 @@ namespace THBimEngine.Geometry.ProjectFactory
             {
                 cloneParam.YAxisLength = wallWidth + 120;
             }
-            var bimOpening = new THBimOpening(openingId, string.Format("opening#{0}", openingId), cloneParam);
+            var bimOpening = new THBimOpening(openingId, string.Format("opening#{0}", openingId), "",cloneParam);
             openingRelation = new THBimElementRelation(bimOpening.Id, bimOpening.Name, bimOpening, bimOpening.Describe, bimOpening.Uid);
             return bimOpening;
         }

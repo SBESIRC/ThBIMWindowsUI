@@ -135,6 +135,8 @@ namespace THBimEngine.Geometry
                     foreach (var item in geometryStretch.Outline.InnerPolylines)
                     {
                         IXbimSolid opening = null;
+                        if (item.Points == null || item.Points.Count < 1)
+                            continue;
                         if (ifcVersion == IfcSchemaVersion.Ifc2X3)
                         {
                             opening = GetXBimSolid2x3(item, thisMove, geometryStretch.ZAxis, geometryStretch.ZAxisLength + geometryStretch.Outline.HolesMaxHeight);

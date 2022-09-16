@@ -22,12 +22,14 @@ namespace THBimEngine.Domain
         /// 物体开洞信息
         /// </summary>
         public List<THBimOpening> Openings { get; private set; }
-        public THBimEntity(int id, string name, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, describe, uid)
+        public string Material { get; set; }
+        public THBimEntity(int id, string name,string material, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, describe, uid)
         {
             Openings = new List<THBimOpening>();
             GeometryParam = geometryParam;
             EntitySolids = new List<IXbimSolid>();
             AllShapeGeometries = new List<THBimShapeGeometry>();
+            Material = material;
         }
 
         public override int GetHashCode()

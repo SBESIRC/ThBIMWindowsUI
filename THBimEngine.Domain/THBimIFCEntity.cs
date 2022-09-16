@@ -10,11 +10,11 @@ namespace THBimEngine.Domain
     public class THBimIFCEntity : THBimEntity, IEquatable<THBimIFCEntity>
     {
         public IPersistEntity IfcEntity { get; }
-        public THBimIFCEntity(IPersistEntity entity) : this(entity.EntityLabel, entity.ExpressType.ExpressName, null) 
+        public THBimIFCEntity(IPersistEntity entity) : this(entity.EntityLabel, entity.ExpressType.ExpressName,"", null) 
         {
             IfcEntity = entity;
         }
-        public THBimIFCEntity(int id, string name, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, geometryParam, describe, uid)
+        public THBimIFCEntity(int id, string name, string material, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, material, geometryParam, describe, uid)
         {
         }
         public override string FriendlyTypeName 

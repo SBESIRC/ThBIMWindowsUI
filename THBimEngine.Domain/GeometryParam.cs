@@ -76,11 +76,11 @@ namespace THBimEngine.Domain
         /// <summary>
         /// 多边形轮廓（可以带洞口）第一个为外轮廓，其余的为内轮廓（洞口）
         /// </summary>
-        public PolylineSurrogate Outline { get; set; }
+        public ThTCHPolyline Outline { get; set; }
         /// <summary>
         /// 降板外轮廓线
         /// </summary>
-        public PolylineSurrogate OutlineBuffer { get; set; }
+        public ThTCHPolyline OutlineBuffer { get; set; }
         #endregion
         /// <summary>
         /// 根据中心点创建矩形拉伸数据
@@ -119,6 +119,27 @@ namespace THBimEngine.Domain
                 outline.InnerPolylines = new List<PolylineSurrogate>();
             if (outline.Points == null)
                 outline.Points = new List<Point3DCollectionSurrogate>();
+            //Outline = outline;
+        }
+
+        /// <summary>
+        /// 根据轮廓创建拉伸数据
+        /// </summary>
+        /// <param name="xAxis"></param>
+        /// <param name="zAxis"></param>
+        /// <param name="zAxisLength"></param>
+        /// <param name="zOffSet"></param>
+        public GeometryStretch(ThTCHPolyline outline, XbimVector3D xAxis, XbimVector3D zAxis, double zAxisLength, double zOffSet = 0.0)
+        {
+            XAxis = xAxis;
+            ZAxis = zAxis;
+            ZAxisLength = zAxisLength;
+            ZAxisOffSet = zOffSet;
+            //处理洞口的，现在暂时还没有处理
+            //if (outline.InnerPolylines == null)
+            //    outline.InnerPolylines = new List<PolylineSurrogate>();
+            //if (outline.Points == null)
+            //    outline.Points = new Google.Protobuf.Collections.RepeatedField<ThTCHPoint3d>();
             Outline = outline;
         }
 
@@ -154,7 +175,7 @@ namespace THBimEngine.Domain
         public override object Clone()
         {
             GeometryStretch clone = null;
-            if (Outline.Points != null && Outline.Points.Count > 0)
+            if (Outline != null && Outline.Points.Count > 0)
             {
                 clone = new GeometryStretch(this.Outline, this.XAxis, this.ZAxis, this.ZAxisLength, this.ZAxisOffSet);
                 clone.XAxisLength = this.XAxisLength;

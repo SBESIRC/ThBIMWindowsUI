@@ -101,7 +101,6 @@
     <Compile Include="MidModel\OutingPolygon.cs" />
     <Compile Include="MidModel\TempModel.cs" />
     <Compile Include="MidModel\UniComponent.cs" />
-    <Compile Include="Model\ThTCHElement.cs" />
     <Compile Include="GeometryModel\PointNormal.cs" />
     <Compile Include="GeometryModel\PointVector.cs" />
     <Compile Include="ProjectExtension.cs" />
@@ -120,6 +119,7 @@
     <Compile Include="ProtoData\ThTCHGeometry.cs" />
     <Compile Include="ProtoData\ThTCHOpeningData.cs" />
     <Compile Include="ProtoData\ThTCHProjectData.cs" />
+    <Compile Include="ProtoData\ThTCHProperty.cs" />
     <Compile Include="ProtoData\ThTCHRailingData.cs" />
     <Compile Include="ProtoData\ThTCHRootData.cs" />
     <Compile Include="ProtoData\ThTCHSiteData.cs" />
@@ -136,17 +136,6 @@
     <Compile Include="GeometryModel\Point3DSurrogate.cs" />
     <Compile Include="GeometryModel\PolylineSurrogate.cs" />
     <Compile Include="GeometryModel\Vector3DSurrogate.cs" />
-    <Compile Include="Model\ThTCHBuilding.cs" />
-    <Compile Include="Model\ThTCHBuildingStorey.cs" />
-    <Compile Include="Model\ThTCHDoor.cs" />
-    <Compile Include="Model\ThTCHOpening.cs" />
-    <Compile Include="Model\ThTCHProject.cs" />
-    <Compile Include="Model\ThTCHRailing.cs" />
-    <Compile Include="Model\ThTCHSite.cs" />
-    <Compile Include="Model\ThTCHSlab.cs" />
-    <Compile Include="Model\ThTCHDescending.cs" />
-    <Compile Include="Model\ThTCHWall.cs" />
-    <Compile Include="Model\ThTCHWindow.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="THBimDoor.cs" />
     <Compile Include="THBimIFCEntity.cs" />
@@ -161,6 +150,7 @@
     <Compile Include="THBimUntypedEntity.cs" />
     <Compile Include="THBimWall.cs" />
     <Compile Include="THBimWindow.cs" />
+    <Compile Include="ThProtoBufExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

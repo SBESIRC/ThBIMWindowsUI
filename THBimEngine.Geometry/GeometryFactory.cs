@@ -139,11 +139,11 @@ namespace THBimEngine.Geometry
                             continue;
                         if (ifcVersion == IfcSchemaVersion.Ifc2X3)
                         {
-                            opening = GetXBimSolid2x3(item, thisMove, geometryStretch.ZAxis, geometryStretch.ZAxisLength + geometryStretch.Outline.HolesMaxHeight);
+                            opening = GetXBimSolid2x3(item, thisMove, geometryStretch.ZAxis, geometryStretch.ZAxisLength + 0);//geometryStretch.Outline.HolesMaxHeight
                         }
                         else
                         {
-                            opening = GetXBimSolid4(item, thisMove, geometryStretch.ZAxis, geometryStretch.ZAxisLength + geometryStretch.Outline.HolesMaxHeight);
+                            opening = GetXBimSolid4(item, thisMove, geometryStretch.ZAxis, geometryStretch.ZAxisLength + 0);//geometryStretch.Outline.HolesMaxHeight
                         }
                         if (null == opening || opening.SurfaceArea < minSurfaceArea)
                             continue;
@@ -211,7 +211,7 @@ namespace THBimEngine.Geometry
             Xbim.Ifc2x3.ProfileResource.IfcProfileDef profile = null;
             XbimPoint3D planeOrigin = geometryStretch.Origin + moveVector + geometryStretch.ZAxis * geometryStretch.ZAxisOffSet;
             bool isOutLine = false;
-            if (geometryStretch.Outline.Points != null)
+            if (geometryStretch.Outline != null)
             {
                 isOutLine = true;
                 profile = ThIFC2x3GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, geometryStretch.Outline);
@@ -275,6 +275,31 @@ namespace THBimEngine.Geometry
 
         private IXbimSolid GetXBimSolid2x3(PolylineSurrogate polyline, XbimVector3D moveVector, XbimVector3D zAxis, double zHeight)
         {
+            return null;
+            //Xbim.Ifc2x3.ProfileResource.IfcProfileDef profile = ThIFC2x3GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, polyline);
+            //if (profile == null)
+            //    return null;
+            //var solid = memoryModel.ToIfcExtrudedAreaSolid(profile, zAxis, zHeight);
+            //var geoSolid = geomEngine.CreateSolid(solid);
+            //var trans = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
+            //geoSolid = geoSolid.Transform(trans) as IXbimSolid;
+            //return geoSolid;
+        }
+        private IXbimSolid GetXBimSolid4(PolylineSurrogate polyline, XbimVector3D moveVector, XbimVector3D zAxis, double zHeight)
+        {
+            return null;
+            //Xbim.Ifc4.ProfileResource.IfcProfileDef profile = ThIFC4GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, polyline);
+            //if (profile == null)
+            //    return null;
+            //var solid = memoryModel.ToIfcExtrudedAreaSolid(profile, zAxis, zHeight);
+            //var geoSolid = geomEngine.CreateSolid(solid);
+            //var trans = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
+            //geoSolid = geoSolid.Transform(trans) as IXbimSolid;
+            //return geoSolid;
+        }
+
+        private IXbimSolid GetXBimSolid2x3(ThTCHPolyline polyline, XbimVector3D moveVector, XbimVector3D zAxis, double zHeight)
+        {
             Xbim.Ifc2x3.ProfileResource.IfcProfileDef profile = ThIFC2x3GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, polyline);
             if (profile == null)
                 return null;
@@ -284,7 +309,7 @@ namespace THBimEngine.Geometry
             geoSolid = geoSolid.Transform(trans) as IXbimSolid;
             return geoSolid;
         }
-        private IXbimSolid GetXBimSolid4(PolylineSurrogate polyline, XbimVector3D moveVector, XbimVector3D zAxis, double zHeight)
+        private IXbimSolid GetXBimSolid4(ThTCHPolyline polyline, XbimVector3D moveVector, XbimVector3D zAxis, double zHeight)
         {
             Xbim.Ifc4.ProfileResource.IfcProfileDef profile = ThIFC4GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, polyline);
             if (profile == null)

@@ -37,7 +37,7 @@ namespace THBimEngine.Geometry
             });
         }
 
-        public static IfcArbitraryClosedProfileDef ToIfcArbitraryClosedProfileDef(this MemoryModel model, PolylineSurrogate e)
+        public static IfcArbitraryClosedProfileDef ToIfcArbitraryClosedProfileDef(this MemoryModel model, ThTCHPolyline e)
         {
             return model.Instances.New<IfcArbitraryClosedProfileDef>(d =>
             {
@@ -98,29 +98,28 @@ namespace THBimEngine.Geometry
             return direction;
         }
 
-        public static IfcCompositeCurve ToIfcCompositeCurve(this MemoryModel model, PolylineSurrogate polyline)
+        public static IfcCompositeCurve ToIfcCompositeCurve(this MemoryModel model, ThTCHPolyline polyline)
         {
             var compositeCurve = CreateIfcCompositeCurve(model);
-            for (int i = 0; i < polyline.Points.Count; i++)
+            var pts = polyline.Points;
+            foreach (var segment in polyline.Segments)
             {
                 var curveSegement = CreateIfcCompositeCurveSegment(model);
-                var pt1 = polyline.Points[i].Points.First().Point3D2XBimPoint();
-                XbimPoint3D pt2 = pt1;
-                if (i + 1 < polyline.Points.Count)
+                if (segment.Index.Count == 2)
                 {
-                    pt2 = polyline.Points[i + 1].Points.First().Point3D2XBimPoint();
+                    //直线
+                    var poly = model.Instances.New<IfcPolyline>();
+                    poly.Points.Add(ToIfcCartesianPoint(model, pts[segment.Index[0].ToInt()].Point3D2XBimPoint()));
+                    poly.Points.Add(ToIfcCartesianPoint(model, pts[segment.Index[1].ToInt()].Point3D2XBimPoint()));
+                    curveSegement.ParentCurve = poly;
+                    compositeCurve.Segments.Add(curveSegement);
                 }
                 else
                 {
-                    pt2 = polyline.Points[0].Points.First().Point3D2XBimPoint();
-                }
-                if (pt1.PointDistanceToPoint(pt2) < 1)
-                    continue;
-                if (polyline.Points[i].Points.Count != 1)
-                {
                     //圆弧
-                    var midPt = polyline.Points[i].Points.Last().Point3D2XBimPoint();
-                    //poly.Points.Add(ToIfcCartesianPoint(model, midPt));
+                    var pt1 = pts[segment.Index[0].ToInt()].Point3D2XBimPoint();
+                    var pt2 = pts[segment.Index[2].ToInt()].Point3D2XBimPoint();
+                    var midPt = pts[segment.Index[1].ToInt()].Point3D2XBimPoint();
                     //计算圆心，半径
                     var seg1 = midPt - pt1;
                     var seg1Mid = pt1 + seg1.Normalized() * (midPt.PointDistanceToPoint(pt1) / 2);
@@ -146,14 +145,6 @@ namespace THBimEngine.Geometry
                         curveSegement.ParentCurve = trimmedCurve;
                         compositeCurve.Segments.Add(curveSegement);
                     }
-                }
-                else
-                {
-                    var poly = model.Instances.New<IfcPolyline>();
-                    poly.Points.Add(ToIfcCartesianPoint(model, pt1));
-                    poly.Points.Add(ToIfcCartesianPoint(model, pt2));
-                    curveSegement.ParentCurve = poly;
-                    compositeCurve.Segments.Add(curveSegement);
                 }
             }
             return compositeCurve;

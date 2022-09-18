@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using THBimEngine.Domain.GeometryModel;
-using THBimEngine.Domain.Model;
 using Xbim.Common.Geometry;
 
 namespace THBimEngine.Domain
@@ -58,69 +57,6 @@ namespace THBimEngine.Domain
             var disY = (point.Y - targetPoint.Y);
             var disZ = (point.Z - targetPoint.Z);
             return Math.Sqrt(disX * disX + disY * disY + disZ + disZ);
-        }
-
-        public static GeometryParam SlabGeometryParam(this ThTCHSlab tchElement, out List<GeometryStretch> slabDescendingData)
-        {
-            slabDescendingData = new List<GeometryStretch>();
-            //楼板因为向下拉伸了，这里ZOffSet给相反的值
-            var outLineGeoParam = new GeometryStretch(tchElement.Outline, XAxis, ZAxis.Negated(), tchElement.Height,-tchElement.ZOffSet);
-            if (null != tchElement.Descendings)
-            {
-                foreach (var item in tchElement.Descendings)
-                {
-                    if (item.IsDescending)
-                    {
-                        //降板
-                        var desGeoStretch = new GeometryStretch(item.Outline, XAxis, ZAxis.Negated(), item.DescendingThickness, item.DescendingHeight);
-                        desGeoStretch.YAxisLength = item.DescendingWrapThickness;
-                        desGeoStretch.OutlineBuffer = item.OutlineBuffer;
-                        slabDescendingData.Add(desGeoStretch);
-                    }
-                    else
-                    {
-                        //洞口
-                        outLineGeoParam.Outline.InnerPolylines.Add(item.Outline);
-                        var outline = new PolylineSurrogate
-                        {
-                            Points = outLineGeoParam.Outline.Points,
-                            IsClosed = outLineGeoParam.Outline.IsClosed,
-                            HolesMaxHeight = item.DescendingHeight,
-                            InnerPolylines = outLineGeoParam.Outline.InnerPolylines,
-                        };
-                        outLineGeoParam.Outline = outline;
-                    }
-                }
-            }
-            return outLineGeoParam;
-        }
-
-        public static GeometryParam THTCHGeometryParam(this ThTCHElement tchElement)
-        {
-            var xVector = tchElement.XVector.Vector3D2XBimVector();
-            if (tchElement.Outline.Points != null && tchElement.Outline.Points.Count >= 2)
-            {
-                var outLineGeoParam = new GeometryStretch(
-                                        tchElement.Outline,
-                                        xVector,
-                                        tchElement.ExtrudedDirection.Vector3D2XBimVector(),
-                                        tchElement.Height,
-                                        tchElement.ZOffSet);
-                outLineGeoParam.YAxisLength = tchElement.Width;
-                return outLineGeoParam;
-            }
-            else
-            {
-                var geoParam = new GeometryStretch(
-                                   tchElement.Origin.Point3D2XBimPoint(),
-                                   xVector,
-                                   tchElement.Length,
-                                   tchElement.Width,
-                                   tchElement.ExtrudedDirection.Vector3D2XBimVector(),
-                                   tchElement.Height,
-                                   tchElement.ZOffSet);
-                return geoParam;
-            }
         }
     }
 }

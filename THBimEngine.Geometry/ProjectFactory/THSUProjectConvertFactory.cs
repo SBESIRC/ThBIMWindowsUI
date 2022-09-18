@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using THBimEngine.Domain;
-using THBimEngine.Domain.Model;
 using THBimEngine.Geometry.NTS;
 using Xbim.Common.Geometry;
 using Xbim.Common.Step21;

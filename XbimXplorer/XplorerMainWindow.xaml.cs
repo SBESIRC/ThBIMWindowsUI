@@ -44,7 +44,6 @@ using XbimXplorer.Properties;
 using System.Windows.Forms.Integration;
 using THBimEngine.Presention;
 using XbimXplorer.ThBIMEngine;
-using THBimEngine.Domain.Model;
 using System.IO.Pipes;
 using ProtoBuf;
 using System.Windows.Media;
@@ -93,7 +92,7 @@ namespace XbimXplorer
         {
             return _openedModelFileName;
         }
-        private ThTCHProject thProject=null;
+        private ThTCHProjectData thProject=null;
         private ThSUProjectData suProject = null;
         NamedPipeServerStream pipeServer = null;
         NamedPipeServerStream SU_pipeServer = null;
@@ -168,7 +167,9 @@ namespace XbimXplorer
             pipeServer.WaitForConnection();
             try
             {
-                thProject = Serializer.Deserialize<ThTCHProject>(pipeServer);
+                //thProject = Serializer.Deserialize<ThTCHProject>(pipeServer);
+                thProject = new ThTCHProjectData();
+                Google.Protobuf.MessageExtensions.MergeFrom(thProject, pipeServer);
             }
             catch (IOException ioEx)
             {

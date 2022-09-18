@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using THBimEngine.Domain;
-using THBimEngine.Domain.MidModel;
-using THBimEngine.Domain.Model;
 using THBimEngine.Geometry.ProjectFactory;
 using Xbim.Common.Geometry;
 using Xbim.Ifc;
@@ -24,15 +22,16 @@ namespace XbimXplorer.ThBIMEngine
             THBimScene.Instance.UnShowEntityTypes.Add("openingelement");
             THBimScene.Instance.UnShowEntityTypes.Add("open");
         }
-        public void AddProject(ThTCHProject project)
+
+        public void AddProject(ThTCHProjectData project)
         {
-            convertFactory = new THProjectConvertFactory(Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3);
-            bool isAdd = IsAddProject(project.Uuid);
+            convertFactory = new THProjectDataConvertFactory(Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3);
+            bool isAdd = IsAddProject(project.Root.GlobalId);
             if (isAdd)
             {
                 //_allProjects.Add(project);
-                var convertResult = convertFactory.ProjectConvert(project,true);
-                if (null != convertResult) 
+                var convertResult = convertFactory.ProjectConvert(project, true);
+                if (null != convertResult)
                 {
                     convertResult.BimProject.HaveChange = true;
                     THBimScene.Instance.AddProject(convertResult.BimProject);

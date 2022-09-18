@@ -349,7 +349,6 @@
     <Compile Include="LogViewer\LogViewer.xaml.cs">
       <DependentUpon>LogViewer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PipeDemo.cs" />
     <Compile Include="PluginSystem\IPackageExtensions.cs" />
     <Compile Include="PluginSystem\PluginActionUI.xaml.cs">
       <DependentUpon>PluginActionUI.xaml</DependentUpon>

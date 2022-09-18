@@ -144,14 +144,14 @@ namespace XbimXplorer
             _dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
             _dispatcherTimer.Tick += DispatcherTimer_Tick;
 
-            pipeServer = new NamedPipeServerStream("THDB2Push_TestPipe", PipeDirection.In);
+            pipeServer = new NamedPipeServerStream("THCAD2P3DPIPE", PipeDirection.In);
             backgroundWorker = new BackgroundWorker();
             backgroundWorker.DoWork += Background_DoWork;
             backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
             backgroundWorker.RunWorkerAsync();
 
             //New Code
-            SU_pipeServer = new NamedPipeServerStream("THSU2Viewer_TestPipe", PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
+            SU_pipeServer = new NamedPipeServerStream("THSU2P3DPIPE", PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
             SU_backgroundWorker = new BackgroundWorker();
             SU_backgroundWorker.DoWork += SU_Background_DoWork;
             SU_backgroundWorker.RunWorkerCompleted += SU_BackgroundWorker_RunWorkerCompleted;
@@ -163,7 +163,7 @@ namespace XbimXplorer
         {
             thProject = null;
             if (null == pipeServer)
-                pipeServer = new NamedPipeServerStream("THDB2Push_TestPipe", PipeDirection.In);
+                pipeServer = new NamedPipeServerStream("THCAD2P3DPIPE", PipeDirection.In);
             pipeServer.WaitForConnection();
             try
             {
@@ -199,7 +199,7 @@ namespace XbimXplorer
         private void SU_Background_DoWork(object sender, DoWorkEventArgs e)
         {
             if (null == SU_pipeServer)
-                SU_pipeServer = new NamedPipeServerStream("THSU2Viewer_TestPipe", PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
+                SU_pipeServer = new NamedPipeServerStream("THSU2P3DPIPE", PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
             SU_pipeServer.WaitForConnection();
             try
             {

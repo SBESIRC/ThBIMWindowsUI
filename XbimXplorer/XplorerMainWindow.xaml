@@ -190,6 +190,9 @@
             <MenuItem Header="导出切图数据" x:Name="ExportCut" Click="ExportCut_Click" Width="90" HorizontalAlignment="Left"
                       VerticalContentAlignment="Center"
                       HorizontalContentAlignment="Center"></MenuItem>
+            <MenuItem Header="Home" x:Name="homeView" Click="homeView_Click"  Width="50" HorizontalAlignment="Left"
+                      VerticalContentAlignment="Center"
+                      HorizontalContentAlignment="Center"></MenuItem>
         </Menu>
         <Grid Grid.Row="1" x:Name="mainGrid">
             <Grid.ColumnDefinitions>

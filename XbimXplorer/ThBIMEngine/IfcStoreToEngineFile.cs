@@ -347,9 +347,9 @@ namespace XbimXplorer.ThBIMEngine
 				for (int i = 0; i < meshPoints.Count; i++)
 				{
 					var point = meshPoints[i];
-					ExampleScene.ifcre_set_g_vertices(point.Point.X);
-					ExampleScene.ifcre_set_g_vertices(point.Point.Y);
-					ExampleScene.ifcre_set_g_vertices(point.Point.Z);
+					ExampleScene.ifcre_set_g_vertices(point.Point.X / 1000);
+					ExampleScene.ifcre_set_g_vertices(point.Point.Y / 1000);
+					ExampleScene.ifcre_set_g_vertices(point.Point.Z / 1000);
 				}
 			}));
 			tasks.Add(Task.Run(() =>

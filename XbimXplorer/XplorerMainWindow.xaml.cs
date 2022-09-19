@@ -1519,5 +1519,10 @@ namespace XbimXplorer
             ;
             ThBimCutData.Run();
         }
+
+        private void homeView_Click(object sender, RoutedEventArgs e)
+        {
+            ExampleScene.ifcre_home();
+        }
     }
 }

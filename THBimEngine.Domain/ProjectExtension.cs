@@ -117,7 +117,11 @@ namespace THBimEngine.Domain
                 {
                     var realType = BuildingCatagory.Unknown;
                     var name = item.Name.ToLower();
-                    if (name.Contains("wall"))
+                    if(name.Contains("thbimuntypedentity"))
+                    {
+                        realType = BuildingCatagory.UnTypeElement;
+                    }
+                    else if (name.Contains("wall"))
                     {
                         realType = BuildingCatagory.Wall;
                     }
@@ -190,11 +194,34 @@ namespace THBimEngine.Domain
         {
             var filters = new List<TypeFilter>();
             var allTypes = AllProjectTypes(allProjects);
+            var allEntitys = allProjects.SelectMany(c => c.PrjAllEntitys.Values).ToList();
+            var allUnTypeEntitys = allEntitys.OfType<THBimUntypedEntity>().ToList();
             foreach (var item in allTypes.OrderBy(c => c.Key)) 
             {
-                var newFilter = new TypeFilter(item.Value);
-                newFilter.Describe = EnumUtil.GetEnumDescription(item.Key);
-                filters.Add(newFilter);
+                if (item.Key == BuildingCatagory.UnTypeElement)
+                {
+                    var allUntypeRealNames = allUnTypeEntitys.Select(c => c.EntityTypeName).Distinct().ToList();
+                    foreach (var realName in allUntypeRealNames) 
+                    {
+                        var newFilter = new UnTypeEntityFilter(new List<string> { realName });
+                        if (string.IsNullOrEmpty(realName))
+                        {
+                            newFilter.Describe = EnumUtil.GetEnumDescription(item.Key);
+                        }
+                        else 
+                        {
+                            newFilter.Describe = realName;
+                        }
+                        filters.Add(newFilter);
+                    }
+                }
+                else 
+                {
+                    var newFilter = new TypeFilter(item.Value);
+                    newFilter.Describe = EnumUtil.GetEnumDescription(item.Key);
+                    filters.Add(newFilter);
+                }
+                
             }
             return filters;
         }

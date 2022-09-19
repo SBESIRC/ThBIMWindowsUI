@@ -8,18 +8,10 @@ namespace THBimEngine.Domain
 {
     public class THBimUntypedEntity : THBimEntity, IEquatable<THBimUntypedEntity>
     {
-        public Type OldType { get; set; }
-        public string OldTypeName 
-        { 
-            get 
-            {
-                if (null != OldType)
-                    return OldType.Name;
-                return string.Empty;
-            } 
-        }
+        public string EntityTypeName { get; set; }
         public THBimUntypedEntity(int id, string name,string material, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, material,geometryParam, describe, uid)
         {
+            EntityTypeName = "";
         }
 
         public override object Clone()

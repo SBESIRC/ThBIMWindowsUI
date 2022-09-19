@@ -87,6 +87,7 @@ namespace XbimXplorer.ThBIMEngine
             var prjName = Path.GetFileNameWithoutExtension(ifcStore.FileName);
             var ifcProject = ifcStore.Instances.FirstOrDefault<IIfcProject>();
             var bimProject = new THBimProject(0, prjName, "", ifcProject.GlobalId);
+            bimProject.SourceName = "IFC";
             bimProject.ProjectIdentity = ifcStore.FileName;
             bimProject.SourceProject = ifcStore;
             bimProject.NeedCreateMesh = false;

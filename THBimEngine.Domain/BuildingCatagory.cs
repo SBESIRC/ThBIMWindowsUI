@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 
 namespace THBimEngine.Domain
 {
@@ -43,6 +38,8 @@ namespace THBimEngine.Domain
         Railing =100022,
         [Description("洞口")]
         Opening =100099,
+        [Description("无类型")]//需要后续计算的
+        UnTypeElement = 9999998,
         [Description("未知")]
         Unknown = 9999999,
     }

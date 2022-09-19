@@ -180,5 +180,63 @@ namespace THBimEngine.Domain
             }
         }
     }
+    public class UnTypeEntityFilter : TypeFilter
+    {
+        private HashSet<string> typeNames = new HashSet<string>();
+        public UnTypeEntityFilter(List<string> untypeNames) : base(null)
+        {
+            AcceptTypes(new List<Type> { typeof(THBimUntypedEntity) });
+            AddUntypeRealNames(untypeNames);
+        }
+        public void AddAcceptTypes(List<string> untypeNames)
+        {
+            AcceptTypes(new List<Type> { typeof(THBimUntypedEntity) });
+            AddUntypeRealNames(untypeNames);
+        }
+        public override bool CheckType(THBimElement bimEntity)
+        {
+            if (!base.CheckType(bimEntity))
+                return false;
+            if (bimEntity is THBimUntypedEntity untypedEntity) 
+            {
+                var checkName = untypedEntity.EntityTypeName;
+                return typeNames.Contains(checkName);
+            }
+            return false;
+        }
+        public override object Clone()
+        {
+            var filter = new TypeFilter(this.acceptElementTypes.ToList());
+            filter.Describe = this.Describe;
+            foreach (var item in this.ResultElementUids)
+            {
+                filter.ResultElementUids.Add(item);
+            }
+            return filter;
+        }
+
+        void AcceptTypes(List<Type> targetTypes)
+        {
+            if (null == targetTypes || targetTypes.Count < 1)
+                return;
+            foreach (var item in targetTypes)
+            {
+                if (acceptElementTypes.Contains(item))
+                    continue;
+                acceptElementTypes.Add(item);
+            }
+        }
+        void AddUntypeRealNames(List<string> untypeNames) 
+        {
+            if (untypeNames == null || untypeNames.Count < 1)
+                return;
+            foreach (var item in untypeNames)
+            {
+                if (typeNames.Contains(item))
+                    continue;
+                typeNames.Add(item);
+            }
+        }
+    }
 
 }

@@ -32,8 +32,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xbim.ModelGeometry.Scene", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "THBimEngine.DataFactory", "THBimEngine.DataFactory\THBimEngine.DataFactory.csproj", "{A44A4F9C-D4D4-4768-A1F6-34250DAC95B1}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "THBimViewerSetup", "THBimViewerSetup\THBimViewerSetup.vdproj", "{DE36438D-439B-49F7-B3E3-4F49A0155D90}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -164,12 +162,6 @@ Global
 		{A44A4F9C-D4D4-4768-A1F6-34250DAC95B1}.Release|x64.Build.0 = Release|Any CPU
 		{A44A4F9C-D4D4-4768-A1F6-34250DAC95B1}.Release|x86.ActiveCfg = Release|Any CPU
 		{A44A4F9C-D4D4-4768-A1F6-34250DAC95B1}.Release|x86.Build.0 = Release|Any CPU
-		{DE36438D-439B-49F7-B3E3-4F49A0155D90}.Debug|Any CPU.ActiveCfg = Debug
-		{DE36438D-439B-49F7-B3E3-4F49A0155D90}.Debug|x64.ActiveCfg = Debug
-		{DE36438D-439B-49F7-B3E3-4F49A0155D90}.Debug|x86.ActiveCfg = Debug
-		{DE36438D-439B-49F7-B3E3-4F49A0155D90}.Release|Any CPU.ActiveCfg = Release
-		{DE36438D-439B-49F7-B3E3-4F49A0155D90}.Release|x64.ActiveCfg = Release
-		{DE36438D-439B-49F7-B3E3-4F49A0155D90}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -40,13 +40,13 @@
         "Entry"
         {
         "MsmKey" = "8:_0689335B49811F3BBC83E1087C12A658"
-        "OwnerKey" = "8:_A57063B4618B76806E8318B880096D0C"
+        "OwnerKey" = "8:_1A5D489789588A0413FC12FA79D634A5"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_0689335B49811F3BBC83E1087C12A658"
-        "OwnerKey" = "8:_B1EC13D795B0545F52CE82B224731401"
+        "OwnerKey" = "8:_85A7C591A464C971DF081742E3885BBB"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -113,6 +113,12 @@
         {
         "MsmKey" = "8:_1611F1D9CEB1431E89B3530BB27F5E4D"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_1A5D489789588A0413FC12FA79D634A5"
+        "OwnerKey" = "8:_26A2FB63D48241B5A2E263F875FD6DFD"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -202,13 +208,13 @@
         "Entry"
         {
         "MsmKey" = "8:_27BFA551408BDBF5B7D02B492A5F7D8B"
-        "OwnerKey" = "8:_A57063B4618B76806E8318B880096D0C"
+        "OwnerKey" = "8:_1A5D489789588A0413FC12FA79D634A5"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_27BFA551408BDBF5B7D02B492A5F7D8B"
-        "OwnerKey" = "8:_B1EC13D795B0545F52CE82B224731401"
+        "OwnerKey" = "8:_85A7C591A464C971DF081742E3885BBB"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -310,7 +316,7 @@
         "Entry"
         {
         "MsmKey" = "8:_3060AA03703FFF3F04A8E4660A33D970"
-        "OwnerKey" = "8:_B1EC13D795B0545F52CE82B224731401"
+        "OwnerKey" = "8:_85A7C591A464C971DF081742E3885BBB"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -370,7 +376,7 @@
         "Entry"
         {
         "MsmKey" = "8:_37F1D42CED1B2308E1BEB62C923679DF"
-        "OwnerKey" = "8:_5A348231EA96114A6C2FA4F414B9C3DE"
+        "OwnerKey" = "8:_A8EE65F31D5D7EA96985BE15556EA3D9"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -472,7 +478,7 @@
         "Entry"
         {
         "MsmKey" = "8:_56CE52B7226CECF73D4B7817FFB07EEB"
-        "OwnerKey" = "8:_A57063B4618B76806E8318B880096D0C"
+        "OwnerKey" = "8:_1A5D489789588A0413FC12FA79D634A5"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -483,18 +489,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_5A348231EA96114A6C2FA4F414B9C3DE"
-        "OwnerKey" = "8:_26A2FB63D48241B5A2E263F875FD6DFD"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_5A348231EA96114A6C2FA4F414B9C3DE"
-        "OwnerKey" = "8:_9EE529A42ABB0CD61D16DCD679452B10"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_5CEA087F846963D94ADE6D9733FE240A"
         "OwnerKey" = "8:_26A2FB63D48241B5A2E263F875FD6DFD"
         "MsmSig" = "8:_UNDEFINED"
@@ -502,7 +496,7 @@
         "Entry"
         {
         "MsmKey" = "8:_5CEA087F846963D94ADE6D9733FE240A"
-        "OwnerKey" = "8:_A57063B4618B76806E8318B880096D0C"
+        "OwnerKey" = "8:_1A5D489789588A0413FC12FA79D634A5"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -555,6 +549,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_75649228DDA7B165A67584B57D128D45"
+        "OwnerKey" = "8:_26A2FB63D48241B5A2E263F875FD6DFD"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_75672E2FFCB340C2B608C39F97D943C6"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -593,6 +593,18 @@
         {
         "MsmKey" = "8:_826DBEEA981D0185844B273B0EEC3170"
         "OwnerKey" = "8:_37F1D42CED1B2308E1BEB62C923679DF"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_85A7C591A464C971DF081742E3885BBB"
+        "OwnerKey" = "8:_26A2FB63D48241B5A2E263F875FD6DFD"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_85A7C591A464C971DF081742E3885BBB"
+        "OwnerKey" = "8:_1A5D489789588A0413FC12FA79D634A5"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -658,13 +670,13 @@
         "Entry"
         {
         "MsmKey" = "8:_969CC252F0887945C99834049FA95B48"
-        "OwnerKey" = "8:_A57063B4618B76806E8318B880096D0C"
+        "OwnerKey" = "8:_1A5D489789588A0413FC12FA79D634A5"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_969CC252F0887945C99834049FA95B48"
-        "OwnerKey" = "8:_B1EC13D795B0545F52CE82B224731401"
+        "OwnerKey" = "8:_85A7C591A464C971DF081742E3885BBB"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -689,12 +701,6 @@
         {
         "MsmKey" = "8:_9D7420EF8B894A5E92DA9B48305D1A9A"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_9EE529A42ABB0CD61D16DCD679452B10"
-        "OwnerKey" = "8:_26A2FB63D48241B5A2E263F875FD6DFD"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -753,14 +759,20 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_A57063B4618B76806E8318B880096D0C"
+        "MsmKey" = "8:_A732F0310C344E81BAA2E91D7462AA33"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_A8EE65F31D5D7EA96985BE15556EA3D9"
         "OwnerKey" = "8:_26A2FB63D48241B5A2E263F875FD6DFD"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_A732F0310C344E81BAA2E91D7462AA33"
-        "OwnerKey" = "8:_UNDEFINED"
+        "MsmKey" = "8:_A8EE65F31D5D7EA96985BE15556EA3D9"
+        "OwnerKey" = "8:_75649228DDA7B165A67584B57D128D45"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -861,18 +873,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_B1EC13D795B0545F52CE82B224731401"
-        "OwnerKey" = "8:_26A2FB63D48241B5A2E263F875FD6DFD"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_B1EC13D795B0545F52CE82B224731401"
-        "OwnerKey" = "8:_A57063B4618B76806E8318B880096D0C"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_B4C3B94182F8413D9BD3F98F35E8CCB3"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -952,13 +952,13 @@
         "Entry"
         {
         "MsmKey" = "8:_C14A7B0BD783C809A6CE37517DE68487"
-        "OwnerKey" = "8:_A57063B4618B76806E8318B880096D0C"
+        "OwnerKey" = "8:_1A5D489789588A0413FC12FA79D634A5"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_C14A7B0BD783C809A6CE37517DE68487"
-        "OwnerKey" = "8:_B1EC13D795B0545F52CE82B224731401"
+        "OwnerKey" = "8:_85A7C591A464C971DF081742E3885BBB"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1018,7 +1018,7 @@
         "Entry"
         {
         "MsmKey" = "8:_CA4233B09642D1AB9BDB7F4B6AD1EA9C"
-        "OwnerKey" = "8:_A57063B4618B76806E8318B880096D0C"
+        "OwnerKey" = "8:_1A5D489789588A0413FC12FA79D634A5"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1084,13 +1084,13 @@
         "Entry"
         {
         "MsmKey" = "8:_DEE185102DC40F26465D254FE1D608C5"
-        "OwnerKey" = "8:_A57063B4618B76806E8318B880096D0C"
+        "OwnerKey" = "8:_1A5D489789588A0413FC12FA79D634A5"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_DEE185102DC40F26465D254FE1D608C5"
-        "OwnerKey" = "8:_B1EC13D795B0545F52CE82B224731401"
+        "OwnerKey" = "8:_85A7C591A464C971DF081742E3885BBB"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1234,13 +1234,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_68FCF6A06870C4E65F3849BBE59E1A72"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_39CA93DC69FF482FBC7DA3E29EDA6D19"
+        "OwnerKey" = "8:_26A2FB63D48241B5A2E263F875FD6DFD"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1252,25 +1246,25 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_9EE529A42ABB0CD61D16DCD679452B10"
+        "OwnerKey" = "8:_39CA93DC69FF482FBC7DA3E29EDA6D19"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_A57063B4618B76806E8318B880096D0C"
+        "OwnerKey" = "8:_75649228DDA7B165A67584B57D128D45"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_B1EC13D795B0545F52CE82B224731401"
+        "OwnerKey" = "8:_1A5D489789588A0413FC12FA79D634A5"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_26A2FB63D48241B5A2E263F875FD6DFD"
+        "OwnerKey" = "8:_85A7C591A464C971DF081742E3885BBB"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1555,6 +1549,12 @@
         "OwnerKey" = "8:_D0DC857E54CF6AC449C63B3831DC6F96"
         "MsmSig" = "8:_UNDEFINED"
         }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_68FCF6A06870C4E65F3849BBE59E1A72"
+        "MsmSig" = "8:_UNDEFINED"
+        }
     }
     "Configurations"
     {
@@ -1573,13 +1573,21 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
         "Release"
         {
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\THBimViewerSetup1.0.0.msi"
+        "OutputFilename" = "8:Release\\THBimViewerSetup1.0.1.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -1589,6 +1597,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
     }
     "Deployable"
@@ -1869,6 +1885,37 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_1A5D489789588A0413FC12FA79D634A5"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:THBimEngine.Geometry, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_1A5D489789588A0413FC12FA79D634A5"
+                    {
+                    "Name" = "8:THBimEngine.Geometry.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:THBimEngine.Geometry.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_0651A10A253F4D13A5CC23E1EBF76FF8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_1B1CF8DFCF84091E2F4B055796D15158"
@@ -2578,37 +2625,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_5A348231EA96114A6C2FA4F414B9C3DE"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:GLFW.NET, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_5A348231EA96114A6C2FA4F414B9C3DE"
-                    {
-                    "Name" = "8:GLFW.NET.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:GLFW.NET.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_0651A10A253F4D13A5CC23E1EBF76FF8"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_5CEA087F846963D94ADE6D9733FE240A"
             {
             "AssemblyRegister" = "3:1"
@@ -2773,6 +2789,37 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_75649228DDA7B165A67584B57D128D45"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:THBimEngine.Presention, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_75649228DDA7B165A67584B57D128D45"
+                    {
+                    "Name" = "8:THBimEngine.Presention.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:THBimEngine.Presention.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_0651A10A253F4D13A5CC23E1EBF76FF8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_75672E2FFCB340C2B608C39F97D943C6"
             {
             "SourcePath" = "8:..\\WorkDir\\shaders\\bbx.vert"
@@ -2918,6 +2965,37 @@
                     }
                 }
             "SourcePath" = "8:System.IO.Compression.FileSystem.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_0651A10A253F4D13A5CC23E1EBF76FF8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_85A7C591A464C971DF081742E3885BBB"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:THBimEngine.Domain, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_85A7C591A464C971DF081742E3885BBB"
+                    {
+                    "Name" = "8:THBimEngine.Domain.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:THBimEngine.Domain.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_0651A10A253F4D13A5CC23E1EBF76FF8"
@@ -3212,37 +3290,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_9EE529A42ABB0CD61D16DCD679452B10"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:THBimEngine.Presention, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_9EE529A42ABB0CD61D16DCD679452B10"
-                    {
-                    "Name" = "8:THBimEngine.Presention.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:THBimEngine.Presention.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_0651A10A253F4D13A5CC23E1EBF76FF8"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_9FF2E2EAF51B1229885268474937711A"
             {
             "AssemblyRegister" = "3:1"
@@ -3345,37 +3392,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_A57063B4618B76806E8318B880096D0C"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:THBimEngine.Geometry, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_A57063B4618B76806E8318B880096D0C"
-                    {
-                    "Name" = "8:THBimEngine.Geometry.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:THBimEngine.Geometry.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_0651A10A253F4D13A5CC23E1EBF76FF8"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A732F0310C344E81BAA2E91D7462AA33"
             {
             "SourcePath" = "8:..\\WorkDir\\shaders\\chosen_test.frag"
@@ -3394,6 +3410,37 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_A8EE65F31D5D7EA96985BE15556EA3D9"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:GLFW.NET, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_A8EE65F31D5D7EA96985BE15556EA3D9"
+                    {
+                    "Name" = "8:GLFW.NET.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:GLFW.NET.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_0651A10A253F4D13A5CC23E1EBF76FF8"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_A93439AF732F2D1067F73035E2D4BCC7"
@@ -3536,37 +3583,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_B1EC13D795B0545F52CE82B224731401"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:THBimEngine.Domain, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_B1EC13D795B0545F52CE82B224731401"
-                    {
-                    "Name" = "8:THBimEngine.Domain.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:THBimEngine.Domain.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_0651A10A253F4D13A5CC23E1EBF76FF8"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B4C3B94182F8413D9BD3F98F35E8CCB3"
@@ -4405,15 +4421,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:THBimViewer"
-        "ProductCode" = "8:{3952899F-4727-43E4-A2C1-7CDF187FB23A}"
-        "PackageCode" = "8:{3DCEB485-6B42-457C-A430-D4D103818599}"
+        "ProductCode" = "8:{21D79F9F-10F3-4EFF-BBB7-9C6D6C45A7D6}"
+        "PackageCode" = "8:{859629CA-6141-4AFC-BDF0-754587793A9B}"
         "UpgradeCode" = "8:{ED2A8D68-8A28-4313-AC3F-A8420ED52526}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.0"
+        "ProductVersion" = "8:1.0.1"
         "Manufacturer" = "8:THBim"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

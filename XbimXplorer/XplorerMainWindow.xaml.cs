@@ -50,6 +50,7 @@ using System.Windows.Media;
 using XbimXplorer.LeftTabItme;
 using System.Threading;
 using Xbim.Common.Geometry;
+using THBimEngine.Domain;
 #endregion
 
 namespace XbimXplorer
@@ -167,9 +168,16 @@ namespace XbimXplorer
             pipeServer.WaitForConnection();
             try
             {
-                //thProject = Serializer.Deserialize<ThTCHProject>(pipeServer);
                 thProject = new ThTCHProjectData();
-                Google.Protobuf.MessageExtensions.MergeFrom(thProject, pipeServer);
+                byte[] PipeData = ReadPipeData(pipeServer);
+                if (PipeData.VerifyPipeData())
+                {
+                    Google.Protobuf.MessageExtensions.MergeFrom(thProject, PipeData.Skip(10).ToArray());
+                }
+                else
+                {
+                    throw new Exception("无法识别的CAD-Push数据!");
+                }
             }
             catch (IOException ioEx)
             {
@@ -178,7 +186,21 @@ namespace XbimXplorer
             }
             pipeServer.Dispose();
         }
-        
+
+        private byte[] ReadPipeData(NamedPipeServerStream stream)
+        {
+            List<byte> _current = new List<byte>();
+            while (true)
+            {
+                var i = stream.ReadByte();
+                if (i == -1)
+                {
+                    return _current.ToArray();
+                }
+                _current.Add(Convert.ToByte(i));
+            }
+        }
+
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (null != thProject)
@@ -203,10 +225,16 @@ namespace XbimXplorer
             SU_pipeServer.WaitForConnection();
             try
             {
-                //byte[] data = new byte[pipeServer.Length];
-                //pipeServer.Read(data, 0, data.Length);
                 suProject = new ThSUProjectData();
-                Google.Protobuf.MessageExtensions.MergeFrom(suProject, SU_pipeServer);
+                byte[] PipeData = ReadPipeData(SU_pipeServer);
+                if (PipeData.VerifyPipeData())
+                {
+                    Google.Protobuf.MessageExtensions.MergeFrom(suProject, PipeData.Skip(10).ToArray());
+                }
+                else
+                {
+                    throw new Exception("无法识别的SU-Push数据!");
+                }
             }
             catch (IOException ioEx)
             {
@@ -519,9 +547,9 @@ namespace XbimXplorer
 
                 var DataHead = fileArray.Take(10).ToArray();
                 //84 = 'T' 72 = 'H' 
-                if(DataHead[0] == 84 && DataHead[1] == 72)
+                if(DataHead[0] == 84 && DataHead[1] == 72 && DataHead[2] == 3)
                 {
-                    switch(DataHead[2])
+                    switch(DataHead[3])
                     {
                         case 1:
                             {

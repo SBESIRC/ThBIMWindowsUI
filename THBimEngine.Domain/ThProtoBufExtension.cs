@@ -94,5 +94,12 @@ namespace THBimEngine.Domain
             }
             return outLineGeoParam;
         }
+
+        public static bool VerifyPipeData(this byte[] data)
+        {
+            return data[0] == 84 && data[1] == 72 //校验
+                && (data[2] == 1 || data[2] == 2 || data[2] == 3) //push/zoom/外链
+                && (data[3] == 1 || data[3] == 2); //CAD/SU
+        }
     }
 }

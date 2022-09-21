@@ -120,8 +120,9 @@ namespace THBimEngine.Domain
 								meshModel.FaceTriangles.Add(triangle);
 							}
 						}
-
 					}
+					if (meshModel.FaceTriangles.Count < 1)
+						continue;
 					storeyGeoModels.Add(meshModel);
 					gIndex += 1;
 				}

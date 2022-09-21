@@ -746,7 +746,7 @@ namespace Xbim.ModelGeometry.Scene
             PerformSubtractions = 2,
             ReplaceBoundingBox = 4,
             Skip = 8,
-            Default = PerformAdditions | PerformSubtractions
+            Default = PerformAdditions // | PerformSubtractions
         }
 
         public delegate MeshingBehaviourResult MeshingBehaviourSetter(int elementId, int typeId, ref double linearDeflection,

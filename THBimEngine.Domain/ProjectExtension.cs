@@ -97,6 +97,13 @@ namespace THBimEngine.Domain
                         }
                     }
                 }
+                storeys = storeys.OrderBy(c => c.LevelHeight).ToList();
+                for (int i = 0; i < storeys.Count - 1; i++) 
+                {
+                    var btStorey = storeys[i];
+                    var upStorey = storeys[i + 1];
+                    btStorey.LevelHeight = upStorey.Elevation - btStorey.Elevation;
+                }
             }
             else
             {
@@ -257,39 +264,39 @@ namespace THBimEngine.Domain
                 storey_Elevation = storey.Elevation.Value;
             }
             var bimStorey = new THBimStorey(storey.EntityLabel, storey.Name, storey_Elevation, storey_Height, "", storey.GlobalId);
-            if (storey.PropertySets == null)
-                return bimStorey;
-            var propSets = storey.PropertySets.ToList();
-            if (propSets.Count<1)
-                return bimStorey;
-            foreach (var item in propSets)
-            {
-                if (item.PropertySetDefinitions == null)
-                    continue;
-                var defs = item.PropertySetDefinitions.ToList();
-                foreach (var prop in defs)
-                {
-                    var propertySet = prop as IIfcPropertySet;
-                    if (propertySet == null) 
-                        continue;
-                    foreach (var realProp in propertySet.HasProperties)
-                    {
-                        if (realProp.Name == "Height")
-                        {
-                            if (realProp is IIfcPropertySingleValue propValue)
-                            {
-                                if (double.TryParse(propValue.NominalValue.ToString(), out double height))
-                                {
-                                    storey_Height = height;
-                                    goto StoreyHeightSetted;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
- StoreyHeightSetted:
-            bimStorey.LevelHeight = storey_Height;
+ //           if (storey.PropertySets == null)
+ //               return bimStorey;
+ //           var propSets = storey.PropertySets.ToList();
+ //           if (propSets.Count<1)
+ //               return bimStorey;
+ //           foreach (var item in propSets)
+ //           {
+ //               if (item.PropertySetDefinitions == null)
+ //                   continue;
+ //               var defs = item.PropertySetDefinitions.ToList();
+ //               foreach (var prop in defs)
+ //               {
+ //                   var propertySet = prop as IIfcPropertySet;
+ //                   if (propertySet == null) 
+ //                       continue;
+ //                   foreach (var realProp in propertySet.HasProperties)
+ //                   {
+ //                       if (realProp.Name == "Height")
+ //                       {
+ //                           if (realProp is IIfcPropertySingleValue propValue)
+ //                           {
+ //                               if (double.TryParse(propValue.NominalValue.ToString(), out double height))
+ //                               {
+ //                                   storey_Height = height;
+ //                                   goto StoreyHeightSetted;
+ //                               }
+ //                           }
+ //                       }
+ //                   }
+ //               }
+ //           }
+ //StoreyHeightSetted:
+            //bimStorey.LevelHeight = storey_Height;
             return bimStorey;
         }
         public static THBimStorey IfcStoreyToBimStorey(Xbim.Ifc4.ProductExtension.IfcBuildingStorey storey)
@@ -301,45 +308,45 @@ namespace THBimEngine.Domain
                 storey_Elevation = storey.Elevation.Value;
             }
             var bimStorey = new THBimStorey(storey.EntityLabel, storey.Name, storey_Elevation, storey_Height, "", storey.GlobalId);
-            if (storey.PropertySets == null)
-                return bimStorey;
-            var propSets = storey.PropertySets.ToList();
-            if (propSets.Count() < 1)
-                return bimStorey;
-            bool isBreak = false;
-            foreach (var item in propSets)
-            {
-                if (item.PropertySetDefinitions == null)
-                    continue;
-                if (isBreak)
-                    break;
-                foreach (var prop in item.PropertySetDefinitions)
-                {
-                    if (isBreak)
-                        break;
-                    if (!(prop is IIfcPropertySet))
-                        continue;
-                    var propertySet = prop as IIfcPropertySet;
-                    foreach (var realProp in propertySet.HasProperties)
-                    {
-                        if (isBreak)
-                            break;
-                        if (realProp.Name == "Height")
-                        {
-                            if (realProp is IIfcPropertySingleValue propValue)
-                            {
-                                if (double.TryParse(propValue.NominalValue.ToString(), out double height))
-                                {
-                                    storey_Height = height;
-                                    isBreak = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            bimStorey.LevelHeight = storey_Height;
+            //if (storey.PropertySets == null)
+            //    return bimStorey;
+            //var propSets = storey.PropertySets.ToList();
+            //if (propSets.Count() < 1)
+            //    return bimStorey;
+            //bool isBreak = false;
+            //foreach (var item in propSets)
+            //{
+            //    if (item.PropertySetDefinitions == null)
+            //        continue;
+            //    if (isBreak)
+            //        break;
+            //    foreach (var prop in item.PropertySetDefinitions)
+            //    {
+            //        if (isBreak)
+            //            break;
+            //        if (!(prop is IIfcPropertySet))
+            //            continue;
+            //        var propertySet = prop as IIfcPropertySet;
+            //        foreach (var realProp in propertySet.HasProperties)
+            //        {
+            //            if (isBreak)
+            //                break;
+            //            if (realProp.Name == "Height")
+            //            {
+            //                if (realProp is IIfcPropertySingleValue propValue)
+            //                {
+            //                    if (double.TryParse(propValue.NominalValue.ToString(), out double height))
+            //                    {
+            //                        storey_Height = height;
+            //                        isBreak = true;
+            //                        break;
+            //                    }
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+            //bimStorey.LevelHeight = storey_Height;
             return bimStorey;
         }
 

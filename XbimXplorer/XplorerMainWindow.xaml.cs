@@ -185,7 +185,7 @@ namespace XbimXplorer
             {
                 ExampleScene.ifcre_set_sleep_time(1000);
                 DateTime startTime = DateTime.Now;
-                bimDataController.AddProject(thProject);
+                bimDataController.AddProject(thProject, projectMatrix3D);
                 thProject = null;
                 pipeServer = null;
                 backgroundWorker.RunWorkerAsync();
@@ -529,7 +529,7 @@ namespace XbimXplorer
                                 var DataBody = fileArray.Skip(10).ToArray();
                                 var th_Project = new ThTCHProjectData();
                                 Google.Protobuf.MessageExtensions.MergeFrom(th_Project, DataBody);
-                                //bimDataController.AddProject(th_Project);
+                                bimDataController.AddProject(th_Project, projectMatrix3D);
                                 break;
                             }
                         case 2:

@@ -64,7 +64,7 @@ namespace THBimEngine.Domain
                 {
                     foreach (var file in files) 
                     {
-                        if (file.Extension.ToLower() == ".cadmidfile")
+                        if (file.Extension.ToLower() == ".thbim")
                         {
                             var cadModelFile = new ModelFile(file.FullName, "主体");
                             cadModelFile.MidFilePath = file.FullName;

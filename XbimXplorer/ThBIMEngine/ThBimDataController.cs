@@ -23,7 +23,7 @@ namespace XbimXplorer.ThBIMEngine
             THBimScene.Instance.UnShowEntityTypes.Add("open");
         }
 
-        public void AddProject(ThTCHProjectData project)
+        public void AddProject(ThTCHProjectData project, XbimMatrix3D matrix3D)
         {
             convertFactory = new THProjectDataConvertFactory(Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3);
             bool isAdd = IsAddProject(project.Root.GlobalId);
@@ -31,6 +31,7 @@ namespace XbimXplorer.ThBIMEngine
             {
                 //_allProjects.Add(project);
                 var convertResult = convertFactory.ProjectConvert(project, true);
+                convertResult.BimProject.Matrix3D = matrix3D;
                 if (null != convertResult)
                 {
                     convertResult.BimProject.HaveChange = true;
@@ -42,6 +43,7 @@ namespace XbimXplorer.ThBIMEngine
             else
             {
                 var convertResult = convertFactory.ProjectConvert(project, false);
+                convertResult.BimProject.Matrix3D = matrix3D;
                 UpdateProject(convertResult);
             }
         }

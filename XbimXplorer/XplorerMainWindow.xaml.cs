@@ -547,9 +547,9 @@ namespace XbimXplorer
 
                 var DataHead = fileArray.Take(10).ToArray();
                 //84 = 'T' 72 = 'H' 
-                if(DataHead[0] == 84 && DataHead[1] == 72 && DataHead[2] == 3)
+                if (DataHead[0] == 84 && DataHead[1] == 72 && DataHead[2] == 3)
                 {
-                    switch(DataHead[3])
+                    switch (DataHead[3])
                     {
                         case 1:
                             {
@@ -557,6 +557,7 @@ namespace XbimXplorer
                                 var DataBody = fileArray.Skip(10).ToArray();
                                 var th_Project = new ThTCHProjectData();
                                 Google.Protobuf.MessageExtensions.MergeFrom(th_Project, DataBody);
+                                th_Project.Root.GlobalId = fileName;
                                 bimDataController.AddProject(th_Project, projectMatrix3D);
                                 break;
                             }
@@ -578,11 +579,15 @@ namespace XbimXplorer
                             }
                     }
                 }
-                
+
             }
             catch (Exception ex)
             {
 
+            }
+            finally 
+            {
+                r.Dispose();
             }
         }
 

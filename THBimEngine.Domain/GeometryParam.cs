@@ -158,8 +158,11 @@ namespace THBimEngine.Domain
         {
             if (other is GeometryStretch geometry) 
             {
-                if (!Outline.Equals(geometry.Outline))
-                    return false;
+                if (null != Outline && geometry.Outline != null)
+                {
+                    if (!Outline.Equals(geometry.Outline))
+                        return false;
+                }
                 if (XAxisLength.FloatEquals(geometry.XAxisLength) &&
                     YAxisLength.FloatEquals(geometry.YAxisLength) &&
                     ZAxisLength.FloatEquals(geometry.ZAxisLength) &&

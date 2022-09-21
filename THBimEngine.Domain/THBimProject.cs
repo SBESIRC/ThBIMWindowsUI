@@ -84,7 +84,7 @@ namespace THBimEngine.Domain
 							continue;
 						var moveVector = shapeGeo.ShapeGeometry.TempOriginDisplacement;
 						var transform = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
-						transform = relation.Matrix3D * storey.Matrix3D * transform * shapeGeo.Matrix3D;
+						transform = relation.Matrix3D * storey.Matrix3D * transform * shapeGeo.Matrix3D * Matrix3D;
 						var allPts = tr.Vertices.ToArray();
 						var allFace = tr.Faces;
 						foreach (var face in allFace.ToList())

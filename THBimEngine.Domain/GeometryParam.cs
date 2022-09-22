@@ -12,29 +12,6 @@ namespace THBimEngine.Domain
     }
 
     /// <summary>
-    /// 三维Brep数据
-    /// </summary>
-    public class GeometryBrep : GeometryParam
-    {
-        public List<PolylineSurrogate> Outer { get; }
-        public List<PolylineSurrogate> Voids { get; }
-        public GeometryBrep()
-        {
-            Outer = new List<PolylineSurrogate>();
-            Voids = new List<PolylineSurrogate>();
-        }
-        public override object Clone()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool Equals(GeometryParam other)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    /// <summary>
     /// 三维FacetedBrep数据
     /// </summary>
     public class GeometryFacetedBrep : GeometryParam

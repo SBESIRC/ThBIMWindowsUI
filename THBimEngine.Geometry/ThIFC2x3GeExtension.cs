@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using THBimEngine.Domain;
-using THBimEngine.Domain.GeometryModel;
 using Xbim.Common.Geometry;
 using Xbim.Ifc2x3.GeometricConstraintResource;
 using Xbim.Ifc2x3.GeometricModelResource;
@@ -141,50 +140,6 @@ namespace THBimEngine.Geometry
                 }
             }
             return compositeCurve;
-        }
-
-        public static IfcFacetedBrepWithVoids ToIfcFacetedBrep(this MemoryModel model, List<PolylineSurrogate> facePlines, List<PolylineSurrogate> voidsFaces)
-        {
-            var facetedBrepWithVoids = model.Instances.New<IfcFacetedBrepWithVoids>();
-            facetedBrepWithVoids.Outer = ToIfcClosedShell(model, facePlines);
-            facetedBrepWithVoids.Voids.Add(ToIfcClosedShell(model, voidsFaces));
-            return facetedBrepWithVoids;
-        }
-
-        private static IfcClosedShell ToIfcClosedShell(this MemoryModel model, List<PolylineSurrogate> facePlines)
-        {
-            var ifcClosedShell = model.Instances.New<IfcClosedShell>();
-            foreach (var face in facePlines)
-            {
-                ifcClosedShell.CfsFaces.Add(ToIfcFace(model, face));
-            }
-            return ifcClosedShell;
-        }
-
-        private static IfcFace ToIfcFace(this MemoryModel model, PolylineSurrogate facePLine)
-        {
-            var ifcFace = model.Instances.New<IfcFace>();
-            ifcFace.Bounds.Add(ToIfcFaceBound(model, facePLine));
-            return ifcFace;
-        }
-
-        private static IfcFaceBound ToIfcFaceBound(this MemoryModel model, PolylineSurrogate boundaryLoop)
-        {
-            return model.Instances.New<IfcFaceBound>(b =>
-            {
-                b.Bound = model.ToIfcPolyLoop(boundaryLoop);
-            });
-        }
-
-        private static IfcPolyLoop ToIfcPolyLoop(this MemoryModel model, PolylineSurrogate boundaryLoop)
-        {
-            var polyLoop = model.Instances.New<IfcPolyLoop>();
-            foreach (var points in boundaryLoop.Points)
-            {
-                foreach (var point in points.Points)
-                    polyLoop.Polygon.Add(ToIfcCartesianPoint(model, point.Point3D2XBimPoint()));
-            }
-            return polyLoop;
         }
 
         public static IfcFacetedBrepWithVoids ToIfcFacetedBrep(this MemoryModel model, List<ThTCHPolyline> facePlines, List<ThTCHPolyline> voidsFaces)

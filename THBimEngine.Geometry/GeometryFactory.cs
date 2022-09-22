@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using THBimEngine.Domain;
-using THBimEngine.Domain.GeometryModel;
-using Xbim.Common;
-using Xbim.Common.Geometry;
-using Xbim.Common.Step21;
-using Xbim.Geometry.Engine.Interop;
+
 using Xbim.Ifc;
-using Xbim.Ifc4.Interfaces;
+using Xbim.Common;
 using Xbim.IO.Memory;
+using Xbim.Common.Step21;
+using Xbim.Common.Geometry;
+using Xbim.Ifc4.Interfaces;
+using Xbim.Geometry.Engine.Interop;
+
+using THBimEngine.Domain;
 
 namespace THBimEngine.Geometry
 {
@@ -94,10 +95,6 @@ namespace THBimEngine.Geometry
                 if (null != geoSolid)
                     resList.Add(geoSolid);
             }
-            else if (geometryParam is GeometryBrep geometryBrep)
-            {
-                resList = GetXBimSolid(geometryBrep, moveVector);
-            }
             else if (geometryParam is GeometryFacetedBrep facetedBrep)
             {
                 resList = GetXBimSolid(facetedBrep, moveVector);
@@ -166,6 +163,7 @@ namespace THBimEngine.Geometry
                 solids.Add(item);
             return solids;
         }
+
         public List<IXbimSolid> GetXBimSolid(IPersistEntity persistEntity)
         {
             var resSolids = new List<IXbimSolid>();
@@ -180,6 +178,7 @@ namespace THBimEngine.Geometry
             }
             return resSolids;
         }
+
         public IXbimSolid GetXBimSolid(GeometryStretch geometryStretch, XbimVector3D moveVector)
         {
             IXbimSolid geoSolid = null;
@@ -196,19 +195,6 @@ namespace THBimEngine.Geometry
                 txn.Commit();
             }
             return geoSolid;
-        }
-
-        public List<IXbimSolid> GetXBimSolid(GeometryBrep geometryBrep, XbimVector3D moveVector)
-        {
-            var resSolids = new List<IXbimSolid>();
-            var brep = ThIFC2x3GeExtension.ToIfcFacetedBrep(memoryModel, geometryBrep.Outer, geometryBrep.Voids);
-            var geoSolid = geomEngine.CreateSolidSet(brep);
-            var trans = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
-            foreach (var item in geoSolid)
-            {
-                resSolids.Add(item.Transform(trans) as IXbimSolid);
-            }
-            return resSolids;
         }
 
         public List<IXbimSolid> GetXBimSolid(GeometryFacetedBrep facetedBrep, XbimVector3D moveVector)
@@ -258,6 +244,7 @@ namespace THBimEngine.Geometry
             }
             return geoSolid;
         }
+
         private IXbimSolid GetXBimSolid4(GeometryStretch geometryStretch, XbimVector3D moveVector)
         {
             Xbim.Ifc4.ProfileResource.IfcProfileDef profile = null;
@@ -292,31 +279,6 @@ namespace THBimEngine.Geometry
             return geoSolid;
         }
 
-        private IXbimSolid GetXBimSolid2x3(PolylineSurrogate polyline, XbimVector3D moveVector, XbimVector3D zAxis, double zHeight)
-        {
-            return null;
-            //Xbim.Ifc2x3.ProfileResource.IfcProfileDef profile = ThIFC2x3GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, polyline);
-            //if (profile == null)
-            //    return null;
-            //var solid = memoryModel.ToIfcExtrudedAreaSolid(profile, zAxis, zHeight);
-            //var geoSolid = geomEngine.CreateSolid(solid);
-            //var trans = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
-            //geoSolid = geoSolid.Transform(trans) as IXbimSolid;
-            //return geoSolid;
-        }
-        private IXbimSolid GetXBimSolid4(PolylineSurrogate polyline, XbimVector3D moveVector, XbimVector3D zAxis, double zHeight)
-        {
-            return null;
-            //Xbim.Ifc4.ProfileResource.IfcProfileDef profile = ThIFC4GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, polyline);
-            //if (profile == null)
-            //    return null;
-            //var solid = memoryModel.ToIfcExtrudedAreaSolid(profile, zAxis, zHeight);
-            //var geoSolid = geomEngine.CreateSolid(solid);
-            //var trans = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
-            //geoSolid = geoSolid.Transform(trans) as IXbimSolid;
-            //return geoSolid;
-        }
-
         private IXbimSolid GetXBimSolid2x3(ThTCHPolyline polyline, XbimVector3D moveVector, XbimVector3D zAxis, double zHeight)
         {
             Xbim.Ifc2x3.ProfileResource.IfcProfileDef profile = ThIFC2x3GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, polyline);
@@ -328,6 +290,7 @@ namespace THBimEngine.Geometry
             geoSolid = geoSolid.Transform(trans) as IXbimSolid;
             return geoSolid;
         }
+
         private IXbimSolid GetXBimSolid4(ThTCHPolyline polyline, XbimVector3D moveVector, XbimVector3D zAxis, double zHeight)
         {
             Xbim.Ifc4.ProfileResource.IfcProfileDef profile = ThIFC4GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, polyline);
@@ -338,31 +301,6 @@ namespace THBimEngine.Geometry
             var trans = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
             geoSolid = geoSolid.Transform(trans) as IXbimSolid;
             return geoSolid;
-        }
-
-        public List<IXbimSolid> GetXBimSolid2x3(GeometryBrep geometryBrep, XbimVector3D moveVector)
-        {
-            var resSolids = new List<IXbimSolid>();
-            var brep = ThIFC2x3GeExtension.ToIfcFacetedBrep(memoryModel, geometryBrep.Outer, geometryBrep.Voids);
-            var geoSolid = geomEngine.CreateSolidSet(brep);
-            var trans = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
-            foreach (var item in geoSolid)
-            {
-                resSolids.Add(item.Transform(trans) as IXbimSolid);
-            }
-            return resSolids;
-        }
-        public List<IXbimSolid> GetXBimSolid4(GeometryBrep geometryBrep, XbimVector3D moveVector)
-        {
-            var resSolids = new List<IXbimSolid>();
-            var brep = ThIFC4GeExtension.ToIfcFacetedBrep(memoryModel, geometryBrep.Outer, geometryBrep.Voids);
-            var geoSolid = geomEngine.CreateSolidSet(brep);
-            var trans = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
-            foreach (var item in geoSolid)
-            {
-                resSolids.Add(item.Transform(trans) as IXbimSolid);
-            }
-            return resSolids;
         }
         #endregion
     }

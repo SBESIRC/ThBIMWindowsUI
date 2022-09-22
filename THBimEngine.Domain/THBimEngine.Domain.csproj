@@ -121,6 +121,7 @@
     <Compile Include="ProtoData\ThTCHProjectData.cs" />
     <Compile Include="ProtoData\ThTCHProperty.cs" />
     <Compile Include="ProtoData\ThTCHRailingData.cs" />
+    <Compile Include="ProtoData\ThTCHRoomData.cs" />
     <Compile Include="ProtoData\ThTCHRootData.cs" />
     <Compile Include="ProtoData\ThTCHSiteData.cs" />
     <Compile Include="ProtoData\ThTCHSlabData.cs" />

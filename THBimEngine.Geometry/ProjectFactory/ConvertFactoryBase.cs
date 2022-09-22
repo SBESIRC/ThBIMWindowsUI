@@ -20,7 +20,7 @@ namespace THBimEngine.Geometry.ProjectFactory
         /// <summary>
         /// 项目中所有的实体信息
         /// </summary>
-        protected Dictionary<string,THBimEntity> allEntitys;
+        protected Dictionary<string, THBimEntity> allEntitys;
         /// <summary>
         /// 项目中非标层，和标准层首层楼层数据
         /// </summary>
@@ -29,13 +29,13 @@ namespace THBimEngine.Geometry.ProjectFactory
         /// 项目中所有楼层信息
         /// </summary>
         protected Dictionary<string, THBimStorey> allStoreys;
-        public ConvertFactoryBase(IfcSchemaVersion ifcSchemaVersion) 
+        public ConvertFactoryBase(IfcSchemaVersion ifcSchemaVersion)
         {
-            allEntitys = new Dictionary<string,THBimEntity>();
+            allEntitys = new Dictionary<string, THBimEntity>();
             schemaVersion = ifcSchemaVersion;
             InitOrClearData();
         }
-        public abstract ConvertResult ProjectConvert(object prject,bool createSolidMesh);
+        public abstract ConvertResult ProjectConvert(object prject, bool createSolidMesh);
         public virtual void CreateSolidMesh(List<THBimEntity> meshEntitys)
         {
             //step2 转换每个实体的Solid;
@@ -44,7 +44,7 @@ namespace THBimEngine.Geometry.ProjectFactory
                 if (entity == null)
                     return;
                 var geometryFactory = new GeometryFactory(schemaVersion);
-                if (entity is THBimIFCEntity ifcEntity) 
+                if (entity is THBimIFCEntity ifcEntity)
                 {
                     //geometryFactory.GetXBimSolid(ifcEntity.IfcEntity);
                 }
@@ -73,14 +73,14 @@ namespace THBimEngine.Geometry.ProjectFactory
                 {
                     if (opening.EntitySolids.Count < 1)
                     {
-                        var opEntity = meshEntitys.Find(c=>c.Uid == opening.Uid);
-                        if (null != opEntity) 
+                        var opEntity = meshEntitys.Find(c => c.Uid == opening.Uid);
+                        if (null != opEntity)
                         {
                             foreach (var solid in opEntity.EntitySolids)
                                 openingSolds.Add(solid);
                         }
                     }
-                    else 
+                    else
                     {
                         foreach (var solid in opening.EntitySolids)
                             openingSolds.Add(solid);
@@ -88,15 +88,15 @@ namespace THBimEngine.Geometry.ProjectFactory
                 }
                 var geo = geometryFactory.GetShapeGeometry(entity.EntitySolids, openingSolds);
                 entity.AllShapeGeometries.Add(new THBimShapeGeometry(geo));
-                
+
             });
         }
-        protected virtual void InitOrClearData() 
+        protected virtual void InitOrClearData()
         {
             prjEntityFloors = new Dictionary<string, THBimStorey>();
             allStoreys = new Dictionary<string, THBimStorey>();
             globalIndex = 0;
-            allEntitys = new Dictionary<string,THBimEntity>();
+            allEntitys = new Dictionary<string, THBimEntity>();
             bimProject = null;
         }
         protected int CurrentGIndex()
@@ -106,7 +106,7 @@ namespace THBimEngine.Geometry.ProjectFactory
             return res;
         }
     }
-    
+
     public class ConvertResult
     {
         public THBimProject BimProject { get; set; }

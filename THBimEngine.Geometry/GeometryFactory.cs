@@ -72,6 +72,7 @@ namespace THBimEngine.Geometry
                 return shapeGeometry;
             }
         }
+
         public List<IXbimSolid> GetXBimSolid(GeometryParam geometryParam, XbimVector3D moveVector)
         {
             var resList = new List<IXbimSolid>();
@@ -96,6 +97,10 @@ namespace THBimEngine.Geometry
             else if (geometryParam is GeometryBrep geometryBrep)
             {
                 resList = GetXBimSolid(geometryBrep, moveVector);
+            }
+            else if (geometryParam is GeometryFacetedBrep facetedBrep)
+            {
+                resList = GetXBimSolid(facetedBrep, moveVector);
             }
             return resList;
         }
@@ -192,10 +197,24 @@ namespace THBimEngine.Geometry
             }
             return geoSolid;
         }
+
         public List<IXbimSolid> GetXBimSolid(GeometryBrep geometryBrep, XbimVector3D moveVector)
         {
             var resSolids = new List<IXbimSolid>();
             var brep = ThIFC2x3GeExtension.ToIfcFacetedBrep(memoryModel, geometryBrep.Outer, geometryBrep.Voids);
+            var geoSolid = geomEngine.CreateSolidSet(brep);
+            var trans = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
+            foreach (var item in geoSolid)
+            {
+                resSolids.Add(item.Transform(trans) as IXbimSolid);
+            }
+            return resSolids;
+        }
+
+        public List<IXbimSolid> GetXBimSolid(GeometryFacetedBrep facetedBrep, XbimVector3D moveVector)
+        {
+            var resSolids = new List<IXbimSolid>();
+            var brep = ThIFC2x3GeExtension.ToIfcFacetedBrep(memoryModel, facetedBrep.Outer, facetedBrep.Voids);
             var geoSolid = geomEngine.CreateSolidSet(brep);
             var trans = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);
             foreach (var item in geoSolid)

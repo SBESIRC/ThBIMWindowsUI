@@ -35,7 +35,6 @@ using Xbim.IO.Esent;
 using Xbim.ModelGeometry.Scene;
 using Xbim.Presentation;
 using Xbim.Presentation.FederatedModel;
-using Xbim.Presentation.ModelGeomInfo;
 using Xbim.Presentation.XplorerPluginSystem;
 using XbimXplorer.Dialogs;
 using XbimXplorer.Dialogs.ExcludedTypes;
@@ -45,8 +44,6 @@ using System.Windows.Forms.Integration;
 using THBimEngine.Presention;
 using XbimXplorer.ThBIMEngine;
 using System.IO.Pipes;
-using ProtoBuf;
-using System.Windows.Media;
 using XbimXplorer.LeftTabItme;
 using System.Threading;
 using Xbim.Common.Geometry;
@@ -62,7 +59,7 @@ namespace XbimXplorer
     {
         private BackgroundWorker _loadFileBackgroundWorker;
         private DispatcherTimer _dispatcherTimer;
-        private int _selectIndex=-1;
+        private int _selectIndex = -1;
         private Dictionary<int, int> _geoIndexIfcIndexMap;
         /// <summary>
         /// Used for the creation of a new federation file
@@ -80,7 +77,7 @@ namespace XbimXplorer
         private string _temporaryXbimFileName;
 
         private string _openedModelFileName;
-		private string _tempMidFileName;
+        private string _tempMidFileName;
         private ThBimDataController bimDataController = new ThBimDataController();
         private XbimMatrix3D projectMatrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero);
 
@@ -93,7 +90,7 @@ namespace XbimXplorer
         {
             return _openedModelFileName;
         }
-        private ThTCHProjectData thProject=null;
+        private ThTCHProjectData thProject = null;
         private ThSUProjectData suProject = null;
         NamedPipeServerStream pipeServer = null;
         NamedPipeServerStream SU_pipeServer = null;
@@ -122,8 +119,8 @@ namespace XbimXplorer
             EvaluateXbimUiType(typeof(IfcValidation.ValidationWindow), true);
             EvaluateXbimUiType(typeof(LogViewer.LogViewer), true);
             EvaluateXbimUiType(typeof(Commands.wdwCommands), true);
-            
-            
+
+
             // attach window managment functions
             Closed += XplorerMainWindow_Closed;
             Loaded += XplorerMainWindow_Loaded;
@@ -262,7 +259,7 @@ namespace XbimXplorer
         }
         #endregion
         private void DispatcherTimer_Tick(object sender, EventArgs e)
-		{
+        {
             var selectId = ExampleScene.GetCurrentCompID();
             if (selectId < 0)
                 return;
@@ -270,15 +267,15 @@ namespace XbimXplorer
 
 
         }
-        
-        public Visibility DeveloperVisible => Settings.Default.DeveloperMode 
-            ? Visibility.Visible 
+
+        public Visibility DeveloperVisible => Settings.Default.DeveloperMode
+            ? Visibility.Visible
             : Visibility.Collapsed;
 
         private void InitFromSettings()
         {
             FileAccessMode = Settings.Default.FileAccessMode;
-            OnPropertyChanged("DeveloperVisible");           
+            OnPropertyChanged("DeveloperVisible");
         }
 
         private ObservableMruList<string> _mruFiles = new ObservableMruList<string>();
@@ -303,21 +300,21 @@ namespace XbimXplorer
             Settings.Default.Save();
         }
 
-        
+
         #region "Model File Operations"
 
         void XplorerMainWindow_Closing(object sender, CancelEventArgs e)
         {
-            if (null != winFormHost.Child) 
+            if (null != winFormHost.Child)
             {
                 if (winFormHost.Child is GLControl glControl)
                     Win32.CloseRender(glControl.Handle);
             }
-            if (null != backgroundWorker) 
+            if (null != backgroundWorker)
             {
                 backgroundWorker.Dispose();
             }
-            if (null == pipeServer) 
+            if (null == pipeServer)
             {
                 pipeServer.Dispose();
             }
@@ -328,13 +325,13 @@ namespace XbimXplorer
             // this enables a basic configuration for the logger.
             //
             BasicConfigurator.Configure();
-            var model = IfcStore.Create(null,IfcSchemaVersion.Ifc2X3, XbimStoreType.InMemoryModel);
+            var model = IfcStore.Create(null, IfcSchemaVersion.Ifc2X3, XbimStoreType.InMemoryModel);
             ModelProvider.ObjectInstance = model;
             ModelProvider.Refresh();
 
             // logging information warnings
             //
-            _appender = new EventAppender {Tag = "MainWindow"};
+            _appender = new EventAppender { Tag = "MainWindow" };
             _appender.Logged += appender_Logged;
 
             var hier = LogManager.GetRepository() as Hierarchy;
@@ -351,9 +348,9 @@ namespace XbimXplorer
         {
             CloseAndDeleteTemporaryFiles();
         }
-        
+
         public XbimDBAccess FileAccessMode { get; set; } = XbimDBAccess.Read;
-        
+
         private void OpenAcceptableExtension(object s, DoWorkEventArgs args)
         {
             var worker = s as BackgroundWorker;
@@ -459,7 +456,7 @@ namespace XbimXplorer
         private void dlg_OpenAnyFile(object sender, CancelEventArgs e)
         {
             var dlg = sender as OpenFileDialog;
-            if (dlg != null) 
+            if (dlg != null)
                 LoadAnyModel(dlg.FileName);
             //var fInfo = new FileInfo(dlg.FileName);
             //var ext = fInfo.Extension.ToLower();
@@ -473,13 +470,13 @@ namespace XbimXplorer
         /// 
         /// </summary>
         /// <param name="modelFileName"></param>
-        public void LoadAnyModel(string modelFileName, XbimMatrix3D? prjMatrix3D =null)
+        public void LoadAnyModel(string modelFileName, XbimMatrix3D? prjMatrix3D = null)
         {
             if (prjMatrix3D.HasValue)
             {
                 projectMatrix3D = prjMatrix3D.Value;
             }
-            else 
+            else
             {
                 projectMatrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero);
             }
@@ -497,12 +494,12 @@ namespace XbimXplorer
             {
                 //LoadIfcFile(modelFileName);
             }
-            else if (ext ==".thbim")
+            else if (ext == ".thbim")
             {
                 LoadTHBimFile(modelFileName);
                 LoadIfcFile("");
             }
-            else 
+            else
             {
                 // there's no going back; if it fails after this point the current file should be closed anyway
                 CloseAndDeleteTemporaryFiles();
@@ -525,7 +522,7 @@ namespace XbimXplorer
                 }
             }
         }
-        public void RemoveModel(string projectId) 
+        public void RemoveModel(string projectId)
         {
             bimDataController.DeleteProject(new List<string> { projectId });
             LoadIfcFile("");
@@ -585,7 +582,7 @@ namespace XbimXplorer
             {
 
             }
-            finally 
+            finally
             {
                 r.Dispose();
             }
@@ -661,13 +658,13 @@ namespace XbimXplorer
             FireLoadingComplete(s, args);
         }
 
-        private void IfcStoreToMidFile(IfcStore ifcStore) 
+        private void IfcStoreToMidFile(IfcStore ifcStore)
         {
             var engineFile = new IfcStoreToEngineFile();
             engineFile.ProgressChanged += OnProgressChanged;
             _geoIndexIfcIndexMap = engineFile.LoadGeometry(ifcStore, _tempMidFileName);
         }
-        private void ShowIfcStore(IfcStore ifcStore) 
+        private void ShowIfcStore(IfcStore ifcStore)
         {
             //this Triggers the event to load the model into the views 
             ModelProvider.ObjectInstance = ifcStore;
@@ -687,7 +684,7 @@ namespace XbimXplorer
                 new Action(() =>
                 {
                     ProgressBar.Value = args.ProgressPercentage;
-                    StatusMsg.Text = (string) args.UserState;
+                    StatusMsg.Text = (string)args.UserState;
                 }));
 
         }
@@ -695,7 +692,7 @@ namespace XbimXplorer
         private void dlg_FileSaveAs(object sender, CancelEventArgs e)
         {
             var dlg = sender as SaveFileDialog;
-            if (dlg == null) 
+            if (dlg == null)
                 return;
             var fInfo = new FileInfo(dlg.FileName);
             try
@@ -710,10 +707,10 @@ namespace XbimXplorer
                     Model.SaveAs(dlg.FileName);
                     SetOpenedModelFileName(dlg.FileName);
                     var s = Path.GetExtension(dlg.FileName);
-                    if (string.IsNullOrWhiteSpace(s)) 
+                    if (string.IsNullOrWhiteSpace(s))
                         return;
                     var extension = s.ToLowerInvariant();
-                    if (extension != "xbim" || string.IsNullOrWhiteSpace(_temporaryXbimFileName)) 
+                    if (extension != "xbim" || string.IsNullOrWhiteSpace(_temporaryXbimFileName))
                         return;
                     File.Delete(_temporaryXbimFileName);
                     _temporaryXbimFileName = null;
@@ -735,7 +732,7 @@ namespace XbimXplorer
                 return;
             LoadAnyModel(_openedModelFileName);
         }
-        
+
         private void CommandBinding_SaveAs(object sender, ExecutedRoutedEventArgs e)
         {
             var dlg = new SaveFileDialog();
@@ -777,7 +774,7 @@ namespace XbimXplorer
         {
             CloseAndDeleteTemporaryFiles();
         }
-        
+
         private void CommandBinding_Open(object sender, ExecutedRoutedEventArgs e)
         {
             var corefilters = new[] {
@@ -805,7 +802,7 @@ namespace XbimXplorer
             {
                 if (_loadFileBackgroundWorker != null && _loadFileBackgroundWorker.IsBusy)
                     _loadFileBackgroundWorker.CancelAsync(); //tell it to stop
-                
+
                 SetOpenedModelFileName(null);
                 if (Model != null)
                 {
@@ -848,7 +845,7 @@ namespace XbimXplorer
                     e.CanExecute = (Model != null);
                 }
                 else if (e.Command == OpenExportWindowCmd)
-                {   
+                {
                     e.CanExecute = (Model != null) && (!string.IsNullOrEmpty(GetOpenedModelFileName()));
                 }
                 else
@@ -862,7 +859,7 @@ namespace XbimXplorer
         # region "Federation Model operations"
         private void EditFederationCmdExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            var fdlg = new FederatedModelDialog {DataContext = Model};
+            var fdlg = new FederatedModelDialog { DataContext = Model };
             var done = fdlg.ShowDialog();
             if (done.HasValue && done.Value)
             {
@@ -874,7 +871,7 @@ namespace XbimXplorer
         {
             e.CanExecute = Model != null && Model.IsFederation;
         }
-       
+
         private void CreateFederationCmdExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             var dlg = new OpenFileDialog
@@ -922,7 +919,7 @@ namespace XbimXplorer
                 case ".ifczip":
                 case ".ifcxml":
                     // create temp file as a placeholder for the temporory xbim file                   
-                    fedModel = IfcStore.Create(null,IfcSchemaVersion.Ifc2X3, XbimStoreType.InMemoryModel);                    
+                    fedModel = IfcStore.Create(null, IfcSchemaVersion.Ifc2X3, XbimStoreType.InMemoryModel);
                     using (var txn = fedModel.BeginTransaction())
                     {
                         var project = fedModel.Instances.New<Xbim.Ifc2x3.Kernel.IfcProject>();
@@ -977,7 +974,7 @@ namespace XbimXplorer
             //ModelProvider.ObjectInstance = fedModel;
             //ModelProvider.Refresh();
         }
-        
+
         #endregion
 
         /// <summary>
@@ -1042,10 +1039,10 @@ namespace XbimXplorer
         /// </summary>
         private bool _meshModel = true;
 
-        
+
         private double _deflectionOverride = double.NaN;
         private double _angularDeflectionOverride = double.NaN;
-        
+
         /// <summary>
         /// determines if the geometry engine will run on parallel threads.
         /// </summary>
@@ -1076,7 +1073,7 @@ namespace XbimXplorer
         {
             //DrawingControl.ViewHome();
         }
-        
+
         private void OpenExportWindow(object sender, ExecutedRoutedEventArgs executedRoutedEventArgs)
         {
             var wndw = new ExportWindow(this);
@@ -1093,7 +1090,7 @@ namespace XbimXplorer
             };
             w.Show();
         }
-        
+
         private void DisplaySettingsPage(object sender, RoutedEventArgs e)
         {
             var sett = new SettingsWindow();
@@ -1105,15 +1102,15 @@ namespace XbimXplorer
                 sett.AngularDeflection.Text = _angularDeflectionOverride.ToString();
             if (!double.IsNaN(_deflectionOverride))
                 sett.Deflection.Text = _deflectionOverride.ToString();
-            
+
             // visuals
             //sett.SimplifiedRendering.IsChecked = DrawingControl.HighSpeed;
             //sett.ShowFps.IsChecked = DrawingControl.ShowFps;
 
             // show dialog
             sett.ShowDialog();
-            
-            
+
+
             // dialog closed
             if (!sett.SettingsChanged)
                 return;
@@ -1134,7 +1131,7 @@ namespace XbimXplorer
             _angularDeflectionOverride = double.NaN;
             if (!string.IsNullOrWhiteSpace(sett.AngularDeflection.Text))
                 double.TryParse(sett.AngularDeflection.Text, out _angularDeflectionOverride);
-            
+
             if (!string.IsNullOrWhiteSpace(sett.Deflection.Text))
                 double.TryParse(sett.Deflection.Text, out _deflectionOverride);
 
@@ -1152,7 +1149,7 @@ namespace XbimXplorer
         private void RecentFileClick(object sender, RoutedEventArgs e)
         {
             var obMenuItem = e.OriginalSource as MenuItem;
-            if (obMenuItem == null) 
+            if (obMenuItem == null)
                 return;
             var fileName = obMenuItem.Header.ToString();
             if (!File.Exists(fileName))
@@ -1192,7 +1189,7 @@ namespace XbimXplorer
 
         private void ShowErrors(object sender, MouseButtonEventArgs e)
         {
-            OpenOrFocusPluginWindow(typeof (LogViewer.LogViewer));
+            OpenOrFocusPluginWindow(typeof(LogViewer.LogViewer));
         }
 
         private void Exit(object sender, RoutedEventArgs e)
@@ -1222,7 +1219,7 @@ namespace XbimXplorer
             ConnectStylerFeedBack();
             _appender.EventsLimit = 100;
         }
-        
+
         private void EntityLabel_KeyDown()
         {
             //var input = EntityLabel.Text;
@@ -1313,7 +1310,7 @@ namespace XbimXplorer
         {
             var mi = sender as MenuItem;
             if (mi == null)
-            {  
+            {
                 return;
             }
             WholeMesh.IsChecked = false;
@@ -1354,7 +1351,7 @@ namespace XbimXplorer
             var module4 = (typeof(Xbim.Ifc4.Kernel.IfcProduct)).Module;
             var meta4 = ExpressMetaData.GetMetadata(module4);
             var product4 = meta4.ExpressType("IFCPRODUCT");
-            
+
 
 
             var tpcoll = product2X3.NonAbstractSubTypes.Select(x => x.Type).ToList();
@@ -1425,8 +1422,8 @@ namespace XbimXplorer
             //    DrawingControl.SelectionColor = Colors.Blue;
             //}
         }
-		private void LoadIfcFile(string path)
-		{
+        private void LoadIfcFile(string path)
+        {
             projectMatrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero);
             //if (!bimDataController.HaveMeshData) 
             //{
@@ -1456,17 +1453,17 @@ namespace XbimXplorer
 
             startTime = DateTime.Now;
             var formHost = winFormHost;
-			var childConrol = formHost.Child as GLControl;
-			childConrol.EnableNativeInput();
-			childConrol.MakeCurrent();
-			ExampleScene.Init(childConrol.Handle, childConrol.Width, childConrol.Height, path);
+            var childConrol = formHost.Child as GLControl;
+            childConrol.EnableNativeInput();
+            childConrol.MakeCurrent();
+            ExampleScene.Init(childConrol.Handle, childConrol.Width, childConrol.Height, path);
             DateTime endTime = DateTime.Now;
             var totalTime = (endTime - startTime).TotalSeconds;
             Log.Info(string.Format("渲染前准备工作完成，耗时：{0}s", totalTime));
 
             _dispatcherTimer.Start();
             ExampleScene.Render();
-		}
+        }
         private void MenuItem_Click_2(object sender, RoutedEventArgs e)
         {
             bimDataController.ClearAllProject();
@@ -1505,7 +1502,7 @@ namespace XbimXplorer
             if (elemHost.Child == null)
                 return;
             bool isClose = false;
-            if (leftTabControl.SelectedItem != null) 
+            if (leftTabControl.SelectedItem != null)
             {
                 var tabSelect = leftTabControl.SelectedItem as LeftTabItemBtn;
                 isClose = tabSelect.PanelControl == elemHost.Child;
@@ -1514,10 +1511,10 @@ namespace XbimXplorer
             elemHost.Child = null;
             elemHost.Dispose();
             winHost.Child = null;
-            if(isClose)
+            if (isClose)
                 leftTabControl.SelectedItem = null;
         }
-        WindowsFormsHost GetOrAddLeftHost() 
+        WindowsFormsHost GetOrAddLeftHost()
         {
             var winFormName = "TempShowFormHost";
             WindowsFormsHost winHost = null;
@@ -1540,7 +1537,7 @@ namespace XbimXplorer
             }
             return winHost;
         }
-        void InitLeftTabItemValues() 
+        void InitLeftTabItemValues()
         {
             MainViewModel mainViewModel = new MainViewModel(MainWindow);
             leftTabControl.DataContext = mainViewModel;

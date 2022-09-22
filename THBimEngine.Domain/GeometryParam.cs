@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using Xbim.Common.Geometry;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using THBimEngine.Domain.GeometryModel;
+using Xbim.Common.Geometry;
 
 namespace THBimEngine.Domain
 {
@@ -10,6 +10,7 @@ namespace THBimEngine.Domain
         public abstract object Clone();
         public abstract bool Equals(GeometryParam other);
     }
+
     /// <summary>
     /// 三维Brep数据
     /// </summary>
@@ -17,7 +18,7 @@ namespace THBimEngine.Domain
     {
         public List<PolylineSurrogate> Outer { get; }
         public List<PolylineSurrogate> Voids { get; }
-        public GeometryBrep() 
+        public GeometryBrep()
         {
             Outer = new List<PolylineSurrogate>();
             Voids = new List<PolylineSurrogate>();
@@ -32,10 +33,35 @@ namespace THBimEngine.Domain
             throw new NotImplementedException();
         }
     }
+
+    /// <summary>
+    /// 三维FacetedBrep数据
+    /// </summary>
+    public class GeometryFacetedBrep : GeometryParam
+    {
+        public List<ThTCHPolyline> Outer { get; }
+        public List<ThTCHPolyline> Voids { get; }
+        public GeometryFacetedBrep()
+        {
+            Outer = new List<ThTCHPolyline>();
+            Voids = new List<ThTCHPolyline>();
+        }
+
+        public override object Clone()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool Equals(GeometryParam other)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     /// <summary>
     /// 二维轮廓拉伸几何信息
     /// </summary>
-    public class GeometryStretch: GeometryParam
+    public class GeometryStretch : GeometryParam
     {
         /*
          二维轮廓通过拉伸方向和拉伸高度可以拉伸出一个3维几何体
@@ -82,6 +108,7 @@ namespace THBimEngine.Domain
         /// </summary>
         public ThTCHPolyline OutlineBuffer { get; set; }
         #endregion
+
         /// <summary>
         /// 根据中心点创建矩形拉伸数据
         /// </summary>
@@ -92,7 +119,7 @@ namespace THBimEngine.Domain
         /// <param name="zAxis">z轴方向</param>
         /// <param name="zAxisLength">z轴方向拉伸长度</param>
         /// <param name="zOffSet">z轴偏移量</param>
-        public GeometryStretch(XbimPoint3D origin, XbimVector3D xAxis, double xAxisLength,double yAxisLength, XbimVector3D zAxis,double zAxisLength,double zOffSet=0.0) 
+        public GeometryStretch(XbimPoint3D origin, XbimVector3D xAxis, double xAxisLength, double yAxisLength, XbimVector3D zAxis, double zAxisLength, double zOffSet = 0.0)
         {
             Origin = origin;
             XAxis = xAxis;
@@ -102,6 +129,7 @@ namespace THBimEngine.Domain
             ZAxisLength = zAxisLength;
             ZAxisOffSet = zOffSet;
         }
+
         /// <summary>
         /// 根据轮廓创建拉伸数据
         /// </summary>
@@ -109,7 +137,7 @@ namespace THBimEngine.Domain
         /// <param name="zAxis"></param>
         /// <param name="zAxisLength"></param>
         /// <param name="zOffSet"></param>
-        public GeometryStretch(PolylineSurrogate outline, XbimVector3D xAxis, XbimVector3D zAxis, double zAxisLength, double zOffSet = 0.0) 
+        public GeometryStretch(PolylineSurrogate outline, XbimVector3D xAxis, XbimVector3D zAxis, double zAxisLength, double zOffSet = 0.0)
         {
             XAxis = xAxis;
             ZAxis = zAxis;
@@ -145,18 +173,18 @@ namespace THBimEngine.Domain
 
         public override int GetHashCode()
         {
-            return XAxisLength.GetHashCode() 
-                 ^ YAxisLength.GetHashCode() 
-                 ^ ZAxisLength.GetHashCode() 
-                 ^ Origin.GetHashCode() 
-                 ^ ZAxis.GetHashCode() 
-                 ^ XAxis.GetHashCode() 
+            return XAxisLength.GetHashCode()
+                 ^ YAxisLength.GetHashCode()
+                 ^ ZAxisLength.GetHashCode()
+                 ^ Origin.GetHashCode()
+                 ^ ZAxis.GetHashCode()
+                 ^ XAxis.GetHashCode()
                  ^ ZAxisOffSet.GetHashCode();
         }
 
         public override bool Equals(GeometryParam other)
         {
-            if (other is GeometryStretch geometry) 
+            if (other is GeometryStretch geometry)
             {
                 if (null != Outline && geometry.Outline != null)
                 {
@@ -186,9 +214,9 @@ namespace THBimEngine.Domain
                 clone.Origin = this.Origin;
                 clone.OutlineBuffer = this.OutlineBuffer;
             }
-            else 
+            else
             {
-                clone = new GeometryStretch(this.Origin, this.XAxis,this.XAxisLength, this.YAxisLength,this.ZAxis, this.ZAxisLength, this.ZAxisOffSet);
+                clone = new GeometryStretch(this.Origin, this.XAxis, this.XAxisLength, this.YAxisLength, this.ZAxis, this.ZAxisLength, this.ZAxisOffSet);
             }
             return clone;
         }

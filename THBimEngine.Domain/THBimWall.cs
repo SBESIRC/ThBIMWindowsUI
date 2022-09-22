@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xbim.Common.Geometry;
 
 namespace THBimEngine.Domain
 {
@@ -25,13 +21,12 @@ namespace THBimEngine.Domain
             return base.GetHashCode() ^ Doors.Count ^ Windows.Count;
         }
 
-
         public bool Equals(THBimWall other)
         {
             if (!base.Equals(other)) return false;
             if (Doors.Count != other.Doors.Count) return false;
             if (Windows.Count != other.Windows.Count) return false;
-            for(int i =0;i < Doors.Count;i++)
+            for (int i = 0; i < Doors.Count; i++)
             {
                 if (!Doors[i].Equals(other.Doors[i]))
                 {

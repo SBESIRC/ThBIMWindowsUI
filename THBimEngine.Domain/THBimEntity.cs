@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using Xbim.Common.Geometry;
 
 namespace THBimEngine.Domain
@@ -22,8 +22,12 @@ namespace THBimEngine.Domain
         /// 物体开洞信息
         /// </summary>
         public List<THBimOpening> Openings { get; private set; }
+        /// <summary>
+        /// 材质
+        /// </summary>
         public string Material { get; set; }
-        public THBimEntity(int id, string name,string material, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, describe, uid)
+
+        public THBimEntity(int id, string name, string material, GeometryParam geometryParam, string describe = "", string uid = "") : base(id, name, describe, uid)
         {
             Openings = new List<THBimOpening>();
             GeometryParam = geometryParam;
@@ -56,16 +60,16 @@ namespace THBimEngine.Domain
         }
     }
 
-    public class THBimShapeGeometry 
+    public class THBimShapeGeometry
     {
         public XbimShapeGeometry ShapeGeometry { get; }
         public XbimMatrix3D Matrix3D { get; set; }
-        public THBimShapeGeometry(XbimShapeGeometry shapeGeometry) 
+        public THBimShapeGeometry(XbimShapeGeometry shapeGeometry)
         {
             ShapeGeometry = shapeGeometry;
             Matrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero);
         }
-        public THBimShapeGeometry(XbimShapeGeometry shapeGeometry,XbimMatrix3D matrix3D) 
+        public THBimShapeGeometry(XbimShapeGeometry shapeGeometry, XbimMatrix3D matrix3D)
         {
             Matrix3D = matrix3D;
             ShapeGeometry = shapeGeometry;

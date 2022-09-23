@@ -184,8 +184,6 @@ namespace THBimEngine.Domain.MidModel
                     {
                         var uid = relation.Uid;
                         var type = bimProject.PrjAllEntitys[uid].FriendlyTypeName;
-                        if (type.Contains("Railing"))
-                            ;
 
                         if (!typeName2IFCTypeName.ContainsKey(type))
                         {
@@ -237,9 +235,8 @@ namespace THBimEngine.Domain.MidModel
                         if (!bimProject.PrjAllEntitys.ContainsKey(uid)) continue;
                         var type = bimProject.PrjAllEntitys[uid].FriendlyTypeName;
                         if (!typeName2IFCTypeName.ContainsKey(type))
-                        {
                             continue;
-                        }
+                        
                         var ifcType = typeName2IFCTypeName[type];
                         var material = THBimMaterial.GetTHBimEntityMaterial(ifcType, true);
                         var uniComponent = new UniComponent(bimProject.PrjAllEntitys[uid], material, ref uniComponentIndex, buildingStorey, Components[ifcType]);

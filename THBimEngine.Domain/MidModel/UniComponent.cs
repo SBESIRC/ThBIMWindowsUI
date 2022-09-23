@@ -14,40 +14,35 @@ namespace THBimEngine.Domain.MidModel
         public string floor_name;
         public int floor_num;
         public double[] rgb;
-        public double depth = 0;
-        public double depth_t = 0;
-        public double x_len = 0.0;
-        public double y_len = 0.0;
+        public double depth;
+        public double depth_t;
+        public double x_len;
+        public double y_len;
         public double x_l, x_r;
         public double y_l, y_r;
         public double z_l, z_r;
-        public double bg = 0;
-
+        public double bg;
         public double[] direction = new double[3] { 0.0, 0.0, 0.0 };
         public string material = "";
         public string openmethod = "";
         public string description = "";
         public Dictionary<string, string> properties = new Dictionary<string, string>();
-        public double _height = 5300;
-        public double _width = 5300;
+        public double _height;
+        public double _width;
         public int OpenDirIndex;
-
-        public string comp_name = "ifc";
+        public string comp_name = "";
 
 
         public UniComponent(THBimEntity entity, THBimMaterial bimMaterial, ref int uniComponentIndex, Buildingstorey buildingStorey, Component component,string materialType="") : base(component.name, component.type_id)
         {
             unique_id = uniComponentIndex++;
             guid = entity.Uid;
-
             floor_name = buildingStorey.floor_name;
             floor_num = buildingStorey.floorNo;
             comp_name = component.name;
             rgb = new double[3] { bimMaterial.KS_R, bimMaterial.KS_G, bimMaterial.KS_B };
             properties.Add("type", name);
             material = entity.Material;
-            if (material == "加气混凝土") material = "TH-加气混凝土";
-
             if (name.Contains("Door") )
             {
                 _height = (entity.GeometryParam as GeometryStretch).ZAxisLength;
@@ -74,6 +69,17 @@ namespace THBimEngine.Domain.MidModel
             guid = uid;
             floor_name = buildingStorey.floor_name;
             floor_num = buildingStorey.floorNo;
+            rgb = new double[3] { bimMaterial.Color_R, bimMaterial.Color_G, bimMaterial.Color_B };
+            material = materialType;
+            comp_name = component.name;
+
+            properties.Add("type", name);
+        }
+
+        public UniComponent(string uid, THBimMaterial bimMaterial, ref int uniComponentIndex, Component component, string materialType) : base(component.name, component.type_id)
+        {
+            unique_id = uniComponentIndex++;
+            guid = uid;
             rgb = new double[3] { bimMaterial.Color_R, bimMaterial.Color_G, bimMaterial.Color_B };
             material = materialType;
             comp_name = component.name;
@@ -129,8 +135,7 @@ namespace THBimEngine.Domain.MidModel
                 key.WriteStr(writer);
                 value.WriteStr(writer);
             }
-            if (OpenDirIndex == 2)
-                ;
+
             writer.Write(OpenDirIndex);
             comp_name.WriteStr(writer);
             writer.Write(edge_ind_s);

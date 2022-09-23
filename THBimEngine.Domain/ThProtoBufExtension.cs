@@ -45,7 +45,7 @@ namespace THBimEngine.Domain
         public static GeometryParam THTCHGeometryParam(this ThTCHBuiltElementData tchElement)
         {
             var xVector = tchElement.XVector.Vector3D2XBimVector();
-            if (tchElement.Outline != null && tchElement.Outline.Points.Count >= 2)
+            if (tchElement.Outline != null && tchElement.Outline.Shell != null && tchElement.Outline.Shell.Points.Count >= 2)
             {
                 var outLineGeoParam = new GeometryStretch(
                                         tchElement.Outline,
@@ -82,13 +82,13 @@ namespace THBimEngine.Domain
                         //降板
                         var desGeoStretch = new GeometryStretch(item.Outline, XAxis, ZAxis.Negated(), item.DescendingThickness, item.DescendingHeight);
                         desGeoStretch.YAxisLength = item.DescendingWrapThickness;
-                        desGeoStretch.OutlineBuffer = item.OutlineBuffer;
+                        desGeoStretch.OutlineBuffer = item.OutlineBuffer.Shell;
                         slabDescendingData.Add(desGeoStretch);
                     }
                     else
                     {
                         //洞口
-                        outLineGeoParam.Outline.InnerPolylines.Add(item.Outline);
+                        outLineGeoParam.Outline.Holes.Add(item.Outline.Shell);
                     }
                 }
             }

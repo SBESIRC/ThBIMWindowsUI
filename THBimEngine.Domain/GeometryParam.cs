@@ -79,7 +79,7 @@ namespace THBimEngine.Domain
         /// <summary>
         /// 多边形轮廓（可以带洞口）第一个为外轮廓，其余的为内轮廓（洞口）
         /// </summary>
-        public ThTCHPolyline Outline { get; set; }
+        public ThTCHMPolygon Outline { get; set; }
         /// <summary>
         /// 降板外轮廓线
         /// </summary>
@@ -134,7 +134,7 @@ namespace THBimEngine.Domain
         /// <param name="zAxis"></param>
         /// <param name="zAxisLength"></param>
         /// <param name="zOffSet"></param>
-        public GeometryStretch(ThTCHPolyline outline, XbimVector3D xAxis, XbimVector3D zAxis, double zAxisLength, double zOffSet = 0.0)
+        public GeometryStretch(ThTCHMPolygon mPolygon, XbimVector3D xAxis, XbimVector3D zAxis, double zAxisLength, double zOffSet = 0.0)
         {
             XAxis = xAxis;
             ZAxis = zAxis;
@@ -145,7 +145,7 @@ namespace THBimEngine.Domain
             //    outline.InnerPolylines = new List<PolylineSurrogate>();
             //if (outline.Points == null)
             //    outline.Points = new Google.Protobuf.Collections.RepeatedField<ThTCHPoint3d>();
-            Outline = outline;
+            Outline = mPolygon;
         }
 
         public override int GetHashCode()
@@ -183,7 +183,7 @@ namespace THBimEngine.Domain
         public override object Clone()
         {
             GeometryStretch clone = null;
-            if (Outline != null && Outline.Points.Count > 0)
+            if (Outline != null)
             {
                 clone = new GeometryStretch(this.Outline, this.XAxis, this.ZAxis, this.ZAxisLength, this.ZAxisOffSet);
                 clone.XAxisLength = this.XAxisLength;

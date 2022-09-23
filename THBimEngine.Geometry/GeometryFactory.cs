@@ -122,19 +122,19 @@ namespace THBimEngine.Geometry
                         if (ifcVersion == IfcSchemaVersion.Ifc2X3)
                         {
                             geoSolid = GetXBimSolid2x3(outLine, thisMove, geometryStretch.ZAxis, item.ZAxisOffSet + item.ZAxisLength);
-                            opening = GetXBimSolid2x3(item.Outline, thisMove, geometryStretch.ZAxis, item.ZAxisOffSet);
+                            opening = GetXBimSolid2x3(item.Outline.Shell, thisMove, geometryStretch.ZAxis, item.ZAxisOffSet);
                         }
                         else
                         {
                             geoSolid = GetXBimSolid4(outLine, thisMove, geometryStretch.ZAxis, item.ZAxisOffSet + item.ZAxisLength);
-                            opening = GetXBimSolid4(item.Outline, thisMove, geometryStretch.ZAxis, item.ZAxisOffSet);
+                            opening = GetXBimSolid4(item.Outline.Shell, thisMove, geometryStretch.ZAxis, item.ZAxisOffSet);
                         }
                         if (null == geoSolid || geoSolid.SurfaceArea < minSurfaceArea)
                             continue;
                         solidSet = solidSet.Union(geoSolid, 1);
                         openings.Add(opening);
                     }
-                    foreach (var item in geometryStretch.Outline.InnerPolylines)
+                    foreach (var item in geometryStretch.Outline.Holes)
                     {
                         IXbimSolid opening = null;
                         if (item.Points == null || item.Points.Count < 1)
@@ -216,10 +216,10 @@ namespace THBimEngine.Geometry
             Xbim.Ifc2x3.ProfileResource.IfcProfileDef profile = null;
             XbimPoint3D planeOrigin = geometryStretch.Origin + moveVector + geometryStretch.ZAxis * geometryStretch.ZAxisOffSet;
             bool isOutLine = false;
-            if (geometryStretch.Outline != null)
+            if (geometryStretch.Outline != null && geometryStretch.Outline.Shell != null && geometryStretch.Outline.Shell.Points.Count > 0)
             {
                 isOutLine = true;
-                profile = ThIFC2x3GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, geometryStretch.Outline);
+                profile = ThIFC2x3GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, geometryStretch.Outline.Shell);
             }
             else
             {
@@ -250,10 +250,10 @@ namespace THBimEngine.Geometry
             Xbim.Ifc4.ProfileResource.IfcProfileDef profile = null;
             XbimPoint3D planeOrigin = geometryStretch.Origin + moveVector + geometryStretch.ZAxis * geometryStretch.ZAxisOffSet;
             bool isOutLine = false;
-            if (geometryStretch.Outline.Points != null)
+            if (geometryStretch.Outline != null && geometryStretch.Outline.Shell.Points != null && geometryStretch.Outline.Shell.Points.Count > 1)
             {
                 isOutLine = true;
-                profile = ThIFC4GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, geometryStretch.Outline);
+                profile = ThIFC4GeExtension.ToIfcArbitraryClosedProfileDef(memoryModel, geometryStretch.Outline.Shell);
             }
             else
             {

@@ -104,6 +104,9 @@
     <Compile Include="GeometryModel\PointNormal.cs" />
     <Compile Include="GeometryModel\PointVector.cs" />
     <Compile Include="ProjectExtension.cs" />
+    <Compile Include="ProtoData\ThCircleLableGroupData.cs" />
+    <Compile Include="ProtoData\ThDimensionGroupData.cs" />
+    <Compile Include="ProtoData\ThGridLineSyetemData.cs" />
     <Compile Include="ProtoData\ThSUBuildingElementData.cs" />
     <Compile Include="ProtoData\ThSUCompDefinitionData.cs" />
     <Compile Include="ProtoData\ThSUComponentData.cs" />

@@ -580,7 +580,7 @@ namespace XbimXplorer
             }
             catch (Exception ex)
             {
-
+                Log.Error(string.Format("文件解析失败:{0}", ex.Message));
             }
             finally
             {

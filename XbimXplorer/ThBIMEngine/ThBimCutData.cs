@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using THBimEngine.Domain;
 using THBimEngine.Domain.MidModel;
 
@@ -10,15 +6,13 @@ namespace XbimXplorer.ThBIMEngine
 {
     public class ThBimCutData
     {
-        public static void Run()
+        public static void Run(List<THBimProject> bimProjects)
         {
-            var ifcProjects = THBimScene.Instance.AllBimProjects;
             bool firstPr = true;
             var tempData = new TempModel();
-
-            foreach (var project in ifcProjects)
+            foreach (var project in bimProjects)
             {
-                if(firstPr)
+                if (firstPr)
                 {
                     tempData.ModelConvert(project);
                     firstPr = false;

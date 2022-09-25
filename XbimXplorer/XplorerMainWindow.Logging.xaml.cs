@@ -41,14 +41,18 @@ namespace XbimXplorer
 
         internal void appender_Logged(object sender, LogEventArgs e)
         {
-            foreach (var loggingEvent in e.LoggingEvents)
+            if (Application.Current != null) 
             {
-                var m = new EventViewModel(loggingEvent);
-                Application.Current.Dispatcher.BeginInvoke((Action)delegate
+                foreach (var loggingEvent in e.LoggingEvents)
                 {
-                    LoggedEvents.Add(m);
-                });
-                Application.Current.Dispatcher.BeginInvoke((Action)UpdateLoggerCounts);
+                    var m = new EventViewModel(loggingEvent);
+                    Application.Current.Dispatcher.BeginInvoke((Action)delegate
+                    {
+                        LoggedEvents.Add(m);
+                    });
+                    Application.Current.Dispatcher.BeginInvoke((Action)UpdateLoggerCounts);
+                }
+
             }
         }
 

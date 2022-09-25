@@ -1045,7 +1045,7 @@ namespace Xbim.Presentation
         }
 
         internal IXbimShapeGeometryData ComputeRepresentationGeometry(IIfcRepresentationItem item)
-		{
+        {
             // make sure it's valide
             var geom = item as IIfcGeometricRepresentationItem;
             if (geom == null)
@@ -1095,7 +1095,7 @@ namespace Xbim.Presentation
                         // if previous failed we make an attempt to mesh in realtime.
                         var meshed = ComputeRepresentationGeometry(newVal as IIfcRepresentationItem);
                         if (meshed != null)
-						{
+                        {
                             m = WpfMeshGeometry3D.GetRepresentationGeometry(mat, productContexts, meshed, selModel, modelTransform);
                         }
                     }

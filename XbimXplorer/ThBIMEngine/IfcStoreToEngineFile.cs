@@ -26,7 +26,7 @@ namespace XbimXplorer.ThBIMEngine
 		public IfcStoreToEngineFile()
 		{
 		}
-		public Dictionary<int, int> LoadGeometry(IfcStore model, string midFilePath)
+		public Dictionary<int, int> LoadGeometry(IfcStore model)
 		{
 			var readGeomtry = new IfcStoreReadGeomtry(XbimMatrix3D.CreateTranslation(XbimVector3D.Zero));
 			readGeomtry.ProgressChanged += ProgressChanged;

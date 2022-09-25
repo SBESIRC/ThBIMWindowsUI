@@ -91,109 +91,132 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" MinHeight="23" />
         </Grid.RowDefinitions>
-
-        <Menu Grid.Row="0" >
-            <Menu.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <DockPanel HorizontalAlignment="Stretch"/>
-                </ItemsPanelTemplate>
-            </Menu.ItemsPanel>
-            <MenuItem Header="_File">
-                <MenuItem Header="_Open" Command="Open" ToolTip="Load a single Ifc, Xbim, IfcZip or IfcXML file." />
-                <MenuItem Header="_Reload model" Command="Refresh" Visibility="Collapsed"/>
-                <MenuItem Header="_SaveAs" Command="SaveAs"  Visibility="Collapsed"/>
-                <MenuItem Header="_Close" Command="Close"  Visibility="Collapsed"/>
-                <MenuItem Header="_Federation"  Visibility="Collapsed">
-                    <MenuItem Header="_Create" Command="{x:Static local:XplorerMainWindow.CreateFederationCmd}" ToolTip="Loads a set of existing Ifc, Xbim, IfcZip or IfcXML files." />
-                    <MenuItem Header="_Edit" Command="{x:Static local:XplorerMainWindow.EditFederationCmd}" ToolTip="Load or unluad federated files and changes their properties." />
-                </MenuItem>
-                <Separator  Visibility="Collapsed"/>
-                <MenuItem Header="Recent files" x:Name="MnuRecent" Click="RecentFileClick"  Visibility="Collapsed"/>
-                <Separator  Visibility="Collapsed"/>
-                <MenuItem x:Name="ExportMenu" Header="_Export"  Visibility="Collapsed">
-                    <MenuItem Header="_WexBim" Command="{x:Static local:XplorerMainWindow.OpenExportWindowCmd}" />
-                </MenuItem>
-                <Separator />
-                <MenuItem Header="_Run command" Click="ShowCommandBox" />
-                <MenuItem Header="_Exit" Click="Exit" />
-            </MenuItem>
-            <MenuItem Header="_View">
-                <MenuItem Header="_Style">
-                    <MenuItem Header="_Styler Reset" Click="SetDefaultModeStyler" />
-                    <MenuItem Header="Styler _Configuration" Click="ConfigureStyler" />
-                    <MenuItem Header="IfcSpaces only" Click="StylerIfcSpacesOnly" />
-                    <MenuItem Header="Display bounding corners" Click="SetStylerBoundCorners" />
-                </MenuItem>
-                <MenuItem Header="Selection view _mode">
-                    <MenuItem x:Name="WholeMesh" Header="Whole mesh" Click="SelectionMode" IsChecked="True" />
-                    <MenuItem x:Name="Normals" Header="Normals" Click="SelectionMode" />
-                    <MenuItem x:Name="WireFrame" Header="WireFrame" Click="SelectionMode" />
-                </MenuItem>
-                <MenuItem Header="_Zoom">
-                    <MenuItem Header="Zoom _Extents" Click="MenuItem_ZoomExtents"/>
-                    <MenuItem Header="Zoom _Selected" Click="MenuItem_ZoomSelected"/>
-                </MenuItem>
-                <MenuItem IsCheckable="True" Header="Show Gridlines" IsChecked="{Binding ShowGridLines, ElementName=DrawingControl}"/>
-                <MenuItem Header="_Copy image" Command="Copy"/>
-                <Separator Visibility="Visible"/>
-                <MenuItem Header="Isolate selected objects" Click="IsolateSelected"/>
-                <MenuItem Header="Hide selected objects" Click="HideSelected"/>
-                <MenuItem Header="Show all objects" Click="RestoreView"/>
-                <MenuItem Header="Select visualization context" Click="SelectRepresentationContext"/>
-                <Separator Visibility="{Binding DeveloperVisible, ElementName=MainWindow}" />
-                <MenuItem x:Name="DeveloperMenu" Header="_Developer windows" Visibility="{Binding DeveloperVisible, ElementName=MainWindow}" >
-                    <MenuItem Header="IFC stripping" Click="OpenStrippingWindow">
-                        <MenuItem.Icon>
-                            <Image Width="20" Source="Simplify\Funnel.png"/>
-                        </MenuItem.Icon>
+        <Grid Grid.Row="0" Background="#F0F0F0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Menu Grid.Row="0" Grid.Column="0">
+                <Menu.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <DockPanel HorizontalAlignment="Stretch"/>
+                    </ItemsPanelTemplate>
+                </Menu.ItemsPanel>
+                <MenuItem Header="_File">
+                    <MenuItem Header="_Open" Command="Open" ToolTip="Load a single Ifc, Xbim, IfcZip or IfcXML file." />
+                    <MenuItem Header="_Reload model" Command="Refresh" Visibility="Collapsed"/>
+                    <MenuItem Header="_SaveAs" Command="SaveAs"  Visibility="Collapsed"/>
+                    <MenuItem Header="_Close" Command="Close"  Visibility="Collapsed"/>
+                    <MenuItem Header="_Federation"  Visibility="Collapsed">
+                        <MenuItem Header="_Create" Command="{x:Static local:XplorerMainWindow.CreateFederationCmd}" ToolTip="Loads a set of existing Ifc, Xbim, IfcZip or IfcXML files." />
+                        <MenuItem Header="_Edit" Command="{x:Static local:XplorerMainWindow.EditFederationCmd}" ToolTip="Load or unluad federated files and changes their properties." />
                     </MenuItem>
+                    <Separator  Visibility="Collapsed"/>
+                    <MenuItem Header="Recent files" x:Name="MnuRecent" Click="RecentFileClick"  Visibility="Collapsed"/>
+                    <Separator  Visibility="Collapsed"/>
+                    <MenuItem x:Name="ExportMenu" Header="_Export"  Visibility="Collapsed">
+                        <MenuItem Header="_WexBim" Command="{x:Static local:XplorerMainWindow.OpenExportWindowCmd}" />
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="_Run command" Click="ShowCommandBox" />
+                    <MenuItem Header="_Exit" Click="Exit" />
                 </MenuItem>
-                <Separator />
-                <MenuItem Header="_Settings" Click="DisplaySettingsPage" />
-            </MenuItem>
-            <MenuItem x:Name="PluginMenu" Header="_Plugins" Visibility="{Binding PluginMenuVisibility, ElementName=MainWindow}" />
-            <MenuItem Header="_Camera">
-                <MenuItem IsCheckable="True" Header="RotateAroundMouseDownPoint" IsChecked="{Binding Viewport.RotateAroundMouseDownPoint, ElementName=DrawingControl}"/>
-                <MenuItem IsCheckable="True" Header="ZoomAroundMouseDownPoint" IsChecked="{Binding Viewport.ZoomAroundMouseDownPoint, ElementName=DrawingControl}"/>
-                <MenuItem IsCheckable="True" Header="Orthographic" IsChecked="{Binding Viewport.Orthographic, ElementName=DrawingControl}"/>
-                <MenuItem IsCheckable="True" Header="InfiniteSpin" IsChecked="{Binding Viewport.InfiniteSpin, ElementName=DrawingControl}"/>
-                <MenuItem IsCheckable="True" Header="IsPanEnabled" IsChecked="{Binding Viewport.IsPanEnabled, ElementName=DrawingControl}" Background="PaleGoldenrod"/>
-                <MenuItem IsCheckable="True" Header="IsRotationEnabled" IsChecked="{Binding Viewport.IsRotationEnabled, ElementName=DrawingControl}"/>
-                <MenuItem IsCheckable="True" Header="IsZoomEnabled" IsChecked="{Binding Viewport.IsZoomEnabled, ElementName=DrawingControl}"/>
-                <MenuItem IsCheckable="True" Header="IsChangeFovEnabled" IsChecked="{Binding Viewport.IsChangeFieldOfViewEnabled, ElementName=DrawingControl}"/>
-                <MenuItem Header="RotationSensitivity">
-                    <StackPanel Orientation="Horizontal">
-                        <Slider Value="{Binding Viewport.RotationSensitivity, ElementName=DrawingControl}" Minimum="0.1" Maximum="5" Width="200"/>
-                        <TextBlock Text="{Binding Viewport.RotationSensitivity, StringFormat='{}{0:0.0}', ElementName=DrawingControl}"/>
-                    </StackPanel>
+                <MenuItem Header="_View">
+                    <MenuItem Header="_Style">
+                        <MenuItem Header="_Styler Reset" Click="SetDefaultModeStyler" />
+                        <MenuItem Header="Styler _Configuration" Click="ConfigureStyler" />
+                        <MenuItem Header="IfcSpaces only" Click="StylerIfcSpacesOnly" />
+                        <MenuItem Header="Display bounding corners" Click="SetStylerBoundCorners" />
+                    </MenuItem>
+                    <MenuItem Header="Selection view _mode">
+                        <MenuItem x:Name="WholeMesh" Header="Whole mesh" Click="SelectionMode" IsChecked="True" />
+                        <MenuItem x:Name="Normals" Header="Normals" Click="SelectionMode" />
+                        <MenuItem x:Name="WireFrame" Header="WireFrame" Click="SelectionMode" />
+                    </MenuItem>
+                    <MenuItem Header="_Zoom">
+                        <MenuItem Header="Zoom _Extents" Click="MenuItem_ZoomExtents"/>
+                        <MenuItem Header="Zoom _Selected" Click="MenuItem_ZoomSelected"/>
+                    </MenuItem>
+                    <MenuItem IsCheckable="True" Header="Show Gridlines" IsChecked="{Binding ShowGridLines, ElementName=DrawingControl}"/>
+                    <MenuItem Header="_Copy image" Command="Copy"/>
+                    <Separator Visibility="Visible"/>
+                    <MenuItem Header="Isolate selected objects" Click="IsolateSelected"/>
+                    <MenuItem Header="Hide selected objects" Click="HideSelected"/>
+                    <MenuItem Header="Show all objects" Click="RestoreView"/>
+                    <MenuItem Header="Select visualization context" Click="SelectRepresentationContext"/>
+                    <Separator Visibility="{Binding DeveloperVisible, ElementName=MainWindow}" />
+                    <MenuItem x:Name="DeveloperMenu" Header="_Developer windows" Visibility="{Binding DeveloperVisible, ElementName=MainWindow}" >
+                        <MenuItem Header="IFC stripping" Click="OpenStrippingWindow">
+                            <MenuItem.Icon>
+                                <Image Width="20" Source="Simplify\Funnel.png"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="_Settings" Click="DisplaySettingsPage" />
                 </MenuItem>
-                <MenuItem Header="ZoomSensitivity">
-                    <StackPanel Orientation="Horizontal">
-                        <Slider Value="{Binding Viewport.ZoomSensitivity, ElementName=DrawingControl}" Minimum="0.1" Maximum="5" Width="200"/>
-                        <TextBlock Text="{Binding Viewport.ZoomSensitivity, StringFormat='{}{0:0.0}', ElementName=DrawingControl}"/>
-                    </StackPanel>
-                </MenuItem>
-                <MenuItem Header="CameraInertiaFactor">
-                    <StackPanel Orientation="Horizontal">
-                        <Slider Value="{Binding Viewport.CameraInertiaFactor, ElementName=DrawingControl}" Minimum="0.7" Maximum="1" Width="200"/>
-                        <TextBlock Text="{Binding Viewport.CameraInertiaFactor, StringFormat='{}{0:0.000}', ElementName=DrawingControl}"/>
-                    </StackPanel>
-                </MenuItem>
-                <!--
+                <MenuItem x:Name="PluginMenu" Header="_Plugins" Visibility="{Binding PluginMenuVisibility, ElementName=MainWindow}" />
+                <MenuItem Header="_Camera">
+                    <MenuItem IsCheckable="True" Header="RotateAroundMouseDownPoint" IsChecked="{Binding Viewport.RotateAroundMouseDownPoint, ElementName=DrawingControl}"/>
+                    <MenuItem IsCheckable="True" Header="ZoomAroundMouseDownPoint" IsChecked="{Binding Viewport.ZoomAroundMouseDownPoint, ElementName=DrawingControl}"/>
+                    <MenuItem IsCheckable="True" Header="Orthographic" IsChecked="{Binding Viewport.Orthographic, ElementName=DrawingControl}"/>
+                    <MenuItem IsCheckable="True" Header="InfiniteSpin" IsChecked="{Binding Viewport.InfiniteSpin, ElementName=DrawingControl}"/>
+                    <MenuItem IsCheckable="True" Header="IsPanEnabled" IsChecked="{Binding Viewport.IsPanEnabled, ElementName=DrawingControl}" Background="PaleGoldenrod"/>
+                    <MenuItem IsCheckable="True" Header="IsRotationEnabled" IsChecked="{Binding Viewport.IsRotationEnabled, ElementName=DrawingControl}"/>
+                    <MenuItem IsCheckable="True" Header="IsZoomEnabled" IsChecked="{Binding Viewport.IsZoomEnabled, ElementName=DrawingControl}"/>
+                    <MenuItem IsCheckable="True" Header="IsChangeFovEnabled" IsChecked="{Binding Viewport.IsChangeFieldOfViewEnabled, ElementName=DrawingControl}"/>
+                    <MenuItem Header="RotationSensitivity">
+                        <StackPanel Orientation="Horizontal">
+                            <Slider Value="{Binding Viewport.RotationSensitivity, ElementName=DrawingControl}" Minimum="0.1" Maximum="5" Width="200"/>
+                            <TextBlock Text="{Binding Viewport.RotationSensitivity, StringFormat='{}{0:0.0}', ElementName=DrawingControl}"/>
+                        </StackPanel>
+                    </MenuItem>
+                    <MenuItem Header="ZoomSensitivity">
+                        <StackPanel Orientation="Horizontal">
+                            <Slider Value="{Binding Viewport.ZoomSensitivity, ElementName=DrawingControl}" Minimum="0.1" Maximum="5" Width="200"/>
+                            <TextBlock Text="{Binding Viewport.ZoomSensitivity, StringFormat='{}{0:0.0}', ElementName=DrawingControl}"/>
+                        </StackPanel>
+                    </MenuItem>
+                    <MenuItem Header="CameraInertiaFactor">
+                        <StackPanel Orientation="Horizontal">
+                            <Slider Value="{Binding Viewport.CameraInertiaFactor, ElementName=DrawingControl}" Minimum="0.7" Maximum="1" Width="200"/>
+                            <TextBlock Text="{Binding Viewport.CameraInertiaFactor, StringFormat='{}{0:0.000}', ElementName=DrawingControl}"/>
+                        </StackPanel>
+                    </MenuItem>
+                    <!--
                 <pt:EnumMenuItem SelectedValue="{Binding Viewport.CameraRotationMode, ElementName=DrawingControl}" Header="CameraRotationMode"/>
                 <pt:EnumMenuItem SelectedValue="{Binding Viewport.CameraMode, ElementName=DrawingControl}" Header="CameraMode" />
                 -->
-            </MenuItem>
-            <MenuItem Header="清空数据" Click="MenuItem_Click_2" Width="70" HorizontalAlignment="Left"
+                </MenuItem>
+                <MenuItem Header="清空数据" Click="MenuItem_Click_2" Width="70" HorizontalAlignment="Left"
                       VerticalContentAlignment="Center"
                       HorizontalContentAlignment="Center"></MenuItem>
-            <MenuItem Header="导出切图数据" x:Name="ExportCut" Click="ExportCut_Click" Width="90" HorizontalAlignment="Left"
+                <MenuItem Header="导出切图数据" x:Name="ExportCut" Click="ExportCut_Click" Width="90" HorizontalAlignment="Left"
                       VerticalContentAlignment="Center"
                       HorizontalContentAlignment="Center"></MenuItem>
-            <MenuItem Header="Home" x:Name="homeView" Click="homeView_Click"  Width="50" HorizontalAlignment="Left"
-                      VerticalContentAlignment="Center"
-                      HorizontalContentAlignment="Center"></MenuItem>
-        </Menu>
+            </Menu>
+            <Grid Grid.Column="1" x:Name="topPluginGrid" VerticalAlignment="Stretch">
+                <ItemsControl VerticalAlignment="Stretch" ItemsSource="{Binding TopPluginButtons,Mode=OneWay,NotifyOnSourceUpdated=True,UpdateSourceTrigger=PropertyChanged}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Left" Padding="5,0,5,0" 
+                                    BorderBrush="Transparent"
+                                    Background="Transparent"
+                                    Content="{Binding Content}"
+                                    Command="{Binding Path=DataContext.PluginButtonCommond,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ItemsControl}} }"
+                                    CommandParameter="{Binding RelativeSource={x:Static RelativeSource.Self}}">
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch"></StackPanel>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </Grid>
+        </Grid>
+        
         <Grid Grid.Row="1" x:Name="mainGrid">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"></ColumnDefinition>

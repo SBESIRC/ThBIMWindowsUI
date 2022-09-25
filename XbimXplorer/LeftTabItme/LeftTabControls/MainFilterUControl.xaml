@@ -4,11 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:XbimXplorer.LeftTabItme.LeftTabControls"
-             x:Name="mainUControl"
              mc:Ignorable="d" >
-    <Grid x:Name="mainGrid" Background="White" Width="200" Margin="2,0,0,1"  
-          Visibility="{Binding ElementName=mainUControl,Path=Visibility}">
-
+    <Grid x:Name="mainGrid" Background="White" Width="200" Margin="0,0,0,1">
         <TabControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  BorderThickness="1" >
             <TabItem Header="楼层" Height="25">
                 <Grid>
@@ -18,7 +15,7 @@
                     </Grid.RowDefinitions>
                     <StackPanel Orientation="Horizontal">
                         <Button Content="全选" Height="25" Width="50" Margin="0,5,0,5" Name="BtnSelectAll" Click="BtnSelectAll_Click"></Button>
-                       
+
                     </StackPanel>
                     <DataGrid x:Name="floorDGrid" Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False" 
                               VerticalAlignment="Stretch"
@@ -71,7 +68,7 @@
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
-                
+
             </TabItem>
             <TabItem Header="类别" Height="25">
                 <ListView x:Name="listType" Grid.Row="1" ItemsSource="{Binding AllTypeFilters}">
@@ -100,6 +97,5 @@
                 </ListView>
             </TabItem>
         </TabControl>
-        <Button Height="25" Width="25" VerticalAlignment="Top" Content="X" HorizontalAlignment="Right" Click="Button_Click"></Button>
     </Grid>
 </UserControl>

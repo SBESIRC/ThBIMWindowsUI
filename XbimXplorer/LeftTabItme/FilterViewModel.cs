@@ -1,21 +1,19 @@
-﻿using Microsoft.Toolkit.Mvvm.Input;
-using System;
+﻿using CommunityToolkit.Mvvm.Input;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
+using THBimEngine.Application;
 using THBimEngine.Domain;
-using XbimXplorer.ThBIMEngine;
 
 namespace XbimXplorer.LeftTabItme
 {
     class FilterViewModel: NotifyPropertyChangedBase
     {
-        private ThBimFilterController bimFilterController;
-        public static readonly FilterViewModel Instance =new FilterViewModel();
+        IEngineApplication engineApp;
+        THDocument document;
         private ObservableCollection<FloorFilterViewModel> _allFloorFilters { get; set; }
         public ObservableCollection<FloorFilterViewModel> AllFloorFilters 
         {
@@ -46,27 +44,31 @@ namespace XbimXplorer.LeftTabItme
                 this.RaisePropertyChanged();
             }
         }
-        FilterViewModel() 
+        private Dictionary<string, List<FilterBase>> PrjAllFilters { get; }
+        private HashSet<int> ShowEntityGIndex { get; set; }
+        private int AllEntityCount = 0;
+        private object inUpdata = false;
+
+        public FilterViewModel(IEngineApplication engineApplication) 
         {
+            engineApp = engineApplication;
             AllFloorFilters = new ObservableCollection<FloorFilterViewModel>();
             AllTypeFilters = new ObservableCollection<EntityTypeFilterViewModel>();
             AllFileFilters = new ObservableCollection<FileFilterViewModel>();
-            bimFilterController = new ThBimFilterController();
+            PrjAllFilters = new Dictionary<string, List<FilterBase>>();
+            ShowEntityGIndex = new HashSet<int>();
         }
-        public void UpdataFilterByProject() 
+        public void UpdataFilterByCurrentDocument(THDocument document) 
         {
-            bimFilterController.UpdataProjectFilter();
+            AllFloorFilters.Clear();
+            AllTypeFilters.Clear();
+            AllFileFilters.Clear();
+            PrjAllFilters.Clear();
+            ShowEntityGIndex.Clear();
+            if (null == document)
+                return;
+            UpdataProjectFilter(document);
 
-            //更新 //AllFloorFilters //AllTypeFilters //AllFileFilters
-
-
-            //bimFilterController.PrjAllFilters
-            // 1、
-            // 文件载入时更新 显示的全选内容 & PrjAllFilters
-            //Dictionary<string, List<FilterBase>> PrjAllFilters; 
-            //AllFloorFilters
-            //AllTypeFilters
-            //AllFileFilters
 
             CalcTypeFilter();
             CalcFloorFilter();
@@ -74,13 +76,13 @@ namespace XbimXplorer.LeftTabItme
         }
         private void CalcFloorFilter() 
         {
-            var allFloors = ProjectExtension.AllProjectStoreys(THBimScene.Instance.AllBimProjects);
+            var allFloors = ProjectExtension.AllProjectStoreys(document.AllBimProjects);
             AllFloorFilters.Clear();
             FloorShowIds.Clear();
             foreach (var floorKeyValue in allFloors)
             {
                 var prjStoreyFilters = new Dictionary<string, StoreyFilter>();
-                foreach (var filters in bimFilterController.PrjAllFilters)
+                foreach (var filters in PrjAllFilters)
                 {
                     var floorFilters = filters.Value.OfType<StoreyFilter>().ToList();
                     if (floorFilters.Count < 1)
@@ -103,7 +105,7 @@ namespace XbimXplorer.LeftTabItme
             }
             foreach (var filter in AllFloorFilters)
             {
-                var tempIds = bimFilterController.GetGlobalIndexByFilter(filter.ProjectFilters);
+                var tempIds = GetGlobalIndexByFilter(filter.ProjectFilters);
                 FloorShowIds = TypeShowIds.Union(tempIds).ToHashSet();
             }
         }
@@ -111,7 +113,7 @@ namespace XbimXplorer.LeftTabItme
         {
             AllTypeFilters.Clear();
             TypeShowIds.Clear();
-            foreach (var item in bimFilterController.PrjAllFilters) 
+            foreach (var item in PrjAllFilters) 
             {
                 var typeFilters = item.Value.OfType<TypeFilter>().ToList();
                 if (typeFilters.Count < 1)
@@ -137,7 +139,7 @@ namespace XbimXplorer.LeftTabItme
             }
             foreach (var filter in AllTypeFilters)
             {
-                var tempIds = bimFilterController.GetGlobalIndexByFilter(filter.ProjectFilters);
+                var tempIds = GetGlobalIndexByFilter(filter.ProjectFilters);
                 TypeShowIds = TypeShowIds.Union(tempIds).ToHashSet();
             }
         }
@@ -145,7 +147,7 @@ namespace XbimXplorer.LeftTabItme
         {
             AllFileFilters.Clear();
             ProjectShowIds.Clear();
-            foreach (var item in bimFilterController.PrjAllFilters)
+            foreach (var item in PrjAllFilters)
             {
                 var prjFilters = item.Value.OfType<ProjectFilter>().ToList();
                 if (prjFilters.Count < 1)
@@ -171,7 +173,7 @@ namespace XbimXplorer.LeftTabItme
             }
             foreach (var prjFilter in AllFileFilters)
             {
-                var tempIds = bimFilterController.GetGlobalIndexByFilter(prjFilter.ProjectFilters);
+                var tempIds = GetGlobalIndexByFilter(prjFilter.ProjectFilters);
                 ProjectShowIds = ProjectShowIds.Union(tempIds).ToHashSet();
             }
         }
@@ -196,7 +198,7 @@ namespace XbimXplorer.LeftTabItme
         private void UpdataTypeState(CheckBox typeCheckBox)
         {
             var typeFilter = typeCheckBox.DataContext as EntityTypeFilterViewModel;
-            var tempIds = bimFilterController.GetGlobalIndexByFilter(typeFilter.ProjectFilters);
+            var tempIds = GetGlobalIndexByFilter(typeFilter.ProjectFilters);
             if (typeFilter.IsChecked == true)
             {
                 //新增显示
@@ -226,7 +228,7 @@ namespace XbimXplorer.LeftTabItme
         private void UpdataFileState(CheckBox fileCheckBox) 
         {
             var typeFilter = fileCheckBox.DataContext as FileFilterViewModel;
-            var tempIds = bimFilterController.GetGlobalIndexByFilter(typeFilter.ProjectFilters);
+            var tempIds = GetGlobalIndexByFilter(typeFilter.ProjectFilters);
             if (typeFilter.IsChecked == true)
             {
                 //新增显示
@@ -249,7 +251,7 @@ namespace XbimXplorer.LeftTabItme
             {
                 if (filter.IsChecked != true)
                     continue;
-                var tempIds = bimFilterController.GetGlobalIndexByFilter(filter.ProjectFilters);
+                var tempIds = GetGlobalIndexByFilter(filter.ProjectFilters);
                 FloorShowIds = FloorShowIds.Union(tempIds).ToHashSet();
             }
         }
@@ -257,7 +259,7 @@ namespace XbimXplorer.LeftTabItme
         public void ShowFilterResult()
         {
             var showIds = GetAllShowIdByFilters();
-            bimFilterController.ShowEntity(showIds);
+            engineApp.ShowEntityByIds(showIds.ToList());
 
         }
         private HashSet<int> GetAllShowIdByFilters()
@@ -269,6 +271,108 @@ namespace XbimXplorer.LeftTabItme
             return showIds;
         }
         #endregion
+        public void UpdataProjectFilter(THDocument document)
+        {
+            this.document = document;
+            lock (inUpdata)
+            {
+                inUpdata = true;
+                PrjAllFilters.Clear();
+                ShowEntityGIndex.Clear();
+                ShowEntityGIndex = document.MeshEntiyRelationIndexs.Keys.ToHashSet();
+                AllEntityCount = ShowEntityGIndex.Count;
+                var storeyFilters = ProjectExtension.GetProjectStoreyFilters(document.AllBimProjects); // 获取所有的 storey filter
+                var typeFilters = ProjectExtension.GetProjectTypeFilters(document.AllBimProjects); // 获取所有的 type filter
+                foreach (var project in document.AllBimProjects)
+                {
+                    var filter = new ProjectFilter(new List<string> { project.ProjectIdentity });
+                    filter.Describe = project.Name;
+                    var listFilters = new List<FilterBase>();
+                    listFilters.Add(filter);
+                    foreach (var storeyFilter in storeyFilters)
+                    {
+                        var copyItem = storeyFilter.Clone() as StoreyFilter;
+                        listFilters.Add(copyItem);
+                    }
+                    foreach (var typeFilter in typeFilters)
+                    {
+                        var copyItem = typeFilter.Clone() as TypeFilter;
+                        listFilters.Add(copyItem);
+                    }
+                    ProjectExtension.PorjectFilterEntitys(project, listFilters); // 获取所有的数据
+                    PrjAllFilters.Add(project.ProjectIdentity, listFilters);
+                }
+                inUpdata = false;
+            }
+        }
+        private HashSet<int> GetGlobalIndexByFilterIds(Dictionary<string, HashSet<string>> prjFilterIds)
+        {
+            var resIds = new HashSet<int>();
+            Parallel.ForEach(document.MeshEntiyRelationIndexs.Values, new ParallelOptions() { }, item =>
+            {
+                var prjId = item.ProjectId;
+                if (!prjFilterIds.ContainsKey(prjId))
+                    return;
+                var prjEntityId = item.ProjectEntityId;
+                var filterIds = prjFilterIds[prjId];
+                if (filterIds.Contains(prjEntityId))
+                {
+                    lock (resIds)
+                    {
+                        if (!resIds.Contains(item.GlobalMeshIndex))
+                            resIds.Add(item.GlobalMeshIndex);
+                    }
+                }
+            });
+            return resIds;
+        }
+        private Dictionary<string, HashSet<string>> GetProjectFilterStrIds(Dictionary<string, List<FilterBase>> prjFilters)
+        {
+            var res = new Dictionary<string, HashSet<string>>();
+            foreach (var item in prjFilters)
+            {
+                var filters = item.Value;
+                var filterIds = new HashSet<string>();
+                foreach (var filter in filters)
+                {
+                    foreach (var id in filter.ResultElementUids)
+                    {
+                        if (filterIds.Contains(id))
+                            continue;
+                        filterIds.Add(id);
+                    }
+                }
+                res.Add(item.Key, filterIds);
+            }
+            return res;
+        }
+        private Dictionary<string, HashSet<string>> GetProjectFilterStrIds(Dictionary<string, FilterBase> prjFilters)
+        {
+            var res = new Dictionary<string, HashSet<string>>();
+            foreach (var item in prjFilters)
+            {
+                var filter = item.Value;
+                var filterIds = new HashSet<string>();
+                foreach (var id in filter.ResultElementUids)
+                {
+                    if (filterIds.Contains(id))
+                        continue;
+                    filterIds.Add(id);
+                }
+                res.Add(item.Key, filterIds);
+            }
+            return res;
+        }
+        public HashSet<int> GetGlobalIndexByFilter(Dictionary<string, List<FilterBase>> prjFilters)
+        {
+            var filterIds = GetProjectFilterStrIds(prjFilters);
+            return GetGlobalIndexByFilterIds(filterIds);
+        }
+        public HashSet<int> GetGlobalIndexByFilter(Dictionary<string, FilterBase> prjFilters)
+        {
+            var filterIds = GetProjectFilterStrIds(prjFilters);
+            return GetGlobalIndexByFilterIds(filterIds);
+        }
     }
     public class FloorFilterViewModel : NotifyPropertyChangedBase
     {

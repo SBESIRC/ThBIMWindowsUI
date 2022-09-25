@@ -1,17 +1,18 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using THBimEngine.Application;
 using Xbim.Common.Geometry;
-using Xbim.Presentation.XplorerPluginSystem;
 
 namespace XbimXplorer.LeftTabItme.LeftTabControls
 {
     /// <summary>
     /// LinkUControl.xaml 的交互逻辑
     /// </summary>
-    public partial class LinkUControl : UserControl, IXbimXplorerPluginWindow
+    [EnginePlugin(PluginButtonType.Button, 1, "外\r\n链", "")]
+    public partial class LinkUControl : UserControl, IPluginApplicaton
     {
         private string currentPrjRootPath = "";
-        private XplorerMainWindow mainWindow;
+        private IEngineApplication engineApp;
         private LinkViewModel linkViewModel;
         public string WindowTitle => "";
 
@@ -25,11 +26,6 @@ namespace XbimXplorer.LeftTabItme.LeftTabControls
             linkViewModel = new LinkViewModel();
             mainGrid.DataContext = linkViewModel;
         }
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            this.Visibility = Visibility.Collapsed;
-        }
-
         private void btnAddLink_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(currentPrjRootPath)) 
@@ -63,15 +59,9 @@ namespace XbimXplorer.LeftTabItme.LeftTabControls
             }
             return "";
         }
-
-        public void BindUi(IXbimXplorerPluginMasterWindow mainWindow)
-        {
-            this.mainWindow = mainWindow as XplorerMainWindow;
-        }
-
         private void AddLinkModel(LinkModel linkModel) 
         {
-            if (null == mainWindow)
+            if (null == engineApp)
                 return;
             bool isAdd = true;
             foreach (var item in linkViewModel.AllLinkModel) 
@@ -85,15 +75,14 @@ namespace XbimXplorer.LeftTabItme.LeftTabControls
             if (!isAdd)
                 return;
             linkViewModel.AllLinkModel.Add(linkModel);
-            
-            mainWindow.LoadAnyModel(linkModel.Project.FileName, linkModel.MoveMatrix3D);
+            engineApp.LoadFileToCurrentDocument(linkModel.Project.FileName, linkModel.MoveMatrix3D);
         }
         private void RemoveLinkModel(LinkModel linkModel) 
         {
             if (null == linkModel)
                 return;
             linkViewModel.AllLinkModel.Remove(linkModel);
-            mainWindow.RemoveModel(linkModel.Project.FileName);
+            engineApp.RemoveProjectFormCurrentDocument(linkModel.Project.FileName);
         }
 
         private void changeLink_Click(object sender, RoutedEventArgs e)
@@ -109,7 +98,7 @@ namespace XbimXplorer.LeftTabItme.LeftTabControls
                 linkModel.LinkState = "已链接";
                 linkModel.RotainAngle = rotation;
                 linkModel.MoveMatrix3D = XbimMatrix3D.CreateTranslation(x, y, z);
-                mainWindow.LoadAnyModel(linkModel.Project.FileName, linkModel.MoveMatrix3D);
+                engineApp.LoadFileToCurrentDocument(linkModel.Project.FileName, linkModel.MoveMatrix3D);
             }
         }
 
@@ -127,6 +116,11 @@ namespace XbimXplorer.LeftTabItme.LeftTabControls
             if (string.IsNullOrEmpty(tempPath))
                 return;
             currentPrjRootPath = tempPath;
+        }
+
+        public void BindApplication(IEngineApplication engineApplication)
+        {
+            engineApp = engineApplication;
         }
     }
 }

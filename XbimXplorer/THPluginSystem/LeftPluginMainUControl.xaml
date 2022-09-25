@@ -1,0 +1,13 @@
+﻿<UserControl x:Class="XbimXplorer.THPluginSystem.LeftPluginMainUControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:XbimXplorer.THPluginSystem"
+             x:Name="mainUControl"
+             mc:Ignorable="d">
+    <Grid x:Name="mainGrid" Background="White" Width="200" Margin="2,0,0,1"  
+          Visibility="{Binding ElementName=mainUControl,Path=Visibility}">
+        <Button Height="25" Width="25" VerticalAlignment="Top" Content="X" HorizontalAlignment="Right" Click="Button_Click" Panel.ZIndex="99999"></Button>
+    </Grid>
+</UserControl>

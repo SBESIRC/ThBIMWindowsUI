@@ -1,57 +1,69 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using THBimEngine.Application;
 
 namespace XbimXplorer.LeftTabItme.LeftTabControls
 {
     /// <summary>
     /// MainFilterUControl.xaml 的交互逻辑
     /// </summary>
-    public partial class MainFilterUControl : UserControl
+    [EnginePlugin(PluginButtonType.Button, 0,"过\r\n滤","")]
+    public partial class MainFilterUControl : UserControl, IPluginApplicaton
     {
+        private IEngineApplication engineApp;
+        FilterViewModel filterViewModel;
         public MainFilterUControl()
         {
             InitializeComponent();
-            mainGrid.DataContext = FilterViewModel.Instance;
         }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            this.Visibility = Visibility.Collapsed;
-        }
-
         private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var selectItems = floorDGrid.SelectedItems.Cast<FloorFilterViewModel>();
-            foreach (var item in FilterViewModel.Instance.AllFloorFilters) 
+            if (selectItems.Count() < 1 || engineApp.CurrentDocument == null)
+                return;
+            foreach (var item in filterViewModel.AllFloorFilters)
             {
                 if (selectItems.Any(c => c == item))
                 {
                     item.IsChecked = true;
                 }
-                else 
+                else
                 {
                     item.IsChecked = false;
                 }
             }
-            FilterViewModel.Instance.UpdataFloorShowIds();
-            FilterViewModel.Instance.ShowFilterResult();
+            filterViewModel.UpdataFloorShowIds();
+            filterViewModel.ShowFilterResult();
         }
 
         private void BtnSelectAll_Click(object sender, RoutedEventArgs e)
         {
             floorDGrid.SelectAll();
+        }
+
+        public void BindApplication(IEngineApplication engineApplication)
+        {
+            engineApp = engineApplication;
+            filterViewModel = new FilterViewModel(engineApp);
+            mainGrid.DataContext = filterViewModel;
+            ShowFilterByCurrentDocument();
+            engineApplication.SelectDocumentChanged += EngineApplication_SelectDocumentChanged;
+            engineApplication.DocumentChanged += EngineApplication_DocumentChanged;
+        }
+
+        private void EngineApplication_DocumentChanged(object sender, EventArgs e)
+        {
+            ShowFilterByCurrentDocument();
+        }
+        private void EngineApplication_SelectDocumentChanged(object sender, EventArgs e)
+        {
+            ShowFilterByCurrentDocument();
+        }
+        private void ShowFilterByCurrentDocument() 
+        {
+            filterViewModel.UpdataFilterByCurrentDocument(engineApp.CurrentDocument);
         }
     }
 }

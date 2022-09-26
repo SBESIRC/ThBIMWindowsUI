@@ -3,7 +3,7 @@ using Xbim.Common.Geometry;
 
 namespace THBimEngine.Domain
 {
-    public class PointNormal : ICloneable
+    public class PointNormal
 	{
 		public int PointIndex { get; set; }
 		public PointVector Point { get; set; }
@@ -26,26 +26,17 @@ namespace THBimEngine.Domain
 		}
 		public PointNormal GetRealData() 
 		{
-			var realData = this.Clone() as PointNormal;
-			realData.Point = new PointVector() 
-			{ 
-				X = this.Point.X,
-				Y = this.Point.Z, 
-				Z = this.Point.Y 
-			};
-			realData.Normal = new PointVector() 
-			{ 
-				X = this.Normal.X,
-				Y = this.Normal.Z,
-				Z = this.Normal.Y 
-			};
+			var realData = this.Clone();
+			realData.Point = this.Point;
+			realData.Normal = this.Normal;
+
 			return realData;
 		}
-		public object Clone()
+		public PointNormal Clone()
 		{
 			var clone = new PointNormal(this.PointIndex, XbimPoint3D.Zero, XbimVector3D.Zero);
-			clone.Point = this.Point.Clone() as PointVector;
-			clone.Normal = this.Normal.Clone() as PointVector;
+			clone.Point = this.Point;
+			clone.Normal = this.Normal;
 			return clone;
 		}
 	}

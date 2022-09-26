@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using THBimEngine.Domain;
-using THBimEngine.Geometry.NTS;
 using Xbim.Common.Geometry;
 using Xbim.Common.Step21;
 
@@ -59,7 +56,7 @@ namespace THBimEngine.Geometry.ProjectFactory
                     {
                         var componentId = CurrentGIndex();
 
-                        var bimComponent = new THBimUntypedEntity(componentId, string.Format("component#{0}", "", componentId), "", null,"", component.Root.GlobalId);
+                        var bimComponent = new THBimUntypedEntity(componentId, string.Format("component#{0}", "", componentId), "", null, "", component.Root.GlobalId);
                         bimComponent.EntityTypeName = "SU构件";
                         bimComponent.ParentUid = bimStorey.Uid;
 
@@ -90,7 +87,7 @@ namespace THBimEngine.Geometry.ProjectFactory
             {
                 cloneParam.YAxisLength = wallWidth + 120;
             }
-            var bimOpening = new THBimOpening(openingId, string.Format("opening#{0}", openingId), "",cloneParam);
+            var bimOpening = new THBimOpening(openingId, string.Format("opening#{0}", openingId), "", cloneParam);
             openingRelation = new THBimElementRelation(bimOpening.Id, bimOpening.Name, bimOpening, bimOpening.Describe, bimOpening.Uid);
             return bimOpening;
         }

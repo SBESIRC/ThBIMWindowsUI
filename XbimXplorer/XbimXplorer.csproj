@@ -138,8 +138,6 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="PropertyTools" Version="3.1.0" />
     <PackageReference Include="PropertyTools.Wpf" Version="3.1.0" />
-    <PackageReference Include="protobuf-net" Version="3.1.17" />
-    <PackageReference Include="protobuf-net.Core" Version="3.1.17" />
     <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />

@@ -1,15 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using THBimEngine.Domain;
-using THBimEngine.Domain.GeometryModel;
-using Xbim.Common.Geometry;
+﻿using Xbim.Common.Geometry;
 using Xbim.Ifc4.GeometricConstraintResource;
 using Xbim.Ifc4.GeometricModelResource;
 using Xbim.Ifc4.GeometryResource;
 using Xbim.Ifc4.Interfaces;
 using Xbim.Ifc4.ProfileResource;
-using Xbim.Ifc4.TopologyResource;
 using Xbim.IO.Memory;
+using THBimEngine.Domain;
 
 namespace THBimEngine.Geometry
 {
@@ -25,7 +21,7 @@ namespace THBimEngine.Geometry
         public static IfcAxis2Placement3D ToIfcAxis2Placement3D(this MemoryModel model, XbimPoint3D point)
         {
             var placement = model.Instances.New<IfcAxis2Placement3D>();
-            placement.Location = ToIfcCartesianPoint(model,point);
+            placement.Location = ToIfcCartesianPoint(model, point);
             return placement;
         }
         public static IfcLocalPlacement ToIfcLocalPlacement(this MemoryModel model, XbimPoint3D origin, IfcObjectPlacement relative_to = null)
@@ -33,7 +29,7 @@ namespace THBimEngine.Geometry
             return model.Instances.New<IfcLocalPlacement>(l =>
             {
                 l.PlacementRelTo = relative_to;
-                l.RelativePlacement = ToIfcAxis2Placement3D(model,origin);
+                l.RelativePlacement = ToIfcAxis2Placement3D(model, origin);
             });
         }
 
@@ -53,7 +49,7 @@ namespace THBimEngine.Geometry
                 d.XDim = xDim;
                 d.YDim = yDim;
                 d.ProfileType = IfcProfileTypeEnum.AREA;
-                d.Position = ToIfcAxis2Placement2D(model,origin);
+                d.Position = ToIfcAxis2Placement2D(model, origin);
             });
         }
 
@@ -63,22 +59,15 @@ namespace THBimEngine.Geometry
             {
                 s.Depth = depth;
                 s.SweptArea = profile;
-                s.ExtrudedDirection = ToIfcDirection(model,direction);
-                s.Position = ToIfcAxis2Placement3D(model,XbimPoint3D.Zero);
+                s.ExtrudedDirection = ToIfcDirection(model, direction);
+                s.Position = ToIfcAxis2Placement3D(model, XbimPoint3D.Zero);
             });
         }
-        public static IfcFacetedBrepWithVoids ToIfcFacetedBrep(this MemoryModel model, List<PolylineSurrogate> facePlines, List<PolylineSurrogate> voidsFaces)
-        {
-            var facetedBrepWithVoids = model.Instances.New<IfcFacetedBrepWithVoids>();
-            facetedBrepWithVoids.Outer = ToIfcClosedShell(model, facePlines);
-            facetedBrepWithVoids.Voids.Add(ToIfcClosedShell(model, voidsFaces));
-            return facetedBrepWithVoids;
-        }
-        
+
         public static IfcAxis2Placement2D ToIfcAxis2Placement2D(this MemoryModel model, XbimPoint3D point)
         {
             var placement = model.Instances.New<IfcAxis2Placement2D>();
-            placement.Location = ToIfcCartesianPoint(model,point);
+            placement.Location = ToIfcCartesianPoint(model, point);
             return placement;
         }
 
@@ -86,8 +75,8 @@ namespace THBimEngine.Geometry
         {
             return model.Instances.New<IfcAxis2Placement2D>(p =>
             {
-                p.Location = ToIfcCartesianPoint(model,point);
-                p.RefDirection = ToIfcDirection(model,direction);
+                p.Location = ToIfcCartesianPoint(model, point);
+                p.RefDirection = ToIfcDirection(model, direction);
             });
         }
 
@@ -148,38 +137,6 @@ namespace THBimEngine.Geometry
                 }
             }
             return compositeCurve;
-        }
-        private static IfcClosedShell ToIfcClosedShell(this MemoryModel model, List<PolylineSurrogate> facePlines)
-        {
-            var ifcClosedShell = model.Instances.New<IfcClosedShell>();
-            foreach (var face in facePlines)
-            {
-                ifcClosedShell.CfsFaces.Add(ToIfcFace(model, face));
-            }
-            return ifcClosedShell;
-        }
-        private static IfcFace ToIfcFace(this MemoryModel model, PolylineSurrogate facePLine)
-        {
-            var ifcFace = model.Instances.New<IfcFace>();
-            ifcFace.Bounds.Add(ToIfcFaceBound(model, facePLine));
-            return ifcFace;
-        }
-        private static IfcFaceBound ToIfcFaceBound(this MemoryModel model, PolylineSurrogate boundaryLoop)
-        {
-            return model.Instances.New<IfcFaceBound>(b =>
-            {
-                b.Bound = model.ToIfcPolyLoop(boundaryLoop);
-            });
-        }
-        private static IfcPolyLoop ToIfcPolyLoop(this MemoryModel model, PolylineSurrogate boundaryLoop)
-        {
-            var polyLoop = model.Instances.New<IfcPolyLoop>();
-            foreach (var points in boundaryLoop.Points)
-            {
-                foreach (var point in points.Points)
-                    polyLoop.Polygon.Add(ToIfcCartesianPoint(model, point.Point3D2XBimPoint()));
-            }
-            return polyLoop;
         }
         public static XbimVector3D ToAcGePoint3d(this IfcCartesianPoint point)
         {

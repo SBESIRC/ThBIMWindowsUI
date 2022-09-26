@@ -119,6 +119,8 @@ namespace XbimXplorer.ThBIMEngine
             if (engineApp.CurrentDocument == null)
             {
                 currentDocument = new THDocument(System.Guid.NewGuid().ToString(), "测试项目");
+                currentDocument.UnShowEntityTypes.Add(typeof(THBimOpening).Name.ToString());
+                currentDocument.UnShowEntityTypes.Add("open");
             }
         }
         private void SetNewSceneToSystem()

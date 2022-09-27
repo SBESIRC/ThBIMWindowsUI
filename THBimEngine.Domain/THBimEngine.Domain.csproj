@@ -79,6 +79,11 @@
     <Compile Include="GeometryModel\FaceTriangle.cs" />
     <Compile Include="GeometryModel\GeometryMeshModel.cs" />
     <Compile Include="GeometryParam.cs" />
+    <Compile Include="Geometry\ThBimCircle3D.cs" />
+    <Compile Include="Geometry\ThBimPlane.cs" />
+    <Compile Include="Geometry\THBimRay3D.cs" />
+    <Compile Include="Geometry\XbimPoint3DExtension.cs" />
+    <Compile Include="Geometry\XbimVector3DExtension.cs" />
     <Compile Include="Grid\GridCircle.cs" />
     <Compile Include="Grid\GridLine.cs" />
     <Compile Include="Grid\GridText.cs" />

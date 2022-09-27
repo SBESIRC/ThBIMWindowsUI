@@ -32,6 +32,12 @@ namespace THBimEngine.Domain
         /// </summary>
         public string MemoryStoreyId { get; set; }
         public XbimMatrix3D MemoryMatrix3d { get; set; }
+
+        /// <summary>
+        /// 轴网数据
+        /// </summary>
+        public ThGridLineSyetemData GridLineSyetemData { get; set; }
+
         public THBimStorey(int id, string name,double elevation,double levelHeight, string describe = "", string uid = "") : base(id, name, describe, uid)
         {
             FloorEntityRelations = new Dictionary<string, THBimElementRelation>();

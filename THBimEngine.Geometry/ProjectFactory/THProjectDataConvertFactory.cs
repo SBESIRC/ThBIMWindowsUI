@@ -56,6 +56,7 @@ namespace THBimEngine.Geometry.ProjectFactory
             {
                 var bimStorey = new THBimStorey(CurrentGIndex(), storey.Number, storey.Elevation, storey.Height, "", storey.BuildElement.Root.GlobalId);
                 bimStorey.Matrix3D = XbimMatrix3D.CreateTranslation(storey.Origin.Point3D2Vector());
+                bimStorey.GridLineSyetemData = storey.GridLineSystem;
                 if (!string.IsNullOrEmpty(storey.MemoryStoreyId))
                 {
                     var memoryStorey = prjEntityFloors[storey.MemoryStoreyId];

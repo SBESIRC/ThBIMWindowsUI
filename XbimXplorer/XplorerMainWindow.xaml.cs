@@ -138,7 +138,7 @@ namespace XbimXplorer
             var selectId = ExampleScene.GetCurrentCompID();
             if (selectId < 0)
                 return;
-            //var pro = bimDataController.GetSelectEntityProperties(selectId);
+            var pro = bimDataController.GetSelectEntityProperties(selectId);
 
 
         }

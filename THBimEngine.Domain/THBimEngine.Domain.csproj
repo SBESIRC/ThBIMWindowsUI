@@ -79,6 +79,10 @@
     <Compile Include="GeometryModel\FaceTriangle.cs" />
     <Compile Include="GeometryModel\GeometryMeshModel.cs" />
     <Compile Include="GeometryParam.cs" />
+    <Compile Include="Grid\GridCircle.cs" />
+    <Compile Include="Grid\GridLine.cs" />
+    <Compile Include="Grid\GridText.cs" />
+    <Compile Include="Grid\THBimGrid.cs" />
     <Compile Include="MidModel\Base.cs" />
     <Compile Include="MidModel\Buildingstorey.cs" />
     <Compile Include="MidModel\Component.cs" />

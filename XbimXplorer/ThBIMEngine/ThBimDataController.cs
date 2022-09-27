@@ -349,7 +349,7 @@ namespace XbimXplorer.ThBIMEngine
         }
         public void RenderCurrentDocument()
         {
-            engineApp.RenderScene();
+            //engineApp.RenderScene();
         }
         private bool IsAddProject(string prjIdentity) 
         {

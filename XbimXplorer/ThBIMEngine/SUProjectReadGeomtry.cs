@@ -13,13 +13,13 @@ namespace XbimXplorer.ThBIMEngine
             List<GeometryMeshModel> AllModels = new List<GeometryMeshModel>();
             allPointNormals = new List<PointNormal>();
             var buildings = project.Buildings;
+            var definitions = project.Definitions;
             //var _ptIndex = 0;
             var _ptCount = 0;
             var _meshIndex = 0;
             foreach (var building in buildings)
             {
                 var matrix = building.Component.Transformations;
-
                 Xbim.Common.Geometry.XbimMatrix3D bimMaterial = new Xbim.Common.Geometry.XbimMatrix3D(
                     matrix.Data11,matrix.Data12,matrix.Data13,matrix.Data14,
                     matrix.Data21,matrix.Data22,matrix.Data23,matrix.Data24,
@@ -31,9 +31,10 @@ namespace XbimXplorer.ThBIMEngine
                 
                 ThSUMaterialData ProtoMaterial = null;
                 ProtoMaterial = building.Component.Material;
-                foreach (var face in building.Component.Definition.Faces)
+                foreach (var face in definitions[building.Component.DefinitionIndex].Faces)
                 {
                     var FaceMaterial = face.Material;
+                    var normal = face.FaceNormal;
                     if (FaceMaterial != null)
                     {
                         ProtoMaterial = FaceMaterial;
@@ -42,7 +43,6 @@ namespace XbimXplorer.ThBIMEngine
                     for (int i = 0; i < faceTriangleCount; i++)
                     {
                         var polygon = face.Mesh.Polygons[i].Indices.Select(o => Math.Abs(o) - 1).ToList();
-                        var normal = face.Mesh.Normals[i];
                         var faceTriangle = new FaceTriangle();
                         faceTriangle.ptIndex.Add(_ptCount);
                         faceTriangle.ptIndex.Add(_ptCount + 1);
@@ -54,12 +54,8 @@ namespace XbimXplorer.ThBIMEngine
                         mesh.FaceTriangles.Add(faceTriangle);
                     }
                 }
-                var TriangleMaterial = new THBimMaterial();
+                var TriangleMaterial = THBimMaterial.GetTHBimEntityMaterial("sucomponent");
                 TriangleMaterial.MaterialName = ProtoMaterial?.MaterialName;
-                TriangleMaterial.Alpha = 1;
-                TriangleMaterial.Color_R = 233 / 255f;
-                TriangleMaterial.Color_G = 218 / 255f;
-                TriangleMaterial.Color_B = 217 / 255f;
                 mesh.TriangleMaterial = TriangleMaterial;
                 //if (ProtoMaterial == null)
                 //{

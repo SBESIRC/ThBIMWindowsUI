@@ -74,6 +74,8 @@ namespace XbimXplorer
             if (CurrentDocument == null)
                 return;
             DateTime start = DateTime.Now;
+            currentDocument.UpdateCatchStoreyRelation();
+            currentDocument.ReadGeometryMesh();
             CurrentScene = new THBimScene(currentDocument.DocumentId);
             foreach (var item in CurrentDocument.AllGeoModels) 
             {

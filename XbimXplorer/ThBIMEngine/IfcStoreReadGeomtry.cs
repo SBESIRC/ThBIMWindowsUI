@@ -186,7 +186,7 @@ namespace XbimXplorer.ThBIMEngine
 					int tempCount = 1;
 					foreach (var copyModel in allValues)
 					{
-						var transform = copyModel.Transformation;
+						var transform = copyModel.Transformation * projectMatrix3D;
 						var mesh = new GeometryMeshModel(intGeoCount + tempCount, copyModel.IfcProductLabel.ToString());
 						mesh.TriangleMaterial = material;
 						foreach (var face in allFace.ToList())
@@ -231,7 +231,7 @@ namespace XbimXplorer.ThBIMEngine
 				}
 				else
 				{
-					var transform = insModel.Transformation;
+					var transform = insModel.Transformation * projectMatrix3D;
 					var mesh = new GeometryMeshModel(intGeoCount, insModel.IfcProductLabel.ToString());
 					mesh.TriangleMaterial = material;
 					foreach (var face in allFace.ToList())

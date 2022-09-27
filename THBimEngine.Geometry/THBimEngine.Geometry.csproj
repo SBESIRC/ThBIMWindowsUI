@@ -45,7 +45,6 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Primitives" Version="6.0.0" />
-    <PackageReference Include="NetTopologySuite" Version="2.5.0" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
   </ItemGroup>
   <ItemGroup>
@@ -92,9 +91,6 @@
   <ItemGroup>
     <Compile Include="LineHelper.cs" />
     <Compile Include="ProjectFactory\ConvertFactoryBase.cs" />
-    <Compile Include="NTS\EngineNTSService.cs" />
-    <Compile Include="NTS\EngineNTSOperation.cs" />
-    <Compile Include="NTS\GeometryDomainExtension.cs" />
     <Compile Include="ProjectFactory\THIfcStoreMeshConvertFactory.cs" />
     <Compile Include="ProjectFactory\THProjectDataConvertFactory.cs" />
     <Compile Include="GeometryFactory.cs" />

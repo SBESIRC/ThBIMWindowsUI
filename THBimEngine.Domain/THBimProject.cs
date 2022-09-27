@@ -170,14 +170,14 @@ namespace THBimEngine.Domain
 			var resList = new List<PointNormal>();
 			foreach (var item in _allGeoPointNormals) 
 			{
-				var clonedPt = item.Clone() as PointNormal;
-				if(yzExchange)
-                {
-					float y = clonedPt.Point.Y;
-					float z = clonedPt.Point.Z;
-					clonedPt.Point.Y = z;
-					clonedPt.Point.Z = y;
-				}
+				var clonedPt = item.Clone();
+				//if(yzExchange)
+    //            {
+				//	float y = clonedPt.Point.Y;
+				//	float z = clonedPt.Point.Z;
+				//	clonedPt.Point.Y = z;
+				//	clonedPt.Point.Z = y;
+				//}
 				resList.Add(clonedPt);
 			}
 			return resList;
@@ -215,7 +215,10 @@ namespace THBimEngine.Domain
 			var storeys = this.ProjectAllStorey();
 			foreach (var storey in storeys)
 			{
-				PrjAllStoreys.Add(storey.Uid, storey);
+				//In 1.4G 'wanda' model, two roof stories have same Uid
+				if(!PrjAllStoreys.ContainsKey(storey.Uid))
+					PrjAllStoreys.Add(storey.Uid, storey);
+
 				foreach (var relation in storey.FloorEntityRelations)
 				{
 					if (PrjAllRelations.ContainsKey(relation.Key))

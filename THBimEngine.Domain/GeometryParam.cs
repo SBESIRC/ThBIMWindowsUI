@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using THBimEngine.Domain.GeometryModel;
 using Xbim.Common.Geometry;
 
 namespace THBimEngine.Domain
@@ -114,37 +113,12 @@ namespace THBimEngine.Domain
         /// <param name="zAxis"></param>
         /// <param name="zAxisLength"></param>
         /// <param name="zOffSet"></param>
-        public GeometryStretch(PolylineSurrogate outline, XbimVector3D xAxis, XbimVector3D zAxis, double zAxisLength, double zOffSet = 0.0)
-        {
-            XAxis = xAxis;
-            ZAxis = zAxis;
-            ZAxisLength = zAxisLength;
-            ZAxisOffSet = zOffSet;
-            if (outline.InnerPolylines == null)
-                outline.InnerPolylines = new List<PolylineSurrogate>();
-            if (outline.Points == null)
-                outline.Points = new List<Point3DCollectionSurrogate>();
-            //Outline = outline;
-        }
-
-        /// <summary>
-        /// 根据轮廓创建拉伸数据
-        /// </summary>
-        /// <param name="xAxis"></param>
-        /// <param name="zAxis"></param>
-        /// <param name="zAxisLength"></param>
-        /// <param name="zOffSet"></param>
         public GeometryStretch(ThTCHMPolygon mPolygon, XbimVector3D xAxis, XbimVector3D zAxis, double zAxisLength, double zOffSet = 0.0)
         {
             XAxis = xAxis;
             ZAxis = zAxis;
             ZAxisLength = zAxisLength;
             ZAxisOffSet = zOffSet;
-            //处理洞口的，现在暂时还没有处理
-            //if (outline.InnerPolylines == null)
-            //    outline.InnerPolylines = new List<PolylineSurrogate>();
-            //if (outline.Points == null)
-            //    outline.Points = new Google.Protobuf.Collections.RepeatedField<ThTCHPoint3d>();
             Outline = mPolygon;
         }
 

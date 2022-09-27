@@ -2,13 +2,13 @@
 
 namespace THBimEngine.Domain
 {
-    public class PointVector : ICloneable
+    public struct PointVector
 	{
 		public float X { get; set; }
 		public float Y { get; set; }
 		public float Z { get; set; }
 
-		public object Clone()
+		public PointVector Clone()
 		{
 			return new PointVector()
 			{

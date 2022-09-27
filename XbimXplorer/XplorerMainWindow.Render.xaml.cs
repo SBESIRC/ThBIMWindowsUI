@@ -73,6 +73,7 @@ namespace XbimXplorer
             CurrentScene = null;
             if (CurrentDocument == null)
                 return;
+            DateTime start = DateTime.Now;
             CurrentScene = new THBimScene(currentDocument.DocumentId);
             foreach (var item in CurrentDocument.AllGeoModels) 
             {
@@ -82,7 +83,6 @@ namespace XbimXplorer
             {
                 CurrentScene.AllGeoPointNormals.Add(item);
             }
-            DateTime start = DateTime.Now;
             var storeToEngineFile = new IfcStoreToEngineFile();
             storeToEngineFile.WriteMidDataMultithreading(CurrentScene.AllGeoModels, CurrentScene.AllGeoPointNormals);
             DateTime end = DateTime.Now;

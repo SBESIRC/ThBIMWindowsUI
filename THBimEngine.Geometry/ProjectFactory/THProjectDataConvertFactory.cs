@@ -31,25 +31,29 @@ namespace THBimEngine.Geometry.ProjectFactory
             {
                 bimProject.PrjAllStoreys.Add(item.Key, item.Value);
                 var gridSystem = item.Value.GridLineSyetemData;
-                var bimGrids = new List<THBimGrid>();
-                foreach(var gridLine in gridSystem.GridLines)
+                if(gridSystem != null)
                 {
-                    bimGrids.Add(new THBimGrid(gridLine));
-                }
-                foreach(var gridCircleGroup in gridSystem.CircleLableGroups)
-                {
-                    foreach(var gridCircle in gridCircleGroup.CircleLables)
+                    var bimGrids = new List<THBimGrid>();
+                    foreach (var gridLine in gridSystem.GridLines)
                     {
-                        bimGrids.Add(new THBimGrid(gridCircle));
+                        bimGrids.Add(new THBimGrid(gridLine));
+                    }
+                    foreach (var gridCircleGroup in gridSystem.CircleLableGroups)
+                    {
+                        foreach (var gridCircle in gridCircleGroup.CircleLables)
+                        {
+                            bimGrids.Add(new THBimGrid(gridCircle));
+                        }
+                    }
+                    foreach (var gridDimensionGroup in gridSystem.DimensionGroups)
+                    {
+                        foreach (var gridDimension in gridDimensionGroup.Dimensions)
+                        {
+                            bimGrids.Add(new THBimGrid(gridDimension));
+                        }
                     }
                 }
-                foreach(var gridDimensionGroup in gridSystem.DimensionGroups)
-                {
-                    foreach (var gridDimension in gridDimensionGroup.Dimensions)
-                    {
-                        bimGrids.Add(new THBimGrid(gridDimension));
-                    }
-                }
+                
                 foreach (var entity in item.Value.FloorEntitys)
                 {
                     bimProject.PrjAllEntitys.Add(entity.Key, entity.Value);

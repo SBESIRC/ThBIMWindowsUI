@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 using THBimEngine.Domain;
+using THBimEngine.Domain.Grid;
 using Xbim.Common.Geometry;
 using Xbim.Common.Step21;
 
@@ -28,6 +30,26 @@ namespace THBimEngine.Geometry.ProjectFactory
             foreach (var item in allStoreys)
             {
                 bimProject.PrjAllStoreys.Add(item.Key, item.Value);
+                var gridSystem = item.Value.GridLineSyetemData;
+                var bimGrids = new List<THBimGrid>();
+                foreach(var gridLine in gridSystem.GridLines)
+                {
+                    bimGrids.Add(new THBimGrid(gridLine));
+                }
+                foreach(var gridCircleGroup in gridSystem.CircleLableGroups)
+                {
+                    foreach(var gridCircle in gridCircleGroup.CircleLables)
+                    {
+                        bimGrids.Add(new THBimGrid(gridCircle));
+                    }
+                }
+                foreach(var gridDimensionGroup in gridSystem.DimensionGroups)
+                {
+                    foreach (var gridDimension in gridDimensionGroup.Dimensions)
+                    {
+                        bimGrids.Add(new THBimGrid(gridDimension));
+                    }
+                }
                 foreach (var entity in item.Value.FloorEntitys)
                 {
                     bimProject.PrjAllEntitys.Add(entity.Key, entity.Value);

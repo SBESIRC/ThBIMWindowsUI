@@ -2,7 +2,7 @@
 
 namespace THBimEngine.Domain.Grid
 {
-    internal class GridText
+    public class GridText
     {
         string content;// 文字内容
         string type; // 字体
@@ -35,9 +35,9 @@ namespace THBimEngine.Domain.Grid
             };
 
         }
-        public GridText(ThDimensionGroupData dimensionData)
+        public GridText(ThTCHLine dimLine, string dimension)
         {
-            content = dimensionData.Dimensions.First().Mark;
+            content = dimension;
             type = "";
             color = new THBimMaterial()
             {
@@ -49,8 +49,17 @@ namespace THBimEngine.Domain.Grid
             size = 350;
             normal = new PointVector() { X = 0, Y = 0, Z = 1 };
             direction = new PointVector() { X = 1, Y = 0, Z = 0 };
+            center = GetMidPt(dimLine.StartPt,dimLine.EndPt);
+        }
 
-
+        private PointVector GetMidPt(ThTCHPoint3d pt1, ThTCHPoint3d pt2)
+        {
+            return new PointVector() 
+            { 
+                X = (float)((pt1.X + pt2.X) / 2),
+                Y = (float)((pt1.Y + pt2.Y) / 2), 
+                Z = (float)((pt1.Z + pt2.Z) / 2) 
+            };
         }
     }
 }

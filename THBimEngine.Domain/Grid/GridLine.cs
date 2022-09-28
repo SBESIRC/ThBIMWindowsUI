@@ -55,12 +55,21 @@ namespace THBimEngine.Domain.Grid
         }
 
 
-        public GridLine(ThDimensionGroupData dimensionData)
+        public GridLine(ThTCHLine dimLine)
         {
-            var dimension = dimensionData.Dimensions.First();
-            var pt1 = dimension.XLine1Point;//标注起始点
-            var pt2 = dimension.XLine2Point;//标注终止点
-            var pt3 = dimension.DimLinePoint;//标注定位点
+            stPt = new PointVector()
+            {
+                X = (float)dimLine.StartPt.X,
+                Y = (float)dimLine.StartPt.Y,
+                Z = (float)dimLine.StartPt.Z
+            };
+            edPt = new PointVector()
+            {
+                X = (float)dimLine.EndPt.X,
+                Y = (float)dimLine.EndPt.Y,
+                Z = (float)dimLine.EndPt.Z
+            };
+
 
             color = new Color(255, 0, 0, 1);
             width = 0.1f;

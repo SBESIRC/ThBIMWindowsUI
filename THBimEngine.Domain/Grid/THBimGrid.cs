@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace THBimEngine.Domain.Grid
 {
-    internal class THBimGrid : THBimEntity
+    public class THBimGrid : THBimEntity
     {
         public List<GridLine> GridLines = new List<GridLine>();
         public List<GridCircle> GridCircles = new List<GridCircle>();
@@ -21,10 +22,19 @@ namespace THBimEngine.Domain.Grid
             GridTexts.Add(new GridText(circleLable));
         }
 
-        public THBimGrid(ThDimensionGroupData dimensionData) : base(0, "", "", null, "", "")
+        public THBimGrid(ThAlignedDimension dimensionData) : base(0, "", "", null, "", "")
         {
-            GridLines.Add(new GridLine(dimensionData));
-            GridTexts.Add(new GridText(dimensionData));
+            var dimLines = dimensionData.DimLines;
+            var dimension = dimensionData.Mark;
+            for (int i =0; i < dimLines.Count;i++)
+            {
+                var dimLine = dimLines[i];
+                GridLines.Add(new GridLine(dimLine));
+                if(i==dimLines.Count-1)
+                {
+                    GridTexts.Add(new GridText(dimLine, dimension));
+                }
+            }
         }
 
         public override object Clone()

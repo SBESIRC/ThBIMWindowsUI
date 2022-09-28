@@ -13,10 +13,13 @@ namespace XbimXplorer
     {
         private ThTCHProjectData thProject = null;
         private ThSUProjectData suProject = null;
+        private string ifc_ProjectPath = string.Empty;
         NamedPipeServerStream pipeServer = null;
         NamedPipeServerStream SU_pipeServer = null;
+        NamedPipeServerStream ifc_pipeServer = null;
         BackgroundWorker backgroundWorker = null;
         BackgroundWorker SU_backgroundWorker = null;
+        BackgroundWorker ifc_backgroundWorker = null;
         private void InitPipeService() 
         {
             pipeServer = new NamedPipeServerStream("THCAD2P3DPIPE", PipeDirection.In);
@@ -30,6 +33,12 @@ namespace XbimXplorer
             SU_backgroundWorker.DoWork += SU_Background_DoWork;
             SU_backgroundWorker.RunWorkerCompleted += SU_BackgroundWorker_RunWorkerCompleted;
             SU_backgroundWorker.RunWorkerAsync();
+
+            ifc_pipeServer = new NamedPipeServerStream("THCAD2IFC2P3DPIPE", PipeDirection.In);
+            ifc_backgroundWorker = new BackgroundWorker();
+            ifc_backgroundWorker.DoWork += ifc_Background_DoWork;
+            ifc_backgroundWorker.RunWorkerCompleted += ifc_BackgroundWorker_RunWorkerCompleted;
+            ifc_backgroundWorker.RunWorkerAsync();
         }
         #region 接收数据并解析数据渲染
         private void Background_DoWork(object sender, DoWorkEventArgs e)
@@ -130,6 +139,56 @@ namespace XbimXplorer
                 var totalTime = (endTime - startTime).TotalSeconds;
                 Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
                 RenderScene();
+            }
+        }
+
+        private void ifc_Background_DoWork(object sender, DoWorkEventArgs e)
+        {
+            ifc_ProjectPath = string.Empty;
+            if (ifc_pipeServer == null)
+                ifc_pipeServer = new NamedPipeServerStream("THCAD2IFC2P3DPIPE", PipeDirection.In);
+            ifc_pipeServer.WaitForConnection();
+            try
+            {
+                byte[] PipeData = ReadPipeData(ifc_pipeServer);
+                //选择保存路径
+                var time = DateTime.Now.ToString("HHmmss");
+                var fileName = "模型数据" + time + ".ifc";
+                ifc_ProjectPath = Path.Combine(Path.GetTempPath(), fileName);
+                using (var outputStream = File.Create(ifc_ProjectPath))
+                using (var writer = new BinaryWriter(outputStream))
+                {
+                    writer.Write(PipeData);
+                }
+            }
+            catch (IOException ioEx)
+            {
+                ifc_ProjectPath = string.Empty;
+                Log.Error(string.Format("ERROR: {0}", ioEx.Message));
+            }
+            ifc_pipeServer.Dispose();
+        }
+
+        private void ifc_BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(ifc_ProjectPath))
+            {
+                ExampleScene.ifcre_set_sleep_time(1000);
+                DateTime startTime = DateTime.Now;
+                //bimDataController.AddProject(thProject, projectMatrix3D);
+                LoadFileToCurrentDocument(ifc_ProjectPath, null);
+                var isFile = File.Exists(ifc_ProjectPath);
+                if (isFile)
+                {
+                    //File.Delete(ifc_ProjectPath);
+                }
+                ifc_ProjectPath = string.Empty;
+                ifc_pipeServer = null;
+                ifc_backgroundWorker.RunWorkerAsync();
+                DateTime endTime = DateTime.Now;
+                var totalTime = (endTime - startTime).TotalSeconds;
+                Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
+                //RenderScene();
             }
         }
         #endregion

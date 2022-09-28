@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.SqlServer.Server;
+using System;
 using Xbim.Common.Geometry;
 
 namespace THBimEngine.Domain
@@ -24,11 +25,27 @@ namespace THBimEngine.Domain
 				Z = (float)normal.Y 
 			};
 		}
+
+
+		/// <summary>
+		/// 获取真实坐标。注意，由于引擎坐标系，此处需要将Y和Z互换！！！
+		/// </summary>
+		/// <returns></returns>
 		public PointNormal GetRealData() 
 		{
 			var realData = this.Clone();
-			realData.Point = this.Point;
-			realData.Normal = this.Normal;
+			realData.Point = new PointVector()
+            {
+                X = (float)Point.X,
+                Y = (float)Point.Z,
+                Z = (float)Point.Y
+            }; ;
+			realData.Normal = new PointVector()
+			{
+				X = (float)Normal.X,
+                Y = (float)Normal.Z,
+                Z = (float)Normal.Y
+            };
 
 			return realData;
 		}

@@ -15,7 +15,7 @@
     <Copyright>Copyright © Eric Freed 2018</Copyright>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>1.0.4</Version>
+    <Version>1.0.5</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PackageVersion>3.3.1</PackageVersion>
     <Title>glfw-net</Title>

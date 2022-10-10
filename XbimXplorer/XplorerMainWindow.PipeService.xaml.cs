@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
+using System.Text;
 using THBimEngine.Domain;
 using THBimEngine.Presention;
 
@@ -22,17 +23,17 @@ namespace XbimXplorer
         BackgroundWorker ifc_backgroundWorker = null;
         private void InitPipeService() 
         {
-            pipeServer = new NamedPipeServerStream("THCAD2P3DPIPE", PipeDirection.In);
-            backgroundWorker = new BackgroundWorker();
-            backgroundWorker.DoWork += Background_DoWork;
-            backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
-            backgroundWorker.RunWorkerAsync();
+            //pipeServer = new NamedPipeServerStream("THCAD2P3DPIPE", PipeDirection.In);
+            //backgroundWorker = new BackgroundWorker();
+            //backgroundWorker.DoWork += Background_DoWork;
+            //backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
+            //backgroundWorker.RunWorkerAsync();
 
-            SU_pipeServer = new NamedPipeServerStream("THSU2P3DPIPE", PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
-            SU_backgroundWorker = new BackgroundWorker();
-            SU_backgroundWorker.DoWork += SU_Background_DoWork;
-            SU_backgroundWorker.RunWorkerCompleted += SU_BackgroundWorker_RunWorkerCompleted;
-            SU_backgroundWorker.RunWorkerAsync();
+            //SU_pipeServer = new NamedPipeServerStream("THSU2P3DPIPE", PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
+            //SU_backgroundWorker = new BackgroundWorker();
+            //SU_backgroundWorker.DoWork += SU_Background_DoWork;
+            //SU_backgroundWorker.RunWorkerCompleted += SU_BackgroundWorker_RunWorkerCompleted;
+            //SU_backgroundWorker.RunWorkerAsync();
 
             ifc_pipeServer = new NamedPipeServerStream("THCAD2IFC2P3DPIPE", PipeDirection.In);
             ifc_backgroundWorker = new BackgroundWorker();
@@ -151,15 +152,16 @@ namespace XbimXplorer
             try
             {
                 byte[] PipeData = ReadPipeData(ifc_pipeServer);
-                //选择保存路径
-                var time = DateTime.Now.ToString("HHmmss");
-                var fileName = "模型数据" + time + ".ifc";
-                ifc_ProjectPath = Path.Combine(Path.GetTempPath(), fileName);
-                using (var outputStream = File.Create(ifc_ProjectPath))
-                using (var writer = new BinaryWriter(outputStream))
-                {
-                    writer.Write(PipeData);
-                }
+                ifc_ProjectPath = Encoding.UTF8.GetString(PipeData, 0, PipeData.Length);
+                ////选择保存路径
+                //var time = DateTime.Now.ToString("HHmmss");
+                //var fileName = "模型数据" + time + ".ifc";
+                //ifc_ProjectPath = Path.Combine(Path.GetTempPath(), fileName);
+                //using (var outputStream = File.Create(ifc_ProjectPath))
+                //using (var writer = new BinaryWriter(outputStream))
+                //{
+                //    writer.Write(PipeData);
+                //}
             }
             catch (IOException ioEx)
             {

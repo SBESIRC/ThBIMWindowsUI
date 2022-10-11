@@ -43,32 +43,28 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Xbim.CobieExpress, Version=4.0.0.0, Culture=neutral, PublicKeyToken=11e3655e576ec5a9, processorArchitecture=MSIL">
-      <HintPath>..\Xbim.Essentials\4.x\Xbim.CobieExpress.dll</HintPath>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Xbim.Common">
+      <HintPath>..\Xbim.Essentials\5.x\Xbim.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Xbim.Common, Version=4.0.0.0, Culture=neutral, PublicKeyToken=11e3655e576ec5a9, processorArchitecture=MSIL">
-      <HintPath>..\Xbim.Essentials\4.x\Xbim.Common.dll</HintPath>
+    <Reference Include="Xbim.Ifc">
+      <HintPath>..\Xbim.Essentials\5.x\Xbim.Ifc.dll</HintPath>
     </Reference>
-    <Reference Include="Xbim.Ifc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=11e3655e576ec5a9, processorArchitecture=MSIL">
-      <HintPath>..\Xbim.Essentials\4.x\Xbim.Ifc.dll</HintPath>
+    <Reference Include="Xbim.Ifc2x3">
+      <HintPath>..\Xbim.Essentials\5.x\Xbim.Ifc2x3.dll</HintPath>
     </Reference>
-    <Reference Include="Xbim.Ifc.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=11e3655e576ec5a9, processorArchitecture=MSIL">
-      <HintPath>..\Xbim.Essentials\4.x\Xbim.Ifc.Extensions.dll</HintPath>
+    <Reference Include="Xbim.Ifc4">
+      <HintPath>..\Xbim.Essentials\5.x\Xbim.Ifc4.dll</HintPath>
     </Reference>
-    <Reference Include="Xbim.Ifc2x3, Version=4.0.0.0, Culture=neutral, PublicKeyToken=11e3655e576ec5a9, processorArchitecture=MSIL">
-      <HintPath>..\Xbim.Essentials\4.x\Xbim.Ifc2x3.dll</HintPath>
+    <Reference Include="Xbim.IO.Esent">
+      <HintPath>..\Xbim.Essentials\5.x\Xbim.IO.Esent.dll</HintPath>
     </Reference>
-    <Reference Include="Xbim.Ifc2x3.IO, Version=4.0.0.0, Culture=neutral, PublicKeyToken=11e3655e576ec5a9, processorArchitecture=MSIL">
-      <HintPath>..\Xbim.Essentials\4.x\Xbim.Ifc2x3.IO.dll</HintPath>
+    <Reference Include="Xbim.IO.MemoryModel">
+      <HintPath>..\Xbim.Essentials\5.x\Xbim.IO.MemoryModel.dll</HintPath>
     </Reference>
-    <Reference Include="Xbim.Ifc4, Version=4.0.0.0, Culture=neutral, PublicKeyToken=11e3655e576ec5a9, processorArchitecture=MSIL">
-      <HintPath>..\Xbim.Essentials\4.x\Xbim.Ifc4.dll</HintPath>
-    </Reference>
-    <Reference Include="Xbim.IO, Version=4.0.0.0, Culture=neutral, PublicKeyToken=11e3655e576ec5a9, processorArchitecture=MSIL">
-      <HintPath>..\Xbim.Essentials\4.x\Xbim.IO.dll</HintPath>
-    </Reference>
-    <Reference Include="Xbim.Tessellator, Version=4.0.0.0, Culture=neutral, PublicKeyToken=11e3655e576ec5a9, processorArchitecture=MSIL">
-      <HintPath>..\Xbim.Essentials\4.x\Xbim.Tessellator.dll</HintPath>
+    <Reference Include="Xbim.Tessellator">
+      <HintPath>..\Xbim.Essentials\5.x\Xbim.Tessellator.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

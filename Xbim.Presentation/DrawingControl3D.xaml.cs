@@ -1055,13 +1055,13 @@ namespace Xbim.Presentation
             var engine = new XbimGeometryEngine();
 
             // compute geometry
-            var s = engine.Create(geom);
+            var s = engine.Create(geom, null);
 
             // then mesh with required precision and geometric rules
             var precision = item.Model.ModelFactors.Precision;
             var deflection = item.Model.ModelFactors.DeflectionTolerance;
             var deflectionAngle = item.Model.ModelFactors.DeflectionAngle;
-            var shapeGeom = engine.CreateShapeGeometry(s, precision, deflection, deflectionAngle, XbimGeometryType.PolyhedronBinary);
+            var shapeGeom = engine.CreateShapeGeometry(s, precision, deflection, deflectionAngle, XbimGeometryType.PolyhedronBinary, null);
 
             // finally return
             return shapeGeom;
@@ -1440,7 +1440,8 @@ namespace Xbim.Presentation
 
                 Debug.WriteLine($"ths Region    :{newRegion}");
                 Debug.WriteLine($"Was ViewBounds:{_viewBounds}");
-                _viewBounds = _viewBounds.Union(newRegion);
+                _viewBounds.Union(newRegion);
+                //_viewBounds = _viewBounds.Union(newRegion);
                 Debug.WriteLine($"Now ViewBounds:{_viewBounds}");
             }
 
@@ -1893,7 +1894,8 @@ namespace Xbim.Presentation
                         }
                         else
                         {
-                            _viewBounds = _viewBounds.Union(transformed);
+                            _viewBounds.Union(transformed);
+                            //_viewBounds = _viewBounds.Union(transformed);
                         }
                         return true;
                     }

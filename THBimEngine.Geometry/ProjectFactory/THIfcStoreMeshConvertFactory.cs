@@ -22,7 +22,7 @@ namespace THBimEngine.Geometry.ProjectFactory
         Dictionary<int, XbimShapeGeometry> shapeGeometries = new Dictionary<int, XbimShapeGeometry>();
         List<XbimShapeInstance> shapeInstances = new List<XbimShapeInstance>();
         IDictionary<int, List<XbimShapeInstance>> shapeGeoLoopups = new Dictionary<int, List<XbimShapeInstance>>();
-        public THIfcStoreMeshConvertFactory(IfcSchemaVersion ifcSchemaVersion) : base(ifcSchemaVersion)
+        public THIfcStoreMeshConvertFactory(XbimSchemaVersion ifcSchemaVersion) : base(ifcSchemaVersion)
         {
         }
 

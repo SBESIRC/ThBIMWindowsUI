@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Xbim.Common;
 using Xbim.Ifc;
-using Xbim.Ifc2x3.IO;
 
 namespace XbimXplorer.Commands
 {

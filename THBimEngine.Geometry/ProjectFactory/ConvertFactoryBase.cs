@@ -11,7 +11,7 @@ namespace THBimEngine.Geometry.ProjectFactory
         /// <summary>
         /// Ifc版本信息
         /// </summary>
-        protected IfcSchemaVersion schemaVersion;
+        protected XbimSchemaVersion schemaVersion;
         protected int globalIndex = 0;
         /// <summary>
         /// 项目信息
@@ -29,7 +29,7 @@ namespace THBimEngine.Geometry.ProjectFactory
         /// 项目中所有楼层信息
         /// </summary>
         protected Dictionary<string, THBimStorey> allStoreys;
-        public ConvertFactoryBase(IfcSchemaVersion ifcSchemaVersion)
+        public ConvertFactoryBase(XbimSchemaVersion ifcSchemaVersion)
         {
             allEntitys = new Dictionary<string, THBimEntity>();
             schemaVersion = ifcSchemaVersion;

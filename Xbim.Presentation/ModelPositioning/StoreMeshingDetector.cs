@@ -90,7 +90,6 @@ namespace Xbim.Presentation.Modelpositioning
                     // todo: there should be a simplified entry for this, in geometry
                     //
                     var xbimTessellator = new XbimTessellator(_model, XbimGeometryType.PolyhedronBinary);
-                    xbimTessellator.MoveMinToOrigin = true;
                     XbimShapeGeometry shapeGeom = null;
                     if (xbimTessellator.CanMesh(repItem))
                     {
@@ -98,11 +97,13 @@ namespace Xbim.Presentation.Modelpositioning
                     }
                     else
                     {
-                        var recreated = Engine.Create(repItem);
-                        shapeGeom = Engine.CreateShapeGeometry(recreated, _model.ModelFactors.Precision, _model.ModelFactors.DeflectionTolerance, _model.ModelFactors.DeflectionAngle, XbimGeometryType.PolyhedronBinary);
+                        var recreated = Engine.Create(repItem,null);
+                        shapeGeom = Engine.CreateShapeGeometry(recreated, _model.ModelFactors.Precision, _model.ModelFactors.DeflectionTolerance, _model.ModelFactors.DeflectionAngle, XbimGeometryType.PolyhedronBinary,null);
                     }
 
-                    var shapeOffset = shapeGeom.TempOriginDisplacement;
+                    var shapeOffset = XbimVector3D.Zero;
+                    if (shapeGeom.LocalShapeDisplacement.HasValue)
+                        shapeOffset = shapeGeom.LocalShapeDisplacement.Value;
                     var adjustedForShape = XbimMatrix3D.Multiply(
                                XbimMatrix3D.CreateTranslation((XbimVector3D)shapeOffset),
                                nonAdjustedTransform);
@@ -116,7 +117,7 @@ namespace Xbim.Presentation.Modelpositioning
                         _WcsAdjustmentStatus = WcsAdjustmentStatusEnum.Adjusted;
                         try
                         {
-                            _wcsMatrix = placementTree.RootNodes[0].Matrix;
+                            _wcsMatrix = placementTree[0];
                         }
                         catch (Exception ex)
                         {

@@ -1056,7 +1056,7 @@ namespace XbimXplorer.Commands
                         }
                         Report("OpaquesVisual3D", _parentWindow.DrawingControl.OpaquesVisual3D);
                         Report("TransparentsVisual3D", _parentWindow.DrawingControl.TransparentsVisual3D);
-                        Report("Selection", _parentWindow.DrawingControl.HighlightedVisual, true);
+                        //Report("Selection", _parentWindow.DrawingControl.HighlightedVisual, true);
 
                     }
                     else if (m.Groups["action"].Value.ToLowerInvariant() == "tree")
@@ -1362,7 +1362,7 @@ namespace XbimXplorer.Commands
             }
 
             ReportAdd($"Saving.");
-            model.SaveAs(newFile, IfcStorageType.IfcZip);
+            model.SaveAs(newFile, StorageType.IfcZip);
             model.Close();
 
             var fBefore = new FileInfo(fileName);

@@ -15,7 +15,7 @@ namespace THBimEngine.Geometry.ProjectFactory
 {
     public class THProjectDataConvertFactory : ConvertFactoryBase
     {
-        public THProjectDataConvertFactory(IfcSchemaVersion ifcSchemaVersion) : base(ifcSchemaVersion)
+        public THProjectDataConvertFactory(XbimSchemaVersion ifcSchemaVersion) : base(ifcSchemaVersion)
         {
         }
         public override ConvertResult ProjectConvert(object objProject, bool createSolidMesh)

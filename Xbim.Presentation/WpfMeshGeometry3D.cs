@@ -162,7 +162,9 @@ namespace Xbim.Presentation
             {
                 var trsf = pt[contextualProduct.ObjectPlacement.EntityLabel];
                 // var trsf = XbimMatrix3D.Identity;
-                var disp = ((XbimShapeGeometry)shapegeom).TempOriginDisplacement;
+                var disp = XbimVector3D.Zero;
+                if(((XbimShapeGeometry)shapegeom).LocalShapeDisplacement.HasValue)
+                    disp = ((XbimShapeGeometry)shapegeom).LocalShapeDisplacement.Value;
                 var mt = XbimMatrix3D.CreateTranslation(disp.X, disp.Y, disp.Z);
                 trsf = XbimMatrix3D.Multiply(mt, trsf);
 

@@ -303,6 +303,10 @@
     <Compile Include="THPluginSystem\LeftPluginViewModel.cs" />
     <Compile Include="THPluginSystem\PluginService.cs" />
     <Compile Include="THPluginSystem\TopPluginViewModel.cs" />
+    <Compile Include="XplorerMainWindow.LoadFile.xaml.cs">
+      <DependentUpon>XplorerMainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="XplorerMainWindow.Logging.xaml.cs">
       <DependentUpon>XplorerMainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

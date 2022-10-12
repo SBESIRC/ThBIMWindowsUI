@@ -110,7 +110,10 @@
     <Compile Include="ProtoData\ThTCHDescendingData.cs" />
     <Compile Include="ProtoData\ThTCHDoorData.cs" />
     <Compile Include="ProtoData\ThTCHGeometry.cs" />
+    <Compile Include="ProtoData\ThTCHGridAxisData.cs" />
+    <Compile Include="ProtoData\ThTCHGridData.cs" />
     <Compile Include="ProtoData\ThTCHOpeningData.cs" />
+    <Compile Include="ProtoData\ThTCHPositioningElementData.cs" />
     <Compile Include="ProtoData\ThTCHProjectData.cs" />
     <Compile Include="ProtoData\ThTCHProperty.cs" />
     <Compile Include="ProtoData\ThTCHRailingData.cs" />

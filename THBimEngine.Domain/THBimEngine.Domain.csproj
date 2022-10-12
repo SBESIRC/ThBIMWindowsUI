@@ -101,6 +101,7 @@
     <Compile Include="ProtoData\ThSUComponentData.cs" />
     <Compile Include="ProtoData\ThSUFaceData.cs" />
     <Compile Include="ProtoData\ThSUGeometry.cs" />
+    <Compile Include="ProtoData\ThSULoopData.cs" />
     <Compile Include="ProtoData\ThSUMaterialData.cs" />
     <Compile Include="ProtoData\ThSUProjectData.cs" />
     <Compile Include="ProtoData\ThTCHBuildingData.cs" />

@@ -1,16 +1,18 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
-using THBimEngine.Presention;
-using Xbim.Common.Geometry;
-using Xbim.Common.Step21;
-using Xbim.Ifc;
+using System.Diagnostics;
+using System.ComponentModel;
+
 using Xbim.IO;
+using Xbim.Ifc;
+using Xbim.Common.Step21;
+using Xbim.Common.Geometry;
 using Xbim.ModelGeometry.Scene;
+
+using THBimEngine.Presention;
 
 namespace XbimXplorer
 {
@@ -81,8 +83,9 @@ namespace XbimXplorer
             _loadStreamBackgroundWorker.ProgressChanged += OnProgressChanged;
             _loadStreamBackgroundWorker.DoWork += LoadStreamBackgroundWorker_DoWork;
             _loadStreamBackgroundWorker.RunWorkerCompleted += FileLoadCompleted;
-            _loadFileBackgroundWorker.RunWorkerAsync(streamParameter);
+            _loadStreamBackgroundWorker.RunWorkerAsync(streamParameter);
         }
+
         private void LoadStreamBackgroundWorker_DoWork(object sender, DoWorkEventArgs args)
         {
             var worker = sender as BackgroundWorker;
@@ -170,6 +173,7 @@ namespace XbimXplorer
             var totalTime = (endTime - startTime).TotalSeconds;
             Log.Info(string.Format("Ifc数据解析完成，耗时：{0}s", totalTime));
         }
+
         private void OpenAcceptableExtension(object s, DoWorkEventArgs args)
         {
             var worker = s as BackgroundWorker;
@@ -260,6 +264,7 @@ namespace XbimXplorer
             var totalTime = (endTime - startTime).TotalSeconds;
             Log.Info(string.Format("Ifc数据解析完成，耗时：{0}s", totalTime));
         }
+
         private void SetWorkerForFileLoad()
         {
             _loadFileBackgroundWorker = new BackgroundWorker
@@ -272,6 +277,7 @@ namespace XbimXplorer
             _loadFileBackgroundWorker.DoWork += OpenAcceptableExtension;
             _loadFileBackgroundWorker.RunWorkerCompleted += FileLoadCompleted;
         }
+
         private void LoadTHBimFile(string fileName)
         {
             FileStream fsRead = new FileStream(fileName, FileMode.Open, FileAccess.Read);
@@ -332,6 +338,7 @@ namespace XbimXplorer
                 r.Dispose();
             }
         }
+
         private void FileLoadCompleted(object s, RunWorkerCompletedEventArgs args)
         {
             if (args.Result is IfcStore ifcStore) //all ok

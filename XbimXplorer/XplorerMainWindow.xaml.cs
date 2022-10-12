@@ -188,7 +188,7 @@ namespace XbimXplorer
             {
                 backgroundWorker.Dispose();
             }
-            if (null == pipeServer) 
+            if (null != pipeServer) 
             {
                 pipeServer.Dispose();
             }

@@ -96,6 +96,7 @@ namespace XbimXplorer
                 if (worker == null)
                     throw new Exception("Background thread could not be accessed");
                 var model = IfcStore.Open(streamParameter.IOStream, streamParameter.StorageType, streamParameter.SchemaVersion, streamParameter.ModelType, null, FileAccessMode, worker.ReportProgress);
+                model.FileName = Guid.NewGuid().ToString();
                 if (_meshModel)
                 {
                     // mesh direct model

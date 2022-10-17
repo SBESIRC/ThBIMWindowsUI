@@ -32,6 +32,7 @@ namespace XbimXplorer.LeftTabItme.LeftTabControls
                 return;
             }
             var addLinkSet = new AddLinkSetUI(0,0,0,0);
+            addLinkSet.Owner = this;
             if (addLinkSet.ShowDialog() == true) 
             {
                 //设置成功，读取相应的信息

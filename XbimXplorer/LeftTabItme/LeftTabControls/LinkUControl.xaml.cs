@@ -38,6 +38,7 @@ namespace XbimXplorer.LeftTabItme.LeftTabControls
                 return;
             }
             var addLinkUI = new AddLinkModelUI(currentPrjRootPath);
+            addLinkUI.Owner = engineApp as Window;
             if (addLinkUI.ShowDialog() == true) 
             {
                 //新增成功

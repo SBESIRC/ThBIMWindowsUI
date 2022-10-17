@@ -204,6 +204,8 @@ namespace THBimEngine.Geometry
         public List<IXbimSolid> GetXBimSolid(GeometryFacetedBrep facetedBrep, XbimVector3D moveVector)
         {
             var resSolids = new List<IXbimSolid>();
+            if (null == facetedBrep || facetedBrep.Outer == null || facetedBrep.Outer.Count < 1)
+                return resSolids;
             var brep = ThIFC2x3GeExtension.ToIfcFacetedBrep(memoryModel, facetedBrep.Outer, facetedBrep.Voids);
             var geoSolid = geomEngine.CreateSolidSet(brep);
             var trans = XbimMatrix3D.CreateTranslation(moveVector.X, moveVector.Y, moveVector.Z);

@@ -109,6 +109,8 @@ namespace THBimEngine.Domain
 				}
 				foreach (var item in project.PrjAllStoreys)
 				{
+					if (AllStoreys.ContainsKey(item.Key))
+						continue;
 					AllStoreys.Add(item.Key, item.Value);
 				}
 				foreach (var item in project.PrjAllRelations)

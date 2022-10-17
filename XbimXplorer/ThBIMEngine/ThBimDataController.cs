@@ -62,6 +62,7 @@ namespace XbimXplorer.ThBIMEngine
                 currentDocument.DeleteProjectData(project.Root.GlobalId);
             }
             var convertResult = convertFactory.ProjectConvert(project, true);
+            convertResult.BimProject.Matrix3D = matrix3D;
             var bimProject = convertResult.BimProject;
             bimProject.ProjectIdentity = project.Root.GlobalId;
             bimProject.SourceProject = project;
@@ -204,7 +205,7 @@ namespace XbimXplorer.ThBIMEngine
                         if (newRemovedUids.Count > 0)
                         {
                             HaveChange = true;
-                            RemoveEntitys(building, newRemovedUids);
+                            RemoveEntitys(project,building, newRemovedUids);
                         }
                     }
                     foreach (var delStorey in delFloorIds)
@@ -298,14 +299,14 @@ namespace XbimXplorer.ThBIMEngine
                             HaveChange = true;
                             updateMeshIds.AddRange(newAddedUids);
                             var addEntitys = newEntitys.Where(c => newAddedUids.Any(x => x == c.Key)).ToDictionary(c => c.Key, x => x.Value);
-                            AddEntitys(building, addEntitys);
+                            AddEntitys(project,building, addEntitys);
                         }
                         if (newUpdatedUids.Count > 0)
                         {
                             HaveChange = true;
                             updateMeshIds.AddRange(newUpdatedUids);
                             var updateEntitys = newEntitys.Where(c => newUpdatedUids.Any(x => x == c.Key)).ToDictionary(c => c.Key, x => x.Value);
-                            UpdateEntitys(updateEntitys);
+                            UpdateEntitys(project, updateEntitys);
                         }
                     }
                     //step6 楼层层高标高变更修改
@@ -332,8 +333,14 @@ namespace XbimXplorer.ThBIMEngine
                 {
                     project.HaveChange = true;
                     currentDocument.UpdateCatchStoreyRelation();
-                    UpateEntitySolidMesh(updateMeshIds);
+                    UpateEntitySolidMesh(project, updateMeshIds);
                 }
+                if (!HaveChange && !projectResult.BimProject.Matrix3D.Equals(project.Matrix3D))
+                {
+                    HaveChange = true;
+                    project.HaveChange = true;
+                    project.Matrix3D = projectResult.BimProject.Matrix3D;
+                } 
             }
             if (HaveChange)
             {
@@ -364,7 +371,7 @@ namespace XbimXplorer.ThBIMEngine
             }
             return isAdd;
         }
-        private void RemoveEntitys(THBimBuilding bimBuilding, List<string> rmEntityIds) 
+        private void RemoveEntitys(THBimProject bimProject,THBimBuilding bimBuilding, List<string> rmEntityIds) 
         {
             var thisStoreys = bimBuilding.BuildingStoreys;
             if (null == rmEntityIds || rmEntityIds.Count < 1)
@@ -372,13 +379,13 @@ namespace XbimXplorer.ThBIMEngine
             var rmIds = new List<string>();
             foreach (var entityId in rmEntityIds)
             {
-                if (!currentDocument.AllEntitys.ContainsKey(entityId))
+                if (!bimProject.PrjAllEntitys.ContainsKey(entityId))
                     continue;
-                var entity = currentDocument.AllEntitys[entityId];
+                var entity = bimProject.PrjAllEntitys[entityId];
                 var pid = entity.ParentUid;
                 while (!string.IsNullOrEmpty(pid) && !thisStoreys.ContainsKey(pid))
                 {
-                    var pEntity = currentDocument.AllEntitys[pid];
+                    var pEntity = bimProject.PrjAllEntitys[pid];
                     pid = pEntity.ParentUid;
                 }
                 rmIds.Add(entityId);
@@ -398,10 +405,10 @@ namespace XbimXplorer.ThBIMEngine
             }
             foreach (var rmId in rmIds) 
             {
-                currentDocument.AllEntitys.Remove(rmId);
+                bimProject.PrjAllEntitys.Remove(rmId);
             }
         }
-        private void AddEntitys(THBimBuilding building, Dictionary<string,THBimEntity> addEntitys) 
+        private void AddEntitys(THBimProject bimProject,THBimBuilding building, Dictionary<string,THBimEntity> addEntitys) 
         {
             var idOffSet = 0;// LastEntityIntId() + 1;
             foreach (var entityKeyValue in addEntitys)
@@ -411,7 +418,7 @@ namespace XbimXplorer.ThBIMEngine
                 while (!string.IsNullOrEmpty(pid) && !building.BuildingStoreys.ContainsKey(pid))
                 {
                     //如果只是增加了门窗，父元素为墙，算更新数据，不算增的数据
-                    var pEntity = addEntitys.ContainsKey(pid)? addEntitys[pid]: currentDocument.AllEntitys[pid];
+                    var pEntity = addEntitys.ContainsKey(pid)? addEntitys[pid]: bimProject.PrjAllEntitys[pid];
                     pid = pEntity.ParentUid;
                 }
                 if (string.IsNullOrEmpty(pid) || !building.BuildingStoreys.ContainsKey(pid))
@@ -437,7 +444,7 @@ namespace XbimXplorer.ThBIMEngine
             }
         }
         
-        private void UpdateEntitys(Dictionary<string, THBimEntity> updateEntitys)
+        private void UpdateEntitys(THBimProject bimProject,Dictionary<string, THBimEntity> updateEntitys)
         {
             if (null == updateEntitys || updateEntitys.Count < 1)
                 return;
@@ -445,7 +452,7 @@ namespace XbimXplorer.ThBIMEngine
             {
                 var id = keyValue.Key;
                 var entity = keyValue.Value;
-                var oldValue = currentDocument.AllEntitys[id];
+                var oldValue = bimProject.PrjAllEntitys[id];
                 oldValue.GeometryParam = entity.GeometryParam;
                 oldValue.EntitySolids.Clear();
                 oldValue.AllShapeGeometries.Clear();
@@ -454,20 +461,20 @@ namespace XbimXplorer.ThBIMEngine
                     oldValue.Openings.Add(item);
             }
         }
-        private void UpateEntitySolidMesh(List<string> updateEntityIds) 
+        private void UpateEntitySolidMesh(THBimProject bimProject,List<string> updateEntityIds) 
         {
             if (null == updateEntityIds || updateEntityIds.Count < 1)
                 return;
             List<THBimEntity> updateEntitys = new List<THBimEntity>();
             foreach (var id in updateEntityIds) 
             {
-                if(!currentDocument.AllEntitys.ContainsKey(id))
+                if(!bimProject.PrjAllEntitys.ContainsKey(id))
                     continue;
-                var entity = currentDocument.AllEntitys[id];
+                var entity = bimProject.PrjAllEntitys[id];
                 updateEntitys.Add(entity);
                 foreach (var item in entity.Openings)
                 {
-                    updateEntitys.Add(currentDocument.AllEntitys[item.Uid]);
+                    updateEntitys.Add(bimProject.PrjAllEntitys[item.Uid]);
                 }
             }
             if (updateEntitys.Count < 1)

@@ -14,8 +14,6 @@ namespace THBimEngine.Domain
 			DocumentName = name;
 			AllBimProjects = new List<THBimProject>();
 			AllStoreys = new Dictionary<string, THBimStorey>();
-			AllEntitys = new Dictionary<string, THBimEntity>();
-			AllRelations = new Dictionary<string, THBimElementRelation>();
 			AllGeoModels = new List<GeometryMeshModel>();
 			AllGeoPointNormals = new List<PointNormal>();
 			MeshEntiyRelationIndexs = new Dictionary<int, MeshEntityIdentifier>();
@@ -30,15 +28,7 @@ namespace THBimEngine.Domain
 		/// 所有项目中的楼层集合
 		/// </summary>
 		public Dictionary<string, THBimStorey> AllStoreys { get; }
-		/// <summary>
-		/// 所有项目所有楼层中的的关联的实体信息
-		/// （通过RelationElementUID）找Entity
-		/// </summary>
-		public Dictionary<string, THBimElementRelation> AllRelations { get; }
-		/// <summary>
-		/// 所有非重复的实体的信息（一个实体可以通过关联+转换到其它位置）
-		/// </summary>
-		public Dictionary<string, THBimEntity> AllEntitys { get; }
+		
 		/// <summary>
 		/// 所有物体的三角面片信息集合
 		/// </summary>
@@ -59,8 +49,6 @@ namespace THBimEngine.Domain
 		{
 			AllBimProjects.Clear();
 			AllStoreys.Clear();
-			AllEntitys.Clear();
-			AllRelations.Clear();
 			AllGeoModels.Clear();
 			AllGeoPointNormals.Clear();
 			MeshEntiyRelationIndexs.Clear();
@@ -80,10 +68,6 @@ namespace THBimEngine.Domain
 				{
 					foreach (var storey in build.Value.BuildingStoreys)
 					{
-						foreach (var item in storey.Value.FloorEntitys)
-						{
-							AllEntitys.Remove(item.Key);
-						}
 						AllStoreys.Remove(storey.Key);
 					}
 				}
@@ -95,8 +79,6 @@ namespace THBimEngine.Domain
 		public void UpdateCatchStoreyRelation()
 		{
 			AllStoreys.Clear();
-			AllRelations.Clear();
-			AllEntitys.Clear();
 
 			foreach (var project in AllBimProjects)
 			{
@@ -112,14 +94,6 @@ namespace THBimEngine.Domain
 					if (AllStoreys.ContainsKey(item.Key))
 						continue;
 					AllStoreys.Add(item.Key, item.Value);
-				}
-				foreach (var item in project.PrjAllRelations)
-				{
-					AllRelations.Add(item.Key, item.Value);
-				}
-				foreach (var item in project.PrjAllEntitys)
-				{
-					AllEntitys.Add(item.Key, item.Value);
 				}
 			}
 		}

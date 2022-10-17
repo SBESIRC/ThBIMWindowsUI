@@ -61,17 +61,17 @@ namespace XbimXplorer.ThBIMEngine
                 //这里增量跟新没有做，先删除原来的数据，再增加现在的数据
                 currentDocument.DeleteProjectData(project.Root.GlobalId);
             }
-            var convertResult = convertFactory.ProjectConvert(project, false);
-
+            var convertResult = convertFactory.ProjectConvert(project, true);
             var bimProject = convertResult.BimProject;
             bimProject.ProjectIdentity = project.Root.GlobalId;
             bimProject.SourceProject = project;
-            bimProject.NeedCreateMesh = false;
-            bimProject.HaveChange=false;
-            var allGeoPointNormals = new List<PointNormal>();
-            var readGeomtry = new SUProjectReadGeomtry();
-            var allGeoModels = readGeomtry.ReadGeomtry(project, matrix3D, out allGeoPointNormals);
-            bimProject.AddGeoMeshModels(allGeoModels, allGeoPointNormals);
+            //bimProject.NeedCreateMesh = false;
+            bimProject.HaveChange = true;
+            HaveChange = true;
+            //var allGeoPointNormals = new List<PointNormal>();
+            //var readGeomtry = new SUProjectReadGeomtry();
+            //var allGeoModels = readGeomtry.ReadGeomtry(project, matrix3D, out allGeoPointNormals);
+            //bimProject.AddGeoMeshModels(allGeoModels, allGeoPointNormals);
             currentDocument.AddProject(bimProject);
             currentDocument.ReadGeometryMesh();
             SetNewSceneToSystem();

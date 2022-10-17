@@ -15,12 +15,38 @@ namespace THBimEngine.Domain
     /// </summary>
     public class GeometryFacetedBrep : GeometryParam
     {
-        public List<ThTCHPolyline> Outer { get; }
-        public List<ThTCHPolyline> Voids { get; }
+        public List<ThTCHMPolygon> Outer { get; }
+        public List<ThTCHMPolygon> Voids { get; }
         public GeometryFacetedBrep()
         {
-            Outer = new List<ThTCHPolyline>();
-            Voids = new List<ThTCHPolyline>();
+            Outer = new List<ThTCHMPolygon>();
+            Voids = new List<ThTCHMPolygon>();
+        }
+        
+        public GeometryFacetedBrep(ThSUCompDefinitionData definitionData, ThTCHMatrix3d suMatrix)
+        {
+            Outer = new List<ThTCHMPolygon>();
+            Voids = new List<ThTCHMPolygon>();
+            var matrix = suMatrix.ToXBimMatrix3D();
+            foreach (var face in definitionData.Faces)
+            {
+                var facePolygon = new ThTCHMPolygon();
+                facePolygon.Shell = new ThTCHPolyline();
+                foreach (var pt in face.OuterLoop.Points)
+                {
+                    facePolygon.Shell.Points.Add(pt.Point3D2XBimPoint().TransPoint(matrix).XBimPoint2Point3D());
+                }
+                foreach (var loop in face.InnerLoops)
+                {
+                    var hole = new ThTCHPolyline();
+                    foreach (var pt in loop.Points)
+                    {
+                        hole.Points.Add(pt.Point3D2XBimPoint().TransPoint(matrix).XBimPoint2Point3D());
+                    }
+                    facePolygon.Holes.Add(hole);
+                }
+                Outer.Add(facePolygon);
+            }
         }
 
         public override object Clone()

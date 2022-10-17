@@ -142,15 +142,15 @@ namespace THBimEngine.Geometry
             return compositeCurve;
         }
 
-        public static IfcFacetedBrepWithVoids ToIfcFacetedBrep(this MemoryModel model, List<ThTCHPolyline> facePlines, List<ThTCHPolyline> voidsFaces)
+        public static IfcFacetedBrepWithVoids ToIfcFacetedBrep(this MemoryModel model, List<ThTCHMPolygon> facePlines, List<ThTCHMPolygon> voidsFaces)
         {
             var facetedBrepWithVoids = model.Instances.New<IfcFacetedBrepWithVoids>();
             facetedBrepWithVoids.Outer = ToIfcClosedShell(model, facePlines);
-            facetedBrepWithVoids.Voids.Add(ToIfcClosedShell(model, voidsFaces));
+            //facetedBrepWithVoids.Voids.Add(ToIfcClosedShell(model, voidsFaces));
             return facetedBrepWithVoids;
         }
 
-        private static IfcClosedShell ToIfcClosedShell(this MemoryModel model, List<ThTCHPolyline> facePlines)
+        private static IfcClosedShell ToIfcClosedShell(this MemoryModel model, List<ThTCHMPolygon> facePlines)
         {
             var ifcClosedShell = model.Instances.New<IfcClosedShell>();
             foreach (var face in facePlines)
@@ -160,14 +160,43 @@ namespace THBimEngine.Geometry
             return ifcClosedShell;
         }
 
-        private static IfcFace ToIfcFace(this MemoryModel model, ThTCHPolyline facePLine)
+        private static IfcFace ToIfcFace(this MemoryModel model, ThTCHMPolygon facePLine)
         {
-            var ifcFace = model.Instances.New<IfcFace>();
-            ifcFace.Bounds.Add(ToIfcFaceBound(model, facePLine));
-            return ifcFace;
+            //var ifcface = model.Instances.New<IfcFace>();
+            //ifcFace.Bounds.Add(ToIfcFaceBound(model, facePLine));
+            //return ifcFace;
+            var ifcface = model.Instances.New<IfcFace>();
+            var ifcFaceOuterBound = model.Instances.New<IfcFaceOuterBound>();
+            IfcPolyLoop ifcloop = model.Instances.New<IfcPolyLoop>();
+            foreach (var pt in facePLine.Shell.Points)
+            {
+                var Newpt = model.Instances.New<IfcCartesianPoint>();
+                Newpt.SetXYZ(pt.X, pt.Y, pt.Z);
+                ifcloop.Polygon.Add(Newpt);
+            }
+            ifcFaceOuterBound.Bound = ifcloop;
+            ifcface.Bounds.Add(ifcFaceOuterBound);
+            var innerBounds = facePLine.Holes;
+            if (innerBounds != null && innerBounds.Count > 0)
+            {
+                foreach (var innerBound in innerBounds)
+                {
+                    IfcPolyLoop ifcInnerloop = model.Instances.New<IfcPolyLoop>();
+                    foreach (var pt in innerBound.Points)
+                    {
+                        var Newpt = model.Instances.New<IfcCartesianPoint>();
+                        Newpt.SetXYZ(pt.X, pt.Y, pt.Z);
+                        ifcInnerloop.Polygon.Add(Newpt);
+                    }
+                    var ifcFaceBound = model.Instances.New<IfcFaceBound>();
+                    ifcFaceBound.Bound = ifcInnerloop;
+                    ifcface.Bounds.Add(ifcFaceBound);
+                }
+            }
+            return ifcface;
         }
 
-        private static IfcFaceBound ToIfcFaceBound(this MemoryModel model, ThTCHPolyline boundaryLoop)
+        private static IfcFaceBound ToIfcFaceBound(this MemoryModel model, ThTCHMPolygon boundaryLoop)
         {
             return model.Instances.New<IfcFaceBound>(b =>
             {
@@ -175,10 +204,10 @@ namespace THBimEngine.Geometry
             });
         }
 
-        private static IfcPolyLoop ToIfcPolyLoop(this MemoryModel model, ThTCHPolyline boundaryLoop)
+        private static IfcPolyLoop ToIfcPolyLoop(this MemoryModel model, ThTCHMPolygon boundaryLoop)
         {
             var polyLoop = model.Instances.New<IfcPolyLoop>();
-            foreach (var point in boundaryLoop.Points)
+            foreach (var point in boundaryLoop.Shell.Points)
             {
                 polyLoop.Polygon.Add(ToIfcCartesianPoint(model, point.Point3D2XBimPoint()));
             }

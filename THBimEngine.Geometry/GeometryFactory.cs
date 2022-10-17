@@ -97,7 +97,11 @@ namespace THBimEngine.Geometry
             }
             else if (geometryParam is GeometryFacetedBrep facetedBrep)
             {
-                resList = GetXBimSolid(facetedBrep, moveVector);
+                using (var txn = memoryModel.BeginTransaction("Create solid"))
+                { 
+                    resList = GetXBimSolid(facetedBrep, moveVector);
+                    txn.Commit();
+                }
             }
             return resList;
         }

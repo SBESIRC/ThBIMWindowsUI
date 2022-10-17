@@ -32,11 +32,11 @@ namespace XbimXplorer
             //backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
             //backgroundWorker.RunWorkerAsync();
 
-            //SU_pipeServer = new NamedPipeServerStream("THSU2P3DPIPE", PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
-            //SU_backgroundWorker = new BackgroundWorker();
-            //SU_backgroundWorker.DoWork += SU_Background_DoWork;
-            //SU_backgroundWorker.RunWorkerCompleted += SU_BackgroundWorker_RunWorkerCompleted;
-            //SU_backgroundWorker.RunWorkerAsync();
+            SU_pipeServer = new NamedPipeServerStream("THSUMODEL2P3DPIPE", PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
+            SU_backgroundWorker = new BackgroundWorker();
+            SU_backgroundWorker.DoWork += SU_Background_DoWork;
+            SU_backgroundWorker.RunWorkerCompleted += SU_BackgroundWorker_RunWorkerCompleted;
+            SU_backgroundWorker.RunWorkerAsync();
 
             ifc_pipeServer = new NamedPipeServerStream("THCAD2IFC2P3DPIPE", PipeDirection.In);
             ifc_backgroundWorker = new BackgroundWorker();
@@ -116,7 +116,7 @@ namespace XbimXplorer
         private void SU_Background_DoWork(object sender, DoWorkEventArgs e)
         {
             if (null == SU_pipeServer)
-                SU_pipeServer = new NamedPipeServerStream("THSU2P3DPIPE", PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
+                SU_pipeServer = new NamedPipeServerStream("THSUMODEL2P3DPIPE", PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
             SU_pipeServer.WaitForConnection();
             try
             {

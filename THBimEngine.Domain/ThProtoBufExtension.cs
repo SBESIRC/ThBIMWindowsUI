@@ -36,11 +36,26 @@ namespace THBimEngine.Domain
             return new XbimPoint3D(point.X, point.Y, point.Z);
         }
 
+        public static ThTCHPoint3d XBimPoint2Point3D(this XbimPoint3D point)
+        {
+            return new ThTCHPoint3d()
+            {
+                X = point.X,
+                Y =  point.Y,
+                Z = point.Z
+            };
+        }
+
         public static int ToInt(this uint value)
         {
             return int.Parse(value.ToString());
         }
 
+        public static GeometryParam THSUGeometryParam(this ThSUCompDefinitionData definitionData, ThTCHMatrix3d suMatrix)
+        {
+            var geoParam = new GeometryFacetedBrep(definitionData, suMatrix);
+            return geoParam;
+        }
 
         public static GeometryParam THTCHGeometryParam(this ThTCHBuiltElementData tchElement)
         {

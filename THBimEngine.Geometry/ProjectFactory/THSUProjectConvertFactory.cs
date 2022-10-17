@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using THBimEngine.Domain;
 using Xbim.Common.Geometry;
 using Xbim.Common.Step21;
@@ -19,6 +20,10 @@ namespace THBimEngine.Geometry.ProjectFactory
             //step1 转换几何数据
             ThTCHProjectToTHBimProject(project);
             bimProject.ProjectIdentity = project.Root.GlobalId;
+            if (createSolidMesh)
+            {
+                CreateSolidMesh(allEntitys.Values.ToList());
+            }
             foreach (var item in allStoreys)
             {
                 bimProject.PrjAllStoreys.Add(item.Key, item.Value);
@@ -48,6 +53,7 @@ namespace THBimEngine.Geometry.ProjectFactory
             //foreach (var storey in project.Site.Building.Storeys) //也暂时没有Storey的概念。。。
             {
                 var bimStorey = new THBimStorey(CurrentGIndex(), project.Root.GlobalId + "StoreyNumber", 0, 3000, "", project.Root.GlobalId + "StoreyUuid");
+                var suDefinitions = project.Definitions;
                 bimStorey.Matrix3D = XbimMatrix3D.CreateTranslation(new XbimVector3D(0, 0, 0));
                 {
                     //多线程有少数据导致后面报错，后续再处理
@@ -55,8 +61,12 @@ namespace THBimEngine.Geometry.ProjectFactory
                     Parallel.ForEach(project.Buildings, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, component =>
                     {
                         var componentId = CurrentGIndex();
-
-                        var bimComponent = new THBimUntypedEntity(componentId, string.Format("component#{0}", "", componentId), "", null, "", component.Root.GlobalId);
+                        var bimComponent = new THBimUntypedEntity(componentId, 
+                            string.Format("component#{0}", "", componentId), 
+                            "", 
+                            suDefinitions[component.Component.DefinitionIndex].THSUGeometryParam(component.Component.Transformations), 
+                            "", 
+                            component.Root.GlobalId);
                         bimComponent.EntityTypeName = "SU构件";
                         bimComponent.ParentUid = bimStorey.Uid;
 

@@ -19,7 +19,10 @@ namespace THBimEngine.Domain
         }
         public static XbimMatrix3D ToXBimMatrix3D(this ThTCHMatrix3d matrix)
         {
-            return WordMatrix;
+            return new XbimMatrix3D(matrix.Data11, matrix.Data12, matrix.Data13, matrix.Data14,
+                matrix.Data21, matrix.Data22, matrix.Data23, matrix.Data24,
+                matrix.Data31, matrix.Data32, matrix.Data33, matrix.Data34,
+                matrix.Data41, matrix.Data42, matrix.Data43, matrix.Data44);
         }
         public static XbimVector3D Vector3D2XBimVector(this ThTCHVector3d vector)
         {

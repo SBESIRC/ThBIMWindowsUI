@@ -26,11 +26,11 @@ namespace XbimXplorer
         BackgroundWorker file_backgroundWorker = null;
         private void InitPipeService() 
         {
-            //pipeServer = new NamedPipeServerStream("THCAD2P3DPIPE", PipeDirection.In);
-            //backgroundWorker = new BackgroundWorker();
-            //backgroundWorker.DoWork += Background_DoWork;
-            //backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
-            //backgroundWorker.RunWorkerAsync();
+            pipeServer = new NamedPipeServerStream("THCAD2P3DPIPE", PipeDirection.In);
+            backgroundWorker = new BackgroundWorker();
+            backgroundWorker.DoWork += Background_DoWork;
+            backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
+            backgroundWorker.RunWorkerAsync();
 
             SU_pipeServer = new NamedPipeServerStream("THSUMODEL2P3DPIPE", PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
             SU_backgroundWorker = new BackgroundWorker();

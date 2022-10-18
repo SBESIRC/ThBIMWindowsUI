@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using THBimEngine.Domain.Grid;
 
 namespace THBimEngine.Domain
 {
@@ -10,7 +11,10 @@ namespace THBimEngine.Domain
 			DocumentId = id;
 			AllGeoModels = new List<GeometryMeshModel>();
 			AllGeoPointNormals = new List<PointNormal>();
-			MeshEntiyRelationIndexs = new Dictionary<int, MeshEntityIdentifier>();
+			AllGridLines = new List<GridLine>();
+			AllGridCircles = new List<GridCircle>();
+			AllGridTexts = new List<GridText>();
+            MeshEntiyRelationIndexs = new Dictionary<int, MeshEntityIdentifier>();
 		}
 		/// <summary>
 		/// 所有物体的三角面片信息集合
@@ -20,7 +24,11 @@ namespace THBimEngine.Domain
 		/// 所有物体的顶点集合
 		/// </summary>
 		public List<PointNormal> AllGeoPointNormals { get; }
-		public Dictionary<int, MeshEntityIdentifier> MeshEntiyRelationIndexs { get; }//relationId
+
+		public List<GridLine> AllGridLines { get; }
+		public List<GridCircle> AllGridCircles { get; }
+        public List<GridText> AllGridTexts { get; }
+        public Dictionary<int, MeshEntityIdentifier> MeshEntiyRelationIndexs { get; }//relationId
 		
 		public void ClearAllData() 
 		{

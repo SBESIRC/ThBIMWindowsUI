@@ -37,6 +37,7 @@ namespace THBimEngine.Domain
 		/// 所有物体的顶点集合
 		/// </summary>
 		public List<PointNormal> AllGeoPointNormals { get; }
+
 		public Dictionary<int, MeshEntityIdentifier> MeshEntiyRelationIndexs { get; }//relationId
 
 		public void AddProject(THBimProject project)

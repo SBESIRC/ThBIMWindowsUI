@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 using THBimEngine.Domain;
+using THBimEngine.Domain.Grid;
 using THBimEngine.Presention;
 using Xbim.Common.Geometry;
 using XbimXplorer.ThBIMEngine;
@@ -85,8 +86,29 @@ namespace XbimXplorer
             {
                 CurrentScene.AllGeoPointNormals.Add(item);
             }
+            foreach(var prj  in CurrentDocument.AllBimProjects)
+            {
+                foreach(var item in prj.PrjAllEntitys.Values)
+                {
+                    if(item.GetType().Name== "GridLine")
+                    {
+                        CurrentScene.AllGridLines.Add(item as GridLine);
+                    }
+                    if (item.GetType().Name == "GridCircle")
+                    {
+                        CurrentScene.AllGridCircles.Add(item as GridCircle);
+                    }
+                    if (item.GetType().Name == "GridText")
+                    {
+                        CurrentScene.AllGridTexts.Add(item as GridText);
+                    }
+                }
+            }
+
             var storeToEngineFile = new IfcStoreToEngineFile();
-            storeToEngineFile.WriteMidDataMultithreading(CurrentScene.AllGeoModels, CurrentScene.AllGeoPointNormals);
+            storeToEngineFile.WriteMidDataMultithreading(CurrentScene.AllGeoModels, 
+                CurrentScene.AllGeoPointNormals, CurrentScene.AllGridLines, 
+                CurrentScene.AllGridCircles, CurrentScene.AllGridTexts);
             DateTime end = DateTime.Now;
             var totalTime = (end - start).TotalSeconds;
             Log.Info(string.Format("数据发送引擎完成，耗时：{0}s", totalTime));

@@ -3,15 +3,15 @@ using THBimEngine.Domain.MidModel;
 
 namespace THBimEngine.Domain.Grid
 {
-    public class GridLine
+    public class GridLine : THBimEntity
     {
-        PointVector stPt = new PointVector();
-        PointVector edPt;
-        Color color;
-        float width; //线宽
-        string type; // 线型
+        public PointVector stPt;
+        public PointVector edPt;
+        public Color color;
+        public float width;
+        public int type;
 
-        public GridLine(ThTCHPolyline gridLine)
+        public GridLine(ThTCHPolyline gridLine, int colorType, double elevation = 0) : base(0, "", "", null)
         {
             var spt = gridLine.Points.First();
             var ept = gridLine.Points.Last();
@@ -19,61 +19,62 @@ namespace THBimEngine.Domain.Grid
             {
                 X = (float)spt.X,
                 Y = (float)spt.Y,
-                Z = (float)spt.Z
+                Z = (float)elevation
             };
             edPt = new PointVector()
             {
                 X = (float)ept.X,
                 Y = (float)ept.Y,
-                Z = (float)ept.Z
+                Z = (float)elevation
             };
-            color = new Color(255, 0, 0, 1);
+            if(colorType==1) color = new Color(1, 0, 0, 1);
+            if(colorType == 2) color = new Color(0, 1, 0, 1);
             width = 0.1f;
-            type = "DASH";
+            type = -1;
         }
 
-        public GridLine(CircleLable circleLable)
+        public GridLine(CircleLable circleLable, double elevation = 0) : base(0, "", "", null)
         {
             var line = circleLable.Leaders.First();
-
-            var spt = line.StartPt;
             stPt = new PointVector()
             {
                 X = (float)line.StartPt.X,
                 Y = (float)line.StartPt.Y,
-                Z = (float)line.StartPt.Z
+                Z = (float)elevation
             };
             edPt = new PointVector()
             {
                 X = (float)line.EndPt.X,
                 Y = (float)line.EndPt.Y,
-                Z = (float)line.EndPt.Z
+                Z = (float)elevation
             };
-            color = new Color(255, 0, 0, 1);
+            color = new Color(0, 1, 0, 1);
             width = 0.1f;
-            type = "DASH";
+            type = 1;
         }
 
-
-        public GridLine(ThTCHLine dimLine)
+        public GridLine(ThTCHLine dimLine, double elevation = 0) : base(0, "", "", null)
         {
             stPt = new PointVector()
             {
                 X = (float)dimLine.StartPt.X,
                 Y = (float)dimLine.StartPt.Y,
-                Z = (float)dimLine.StartPt.Z
+                Z = (float)elevation
             };
             edPt = new PointVector()
             {
                 X = (float)dimLine.EndPt.X,
                 Y = (float)dimLine.EndPt.Y,
-                Z = (float)dimLine.EndPt.Z
+                Z = (float)elevation
             };
-
-
-            color = new Color(255, 0, 0, 1);
+            color = new Color(0, 1, 0, 1);
             width = 0.1f;
-            type = "DASH";
+            type = 1;
+        }
+
+        public override object Clone()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

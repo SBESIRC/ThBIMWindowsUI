@@ -41,6 +41,23 @@ namespace THBimEngine.Presention
         [DllImport("ifc-render-engine.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.None, ExactSpelling = false)]
         public static extern void ifcre_set_sleep_time(int val);
         [DllImport("ifc-render-engine.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.None, ExactSpelling = false)]
+
+        public static extern void ifcre_set_grid_data(int val);
+        [DllImport("ifc-render-engine.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.None, ExactSpelling = false)]
+
+        public static extern void ifcre_set_grid_lines(float val);
+        [DllImport("ifc-render-engine.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.None, ExactSpelling = false)]
+
+        public static extern void ifcre_set_grid_circles(float val);
+        [DllImport("ifc-render-engine.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.None, ExactSpelling = false)]
+
+        public static extern void ifcre_set_grid_text(char[] val);
+        [DllImport("ifc-render-engine.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.None, ExactSpelling = false)]
+
+        public static extern void ifcre_set_grid_text_data(float val);
+        [DllImport("ifc-render-engine.dll", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.None, ExactSpelling = false)]
+
+
         public static extern void ifcre_home();
         public static unsafe void Init(IntPtr wndPtr, int width, int height,string ifcPath)
         {

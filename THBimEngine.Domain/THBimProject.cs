@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using THBimEngine.Domain.Grid;
 using Xbim.Common.Geometry;
 using Xbim.Common.XbimExtensions;
 
@@ -23,7 +24,12 @@ namespace THBimEngine.Domain
 		public Dictionary<string,THBimElementRelation> PrjAllRelations { get; }
         public Dictionary<string, THBimStorey> PrjAllStoreys { get; }
 		public List<string> UnShowEntityTypes { get; }
-		public THBimProject(int id, string name, string describe = "", string uid = "") : base(id, name, describe, uid)
+
+		public List<GridLine> GridLines { get; set; }
+		public List<GridCircle> GridCircles { get; set; }
+		public List<GridText> GridTexts { get; set; }
+
+        public THBimProject(int id, string name, string describe = "", string uid = "") : base(id, name, describe, uid)
         {
 			HaveChange = false;
 			NeedCreateMesh = true;

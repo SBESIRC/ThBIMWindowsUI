@@ -106,24 +106,6 @@
         "Entry"
         {
         "MsmKey" = "8:_0FA8C86CC20F6D830D3155C19D122ACA"
-        "OwnerKey" = "8:_F63B2ECC0B31FA77BC23DB972FC2B91D"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_0FA8C86CC20F6D830D3155C19D122ACA"
-        "OwnerKey" = "8:_EC4D4E1B994D731AC1A78DE6E94AB6C2"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_0FA8C86CC20F6D830D3155C19D122ACA"
-        "OwnerKey" = "8:_16C729491BF01604E35AF1A170FC89BE"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_0FA8C86CC20F6D830D3155C19D122ACA"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -190,42 +172,6 @@
         "Entry"
         {
         "MsmKey" = "8:_16C729491BF01604E35AF1A170FC89BE"
-        "OwnerKey" = "8:_FB8F4AF99C3975E51B46BCB1B16D95BB"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_16C729491BF01604E35AF1A170FC89BE"
-        "OwnerKey" = "8:_FB035702E63E9323C91766D30E5BA855"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_16C729491BF01604E35AF1A170FC89BE"
-        "OwnerKey" = "8:_F63B2ECC0B31FA77BC23DB972FC2B91D"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_16C729491BF01604E35AF1A170FC89BE"
-        "OwnerKey" = "8:_C96D8F0424F5CCC194266C8B5DBFA190"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_16C729491BF01604E35AF1A170FC89BE"
-        "OwnerKey" = "8:_AD24F4EE5A65EB11DC3663384D291B40"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_16C729491BF01604E35AF1A170FC89BE"
-        "OwnerKey" = "8:_55DAEB42A6192B070FCDC354140C4C24"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_16C729491BF01604E35AF1A170FC89BE"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -281,12 +227,6 @@
         {
         "MsmKey" = "8:_26972FB2D6162C97FF2E05D27571B210"
         "OwnerKey" = "8:_16C729491BF01604E35AF1A170FC89BE"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_26972FB2D6162C97FF2E05D27571B210"
-        "OwnerKey" = "8:_FAC08A98039847839E86D2E1DDD4FFFF"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -861,6 +801,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_9E6F7B2C16E14507985C059CD4C0C3B9"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_9EE529A42ABB0CD61D16DCD679452B10"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
         "MsmSig" = "8:_UNDEFINED"
@@ -1083,12 +1029,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_B8179B3561A0B3F9C72EED24FB667107"
-        "OwnerKey" = "8:_FAC08A98039847839E86D2E1DDD4FFFF"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_BB56931EB034E561C0C4C4CBAF849138"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
         "MsmSig" = "8:_UNDEFINED"
@@ -1133,6 +1073,12 @@
         {
         "MsmKey" = "8:_C96D8F0424F5CCC194266C8B5DBFA190"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_CC1DFC14A35E42CCAF4B0BEFEE3E0904"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -3641,6 +3587,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9E6F7B2C16E14507985C059CD4C0C3B9"
+            {
+            "SourcePath" = "8:..\\WorkDir\\ElevationGenerator\\ydb2ifc.exe"
+            "TargetName" = "8:ydb2ifc.exe"
+            "Tag" = "8:"
+            "Folder" = "8:_3362E81E0BCE41FF899FFA323C8B4819"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_9EE529A42ABB0CD61D16DCD679452B10"
             {
             "AssemblyRegister" = "3:1"
@@ -4213,6 +4179,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CC1DFC14A35E42CCAF4B0BEFEE3E0904"
+            {
+            "SourcePath" = "8:..\\WorkDir\\resources\\fonts\\Stfangso.ttf"
+            "TargetName" = "8:Stfangso.ttf"
+            "Tag" = "8:"
+            "Folder" = "8:_C77677CA88F1410DB5B01A229F5C9ED2"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CD686D9935EF47A4832F6524F2539058"
@@ -4854,6 +4840,17 @@
             "Property" = "8:TARGETDIR"
                 "Folders"
                 {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_3362E81E0BCE41FF899FFA323C8B4819"
+                    {
+                    "Name" = "8:ElevationGenerator"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_E6E0B29A983E4045A7111F83D6CB54D6"
+                        "Folders"
+                        {
+                        }
+                    }
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_6FE8CB4ADBB14AB4A276D3B89F3CDF66"
                     {
                     "Name" = "8:resources"

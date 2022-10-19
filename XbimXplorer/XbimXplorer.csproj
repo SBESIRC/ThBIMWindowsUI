@@ -297,6 +297,7 @@
     <Compile Include="ThBIMEngine\SUProjectReadGeomtry.cs" />
     <Compile Include="ThBIMEngine\ThBimCutData.cs" />
     <Compile Include="ThBIMEngine\ThBimDataController.cs" />
+    <Compile Include="ThBIMEngine\ThYDBToIfcConvertService.cs" />
     <Compile Include="THPluginSystem\LeftPluginMainUControl.xaml.cs">
       <DependentUpon>LeftPluginMainUControl.xaml</DependentUpon>
     </Compile>

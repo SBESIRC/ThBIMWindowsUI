@@ -13,6 +13,7 @@ using Xbim.Common.Geometry;
 using Xbim.ModelGeometry.Scene;
 
 using THBimEngine.Presention;
+using XbimXplorer.ThBIMEngine;
 
 namespace XbimXplorer
 {
@@ -46,6 +47,10 @@ namespace XbimXplorer
             {
                 LoadTHBimFile(filePath);
                 RenderScene();
+            }
+            else if (ext == ".ydb") 
+            {
+                LoadYJKYDBFile(filePath);
             }
             else
             {
@@ -339,7 +344,19 @@ namespace XbimXplorer
                 r.Dispose();
             }
         }
-
+        private void LoadYJKYDBFile(string fileName) 
+        {
+            if (string.IsNullOrEmpty(fileName) || !File.Exists(fileName))
+                return;
+            var thYDBToIfcConvert = new ThYDBToIfcConvertService();
+            var ifcPath = thYDBToIfcConvert.Convert(fileName);
+            if (string.IsNullOrEmpty(ifcPath) || !File.Exists(fileName))
+            {
+                MessageBox.Show("打开YDB失败!", "打开文件说明", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            LoadFileToCurrentDocument(ifcPath,null);
+        }
         private void FileLoadCompleted(object s, RunWorkerCompletedEventArgs args)
         {
             if (args.Result is IfcStore ifcStore) //all ok

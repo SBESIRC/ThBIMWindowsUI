@@ -401,7 +401,8 @@ namespace XbimXplorer
                 "IFC Files|*.ifc;*.midfile;*.thbim",
                 "Ifc File (*.ifc)|*.ifc",
                 "Engin Midel File (*.midfile)|*.midfile",
-                "thbim File (*.thbim)|*.thbim"
+                "thbim File (*.thbim)|*.thbim",
+                "YJK File (*.ydb)|*.ydb"
             };
 
             // Filter files by extension 

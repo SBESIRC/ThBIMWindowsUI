@@ -349,8 +349,9 @@ namespace XbimXplorer
                 DateTime endTime = DateTime.Now;
                 var totalTime = (endTime - startTime).TotalSeconds;
                 Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
+                ProgressBar.Value = 0;
+                StatusMsg.Text = "";
                 RenderScene();
-                //ShowIfcStore(ifcStore);
             }
             else //we have a problem
             {

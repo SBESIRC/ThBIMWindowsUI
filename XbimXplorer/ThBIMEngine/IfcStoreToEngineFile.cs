@@ -248,70 +248,10 @@ namespace XbimXplorer.ThBIMEngine
 
 
 
-		public void WriteMidDataMultithreading(List<GeometryMeshModel> meshModels,
-			List<PointNormal> meshPoints,List<GridLine> gridLines=null, 
-			List<GridCircle> gridCircles = null, List<GridText> gridTexts = null)
+		public void WriteMidDataMultithreading(List<GeometryMeshModel> meshModels,List<PointNormal> meshPoints)
 		{
 			ExampleScene.ifcre_set_sleep_time(2000);
             ExampleScene.ifcre_clear_model_data();
-            ExampleScene.ifcre_set_grid_data(0);
-
-            foreach (var gridLine in gridLines)
-			{
-                ExampleScene.ifcre_set_grid_lines((Math.Abs(gridLine.stPt.X / 1000) < 1e-6 ? 0 : -gridLine.stPt.X / 1000));
-                ExampleScene.ifcre_set_grid_lines((Math.Abs(gridLine.stPt.Z / 1000) < 1e-6 ? 0 : gridLine.stPt.Z / 1000));
-                ExampleScene.ifcre_set_grid_lines((Math.Abs(gridLine.stPt.Y / 1000) < 1e-6 ? 0 : -gridLine.stPt.Y / 1000));
-
-                ExampleScene.ifcre_set_grid_lines((Math.Abs(gridLine.edPt.X / 1000) < 1e-6 ? 0 : -gridLine.edPt.X / 1000));
-                ExampleScene.ifcre_set_grid_lines((Math.Abs(gridLine.edPt.Z / 1000) < 1e-6 ? 0 : gridLine.edPt.Z / 1000));
-                ExampleScene.ifcre_set_grid_lines((Math.Abs(gridLine.edPt.Y / 1000) < 1e-6 ? 0 : -gridLine.edPt.Y / 1000));
-
-                ExampleScene.ifcre_set_grid_lines(gridLine.color.r);
-                ExampleScene.ifcre_set_grid_lines(gridLine.color.g);
-                ExampleScene.ifcre_set_grid_lines(gridLine.color.b);
-                ExampleScene.ifcre_set_grid_lines(gridLine.color.a);
-                ExampleScene.ifcre_set_grid_lines(gridLine.width);
-                ExampleScene.ifcre_set_grid_lines(gridLine.type);
-            }
-            foreach (var gridCircle in gridCircles)
-            {
-                ExampleScene.ifcre_set_grid_circles((Math.Abs(gridCircle.center.X / 1000) < 1e-6 ? 0 : -gridCircle.center.X / 1000));
-                ExampleScene.ifcre_set_grid_circles((Math.Abs(gridCircle.center.Z / 1000) < 1e-6 ? 0 : gridCircle.center.Z / 1000));
-                ExampleScene.ifcre_set_grid_circles((Math.Abs(gridCircle.center.Y / 1000) < 1e-6 ? 0 : -gridCircle.center.Y / 1000));
-
-                ExampleScene.ifcre_set_grid_circles((Math.Abs(gridCircle.normal.X) < 1e-6 ? 0 : -gridCircle.normal.X));
-                ExampleScene.ifcre_set_grid_circles((Math.Abs(gridCircle.normal.Z) < 1e-6 ? 0 : gridCircle.normal.Z));
-                ExampleScene.ifcre_set_grid_circles((Math.Abs(gridCircle.normal.Y) < 1e-6 ? 0 : -gridCircle.normal.Y));
-
-                ExampleScene.ifcre_set_grid_circles(gridCircle.color.r);
-                ExampleScene.ifcre_set_grid_circles(gridCircle.color.g);
-                ExampleScene.ifcre_set_grid_circles(gridCircle.color.b);
-                ExampleScene.ifcre_set_grid_circles(gridCircle.color.a);
-                ExampleScene.ifcre_set_grid_circles(gridCircle.radius / 1000);
-                ExampleScene.ifcre_set_grid_circles(gridCircle.width);
-            }
-            foreach (var gridText in gridTexts)
-            {
-                ExampleScene.ifcre_set_grid_text(gridText.content.ToCharArray());
-                ExampleScene.ifcre_set_grid_text_data(-gridText.center.X / 1000);
-                ExampleScene.ifcre_set_grid_text_data(gridText.center.Z / 1000);
-                ExampleScene.ifcre_set_grid_text_data(-gridText.center.Y / 1000);
-                ExampleScene.ifcre_set_grid_text_data(gridText.normal.X);
-                ExampleScene.ifcre_set_grid_text_data(-1.0f);
-                ExampleScene.ifcre_set_grid_text_data(gridText.normal.Y);
-                ExampleScene.ifcre_set_grid_text_data(-gridText.direction.X);
-                ExampleScene.ifcre_set_grid_text_data(gridText.direction.Y);
-                ExampleScene.ifcre_set_grid_text_data(-gridText.direction.Z);
-
-
-                ExampleScene.ifcre_set_grid_text_data(gridText.color.Color_R);
-                ExampleScene.ifcre_set_grid_text_data(gridText.color.Color_G);
-                ExampleScene.ifcre_set_grid_text_data(gridText.color.Color_B);
-                ExampleScene.ifcre_set_grid_text_data(1.0f);
-                ExampleScene.ifcre_set_grid_text_data(gridText.size / 20000);
-            }
-            ExampleScene.ifcre_set_grid_data(1);
-
             if (null == meshModels || meshModels.Count < 1 || null == meshPoints || meshPoints.Count < 1)
 				return;
 			List<Task> tasks = new List<Task>();
@@ -393,6 +333,75 @@ namespace XbimXplorer.ThBIMEngine
 			}));
 			Task.WaitAll(tasks.ToArray());
 			ExampleScene.ifcre_set_sleep_time(10);
+		}
+
+		public void PushGridDataToEngine(List<GridLine> gridLines, List<GridCircle> gridCircles, List<GridText> gridTexts) 
+		{
+			ExampleScene.ifcre_set_grid_data(0);
+			if (null != gridLines) 
+			{
+				foreach (var gridLine in gridLines)
+				{
+					ExampleScene.ifcre_set_grid_lines((Math.Abs(gridLine.stPt.X / 1000) < 1e-6 ? 0 : -gridLine.stPt.X / 1000));
+					ExampleScene.ifcre_set_grid_lines((Math.Abs(gridLine.stPt.Z / 1000) < 1e-6 ? 0 : gridLine.stPt.Z / 1000));
+					ExampleScene.ifcre_set_grid_lines((Math.Abs(gridLine.stPt.Y / 1000) < 1e-6 ? 0 : -gridLine.stPt.Y / 1000));
+
+					ExampleScene.ifcre_set_grid_lines((Math.Abs(gridLine.edPt.X / 1000) < 1e-6 ? 0 : -gridLine.edPt.X / 1000));
+					ExampleScene.ifcre_set_grid_lines((Math.Abs(gridLine.edPt.Z / 1000) < 1e-6 ? 0 : gridLine.edPt.Z / 1000));
+					ExampleScene.ifcre_set_grid_lines((Math.Abs(gridLine.edPt.Y / 1000) < 1e-6 ? 0 : -gridLine.edPt.Y / 1000));
+
+					ExampleScene.ifcre_set_grid_lines(gridLine.color.r);
+					ExampleScene.ifcre_set_grid_lines(gridLine.color.g);
+					ExampleScene.ifcre_set_grid_lines(gridLine.color.b);
+					ExampleScene.ifcre_set_grid_lines(gridLine.color.a);
+					ExampleScene.ifcre_set_grid_lines(gridLine.width);
+					ExampleScene.ifcre_set_grid_lines(gridLine.type);
+				}
+			}
+			if (null != gridCircles) 
+			{
+				foreach (var gridCircle in gridCircles)
+				{
+					ExampleScene.ifcre_set_grid_circles((Math.Abs(gridCircle.center.X / 1000) < 1e-6 ? 0 : -gridCircle.center.X / 1000));
+					ExampleScene.ifcre_set_grid_circles((Math.Abs(gridCircle.center.Z / 1000) < 1e-6 ? 0 : gridCircle.center.Z / 1000));
+					ExampleScene.ifcre_set_grid_circles((Math.Abs(gridCircle.center.Y / 1000) < 1e-6 ? 0 : -gridCircle.center.Y / 1000));
+
+					ExampleScene.ifcre_set_grid_circles((Math.Abs(gridCircle.normal.X) < 1e-6 ? 0 : -gridCircle.normal.X));
+					ExampleScene.ifcre_set_grid_circles((Math.Abs(gridCircle.normal.Z) < 1e-6 ? 0 : gridCircle.normal.Z));
+					ExampleScene.ifcre_set_grid_circles((Math.Abs(gridCircle.normal.Y) < 1e-6 ? 0 : -gridCircle.normal.Y));
+
+					ExampleScene.ifcre_set_grid_circles(gridCircle.color.r);
+					ExampleScene.ifcre_set_grid_circles(gridCircle.color.g);
+					ExampleScene.ifcre_set_grid_circles(gridCircle.color.b);
+					ExampleScene.ifcre_set_grid_circles(gridCircle.color.a);
+					ExampleScene.ifcre_set_grid_circles(gridCircle.radius / 1000);
+					ExampleScene.ifcre_set_grid_circles(gridCircle.width);
+				}
+			}
+			if (null != gridTexts) 
+			{
+				foreach (var gridText in gridTexts)
+				{
+					ExampleScene.ifcre_set_grid_text(gridText.content.ToCharArray());
+					ExampleScene.ifcre_set_grid_text_data(-gridText.center.X / 1000);
+					ExampleScene.ifcre_set_grid_text_data(gridText.center.Z / 1000);
+					ExampleScene.ifcre_set_grid_text_data(-gridText.center.Y / 1000);
+					ExampleScene.ifcre_set_grid_text_data(gridText.normal.X);
+					ExampleScene.ifcre_set_grid_text_data(-1.0f);
+					ExampleScene.ifcre_set_grid_text_data(gridText.normal.Y);
+					ExampleScene.ifcre_set_grid_text_data(-gridText.direction.X);
+					ExampleScene.ifcre_set_grid_text_data(gridText.direction.Y);
+					ExampleScene.ifcre_set_grid_text_data(-gridText.direction.Z);
+
+
+					ExampleScene.ifcre_set_grid_text_data(gridText.color.Color_R);
+					ExampleScene.ifcre_set_grid_text_data(gridText.color.Color_G);
+					ExampleScene.ifcre_set_grid_text_data(gridText.color.Color_B);
+					ExampleScene.ifcre_set_grid_text_data(1.0f);
+					ExampleScene.ifcre_set_grid_text_data(gridText.size / 20000);
+				}
+			}
+			ExampleScene.ifcre_set_grid_data(1);
 		}
 	}
 }

@@ -124,7 +124,7 @@ namespace THBimEngine.Domain
                 {
                     var realType = BuildingCatagory.Unknown;
                     var name = item.Name.ToLower();
-                    if(name.Contains("thbimuntypedentity"))
+                    if (name.Contains("thbimuntypedentity"))
                     {
                         realType = BuildingCatagory.UnTypeElement;
                     }
@@ -156,13 +156,17 @@ namespace THBimEngine.Domain
                     {
                         realType = BuildingCatagory.Opening;
                     }
-                    else if (name.Contains("railing")) 
+                    else if (name.Contains("railing"))
                     {
                         realType = BuildingCatagory.Railing;
                     }
                     else if (name.Contains("roof"))
                     {
                         realType = BuildingCatagory.Roof;
+                    }
+                    else if (name.Contains("grid")) 
+                    {
+                        realType = BuildingCatagory.Grid;
                     }
                     if (resTypes.ContainsKey(realType))
                     {

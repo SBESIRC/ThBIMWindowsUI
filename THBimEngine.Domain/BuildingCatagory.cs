@@ -30,6 +30,8 @@ namespace THBimEngine.Domain
         Roof =100015,
         [Description("楼板")]
         Slab = 100016,
+        [Description("轴网")]
+        Grid = 100017,
         [Description("门")]
         Door =100020,
         [Description("窗")]

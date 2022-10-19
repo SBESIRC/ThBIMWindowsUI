@@ -259,7 +259,22 @@ namespace XbimXplorer.LeftTabItme
         public void ShowFilterResult()
         {
             var showIds = GetAllShowIdByFilters();
-            engineApp.ShowEntityByIds(showIds.ToList());
+            var entityIds = new List<int>();
+            var gridIds = new List<string>();
+            var entityCount = engineApp.CurrentDocument.AllGeoModels.Count;
+            foreach (var item in showIds) 
+            {
+                if (item <= entityCount)
+                {
+                    entityIds.Add(item);
+                }
+                else 
+                {
+                    gridIds.Add(engineApp.CurrentDocument.MeshEntiyRelationIndexs[item].ProjectEntityId);
+                }
+            }
+            engineApp.ShowEntityByIds(entityIds);
+            engineApp.ShowGridByIds(gridIds);
 
         }
         private HashSet<int> GetAllShowIdByFilters()

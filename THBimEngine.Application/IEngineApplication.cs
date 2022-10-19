@@ -38,6 +38,7 @@ namespace THBimEngine.Application
         /// </summary>
         /// <param name="showEntityIds"></param>
         void ShowEntityByIds(List<int> showEntityIds);
+        void ShowGridByIds(List<string> gridEntityIds);
         /// <summary>
         /// 渲染当前Document
         /// </summary>

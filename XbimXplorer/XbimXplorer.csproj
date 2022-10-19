@@ -242,6 +242,8 @@
     </Compile>
     <Compile Include="EditableTextBlock\EditableTextBlock.cs" />
     <Compile Include="EditableTextBlock\EditableTextBlockAdorner.cs" />
+    <Compile Include="Extensions\ModelMerge\ThIFC2x3CloneExtension.cs" />
+    <Compile Include="Extensions\ModelMerge\THModelMergeService.cs" />
     <Compile Include="LeftTabItme\FilterViewModel.cs" />
     <Compile Include="LeftTabItme\LeftTabControls\AddLinkModelUI.xaml.cs">
       <DependentUpon>AddLinkModelUI.xaml</DependentUpon>

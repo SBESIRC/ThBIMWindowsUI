@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using THBimEngine.Domain;
 using THBimEngine.Domain.MidModel;
 
@@ -22,7 +23,7 @@ namespace XbimXplorer.ThBIMEngine
                     tempData.AddProject(project);
                 }
             }
-            tempData.WriteMidFile();
+            tempData.WriteMidFile(bimProjects.First().ProjectIdentity);
         }
     }
 }

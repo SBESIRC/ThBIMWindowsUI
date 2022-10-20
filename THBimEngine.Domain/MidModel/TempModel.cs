@@ -387,9 +387,15 @@ namespace THBimEngine.Domain.MidModel
             return -100;
         }
 
-        public void WriteMidFile()
+        public void WriteMidFile(string ifcPath = null)
         {
             string fileName = Path.Combine(System.IO.Path.GetTempPath(), "BimEngineData.get");
+
+            if (ifcPath!=null)
+            {
+                fileName = Path.Combine(System.IO.Path.GetDirectoryName(ifcPath), "BimEngineData.get");
+            }
+
             string storeyFileName = Path.Combine(System.IO.Path.GetTempPath(), "BimEngineData.storeys.txt");
             FileStream fileStream = new FileStream(fileName, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
             BinaryWriter writer = new BinaryWriter(fileStream, Encoding.UTF8);

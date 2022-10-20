@@ -1075,7 +1075,34 @@ namespace XbimXplorer
         {
             throw new NotImplementedException();
         }
-        
+
+
+        private void ExportCut_Click_structure(object sender, RoutedEventArgs e)
+        {
+            if (currentDocument == null || currentDocument.AllBimProjects.Count < 1)
+                return;
+            var prjName = currentDocument.AllBimProjects.First().ProjectIdentity.Split('.').First()+"-100%.ifc";
+            ; 
+            this.DocumentChanged -= XplorerMainWindow_DocumentChanged;
+            bimDataController.ClearAllProject();
+            this.DocumentChanged += XplorerMainWindow_DocumentChanged;
+            LoadFileToCurrentDocument(prjName,null);
+            
+        }
+
+        private void XplorerMainWindow_DocumentChanged(object sender, EventArgs e)
+        {
+            ThBimCutData.Run(currentDocument.AllBimProjects);
+            this.DocumentChanged -= XplorerMainWindow_DocumentChanged;
+        }
+
+        private void ExportCut_Click_architecture(object sender, RoutedEventArgs e)
+        {
+            //导出建筑切图数据
+            if (currentDocument == null || currentDocument.AllBimProjects.Count < 1)
+                return;
+            ThBimCutData.Run(currentDocument.AllBimProjects);
+        }
     }
     
 }

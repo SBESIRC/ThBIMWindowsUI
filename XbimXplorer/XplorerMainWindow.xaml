@@ -191,9 +191,13 @@
                 <MenuItem Header="清空数据" Click="MenuItem_Click_2" Width="70" HorizontalAlignment="Left"
                       VerticalContentAlignment="Center"
                       HorizontalContentAlignment="Center"></MenuItem>
-                <MenuItem Header="导出切图数据" x:Name="ExportCut" Click="ExportCut_Click" Width="90" HorizontalAlignment="Left"
+                <!--<MenuItem Header="导出切图数据" x:Name="ExportCut" Click="ExportCut_Click" Width="90" HorizontalAlignment="Left"
                       VerticalContentAlignment="Center"
-                      HorizontalContentAlignment="Center"></MenuItem>
+                      HorizontalContentAlignment="Center"></MenuItem>-->
+                <MenuItem Header="导出切图数据">
+                    <MenuItem IsCheckable="True" Header="结构" Click="ExportCut_Click_structure" />
+                    <MenuItem IsCheckable="True" Header="建筑" Click="ExportCut_Click_architecture" />
+                </MenuItem>
             </Menu>
             <Grid Grid.Column="1" x:Name="topPluginGrid" VerticalAlignment="Stretch">
                 <ItemsControl VerticalAlignment="Stretch" ItemsSource="{Binding TopPluginButtons,Mode=OneWay,NotifyOnSourceUpdated=True,UpdateSourceTrigger=PropertyChanged}">

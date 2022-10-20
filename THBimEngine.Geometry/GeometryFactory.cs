@@ -10,6 +10,7 @@ using Xbim.Ifc4.Interfaces;
 using Xbim.Geometry.Engine.Interop;
 
 using THBimEngine.Domain;
+using Xbim.Tessellator;
 
 namespace THBimEngine.Geometry
 {
@@ -73,7 +74,6 @@ namespace THBimEngine.Geometry
                 return shapeGeometry;
             }
         }
-
         public List<IXbimSolid> GetXBimSolid(GeometryParam geometryParam, XbimVector3D moveVector)
         {
             var resList = new List<IXbimSolid>();
@@ -215,7 +215,15 @@ namespace THBimEngine.Geometry
             }
             return resSolids;
         }
-
+        public XbimShapeGeometry BrepFaceToXbimShapeGeometry(GeometryFacetedBrep facetedBrep) 
+        {
+            using (var txn = memoryModel.BeginTransaction("Create Shape Geometry"))
+            {
+                var brep = ThIFC2x3GeExtension.ToIfcFacetedBrep(memoryModel, facetedBrep.Outer, facetedBrep.Voids);
+                XbimTessellator tessellator = new XbimTessellator(memoryModel, XbimGeometryType.PolyhedronBinary);
+                return tessellator.Mesh(brep);
+            }
+        }
         #region
         private IXbimSolid GetXBimSolid2x3(GeometryStretch geometryStretch, XbimVector3D moveVector)
         {

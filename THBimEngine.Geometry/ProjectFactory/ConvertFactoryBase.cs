@@ -44,7 +44,12 @@ namespace THBimEngine.Geometry.ProjectFactory
                 if (entity == null)
                     return;
                 var geometryFactory = new GeometryFactory(schemaVersion);
-                if (entity is THBimIFCEntity ifcEntity)
+                if (entity.GeometryParam is GeometryFacetedBrep facetedBrep)
+                {
+                    var res = geometryFactory.BrepFaceToXbimShapeGeometry(facetedBrep);
+                    entity.AllShapeGeometries.Add(new THBimShapeGeometry(res));
+                }
+                else if (entity is THBimIFCEntity ifcEntity)
                 {
                     //geometryFactory.GetXBimSolid(ifcEntity.IfcEntity);
                 }
@@ -65,7 +70,7 @@ namespace THBimEngine.Geometry.ProjectFactory
             //step3 Solid剪切和Mesh
             Parallel.ForEach(meshEntitys, new ParallelOptions(), entity =>
             {
-                if (entity == null)
+                if (entity == null || entity.EntitySolids.Count<1)
                     return;
                 GeometryFactory geometryFactory = new GeometryFactory(schemaVersion);
                 var openingSolds = new List<IXbimSolid>();

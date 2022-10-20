@@ -56,7 +56,20 @@ namespace THBimEngine.Domain
 
         public override bool Equals(GeometryParam other)
         {
-            throw new NotImplementedException();
+            if (other is GeometryFacetedBrep geometry)
+            {
+                if(geometry.Voids.Count == this.Voids.Count && geometry.Outer.Count == this.Outer.Count)
+                {
+                    for (int i = 0; i < geometry.Outer.Count; i++)
+                    {
+                        if (!geometry.Outer[i].Equals(this.Outer[i]))
+                            return false;
+                    }
+                    return true;
+                }
+                return false;
+            }
+            return false;
         }
     }
 

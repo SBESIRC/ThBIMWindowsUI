@@ -56,27 +56,35 @@ namespace XbimXplorer.ThBIMEngine
             CalcCurrentScene();
             convertFactory = new THSUProjectConvertFactory(Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3);
             bool isAdd = IsAddProject(project.Root.GlobalId);
-            if (!isAdd)
+            if(isAdd)
+            {
+                var convertResult = convertFactory.ProjectConvert(project, true);
+                convertResult.BimProject.Matrix3D = matrix3D;
+                var bimProject = convertResult.BimProject;
+                bimProject.ProjectIdentity = project.Root.GlobalId;
+                bimProject.SourceProject = project;
+                //bimProject.NeedCreateMesh = false;
+                bimProject.HaveChange = true;
+                HaveChange = true;
+                //var allGeoPointNormals = new List<PointNormal>();
+                //var readGeomtry = new SUProjectReadGeomtry();
+                //var allGeoModels = readGeomtry.ReadGeomtry(project, matrix3D, out allGeoPointNormals);
+                //bimProject.AddGeoMeshModels(allGeoModels, allGeoPointNormals);
+                currentDocument.AddProject(bimProject);
+                currentDocument.ReadGeometryMesh();
+                SetNewSceneToSystem();
+                RenderCurrentDocument();
+            }
+            else
             {
                 //这里增量跟新没有做，先删除原来的数据，再增加现在的数据
-                currentDocument.DeleteProjectData(project.Root.GlobalId);
+                //currentDocument.DeleteProjectData(project.Root.GlobalId);
+
+                var convertResult = convertFactory.ProjectConvert(project, false);
+                convertResult.BimProject.Matrix3D = matrix3D;
+                UpdateProject(convertResult);
             }
-            var convertResult = convertFactory.ProjectConvert(project, true);
-            convertResult.BimProject.Matrix3D = matrix3D;
-            var bimProject = convertResult.BimProject;
-            bimProject.ProjectIdentity = project.Root.GlobalId;
-            bimProject.SourceProject = project;
-            //bimProject.NeedCreateMesh = false;
-            bimProject.HaveChange = true;
-            HaveChange = true;
-            //var allGeoPointNormals = new List<PointNormal>();
-            //var readGeomtry = new SUProjectReadGeomtry();
-            //var allGeoModels = readGeomtry.ReadGeomtry(project, matrix3D, out allGeoPointNormals);
-            //bimProject.AddGeoMeshModels(allGeoModels, allGeoPointNormals);
-            currentDocument.AddProject(bimProject);
-            currentDocument.ReadGeometryMesh();
-            SetNewSceneToSystem();
-            RenderCurrentDocument();
+            
         }
 
         /// <summary>

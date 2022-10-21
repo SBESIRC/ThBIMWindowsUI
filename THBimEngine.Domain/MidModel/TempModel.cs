@@ -540,7 +540,16 @@ namespace THBimEngine.Domain.MidModel
         public void GetProfileName(IIfcProduct ifcEntity, UniComponent uniComponent)
         {
             var profileName = "";
-            if (ifcEntity.Model.SchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
+            if(ifcEntity.Name.Value.ToString().Contains("SU")&& ifcEntity.GetType().Name.Contains("Beam"))
+            {
+                var x = (ifcEntity as Xbim.Ifc2x3.Kernel.IfcObject).IsDefinedByProperties;// as Xbim.Ifc2x3.Kernel.IfcRelDefinesByProperties);
+                var y= ((Xbim.Ifc2x3.Kernel.IfcPropertySet)x.First().RelatingPropertyDefinition).HasProperties.First();
+                var z = (string)(y as Xbim.Ifc2x3.PropertyResource.IfcPropertySingleValue).NominalValue.Value;
+                var val1 = z.Split(',')[1];
+                var val2 = z.Split(',').Last();
+                profileName = "Rec_"+ val1 + "*" + val2;
+            }
+            else if (ifcEntity.Model.SchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
             {
                 var ifcProduct = ifcEntity as Xbim.Ifc2x3.Kernel.IfcProduct;
                 var item = ifcProduct.Representation.Representations.First().Items[0];

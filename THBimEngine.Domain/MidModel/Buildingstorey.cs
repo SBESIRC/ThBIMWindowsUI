@@ -34,8 +34,15 @@ namespace THBimEngine.Domain.MidModel
 		public Buildingstorey(IIfcBuildingStorey storey, FloorPara floorPara)
 		{
 			floor_name = storey.Name;
-			elevation = storey.Elevation.Value;
-			height = floorPara.Height;
+			if(storey.Elevation == null)
+			{
+                elevation = 0;
+            }
+            else
+			{
+                elevation = storey.Elevation.Value;
+            }
+            height = floorPara.Height;
 			top_elevation = elevation + height;
 			bottom_elevation = elevation;
 			stdFlrNo = floorPara.StdNum;///

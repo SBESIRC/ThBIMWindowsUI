@@ -18,7 +18,7 @@ namespace XbimXplorer.Extensions.ModelMerge
 {
     public static class ThIFC2x3CloneExtension
     {
-        public static IfcBuildingStorey CloneAndCreateNew(this IfcBuildingStorey storey, IfcStore model, IfcBuilding building, string storeyName, double storey_heigth)
+        public static IfcBuildingStorey CloneAndCreateNew(this IfcBuildingStorey storey, IfcStore model, IfcBuilding building, string storeyName, double storey_z, double storey_heigth)
         {
             using (var txn = model.BeginTransaction("Create Storey"))
             {
@@ -27,7 +27,7 @@ namespace XbimXplorer.Extensions.ModelMerge
                     s.Name = storeyName;
                     s.ObjectPlacement = model.ToIfcLocalPlacement(building.ObjectPlacement);
                 });
-
+                ret.Elevation = storey_z;
                 // setup aggregation relationship
                 var ifcRel = model.Instances.New<IfcRelAggregates>();
                 ifcRel.RelatingObject = building;

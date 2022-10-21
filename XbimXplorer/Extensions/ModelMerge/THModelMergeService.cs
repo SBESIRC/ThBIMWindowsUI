@@ -51,9 +51,10 @@ namespace XbimXplorer.Extensions.ModelMerge
             {
                 var bigStorey = StoreyDic.FirstOrDefault(o => o.Item1.ToString() == BuildingStorey.Name);
                 double storey_heigth = 0;
+                double Storey_z = 0;
                 if (bigStorey == null)
                 {
-                    var Storey_z = ((BuildingStorey.ObjectPlacement as Xbim.Ifc2x3.GeometricConstraintResource.IfcLocalPlacement).RelativePlacement as Xbim.Ifc2x3.GeometryResource.IfcPlacement).Location.Z;
+                    Storey_z = ((BuildingStorey.ObjectPlacement as Xbim.Ifc2x3.GeometricConstraintResource.IfcLocalPlacement).RelativePlacement as Xbim.Ifc2x3.GeometryResource.IfcPlacement).Location.Z;
                     var relatedElements = BuildingStorey.ContainsElements.SelectMany(o => o.RelatedElements).Where(o =>
                     o is Xbim.Ifc2x3.SharedBldgElements.IfcWall || o is Xbim.Ifc2x3.SharedBldgElements.IfcBeam || o is Xbim.Ifc2x3.SharedBldgElements.IfcSlab || o is Xbim.Ifc2x3.SharedBldgElements.IfcColumn || o is Xbim.Ifc2x3.SharedBldgElements.IfcWindow || o is Xbim.Ifc2x3.SharedBldgElements.IfcDoor);
                     if (relatedElements.Any())
@@ -100,7 +101,7 @@ namespace XbimXplorer.Extensions.ModelMerge
                 var storey = bigBuildings.BuildingStoreys.FirstOrDefault(o => o.Name==storeyName) as Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey;
                 if (storey == null)
                 {
-                    storey = BuildingStorey.CloneAndCreateNew(bigModel, bigBuildings, storeyName, storey_heigth);
+                    storey = BuildingStorey.CloneAndCreateNew(bigModel, bigBuildings, storeyName, Storey_z,  storey_heigth);
                 }
                 var CreatWalls = new List<Xbim.Ifc2x3.SharedBldgElements.IfcWall>();
                 var CreatSlabs = new List<Xbim.Ifc2x3.SharedBldgElements.IfcSlab>();

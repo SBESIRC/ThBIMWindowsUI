@@ -18,7 +18,7 @@ namespace XbimXplorer.Extensions.ModelMerge
 {
     public static class ThIFC2x3CloneExtension
     {
-        public static IfcBuildingStorey CloneAndCreateNew(this IfcBuildingStorey storey, IfcStore model, IfcBuilding building, string storeyName)
+        public static IfcBuildingStorey CloneAndCreateNew(this IfcBuildingStorey storey, IfcStore model, IfcBuilding building, string storeyName, double storey_heigth)
         {
             using (var txn = model.BeginTransaction("Create Storey"))
             {
@@ -39,6 +39,33 @@ namespace XbimXplorer.Extensions.ModelMerge
                 {
                     var ifcRelDefinesByProperties = property.CloneAndCreateNew(model);
                     ifcRelDefinesByProperties.RelatedObjects.Add(ret);
+                }
+                else
+                {
+                    model.Instances.New<IfcRelDefinesByProperties>(rel =>
+                    {
+                        rel.Name = "THifc properties";
+                        rel.RelatedObjects.Add(ret);
+                        rel.RelatingPropertyDefinition = model.Instances.New<IfcPropertySet>(pset =>
+                        {
+                            pset.Name = "Basic set of THifc properties";
+                            pset.HasProperties.Add(model.Instances.New<IfcPropertySingleValue>(p =>
+                            {
+                                p.Name = "FloorNo";
+                                p.NominalValue = new IfcText(storeyName);
+                            }));
+                            pset.HasProperties.Add(model.Instances.New<IfcPropertySingleValue>(p =>
+                            {
+                                p.Name = "Height";
+                                p.NominalValue = new IfcLengthMeasure(storey_heigth);
+                            }));
+                            pset.HasProperties.Add(model.Instances.New<IfcPropertySingleValue>(p =>
+                            {
+                                p.Name = "StdFlrNo";
+                                p.NominalValue = new IfcText(storeyName);
+                            }));
+                        });
+                    });
                 }
                 txn.Commit();
                 return ret;

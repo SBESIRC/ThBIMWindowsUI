@@ -98,7 +98,8 @@
     <Compile Include="ProtoData\ThSUBuildingElementData.cs" />
     <Compile Include="ProtoData\ThSUCompDefinitionData.cs" />
     <Compile Include="ProtoData\ThSUComponentData.cs" />
-    <Compile Include="ProtoData\ThSUFaceData.cs" />
+    <Compile Include="ProtoData\ThSUFaceBrepData.cs" />
+    <Compile Include="ProtoData\ThSUFaceMeshData.cs" />
     <Compile Include="ProtoData\ThSUGeometry.cs" />
     <Compile Include="ProtoData\ThSULoopData.cs" />
     <Compile Include="ProtoData\ThSUMaterialData.cs" />

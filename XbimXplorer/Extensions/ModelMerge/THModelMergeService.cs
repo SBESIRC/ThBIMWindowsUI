@@ -50,6 +50,7 @@ namespace XbimXplorer.Extensions.ModelMerge
             foreach (Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey BuildingStorey in smallBuildings.BuildingStoreys)
             {
                 var bigStorey = StoreyDic.FirstOrDefault(o => o.Item1.ToString() == BuildingStorey.Name);
+                double storey_heigth = 0;
                 if (bigStorey == null)
                 {
                     var Storey_z = ((BuildingStorey.ObjectPlacement as Xbim.Ifc2x3.GeometricConstraintResource.IfcLocalPlacement).RelativePlacement as Xbim.Ifc2x3.GeometryResource.IfcPlacement).Location.Z;
@@ -58,8 +59,10 @@ namespace XbimXplorer.Extensions.ModelMerge
                     if (relatedElements.Any())
                     {
                         //找到该楼层的所有构建，找到最低的Location.Z
-                        var relatedElement_z = relatedElements.Min(o => ((o.ObjectPlacement as Xbim.Ifc2x3.GeometricConstraintResource.IfcLocalPlacement).RelativePlacement as Xbim.Ifc2x3.GeometryResource.IfcPlacement).Location.Z);
-                        Storey_z += relatedElement_z;
+                        var relatedElement_minz = relatedElements.Min(o => ((o.ObjectPlacement as Xbim.Ifc2x3.GeometricConstraintResource.IfcLocalPlacement).RelativePlacement as  Xbim.Ifc2x3.GeometryResource.IfcPlacement).Location.Z);
+                        var relatedElement_maxz = relatedElements.Max(o => ((o.ObjectPlacement as Xbim.Ifc2x3.GeometricConstraintResource.IfcLocalPlacement).RelativePlacement as  Xbim.Ifc2x3.GeometryResource.IfcPlacement).Location.Z);
+                        Storey_z += relatedElement_minz;
+                        storey_heigth = relatedElement_maxz - relatedElement_minz;
                     }
                     bigStorey = StoreyDic.FirstOrDefault(o => Math.Abs(o.Item2 - Storey_z) <= 200);
                     if (bigStorey == null)
@@ -97,7 +100,7 @@ namespace XbimXplorer.Extensions.ModelMerge
                 var storey = bigBuildings.BuildingStoreys.FirstOrDefault(o => o.Name==storeyName) as Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey;
                 if (storey == null)
                 {
-                    storey = BuildingStorey.CloneAndCreateNew(bigModel, bigBuildings, storeyName);
+                    storey = BuildingStorey.CloneAndCreateNew(bigModel, bigBuildings, storeyName, storey_heigth);
                 }
                 var CreatWalls = new List<Xbim.Ifc2x3.SharedBldgElements.IfcWall>();
                 var CreatSlabs = new List<Xbim.Ifc2x3.SharedBldgElements.IfcSlab>();

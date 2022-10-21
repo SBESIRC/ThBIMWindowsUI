@@ -20,7 +20,7 @@ namespace THBimEngine.Geometry.ProjectFactory
             //step1 转换几何数据
             ThTCHProjectToTHBimProject(project);
             bimProject.ProjectIdentity = project.Root.GlobalId;
-            if (createSolidMesh)
+            if (createSolidMesh && !project.IsFaceMesh)
             {
                 CreateSolidMesh(allEntitys.Values.ToList());
             }
@@ -41,6 +41,7 @@ namespace THBimEngine.Geometry.ProjectFactory
         }
         private void ThTCHProjectToTHBimProject(ThSUProjectData project)
         {
+            bool MeshFlag = project.IsFaceMesh;
             allEntitys.Clear();
             globalIndex = 0;
             if (null == project)
@@ -63,8 +64,8 @@ namespace THBimEngine.Geometry.ProjectFactory
                         var componentId = CurrentGIndex();
                         var bimComponent = new THBimUntypedEntity(componentId, 
                             string.Format("component#{0}", "", componentId), 
-                            "", 
-                            suDefinitions[component.Component.DefinitionIndex].THSUGeometryParam(component.Component.Transformations), 
+                            "",
+                            MeshFlag ? null : suDefinitions[component.Component.DefinitionIndex].THSUGeometryParam(component.Component.Transformations), 
                             "", 
                             component.Root.GlobalId);
                         bimComponent.EntityTypeName = "SU构件";

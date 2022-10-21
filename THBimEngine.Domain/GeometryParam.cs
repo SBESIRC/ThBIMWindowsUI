@@ -28,7 +28,7 @@ namespace THBimEngine.Domain
             Outer = new List<ThTCHMPolygon>();
             Voids = new List<ThTCHMPolygon>();
             var matrix = suMatrix.ToXBimMatrix3D();
-            foreach (var face in definitionData.Faces)
+            foreach (var face in definitionData.BrepFaces)
             {
                 var facePolygon = new ThTCHMPolygon();
                 facePolygon.Shell = new ThTCHPolyline();

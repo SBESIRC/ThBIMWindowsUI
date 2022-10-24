@@ -35,7 +35,7 @@ namespace XbimXplorer.Extensions.ModelMerge
 
             var bigBuildings = bigProject.Sites.FirstOrDefault()?.Buildings.FirstOrDefault() as Xbim.Ifc2x3.ProductExtension.IfcBuilding;
             var smallBuildings = smallProject.Sites.FirstOrDefault()?.Buildings.FirstOrDefault();
-
+            var MaxStdFlrNo = 0;
             //处理95%
             List<Tuple<int, double, double>> StoreyDic = new List<Tuple<int, double, double>>();
             foreach (Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey BuildingStorey in bigBuildings.BuildingStoreys)
@@ -43,6 +43,24 @@ namespace XbimXplorer.Extensions.ModelMerge
                 double Storey_Elevation = BuildingStorey.Elevation.Value;
                 double Storey_Height = double.Parse(((BuildingStorey.PropertySets.FirstOrDefault().PropertySetDefinitions.FirstOrDefault() as Xbim.Ifc2x3.Kernel.IfcPropertySet).HasProperties.FirstOrDefault(o => o.Name == "Height") as Xbim.Ifc2x3.PropertyResource.IfcPropertySingleValue).NominalValue.Value.ToString());
                 StoreyDic.Add((int.Parse(BuildingStorey.Name.ToString()), Storey_Elevation, Storey_Height).ToTuple());
+                //获取标准层信息，因为不是所有的IFC都会符合我们约定俗成的"标准"，所以这里加上try...catch
+                //即符合我们标准的我们获取，不符合的"跳过"
+                try
+                {
+                    var property = BuildingStorey.Model.Instances.OfType<Xbim.Ifc2x3.Kernel.IfcRelDefinesByProperties>().FirstOrDefault(o => o.RelatedObjects.Contains(BuildingStorey));
+                    if (property != null)
+                    {
+                        var stdFlrNoPrp = (property.RelatingPropertyDefinition as Xbim.Ifc2x3.Kernel.IfcPropertySet).HasProperties
+                            .Where(o => o.Name.Equals("StdFlrNo")).FirstOrDefault() 
+                            as Xbim.Ifc2x3.PropertyResource.IfcPropertySingleValue;
+                        var stdFlrNo = int.Parse(stdFlrNoPrp.NominalValue.ToString());
+                        MaxStdFlrNo = Math.Max(stdFlrNo, MaxStdFlrNo);
+                    }
+                }
+                catch
+                {
+                    // do not
+                }
             }
             StoreyDic = StoreyDic.OrderBy(x => x.Item1).ToList();
 
@@ -101,7 +119,7 @@ namespace XbimXplorer.Extensions.ModelMerge
                 var storey = bigBuildings.BuildingStoreys.FirstOrDefault(o => o.Name==storeyName) as Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey;
                 if (storey == null)
                 {
-                    storey = BuildingStorey.CloneAndCreateNew(bigModel, bigBuildings, storeyName, Storey_z,  storey_heigth);
+                    storey = BuildingStorey.CloneAndCreateNew(bigModel, bigBuildings, storeyName, Storey_z,  storey_heigth, ++MaxStdFlrNo);
                 }
                 var CreatWalls = new List<Xbim.Ifc2x3.SharedBldgElements.IfcWall>();
                 var CreatSlabs = new List<Xbim.Ifc2x3.SharedBldgElements.IfcSlab>();

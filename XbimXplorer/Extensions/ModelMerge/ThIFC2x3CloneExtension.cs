@@ -18,7 +18,7 @@ namespace XbimXplorer.Extensions.ModelMerge
 {
     public static class ThIFC2x3CloneExtension
     {
-        public static IfcBuildingStorey CloneAndCreateNew(this IfcBuildingStorey storey, IfcStore model, IfcBuilding building, string storeyName, double storey_z, double storey_heigth)
+        public static IfcBuildingStorey CloneAndCreateNew(this IfcBuildingStorey storey, IfcStore model, IfcBuilding building, string storeyName, double storey_z, double storey_heigth, int MaxStdFlrNo)
         {
             using (var txn = model.BeginTransaction("Create Storey"))
             {
@@ -62,7 +62,7 @@ namespace XbimXplorer.Extensions.ModelMerge
                             pset.HasProperties.Add(model.Instances.New<IfcPropertySingleValue>(p =>
                             {
                                 p.Name = "StdFlrNo";
-                                p.NominalValue = new IfcText(storeyName);
+                                p.NominalValue = new IfcText(MaxStdFlrNo.ToString());
                             }));
                         });
                     });

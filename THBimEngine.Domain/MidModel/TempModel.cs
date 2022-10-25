@@ -390,13 +390,14 @@ namespace THBimEngine.Domain.MidModel
         public void WriteMidFile(string ifcPath = null)
         {
             string fileName = Path.Combine(System.IO.Path.GetTempPath(), "BimEngineData.get");
+            string storeyFileName = Path.Combine(System.IO.Path.GetTempPath(), "BimEngineData.storeys.txt");
 
             if (ifcPath!=null)
             {
                 fileName = Path.Combine(System.IO.Path.GetDirectoryName(ifcPath), "BimEngineData.get");
+                storeyFileName = Path.Combine(System.IO.Path.GetDirectoryName(ifcPath), "BimEngineData.storeys.txt");
             }
 
-            string storeyFileName = Path.Combine(System.IO.Path.GetTempPath(), "BimEngineData.storeys.txt");
             FileStream fileStream = new FileStream(fileName, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
             BinaryWriter writer = new BinaryWriter(fileStream, Encoding.UTF8);
             int cnt = OutingPolygons.Count;

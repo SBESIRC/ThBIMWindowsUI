@@ -4,7 +4,7 @@ using System.Linq;
 using THBimEngine.Domain;
 using Xbim.Common.Geometry;
 
-namespace XbimXplorer.ThBIMEngine
+namespace THBimEngine.Application
 {
     class SUProjectReadGeomtry
     {

@@ -142,7 +142,6 @@
     <Compile Include="THBimUntypedEntity.cs" />
     <Compile Include="THBimWall.cs" />
     <Compile Include="THBimWindow.cs" />
-    <Compile Include="THDocument.cs" />
     <Compile Include="ThProtoBufExtension.cs" />
   </ItemGroup>
   <ItemGroup />

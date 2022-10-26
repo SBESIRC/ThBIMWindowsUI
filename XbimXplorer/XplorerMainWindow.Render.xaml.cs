@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows;
 using THBimEngine.Domain;
 using THBimEngine.Domain.Grid;
@@ -11,6 +12,7 @@ namespace XbimXplorer
 {
     public partial class XplorerMainWindow
     {
+        bool isFirstRender = true;
         public void ShowEntityByIds(List<int> showEntityIds)
         {
             if (showEntityIds == null)
@@ -29,7 +31,7 @@ namespace XbimXplorer
             if (gridEntityIds == null)
                 return;
             ExampleScene.ifcre_set_sleep_time(100);
-            var storeToEngineFile = new IfcStoreToEngineFile();
+            var dataToEngine = new DataToEngine();
             List<GridLine> showGridLines = new List<GridLine>();
             List<GridCircle> showGridCircles = new List<GridCircle>();
             List<GridText> showGridTexts = new List<GridText>();
@@ -51,7 +53,7 @@ namespace XbimXplorer
                         showGridTexts.Add(item);
                 }
             }
-            storeToEngineFile.PushGridDataToEngine(showGridLines, showGridCircles, showGridTexts);
+            dataToEngine.PushGridDataToEngine(showGridLines, showGridCircles, showGridTexts);
             ExampleScene.ifcre_set_sleep_time(10);
         }
         public void RenderScene()
@@ -59,7 +61,6 @@ namespace XbimXplorer
             if (CurrentApplicationIsDisposed())
                 return;
             CurrentDocumentToScene();
-            DocumentChanged.Invoke(currentDocument, null);
             projectMatrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero);
             DateTime startTime = DateTime.Now;
             ProgressBar.Value = 0;
@@ -74,6 +75,7 @@ namespace XbimXplorer
             var totalTime = (endTime - startTime).TotalSeconds;
             Log.Info(string.Format("渲染前准备工作完成，耗时：{0}s", totalTime));
             _dispatcherTimer.Start();
+            ProgressChanged(this, new ProgressChangedEventArgs(0, ""));
             ExampleScene.Render();
         }
 
@@ -104,9 +106,7 @@ namespace XbimXplorer
             if (CurrentDocument == null)
                 return;
             DateTime start = DateTime.Now;
-            currentDocument.UpdateCatchStoreyRelation();
-            currentDocument.ReadGeometryMesh();
-            CurrentScene = new THBimScene(currentDocument.DocumentId);
+            CurrentScene = new THBimScene(CurrentDocument.DocumentId);
             foreach (var item in CurrentDocument.AllGeoModels) 
             {
                 CurrentScene.AllGeoModels.Add(item);
@@ -115,7 +115,6 @@ namespace XbimXplorer
             {
                 CurrentScene.AllGeoPointNormals.Add(item);
             }
-            var startGIndex = CurrentScene.AllGeoModels.Count + 1;
             foreach (var prj  in CurrentDocument.AllBimProjects)
             {
                 foreach(var item in prj.PrjAllEntitys.Values)
@@ -123,26 +122,20 @@ namespace XbimXplorer
                     if(item.GetType().Name== "GridLine")
                     {
                         CurrentScene.AllGridLines.Add(item as GridLine);
-                        CurrentDocument.MeshEntiyRelationIndexs.Add(startGIndex, new MeshEntityIdentifier(startGIndex, prj.ProjectIdentity, item.Uid));
-                        startGIndex += 1;
                     }
                     if (item.GetType().Name == "GridCircle")
                     {
                         CurrentScene.AllGridCircles.Add(item as GridCircle);
-                        CurrentDocument.MeshEntiyRelationIndexs.Add(startGIndex, new MeshEntityIdentifier(startGIndex, prj.ProjectIdentity, item.Uid));
-                        startGIndex += 1;
                     }
                     if (item.GetType().Name == "GridText")
                     {
                         CurrentScene.AllGridTexts.Add(item as GridText);
-                        CurrentDocument.MeshEntiyRelationIndexs.Add(startGIndex, new MeshEntityIdentifier(startGIndex, prj.ProjectIdentity, item.Uid));
-                        startGIndex += 1;
                     }
                 }
             }
-            var storeToEngineFile = new IfcStoreToEngineFile();
-            storeToEngineFile.WriteMidDataMultithreading(CurrentScene.AllGeoModels,CurrentScene.AllGeoPointNormals);
-            storeToEngineFile.PushGridDataToEngine(CurrentScene.AllGridLines, CurrentScene.AllGridCircles, CurrentScene.AllGridTexts);
+            var dataToEngine = new DataToEngine();
+            dataToEngine.WriteMidDataMultithreading(CurrentScene.AllGeoModels,CurrentScene.AllGeoPointNormals);
+            dataToEngine.PushGridDataToEngine(CurrentScene.AllGridLines, CurrentScene.AllGridCircles, CurrentScene.AllGridTexts);
             DateTime end = DateTime.Now;
             var totalTime = (end - start).TotalSeconds;
             Log.Info(string.Format("数据发送引擎完成，耗时：{0}s", totalTime));

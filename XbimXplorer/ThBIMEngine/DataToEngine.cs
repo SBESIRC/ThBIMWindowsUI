@@ -4,164 +4,15 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web.UI.WebControls;
 using THBimEngine.Domain;
 using THBimEngine.Domain.Grid;
 using THBimEngine.Presention;
-using Xbim.Common;
-using Xbim.Common.Federation;
-using Xbim.Common.Geometry;
-using Xbim.Ifc;
-using Xbim.Presentation.LayerStyling;
-using Xbim.Presentation.Modelpositioning;
 
 namespace XbimXplorer.ThBIMEngine
 {
-    class IfcStoreToEngineFile
-	{
+    class DataToEngine
+    {
 		public event ProgressChangedEventHandler ProgressChanged;
-		protected IfcStore ifcModel;
-		XbimModelRelativeTranformer _modelPositioner = new XbimModelRelativeTranformer();
-		Dictionary<IModel, XbimMatrix3D> _currentModelPositions = new Dictionary<IModel, XbimMatrix3D>();
-		private XbimRect3D _viewBounds { get; set; }
-		public double ModelRegionTolerance { get; set; } = 5;
-		public IfcStoreToEngineFile()
-		{
-		}
-		public Dictionary<int, int> LoadGeometry(IfcStore model)
-		{
-			var readGeomtry = new IfcStoreReadGeomtry(XbimMatrix3D.CreateTranslation(XbimVector3D.Zero));
-			readGeomtry.ProgressChanged += ProgressChanged;
-			var excludedTypes = model.DefaultExclusions(null);
-			var geoIndexIfcIndexMap = new Dictionary<int, int>();
-			var allGeoModels = new List<GeometryMeshModel>();
-			var allGeoPointNormals = new List<PointNormal>();
-			if (null == model || model.Instances == null)
-				return geoIndexIfcIndexMap;
-			if (model.IsFederation)
-			{
-				LoadFederationGeometry(model);
-				foreach (var refModel in model.ReferencedModels) 
-				{
-					var thisGeo = readGeomtry.ReadGeomtry(refModel.Model as IfcStore, out List<PointNormal> thisPointVectors);
-					var ptOffSet = allGeoPointNormals.Count;
-					foreach (var item in thisPointVectors)
-					{
-						item.PointIndex += ptOffSet;
-					}
-					foreach (var item in thisGeo)
-					{
-						item.CIndex += ptOffSet;
-						foreach (var tr in item.FaceTriangles)
-						{
-							for (int i = 0; i < tr.ptIndex.Count; i++)
-								tr.ptIndex[i] += ptOffSet;
-						}
-					}
-					allGeoModels.AddRange(thisGeo);
-					allGeoPointNormals.AddRange(thisPointVectors);
-				}
-			}
-			else 
-			{
-				allGeoModels = readGeomtry.ReadGeomtry(model, out allGeoPointNormals);
-			}
-			if (null != ProgressChanged)
-				ProgressChanged(this, new ProgressChangedEventArgs(100, "Reading Shape End"));
-			if (null != allGeoModels && allGeoModels.Count > 0) 
-			{
-				WriteMidDataMultithreading(allGeoModels, allGeoPointNormals);
-				for (int i = 0; i < allGeoModels.Count; i++)
-				{
-					var tempModel = allGeoModels[i];
-					geoIndexIfcIndexMap.Add(i, Convert.ToInt32(tempModel.EntityLable));
-				}
-			}
-			return geoIndexIfcIndexMap;
-		}
-
-		private void LoadFederationGeometry(IfcStore model) 
-		{
-			if (model == null)
-			{
-				return; //nothing to show
-			}
-			// ensure a unique userDefinedId
-			short userDefinedId = 0;
-			model.UserDefinedId = userDefinedId;
-			if (model.IsFederation)
-			{
-				foreach (var refModel in model.ReferencedModels)
-				{
-					refModel.Model.UserDefinedId = ++userDefinedId;
-				}
-			}
-
-			XbimMatrix3D modelmatrix = XbimMatrix3D.Identity;
-			if (!_currentModelPositions.Any())
-			{
-				var initialRegion = XbimModelRelativeTranformer.GetExpandedMostPopulated(model, ModelRegionTolerance);
-				if (initialRegion != null)
-				{
-					_modelPositioner = new XbimModelRelativeTranformer();
-					modelmatrix = _modelPositioner.SetBaseModel(model, initialRegion);
-					_viewBounds = initialRegion.ToXbimRect3D().Transform(modelmatrix);
-				}
-			}
-			else
-			{
-				// currently never enters here, but kept for future developments
-				modelmatrix = _modelPositioner.GetRelativeMatrix(model);
-				throw new NotImplementedException("LoadGeometry with existing model present.");
-			}
-			_currentModelPositions.Add(model, modelmatrix);
-
-			if (model.IsFederation)
-			{
-				// loading all referenced models.
-				foreach (var refModel in model.ReferencedModels)
-				{
-					LoadReferencedModel(refModel);
-				}
-			}
-		}
-		private void LoadReferencedModel(IReferencedModel refModel)
-		{
-			if (refModel.Model == null)
-				return;
-
-			//DefaultLayerStyler.SetFederationEnvironment(refModel);
-			var mod = refModel.Model as IfcStore;
-			if (mod == null)
-				return;
-
-			var initialRegion = XbimModelRelativeTranformer.GetExpandedMostPopulated(mod.ReferencingModel, ModelRegionTolerance);
-			XbimMatrix3D pos = XbimMatrix3D.Identity;
-			if (_modelPositioner == null)
-			{
-				_modelPositioner = new XbimModelRelativeTranformer();
-				pos = _modelPositioner.SetBaseModel(mod.ReferencingModel, initialRegion);
-				_viewBounds = initialRegion.ToXbimRect3D().Transform(pos);
-			}
-			else
-			{
-				pos = _modelPositioner.GetRelativeMatrix(mod.ReferencingModel);
-				// see if we need to expand the view bounds
-
-				var newRegion = initialRegion.ToXbimRect3D().Transform(pos);
-
-				//Debug.WriteLine($"ths Region    :{newRegion}");
-				//Debug.WriteLine($"Was ViewBounds:{_viewBounds}");
-				_viewBounds = _viewBounds.Union(newRegion);
-				//Debug.WriteLine($"Now ViewBounds:{_viewBounds}");
-			}
-
-			_currentModelPositions.Add(mod.ReferencingModel, pos);
-			
-		}
-		
-
-
 		public void WriteMidFile(List<GeometryMeshModel> meshModels, List<PointNormal> meshPoints, string midFilePath)
 		{
 			if (null == meshModels || meshModels.Count < 1
@@ -248,11 +99,11 @@ namespace XbimXplorer.ThBIMEngine
 
 
 
-		public void WriteMidDataMultithreading(List<GeometryMeshModel> meshModels,List<PointNormal> meshPoints)
+		public void WriteMidDataMultithreading(List<GeometryMeshModel> meshModels, List<PointNormal> meshPoints)
 		{
 			ExampleScene.ifcre_set_sleep_time(2000);
-            ExampleScene.ifcre_clear_model_data();
-            if (null == meshModels || meshModels.Count < 1 || null == meshPoints || meshPoints.Count < 1)
+			ExampleScene.ifcre_clear_model_data();
+			if (null == meshModels || null == meshPoints)
 				return;
 			List<Task> tasks = new List<Task>();
 			tasks.Add(Task.Run(() =>
@@ -293,13 +144,13 @@ namespace XbimXplorer.ThBIMEngine
 						var ptIndex1 = item.ptIndex[0];
 						var ptIndex2 = item.ptIndex[1];
 						var ptIndex3 = item.ptIndex[2];
-                        ExampleScene.ifcre_set_edge_indices(ptIndex1);
-                        ExampleScene.ifcre_set_edge_indices(ptIndex2);
-                        ExampleScene.ifcre_set_edge_indices(ptIndex2);
-                        ExampleScene.ifcre_set_edge_indices(ptIndex3);
-                        ExampleScene.ifcre_set_edge_indices(ptIndex3);
-                        ExampleScene.ifcre_set_edge_indices(ptIndex1);
-                    }
+						ExampleScene.ifcre_set_edge_indices(ptIndex1);
+						ExampleScene.ifcre_set_edge_indices(ptIndex2);
+						ExampleScene.ifcre_set_edge_indices(ptIndex2);
+						ExampleScene.ifcre_set_edge_indices(ptIndex3);
+						ExampleScene.ifcre_set_edge_indices(ptIndex3);
+						ExampleScene.ifcre_set_edge_indices(ptIndex1);
+					}
 				}
 			}));
 			tasks.Add(Task.Run(() =>
@@ -335,10 +186,10 @@ namespace XbimXplorer.ThBIMEngine
 			ExampleScene.ifcre_set_sleep_time(10);
 		}
 
-		public void PushGridDataToEngine(List<GridLine> gridLines, List<GridCircle> gridCircles, List<GridText> gridTexts) 
+		public void PushGridDataToEngine(List<GridLine> gridLines, List<GridCircle> gridCircles, List<GridText> gridTexts)
 		{
 			ExampleScene.ifcre_set_grid_data(0);
-			if (null != gridLines) 
+			if (null != gridLines)
 			{
 				foreach (var gridLine in gridLines)
 				{
@@ -358,7 +209,7 @@ namespace XbimXplorer.ThBIMEngine
 					ExampleScene.ifcre_set_grid_lines(gridLine.type);
 				}
 			}
-			if (null != gridCircles) 
+			if (null != gridCircles)
 			{
 				foreach (var gridCircle in gridCircles)
 				{
@@ -378,7 +229,7 @@ namespace XbimXplorer.ThBIMEngine
 					ExampleScene.ifcre_set_grid_circles(gridCircle.width);
 				}
 			}
-			if (null != gridTexts) 
+			if (null != gridTexts)
 			{
 				foreach (var gridText in gridTexts)
 				{

@@ -76,7 +76,6 @@ namespace XbimXplorer
         private string _temporaryXbimFileName;
 
         private string _openedModelFileName;
-        private ThBimDataController bimDataController;
         private XbimMatrix3D projectMatrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero);
 
         /// <summary>
@@ -99,23 +98,25 @@ namespace XbimXplorer
                     "TianHua Bim Xplorer - [" + ifcFilename + "]";
             }));
         }
-
+        public event PropertyChangedEventHandler PropertyChanged;
+        public event EventHandler ApplicationClosing;
+        public event ProgressChangedEventHandler ProgressChanged;
         public XplorerMainWindow(bool preventPluginLoad = false)
         {
             InitializeComponent();
-            bimDataController = new ThBimDataController(this);
+
+            ProgressChanged = OnProgressChanged;
+            _geoIndexIfcIndexMap = new Dictionary<int, int>();
+            _dispatcherTimer = new DispatcherTimer();
+            _dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+            _dispatcherTimer.Tick += DispatcherTimer_Tick;
+
+            InitDocument();
             PreventPluginLoad = preventPluginLoad;
-            AllDocuments = new List<THDocument>();
             // initialise the internal elements of the UI that behave like plugins
             EvaluateXbimUiType(typeof(IfcValidation.ValidationWindow), true);
             EvaluateXbimUiType(typeof(LogViewer.LogViewer), true);
             EvaluateXbimUiType(typeof(Commands.wdwCommands), true);
-            
-            
-            // attach window managment functions
-            Closed += XplorerMainWindow_Closed;
-            Loaded += XplorerMainWindow_Loaded;
-            Closing += XplorerMainWindow_Closing;
 
             // notify the user of changes in the measures taken in the 3d viewer.
             //--DrawingControl.UserModeledDimensionChangedEvent += DrawingControl_MeasureChangedEvent;
@@ -128,19 +129,19 @@ namespace XbimXplorer
             LoggedEvents = new ObservableCollection<EventViewModel>();
             // any logging event required should happen after XplorerMainWindow_Loaded
 
-            _geoIndexIfcIndexMap = new Dictionary<int, int>();
-            _dispatcherTimer = new DispatcherTimer();
-            _dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
-            _dispatcherTimer.Tick += DispatcherTimer_Tick;
-
             InitPipeService();
+            // attach window managment functions
+            ApplicationClosing += XplorerMainWindow_ApplicationClosing;
+            Closed += XplorerMainWindow_Closed;
+            Loaded += XplorerMainWindow_Loaded;
+            Closing += XplorerMainWindow_Closing;
         }
         private void DispatcherTimer_Tick(object sender, EventArgs e)
 		{
             var selectId = ExampleScene.GetCurrentCompID();
             if (selectId < 0)
                 return;
-            var pro = bimDataController.GetSelectEntityProperties(selectId);
+            //var pro = bimDataController.GetSelectEntityProperties(selectId);
 
 
         }
@@ -164,7 +165,6 @@ namespace XbimXplorer
             _mruFiles = new ObservableMruList<string>(s, 4, StringComparer.InvariantCultureIgnoreCase);
             MnuRecent.ItemsSource = _mruFiles;
         }
-
         private void AddRecentFile()
         {
             _mruFiles.Add(_openedModelFileName);
@@ -186,16 +186,19 @@ namespace XbimXplorer
                 if (winFormHost.Child is GLControl glControl)
                     Win32.CloseRender(glControl.Handle);
             }
-            if (null != backgroundWorker) 
+            ApplicationClosing.Invoke(this, null);
+        }
+        private void XplorerMainWindow_ApplicationClosing(object sender, EventArgs e)
+        {
+            if (null != backgroundWorker)
             {
                 backgroundWorker.Dispose();
             }
-            if (null != pipeServer) 
+            if (null != pipeServer)
             {
                 pipeServer.Dispose();
             }
         }
-
         void XplorerMainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             // this enables a basic configuration for the logger.
@@ -255,11 +258,10 @@ namespace XbimXplorer
 
         public void RemoveProjectFormCurrentDocument(string projectId) 
         {
-            bimDataController.DeleteProject(new List<string> { projectId });
-            RenderScene();
+            if (CurrentDocument == null)
+                return;
+            CurrentDocument.DeleteProject(projectId);
         }
-        
-
         /// <summary>
         /// 
         /// </summary>
@@ -270,7 +272,6 @@ namespace XbimXplorer
         /// 
         /// </summary>
         public event LoadingCompleteEventHandler LoadingComplete;
-
         private void FireLoadingComplete(object s, RunWorkerCompletedEventArgs args)
         {
             if (LoadingComplete != null)
@@ -280,9 +281,9 @@ namespace XbimXplorer
         }
         private void IfcStoreToMidFile(IfcStore ifcStore) 
         {
-            var engineFile = new IfcStoreToEngineFile();
-            engineFile.ProgressChanged += OnProgressChanged;
-            _geoIndexIfcIndexMap = engineFile.LoadGeometry(ifcStore);
+            //var engineFile = new IfcStoreToEngineFile();
+            //engineFile.ProgressChanged += OnProgressChanged;
+            //_geoIndexIfcIndexMap = engineFile.LoadGeometry(ifcStore);
         }
         private void ShowIfcStore(IfcStore ifcStore) 
         {
@@ -797,24 +798,6 @@ namespace XbimXplorer
         {
             get { return null; }// DrawingControl; }
         }
-        public THBimScene CurrentScene { get; set; }
-        private THDocument currentDocument { get; set; }
-        public THDocument CurrentDocument 
-        {
-            get { return currentDocument; }
-            set 
-            {
-                currentDocument = value;
-                SelectDocumentChanged.Invoke(currentDocument, null);
-            }
-        }
-        public List<THDocument> AllDocuments { get; set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        public event EventHandler SelectEntityChanged;
-        public event EventHandler SelectDocumentChanged;
-        public event EventHandler DocumentChanged;
-
         protected virtual void OnPropertyChanged(string propertyName)
         {
             var handler = PropertyChanged;
@@ -1058,8 +1041,9 @@ namespace XbimXplorer
         }
         private void MenuItem_Click_2(object sender, RoutedEventArgs e)
         {
-            bimDataController.ClearAllProject();
-            ExampleScene.ifcre_clear_model_data();
+            if (CurrentDocument == null)
+                return;
+            CurrentDocument.ClearAllData();
             RenderScene();
         }
         
@@ -1067,9 +1051,9 @@ namespace XbimXplorer
         private void ExportCut_Click(object sender, RoutedEventArgs e)
         {
             //导出切图数据
-            if (currentDocument == null || currentDocument.AllBimProjects.Count < 1)
+            if (CurrentDocument == null || CurrentDocument.AllBimProjects.Count < 1)
                 return;
-            ThBimCutData.Run(currentDocument.AllBimProjects);
+            ThBimCutData.Run(CurrentDocument.AllBimProjects);
         }
         public void AddProjectToCurrentScene(THBimProject bimProject)
         {
@@ -1079,29 +1063,29 @@ namespace XbimXplorer
 
         private void ExportCut_Click_structure(object sender, RoutedEventArgs e)
         {
-            if (currentDocument == null || currentDocument.AllBimProjects.Count < 1)
+            if (CurrentDocument == null || CurrentDocument.AllBimProjects.Count < 1)
                 return;
-            var prjName = currentDocument.AllBimProjects.First().ProjectIdentity.Split('.').First()+"-100%.ifc";
-            ; 
-            this.DocumentChanged -= XplorerMainWindow_DocumentChanged;
-            bimDataController.ClearAllProject();
-            this.DocumentChanged += XplorerMainWindow_DocumentChanged;
+            var prjName = CurrentDocument.AllBimProjects.First().ProjectIdentity.Split('.').First()+"-100%.ifc";
+
+            CurrentDocument.DocumentChanged -= XplorerMainWindow_DocumentChanged;
+            CurrentDocument.ClearAllData();
+            CurrentDocument.DocumentChanged += XplorerMainWindow_DocumentChanged;
             LoadFileToCurrentDocument(prjName,null);
             
         }
 
         private void XplorerMainWindow_DocumentChanged(object sender, EventArgs e)
         {
-            ThBimCutData.Run(currentDocument.AllBimProjects);
-            this.DocumentChanged -= XplorerMainWindow_DocumentChanged;
+            ThBimCutData.Run(CurrentDocument.AllBimProjects);
+            CurrentDocument.DocumentChanged -= XplorerMainWindow_DocumentChanged;
         }
 
         private void ExportCut_Click_architecture(object sender, RoutedEventArgs e)
         {
             //导出建筑切图数据
-            if (currentDocument == null || currentDocument.AllBimProjects.Count < 1)
+            if (CurrentDocument == null || CurrentDocument.AllBimProjects.Count < 1)
                 return;
-            ThBimCutData.Run(currentDocument.AllBimProjects);
+            ThBimCutData.Run(CurrentDocument.AllBimProjects);
         }
     }
     

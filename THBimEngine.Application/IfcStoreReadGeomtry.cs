@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using THBimEngine.Domain;
 using Xbim.Common;
 using Xbim.Common.Geometry;
+using Xbim.Common.Metadata;
 using Xbim.Common.XbimExtensions;
 using Xbim.Ifc;
+using Xbim.Ifc4.Interfaces;
 using Xbim.IO.Memory;
-using Xbim.Presentation.LayerStyling;
 
-namespace XbimXplorer.ThBIMEngine
+namespace THBimEngine.Application
 {
     class IfcStoreReadGeomtry
-    {
+	{
 		public event ProgressChangedEventHandler ProgressChanged;
 		protected List<IPersistEntity> ifcInstances;
 		protected List<XbimShapeGeometry> shapeGeometries;
@@ -28,16 +28,16 @@ namespace XbimXplorer.ThBIMEngine
 		private ReadTaskInfo readTaskInfo;
 		readonly XbimColourMap _colourMap = new XbimColourMap();
 		protected XbimMatrix3D projectMatrix3D;
-		public IfcStoreReadGeomtry(XbimMatrix3D prjMatrix3D) 
+		public IfcStoreReadGeomtry(XbimMatrix3D prjMatrix3D)
 		{
 			projectMatrix3D = prjMatrix3D;
 		}
-		public List<GeometryMeshModel> ReadGeomtry(IfcStore model,out List<PointNormal> allPointNormals) 
+		public List<GeometryMeshModel> ReadGeomtry(IfcStore model, out List<PointNormal> allPointNormals)
 		{
 			ifcModel = model;
 			allPointNormals = new List<PointNormal>();
 			readTaskInfo = new ReadTaskInfo();
-			var excludedTypes = model.DefaultExclusions(null);
+			var excludedTypes = DefaultExclusions(model,null);
 			ifcInstances = new List<IPersistEntity>();
 			shapeInstances = new List<XbimShapeInstance>();
 			shapeGeometries = new List<XbimShapeGeometry>();
@@ -88,24 +88,24 @@ namespace XbimXplorer.ThBIMEngine
 			readTaskInfo.AllModels.AddRange(mergeMesh);
 			return readTaskInfo.AllModels;
 		}
-		private List<GeometryMeshModel> MergeModelMesh(List<GeometryMeshModel> meshModels) 
+		private List<GeometryMeshModel> MergeModelMesh(List<GeometryMeshModel> meshModels)
 		{
 			//一个物体可能会有多个实体构成
 			var res = new Dictionary<string, GeometryMeshModel>();
-			foreach (var item in meshModels) 
+			foreach (var item in meshModels)
 			{
 				if (res.ContainsKey(item.EntityLable))
 				{
 					res[item.EntityLable].FaceTriangles.AddRange(item.FaceTriangles);
 				}
-				else 
+				else
 				{
 					res.Add(item.EntityLable, item);
 				}
 			}
 			var newMeshModels = new List<GeometryMeshModel>();
 			int index = 0;
-			foreach (var keyValue in res) 
+			foreach (var keyValue in res)
 			{
 				keyValue.Value.CIndex = index;
 				newMeshModels.Add(keyValue.Value);
@@ -173,7 +173,7 @@ namespace XbimXplorer.ThBIMEngine
 					continue;
 				var type = this.ifcModel.Metadata.ExpressType((short)insModel.IfcTypeId);
 				var typeStr = type.Name.ToLower().Replace("ifc", "");
-				var material = THBimMaterial.GetTHBimEntityMaterial(typeStr,true);
+				var material = THBimMaterial.GetTHBimEntityMaterial(typeStr, true);
 				if (typeStr.Contains("open"))
 					continue;
 				var allPts = tr.Vertices.ToArray();
@@ -318,8 +318,36 @@ namespace XbimXplorer.ThBIMEngine
 							!excludedTypes.Contains(s.IfcTypeId));
 			return shapeInstances;
 		}
+		private HashSet<short> DefaultExclusions(IModel model, List<Type> exclude)
+		{
+			var excludedTypes = new HashSet<short>();
+			if (exclude == null)
+				exclude = new List<Type>()
+				{
+					typeof(IIfcSpace),
+					typeof(IIfcFeatureElement)
+				};
+			foreach (var excludedT in exclude)
+			{
+				ExpressType ifcT;
+				if (excludedT.IsInterface && excludedT.Name.StartsWith("IIfc"))
+				{
+					var concreteTypename = excludedT.Name.Substring(1).ToUpper();
+					ifcT = model.Metadata.ExpressType(concreteTypename);
+				}
+				else
+					ifcT = model.Metadata.ExpressType(excludedT);
+				if (ifcT == null) // it could be a type that does not belong in the model schema
+					continue;
+				foreach (var exIfcType in ifcT.NonAbstractSubTypes)
+				{
+					excludedTypes.Add(exIfcType.TypeId);
+				}
+			}
+			return excludedTypes;
+		}
 	}
-	
+
 	class ReadTaskInfo
 	{
 		public int AllCount { get; set; }

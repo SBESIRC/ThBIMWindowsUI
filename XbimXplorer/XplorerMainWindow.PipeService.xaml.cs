@@ -104,14 +104,13 @@ namespace XbimXplorer
             {
                 ExampleScene.ifcre_set_sleep_time(1000);
                 DateTime startTime = DateTime.Now;
-                bimDataController.AddProject(thProject, projectMatrix3D);
+                CurrentDocument.AddProject(thProject, projectMatrix3D);
                 thProject = null;
                 pipeServer = null;
                 backgroundWorker.RunWorkerAsync();
                 DateTime endTime = DateTime.Now;
                 var totalTime = (endTime - startTime).TotalSeconds;
                 Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
-                RenderScene();
             }
         }
 
@@ -147,14 +146,13 @@ namespace XbimXplorer
             {
                 ExampleScene.ifcre_set_sleep_time(1000);
                 DateTime startTime = DateTime.Now;
-                bimDataController.AddProject(suProject, projectMatrix3D);
+                CurrentDocument.AddProject(suProject, projectMatrix3D);
                 suProject = null;
                 SU_pipeServer = null;
                 SU_backgroundWorker.RunWorkerAsync();
                 DateTime endTime = DateTime.Now;
                 var totalTime = (endTime - startTime).TotalSeconds;
                 Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
-                RenderScene();
             }
         }
 

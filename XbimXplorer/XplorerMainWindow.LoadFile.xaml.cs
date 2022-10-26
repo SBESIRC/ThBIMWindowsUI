@@ -46,7 +46,6 @@ namespace XbimXplorer
             else if (ext == ".thbim")
             {
                 LoadTHBimFile(filePath);
-                RenderScene();
             }
             else if (ext == ".ydb") 
             {
@@ -312,7 +311,7 @@ namespace XbimXplorer
                                 var th_Project = new ThTCHProjectData();
                                 Google.Protobuf.MessageExtensions.MergeFrom(th_Project, DataBody);
                                 th_Project.Root.GlobalId = fileName;
-                                bimDataController.AddProject(th_Project, projectMatrix3D);
+                                CurrentDocument.AddProject(th_Project, projectMatrix3D);
                                 break;
                             }
                         case 2:
@@ -322,7 +321,7 @@ namespace XbimXplorer
                                 var su_Project = new ThSUProjectData();
                                 Google.Protobuf.MessageExtensions.MergeFrom(su_Project, DataBody);
                                 su_Project.Root.GlobalId = fileName;
-                                bimDataController.AddProject(su_Project, projectMatrix3D);
+                                CurrentDocument.AddProject(su_Project, projectMatrix3D);
                                 break;
                             }
                         default:
@@ -362,13 +361,12 @@ namespace XbimXplorer
             if (args.Result is IfcStore ifcStore) //all ok
             {
                 DateTime startTime = DateTime.Now;
-                bimDataController.AddProject(ifcStore, projectMatrix3D);
+                CurrentDocument.AddProject(ifcStore, projectMatrix3D);
                 DateTime endTime = DateTime.Now;
                 var totalTime = (endTime - startTime).TotalSeconds;
                 Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
                 ProgressBar.Value = 0;
                 StatusMsg.Text = "";
-                RenderScene();
             }
             else //we have a problem
             {

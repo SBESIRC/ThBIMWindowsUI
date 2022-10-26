@@ -1,5 +1,7 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using THBimEngine.Domain;
 using Xbim.Common.Geometry;
 
@@ -8,7 +10,7 @@ namespace THBimEngine.Application
     public interface IEngineApplication
     {
         /// <summary>
-        /// 当前Scene
+        /// 当前Scene,用来显示时使用的
         /// </summary>
         THBimScene CurrentScene { get; set; }
         /// <summary>
@@ -18,10 +20,9 @@ namespace THBimEngine.Application
         /// <summary>
         /// 所有Document
         /// </summary>
-        List<THDocument> AllDocuments { get; set; }
-        void AddProjectToCurrentScene(THBimProject bimProject);
+        THDocumentManage DocumentManage { get; set; }
         /// <summary>
-        /// 加载文件
+        /// 加载文件到当前Document中
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="matrix3D"></param>
@@ -32,12 +33,16 @@ namespace THBimEngine.Application
         /// <param name="projId"></param>
         void RemoveProjectFormCurrentDocument(string projId);
         
-        #region
+        #region 引擎相关
         /// <summary>
         /// 隔离显示，要显示的ids
         /// </summary>
         /// <param name="showEntityIds"></param>
         void ShowEntityByIds(List<int> showEntityIds);
+        /// <summary>
+        /// 隔离显示，要显示的轴网Ids
+        /// </summary>
+        /// <param name="gridEntityIds"></param>
         void ShowGridByIds(List<string> gridEntityIds);
         /// <summary>
         /// 渲染当前Document
@@ -48,6 +53,10 @@ namespace THBimEngine.Application
         /// </summary>
         /// <param name="selectIds"></param>
         void SelectEntityIds(List<int> selectIds);
+        /// <summary>
+        /// 获取选中的构件Id
+        /// </summary>
+        /// <returns></returns>
         int GetSelectId();
         /// <summary>
         /// zoom到某些构件（如果传入null或空数据，整个模型进行zoom）
@@ -62,13 +71,17 @@ namespace THBimEngine.Application
         /// </summary>
         event EventHandler SelectEntityChanged;
         /// <summary>
-        /// Document切换事件
+        /// 关闭退出事件（不允许取消）
         /// </summary>
-        event EventHandler SelectDocumentChanged;
+        event EventHandler ApplicationClosing;
         /// <summary>
-        /// Document修改事件
+        /// 进度条事件
         /// </summary>
-        event EventHandler DocumentChanged;
+        event ProgressChangedEventHandler ProgressChanged;
+        #endregion
+
+        #region 辅助相关
+        ILog Log { get; set; }
         #endregion
     }
 }

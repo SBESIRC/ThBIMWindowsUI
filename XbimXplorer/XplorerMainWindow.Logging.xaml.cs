@@ -8,7 +8,7 @@ namespace XbimXplorer
 {
     public partial class XplorerMainWindow
     {
-        private static readonly ILog Log = LogManager.GetLogger("Xbim.WinUI");
+        public ILog Log { get; set; } = LogManager.GetLogger("Xbim.WinUI");
         
         public Visibility AnyErrors
         {

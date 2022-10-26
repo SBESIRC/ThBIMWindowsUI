@@ -3,43 +3,85 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using THBimEngine.Domain.Grid;
 using Xbim.Common.Geometry;
 using Xbim.Common.XbimExtensions;
 
 namespace THBimEngine.Domain
 {
+    /// <summary>
+    /// 项目
+    /// 如果是IFC文件这里有用的数据是 ProjectIdentity Catagory SourceProject SourceName _allGeoMeshModels _allGeoPointNormals PrjAllStoreys
+    /// IFC过来后不再处理其它的结构数据，只是缓存了实体的三角面片信息，项目的基本信息，SourceProject为IfcStore
+    /// </summary>
     public class THBimProject : THBimElement,IEquatable<THBimProject>
     {
+		/// <summary>
+		/// 项目Id，唯一Id
+		/// </summary>
         public string ProjectIdentity { get; set; }
+		/// <summary>
+		/// 项目分类
+		/// </summary>
         public BuildingCatagory Catagory { get; set; }
         public THBimSite ProjectSite { get; set; }
+		/// <summary>
+		/// 原项目
+		/// </summary>
         public object SourceProject { get; set; }
+		/// <summary>
+		/// 项目名称
+		/// </summary>
 		public string SourceName { get; set; }
-		public bool NeedCreateMesh { get; set; }
-		public bool HaveChange { get; set; }
+		/// <summary>
+		/// 是否需要根据创建的实体读取Mesh
+		/// </summary>
+		public bool NeedReadEntityMesh { get; set; }
+		/// <summary>
+		/// 缓存 - 本项目中的实体三角面片索引信息
+		/// </summary>
 		private Dictionary<string,GeometryMeshModel> _allGeoMeshModels { get; }
+		/// <summary>
+		/// 缓存 - 本项目中的实体三角面片点向量的信息
+		/// </summary>
 		private List<PointNormal> _allGeoPointNormals { get; }
+		/// <summary>
+		/// 项目中的实体
+		/// </summary>
 		public Dictionary<string,THBimEntity> PrjAllEntitys { get; }
+		/// <summary>
+		/// 项目中的显示实体和具体实体的关联关系（多个显示实体可以指向同一个实体，关系中有Transform进行转换）
+		/// </summary>
 		public Dictionary<string,THBimElementRelation> PrjAllRelations { get; }
+		/// <summary>
+		/// 项目中所有的楼层缓存（如果Id有重复的也只显示一个）
+		/// </summary>
         public Dictionary<string, THBimStorey> PrjAllStoreys { get; }
+		/// <summary>
+		/// 不显示实体类别名称
+		/// </summary>
 		public List<string> UnShowEntityTypes { get; }
-
-		public List<GridLine> GridLines { get; set; }
-		public List<GridCircle> GridCircles { get; set; }
-		public List<GridText> GridTexts { get; set; }
-
         public THBimProject(int id, string name, string describe = "", string uid = "") : base(id, name, describe, uid)
         {
-			HaveChange = false;
-			NeedCreateMesh = true;
+			NeedReadEntityMesh = true;
 			_allGeoMeshModels = new Dictionary<string, GeometryMeshModel>();
 			_allGeoPointNormals = new List<PointNormal>();
 			PrjAllEntitys = new Dictionary<string, THBimEntity>();
 			PrjAllRelations = new Dictionary<string, THBimElementRelation>();
 			PrjAllStoreys = new Dictionary<string, THBimStorey>();
 			UnShowEntityTypes = new List<string>();
+            this.PorjectChanged += THBimProject_PorjectChanged;
 		}
+		public void ProjectChanged()
+		{
+			PorjectChanged.Invoke(this, null);
+		}
+		private void THBimProject_PorjectChanged(object sender, EventArgs e)
+        {
+			UpdateCatchStoreyRelation();
+			if(NeedReadEntityMesh)
+				UpdataGeometryMeshModel();
+		}
+
         public override object Clone()
         {
             throw new NotImplementedException();
@@ -53,9 +95,88 @@ namespace THBimEngine.Domain
             if (!base.Equals(other)) return false;
             return true;
         }
-
-        public void UpdataGeometryMeshModel() 
+        public Dictionary<string,GeometryMeshModel> AllGeoModels()
         {
+			var resList = new Dictionary<string,GeometryMeshModel>();
+			foreach (var item in _allGeoMeshModels) 
+			{
+				resList.Add(item.Key,item.Value.Clone() as GeometryMeshModel);
+			}
+			return resList;
+		}
+        public List<PointNormal> AllGeoPointNormals()
+        {
+			var resList = new List<PointNormal>();
+			foreach (var item in _allGeoPointNormals) 
+			{
+				var clonedPt = item.Clone();
+				resList.Add(clonedPt);
+			}
+			return resList;
+        }
+		public void AddGeoMeshModels(List<GeometryMeshModel> meshModels, List<PointNormal> pointNormals) 
+		{
+			_allGeoMeshModels.Clear();
+			_allGeoPointNormals.Clear();
+			foreach (var item in meshModels)
+			{
+				_allGeoMeshModels.Add(item.EntityLable,item);
+			}
+			_allGeoPointNormals.AddRange(pointNormals);
+			PorjectChanged.Invoke(this, null);
+		}
+		public void RemoveEntitys(THBimBuilding bimBuilding, List<string> rmEntityIds) 
+		{
+			var thisStoreys = bimBuilding.BuildingStoreys;
+			if (null == rmEntityIds || rmEntityIds.Count < 1)
+				return;
+			var rmIds = new List<string>();
+			foreach (var entityId in rmEntityIds)
+			{
+				if (!PrjAllEntitys.ContainsKey(entityId))
+					continue;
+				var entity = PrjAllEntitys[entityId];
+				var pid = entity.ParentUid;
+				while (!string.IsNullOrEmpty(pid) && !thisStoreys.ContainsKey(pid))
+				{
+					var pEntity = PrjAllEntitys[pid];
+					pid = pEntity.ParentUid;
+				}
+				rmIds.Add(entityId);
+				if (string.IsNullOrEmpty(pid))
+					continue;
+				foreach (var storeyKeyValue in thisStoreys)
+				{
+					var storey = storeyKeyValue.Value;
+					if (storey.Uid != pid && storey.MemoryStoreyId != pid)
+						continue;
+					var rmRealtion = storey.FloorEntityRelations.Where(c => c.Value.RelationElementUid == entityId).Select(c => c.Key).ToList();
+					foreach (var rmId in rmRealtion)
+					{
+						storey.FloorEntityRelations.Remove(rmId);
+					}
+				}
+			}
+			foreach (var rmId in rmIds)
+			{
+				PrjAllEntitys.Remove(rmId);
+			}
+		}
+		/// <summary>
+		/// Document修改事件
+		/// </summary>
+		public event EventHandler PorjectChanged;
+		public void ClearAllData()
+		{
+			PrjAllStoreys.Clear();
+			PrjAllRelations.Clear();
+			PrjAllEntitys.Clear();
+			_allGeoMeshModels.Clear();
+			_allGeoPointNormals.Clear();
+			PorjectChanged.Invoke(this, null);
+		}
+		private void UpdataGeometryMeshModel()
+		{
 			var meshResult = new GeometryMeshResult();
 			var allStoreys = PrjAllStoreys.Values.ToList();
 			Parallel.ForEach(allStoreys, new ParallelOptions(), storey =>
@@ -157,63 +278,14 @@ namespace THBimEngine.Domain
 			_allGeoMeshModels.Clear();
 			_allGeoPointNormals.Clear();
 			_allGeoPointNormals.AddRange(meshResult.AllGeoPointNormals);
-			foreach (var item in meshResult.AllGeoModels) 
+			foreach (var item in meshResult.AllGeoModels)
 			{
 				_allGeoMeshModels.Add(item.EntityLable, item);
 			}
 		}
-        public Dictionary<string,GeometryMeshModel> AllGeoModels()
-        {
-			var resList = new Dictionary<string,GeometryMeshModel>();
-			foreach (var item in _allGeoMeshModels) 
-			{
-				resList.Add(item.Key,item.Value.Clone() as GeometryMeshModel);
-			}
-			return resList;
-		}
-        public List<PointNormal> AllGeoPointNormals(bool yzExchange = false)
-        {
-			var resList = new List<PointNormal>();
-			foreach (var item in _allGeoPointNormals) 
-			{
-				var clonedPt = item.Clone();
-				//if(yzExchange)
-    //            {
-				//	float y = clonedPt.Point.Y;
-				//	float z = clonedPt.Point.Z;
-				//	clonedPt.Point.Y = z;
-				//	clonedPt.Point.Z = y;
-				//}
-				resList.Add(clonedPt);
-			}
-			return resList;
-        }
-		/// <summary>
-		/// 临时使用，后续删除
-		/// </summary>
-		/// <param name="meshModels"></param>
-		/// <param name="pointNormals"></param>
-		public void AddGeoMeshModels(List<GeometryMeshModel> meshModels, List<PointNormal> pointNormals) 
+		private void UpdateCatchStoreyRelation()
 		{
-			_allGeoMeshModels.Clear();
-			_allGeoPointNormals.Clear();
-			foreach (var item in meshModels)
-			{
-				_allGeoMeshModels.Add(item.EntityLable,item);
-			}
-			_allGeoPointNormals.AddRange(pointNormals);
-		}
-		public void ClearAllData()
-		{
-			PrjAllStoreys.Clear();
-			PrjAllRelations.Clear();
-			PrjAllEntitys.Clear();
-			_allGeoMeshModels.Clear();
-			_allGeoPointNormals.Clear();
-		}
-		public void UpdateCatchStoreyRelation()
-		{
-			if (!NeedCreateMesh && PrjAllStoreys.Count>0)
+			if (!NeedReadEntityMesh && PrjAllStoreys.Count>0)
 				return;
             PrjAllStoreys.Clear();
 			PrjAllRelations.Clear();
@@ -224,7 +296,6 @@ namespace THBimEngine.Domain
 				//In 1.4G 'wanda' model, two roof stories have same Uid
 				if(!PrjAllStoreys.ContainsKey(storey.Uid))
 					PrjAllStoreys.Add(storey.Uid, storey);
-
 				foreach (var relation in storey.FloorEntityRelations)
 				{
 					if (PrjAllRelations.ContainsKey(relation.Key))

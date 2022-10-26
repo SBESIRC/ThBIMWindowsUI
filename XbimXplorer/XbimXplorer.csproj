@@ -294,11 +294,8 @@
     <Compile Include="IfcValidation\ValidationWindow.xaml.cs">
       <DependentUpon>ValidationWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ThBIMEngine\IfcStoreReadGeomtry.cs" />
-    <Compile Include="ThBIMEngine\IfcStoreToEngineFile.cs" />
-    <Compile Include="ThBIMEngine\SUProjectReadGeomtry.cs" />
+    <Compile Include="ThBIMEngine\DataToEngine.cs" />
     <Compile Include="ThBIMEngine\ThBimCutData.cs" />
-    <Compile Include="ThBIMEngine\ThBimDataController.cs" />
     <Compile Include="ThBIMEngine\ThYDBToIfcConvertService.cs" />
     <Compile Include="THPluginSystem\LeftPluginMainUControl.xaml.cs">
       <DependentUpon>LeftPluginMainUControl.xaml</DependentUpon>
@@ -306,6 +303,10 @@
     <Compile Include="THPluginSystem\LeftPluginViewModel.cs" />
     <Compile Include="THPluginSystem\PluginService.cs" />
     <Compile Include="THPluginSystem\TopPluginViewModel.cs" />
+    <Compile Include="XplorerMainWindow.IApplication.xaml.cs">
+      <DependentUpon>XplorerMainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="XplorerMainWindow.LoadFile.xaml.cs">
       <DependentUpon>XplorerMainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

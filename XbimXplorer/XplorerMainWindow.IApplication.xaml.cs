@@ -15,7 +15,7 @@ namespace XbimXplorer
         {
             this.DocumentManage = new THDocumentManage(ProgressChanged);
 
-            var testProject = new THDocument(Guid.NewGuid().ToString(), "测试", ProgressChanged);
+            var testProject = new THDocument(Guid.NewGuid().ToString(), "测试", ProgressChanged,Log);
             testProject.UnShowEntityTypes.Add("open");
             testProject.UnShowEntityTypes.Add(typeof(THBimOpening).Name);
             testProject.UnShowEntityTypes.Add("hole");

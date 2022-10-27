@@ -102,15 +102,12 @@ namespace XbimXplorer
         {
             if (null != thProject)
             {
-                ExampleScene.ifcre_set_sleep_time(1000);
-                DateTime startTime = DateTime.Now;
-                CurrentDocument.AddProject(thProject, projectMatrix3D);
+                var project = thProject;
                 thProject = null;
                 pipeServer = null;
                 backgroundWorker.RunWorkerAsync();
-                DateTime endTime = DateTime.Now;
-                var totalTime = (endTime - startTime).TotalSeconds;
-                Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
+                CurrentDocument.AddProject(project, projectMatrix3D);
+                
             }
         }
 
@@ -144,15 +141,11 @@ namespace XbimXplorer
         {
             if (null != suProject)
             {
-                ExampleScene.ifcre_set_sleep_time(1000);
-                DateTime startTime = DateTime.Now;
-                CurrentDocument.AddProject(suProject, projectMatrix3D);
+                var project = suProject;
                 suProject = null;
                 SU_pipeServer = null;
                 SU_backgroundWorker.RunWorkerAsync();
-                DateTime endTime = DateTime.Now;
-                var totalTime = (endTime - startTime).TotalSeconds;
-                Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
+                CurrentDocument.AddProject(suProject, projectMatrix3D);
             }
         }
 
@@ -179,14 +172,8 @@ namespace XbimXplorer
 
         private void ifc_BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            ExampleScene.ifcre_set_sleep_time(1000);
-            DateTime startTime = DateTime.Now;
-            LoadStreamToCurrentDocument(streamParameter);
-            ifc_pipeServer = null;
             ifc_backgroundWorker.RunWorkerAsync();
-            DateTime endTime = DateTime.Now;
-            var totalTime = (endTime - startTime).TotalSeconds;
-            Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
+            LoadStreamToCurrentDocument(streamParameter);
         }
 
         private void file_Background_DoWork(object sender, DoWorkEventArgs e)
@@ -238,15 +225,9 @@ namespace XbimXplorer
                 //    mergeIfc.SaveAs(newName);
                 //}
                 //#endregion
-                ExampleScene.ifcre_set_sleep_time(1000);
-                DateTime startTime = DateTime.Now;
-                LoadFileToCurrentDocument(ifc_ProjectPath, null);
                 file_pipeServer = null;
                 file_backgroundWorker.RunWorkerAsync();
-                DateTime endTime = DateTime.Now;
-                var totalTime = (endTime - startTime).TotalSeconds;
-                Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
-                //RenderScene();
+                LoadFileToCurrentDocument(ifc_ProjectPath, null);
             }
         }
         #endregion

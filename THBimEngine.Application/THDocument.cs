@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using THBimEngine.Domain;
@@ -19,11 +20,13 @@ namespace THBimEngine.Application
 		public string DocumentName { get; set; }
 		#region
 		private DocumentProjectEngine projectEngine;
+		private ILog appLog;
 		#endregion
-		public THDocument(string id, string name,ProgressChangedEventHandler progress)
+		public THDocument(string id, string name,ProgressChangedEventHandler progress,ILog log)
 		{
 			DocumentId = id;
 			DocumentName = name;
+			appLog = log;
 			AllBimProjects = new List<THBimProject>();
 			AllStoreys = new Dictionary<string, THBimStorey>();
 			AllGeoModels = new List<GeometryMeshModel>();
@@ -79,6 +82,7 @@ namespace THBimEngine.Application
 		{
 			if (project == null)
 				return;
+			var startTime = System.DateTime.Now;
 			XbimMatrix3D projectMatrix3D = matrix3d.HasValue? matrix3d.Value: XbimMatrix3D.CreateTranslation(XbimVector3D.Zero);
 			if (project is IfcStore ifcStore)
 			{
@@ -95,6 +99,12 @@ namespace THBimEngine.Application
 			else 
 			{
 				throw new NotSupportedException();
+			}
+			var endTime = System.DateTime.Now;
+			var totalTime = (endTime - startTime).TotalSeconds;
+			if (null != appLog)
+			{
+				appLog.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
 			}
 			if (projectEngine.HaveChange)
 			{

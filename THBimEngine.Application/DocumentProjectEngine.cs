@@ -162,6 +162,7 @@ namespace THBimEngine.Application
                             if (!haveEntity)
                                 continue;
                             var newStorey = newBuilding.BuildingStoreys[storey.Uid];
+                            storey.GridLineSyetemData = newStorey.GridLineSyetemData;
                             if (!string.IsNullOrEmpty(newStorey.MemoryStoreyId))
                             {
                                 //楼层变为标准层非首层数据

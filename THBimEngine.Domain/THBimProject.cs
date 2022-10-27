@@ -148,6 +148,8 @@ namespace THBimEngine.Domain
 				foreach (var storeyKeyValue in thisStoreys)
 				{
 					var storey = storeyKeyValue.Value;
+					if (storey.FloorEntitys.ContainsKey(entityId))
+						storey.FloorEntitys.Remove(entityId);
 					if (storey.Uid != pid && storey.MemoryStoreyId != pid)
 						continue;
 					var rmRealtion = storey.FloorEntityRelations.Where(c => c.Value.RelationElementUid == entityId).Select(c => c.Key).ToList();

@@ -310,8 +310,8 @@ namespace THBimEngine.Application
                 }
                 if (HaveChange)
                 {
-                    project.ProjectChanged();
                     UpateEntitySolidMesh(project, updateMeshIds);
+                    project.ProjectChanged();
                 }
                 if (!HaveChange && !projectResult.BimProject.Matrix3D.Equals(project.Matrix3D))
                 {
@@ -336,6 +336,7 @@ namespace THBimEngine.Application
                 }
                 if (string.IsNullOrEmpty(pid) || !building.BuildingStoreys.ContainsKey(pid))
                     continue;
+                bimProject.PrjAllEntitys.Add(entityKeyValue.Key, entityKeyValue.Value);
                 entityKeyValue.Value.Id = idOffSet;
                 foreach (var storeyKeyValue in building.BuildingStoreys)
                 {

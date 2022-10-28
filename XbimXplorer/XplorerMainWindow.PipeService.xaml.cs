@@ -145,7 +145,7 @@ namespace XbimXplorer
                 suProject = null;
                 SU_pipeServer = null;
                 SU_backgroundWorker.RunWorkerAsync();
-                CurrentDocument.AddProject(suProject, projectMatrix3D);
+                CurrentDocument.AddProject(project, projectMatrix3D);
             }
         }
 

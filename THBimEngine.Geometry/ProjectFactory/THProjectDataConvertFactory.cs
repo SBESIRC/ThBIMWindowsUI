@@ -149,6 +149,13 @@ namespace THBimEngine.Geometry.ProjectFactory
                         entityRelation.RelationElementId = relation.RelationElementId;
                         bimStorey.FloorEntityRelations.Add(entityRelation.Uid, entityRelation);
                     }
+                    if (null == gridSystem)
+                    {
+                        var tempStorey = building.Storeys.Where(c => c.BuildElement.Root.GlobalId == memoryStorey.Uid).FirstOrDefault();
+                        if (null != tempStorey)
+                            gridSystem = tempStorey.GridLineSystem;
+                    }
+                    StoreyAddGridEntity(gridSystem, bimStorey);
                 }
                 else
                 {
@@ -284,103 +291,7 @@ namespace THBimEngine.Geometry.ProjectFactory
                             allEntitys.Add(bimRailing.Uid, bimRailing);
                         }
                     });
-                    if (gridSystem != null)
-                    {
-                        if (gridSystem.GridLines != null)
-                        {
-                            foreach (var gridLine in gridSystem.GridLines)
-                            {
-                                var bimGridLine = new GridLine(gridLine, 1, storey.Elevation);
-                                bimGridLine.ParentUid = bimStorey.Uid;
-                                var gridLineRelation = new THBimElementRelation(bimGridLine.Id, bimGridLine.Name, bimGridLine, bimGridLine.Describe, bimGridLine.Uid);
-                                bimStorey.FloorEntityRelations.Add(bimGridLine.Uid, gridLineRelation);
-                                bimStorey.FloorEntitys.Add(bimGridLine.Uid, bimGridLine);
-                                lock (allEntitys)
-                                {
-                                    allEntitys.Add(bimGridLine.Uid, bimGridLine);
-                                }
-                            }
-                        }
-                        if (gridSystem.CircleLableGroups != null)
-                        {
-                            foreach (var gridCircleGroup in gridSystem.CircleLableGroups)
-                            {
-                                foreach (var circleLable in gridCircleGroup.CircleLables)
-                                {
-                                    var bimGridLine = new GridLine(circleLable, storey.Elevation);
-                                    bimGridLine.ParentUid = bimStorey.Uid;
-                                    var gridLineRelation = new THBimElementRelation(bimGridLine.Id, bimGridLine.Name, bimGridLine, bimGridLine.Describe, bimGridLine.Uid);
-                                    bimStorey.FloorEntityRelations.Add(bimGridLine.Uid, gridLineRelation);
-                                    bimStorey.FloorEntitys.Add(bimGridLine.Uid, bimGridLine);
-                                    lock (allEntitys)
-                                    {
-                                        allEntitys.Add(bimGridLine.Uid, bimGridLine);
-                                    }
-
-
-                                    var bimGridCircle = new GridCircle(circleLable, storey.Elevation);
-                                    bimGridCircle.ParentUid = bimStorey.Uid;
-                                    var gridCircleRelation = new THBimElementRelation(bimGridCircle.Id, bimGridCircle.Name, bimGridCircle, bimGridCircle.Describe, bimGridCircle.Uid);
-                                    bimStorey.FloorEntityRelations.Add(bimGridCircle.Uid, gridCircleRelation);
-                                    bimStorey.FloorEntitys.Add(bimGridCircle.Uid, bimGridCircle);
-                                    lock (allEntitys)
-                                    {
-                                        allEntitys.Add(bimGridCircle.Uid, bimGridCircle);
-                                    }
-
-                                    var bimGridText = new GridText(circleLable, storey.Elevation);
-                                    bimGridText.ParentUid = bimStorey.Uid;
-                                    var gridTextRelation = new THBimElementRelation(bimGridText.Id, bimGridText.Name, bimGridText, bimGridText.Describe, bimGridText.Uid);
-                                    bimStorey.FloorEntityRelations.Add(bimGridText.Uid, gridTextRelation);
-                                    bimStorey.FloorEntitys.Add(bimGridText.Uid, bimGridText);
-                                    lock (allEntitys)
-                                    {
-                                        allEntitys.Add(bimGridText.Uid, bimGridText);
-                                    }
-                                }
-                            }
-                        }
-                        if (gridSystem.DimensionGroups != null)
-                        {
-                            foreach (var gridDimensionGroup in gridSystem.DimensionGroups)
-                            {
-                                foreach (var gridDimension in gridDimensionGroup.Dimensions)
-                                {
-                                    var dimLines = gridDimension.DimLines;
-                                    var mark = gridDimension.Mark;
-
-                                    for (int i = 0; i < dimLines.Count; i++)
-                                    {
-                                        var dimLine = dimLines[i];
-                                        var bimGridLine = new GridLine(dimLine, storey.Elevation);
-                                        bimGridLine.ParentUid = bimStorey.Uid;
-                                        var gridLineRelation = new THBimElementRelation(bimGridLine.Id, bimGridLine.Name, bimGridLine, bimGridLine.Describe, bimGridLine.Uid);
-                                        bimStorey.FloorEntityRelations.Add(bimGridLine.Uid, gridLineRelation);
-                                        bimStorey.FloorEntitys.Add(bimGridLine.Uid, bimGridLine);
-                                        lock (allEntitys)
-                                        {
-                                            allEntitys.Add(bimGridLine.Uid, bimGridLine);
-                                        }
-
-
-                                        if (i == dimLines.Count - 1)
-                                        {
-                                            var bimGridText = new GridText(dimLine, mark, storey.Elevation);
-                                            bimGridText.ParentUid = bimStorey.Uid;
-                                            var gridTextRelation = new THBimElementRelation(bimGridText.Id, bimGridText.Name, bimGridText, bimGridText.Describe, bimGridText.Uid);
-                                            bimStorey.FloorEntityRelations.Add(bimGridText.Uid, gridTextRelation);
-                                            bimStorey.FloorEntitys.Add(bimGridText.Uid, bimGridText);
-                                            lock (allEntitys)
-                                            {
-                                                allEntitys.Add(bimGridText.Uid, bimGridText);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
+                    StoreyAddGridEntity(gridSystem, bimStorey);
                     prjEntityFloors.Add(bimStorey.Uid, bimStorey);
                 }
                 allStoreys.Add(bimStorey.Uid, bimStorey);
@@ -400,6 +311,105 @@ namespace THBimEngine.Geometry.ProjectFactory
             var bimOpening = new THBimOpening(openingId, string.Format("opening#{0}", openingId), "", cloneParam);
             openingRelation = new THBimElementRelation(bimOpening.Id, bimOpening.Name, bimOpening, bimOpening.Describe, bimOpening.Uid);
             return bimOpening;
+        }
+        private void StoreyAddGridEntity(ThGridLineSyetemData gridSystem, THBimStorey bimStorey) 
+        {
+            if (gridSystem != null)
+            {
+                if (gridSystem.GridLines != null)
+                {
+                    foreach (var gridLine in gridSystem.GridLines)
+                    {
+                        var bimGridLine = new GridLine(gridLine, 1, bimStorey.Elevation);
+                        bimGridLine.ParentUid = bimStorey.Uid;
+                        var gridLineRelation = new THBimElementRelation(bimGridLine.Id, bimGridLine.Name, bimGridLine, bimGridLine.Describe, bimGridLine.Uid);
+                        bimStorey.FloorEntityRelations.Add(bimGridLine.Uid, gridLineRelation);
+                        bimStorey.FloorEntitys.Add(bimGridLine.Uid, bimGridLine);
+                        lock (allEntitys)
+                        {
+                            allEntitys.Add(bimGridLine.Uid, bimGridLine);
+                        }
+                    }
+                }
+                if (gridSystem.CircleLableGroups != null)
+                {
+                    foreach (var gridCircleGroup in gridSystem.CircleLableGroups)
+                    {
+                        foreach (var circleLable in gridCircleGroup.CircleLables)
+                        {
+                            var bimGridLine = new GridLine(circleLable, bimStorey.Elevation);
+                            bimGridLine.ParentUid = bimStorey.Uid;
+                            var gridLineRelation = new THBimElementRelation(bimGridLine.Id, bimGridLine.Name, bimGridLine, bimGridLine.Describe, bimGridLine.Uid);
+                            bimStorey.FloorEntityRelations.Add(bimGridLine.Uid, gridLineRelation);
+                            bimStorey.FloorEntitys.Add(bimGridLine.Uid, bimGridLine);
+                            lock (allEntitys)
+                            {
+                                allEntitys.Add(bimGridLine.Uid, bimGridLine);
+                            }
+
+
+                            var bimGridCircle = new GridCircle(circleLable, bimStorey.Elevation);
+                            bimGridCircle.ParentUid = bimStorey.Uid;
+                            var gridCircleRelation = new THBimElementRelation(bimGridCircle.Id, bimGridCircle.Name, bimGridCircle, bimGridCircle.Describe, bimGridCircle.Uid);
+                            bimStorey.FloorEntityRelations.Add(bimGridCircle.Uid, gridCircleRelation);
+                            bimStorey.FloorEntitys.Add(bimGridCircle.Uid, bimGridCircle);
+                            lock (allEntitys)
+                            {
+                                allEntitys.Add(bimGridCircle.Uid, bimGridCircle);
+                            }
+
+                            var bimGridText = new GridText(circleLable, bimStorey.Elevation);
+                            bimGridText.ParentUid = bimStorey.Uid;
+                            var gridTextRelation = new THBimElementRelation(bimGridText.Id, bimGridText.Name, bimGridText, bimGridText.Describe, bimGridText.Uid);
+                            bimStorey.FloorEntityRelations.Add(bimGridText.Uid, gridTextRelation);
+                            bimStorey.FloorEntitys.Add(bimGridText.Uid, bimGridText);
+                            lock (allEntitys)
+                            {
+                                allEntitys.Add(bimGridText.Uid, bimGridText);
+                            }
+                        }
+                    }
+                }
+                if (gridSystem.DimensionGroups != null)
+                {
+                    foreach (var gridDimensionGroup in gridSystem.DimensionGroups)
+                    {
+                        foreach (var gridDimension in gridDimensionGroup.Dimensions)
+                        {
+                            var dimLines = gridDimension.DimLines;
+                            var mark = gridDimension.Mark;
+
+                            for (int i = 0; i < dimLines.Count; i++)
+                            {
+                                var dimLine = dimLines[i];
+                                var bimGridLine = new GridLine(dimLine, bimStorey.Elevation);
+                                bimGridLine.ParentUid = bimStorey.Uid;
+                                var gridLineRelation = new THBimElementRelation(bimGridLine.Id, bimGridLine.Name, bimGridLine, bimGridLine.Describe, bimGridLine.Uid);
+                                bimStorey.FloorEntityRelations.Add(bimGridLine.Uid, gridLineRelation);
+                                bimStorey.FloorEntitys.Add(bimGridLine.Uid, bimGridLine);
+                                lock (allEntitys)
+                                {
+                                    allEntitys.Add(bimGridLine.Uid, bimGridLine);
+                                }
+
+
+                                if (i == dimLines.Count - 1)
+                                {
+                                    var bimGridText = new GridText(dimLine, mark, bimStorey.Elevation);
+                                    bimGridText.ParentUid = bimStorey.Uid;
+                                    var gridTextRelation = new THBimElementRelation(bimGridText.Id, bimGridText.Name, bimGridText, bimGridText.Describe, bimGridText.Uid);
+                                    bimStorey.FloorEntityRelations.Add(bimGridText.Uid, gridTextRelation);
+                                    bimStorey.FloorEntitys.Add(bimGridText.Uid, bimGridText);
+                                    lock (allEntitys)
+                                    {
+                                        allEntitys.Add(bimGridText.Uid, bimGridText);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

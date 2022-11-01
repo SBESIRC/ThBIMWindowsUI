@@ -12,7 +12,7 @@ namespace THBimEngine.Application
         {
             List<GeometryMeshModel> AllModels = new List<GeometryMeshModel>();
             allPointNormals = new List<PointNormal>();
-            var buildings = project.Buildings;
+            var buildings = project.Building.Storeys.SelectMany(o => o.Buildings);
             var definitions = project.Definitions;
             //var _ptIndex = 0;
             var _ptCount = 0;

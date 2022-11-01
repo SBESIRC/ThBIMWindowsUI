@@ -51,15 +51,15 @@ namespace THBimEngine.Geometry.ProjectFactory
             bimProject.ProjectIdentity = project.Root.GlobalId;
             var bimSite = new THBimSite(CurrentGIndex(), "", "", project.Root.GlobalId + "Site");//project.Site.Uuid 暂时SU还没有Site的概念，后续补充
             var bimBuilding = new THBimBuilding(CurrentGIndex(), project.Root.GlobalId + "BuildingName", "", project.Root.GlobalId + "BuildingUuid");//同理，暂时SU也没有Building的概念，后续补充
-            //foreach (var storey in project.Site.Building.Storeys) //也暂时没有Storey的概念。。。
+            foreach (var storey in project.Building.Storeys) //也暂时没有Storey的概念。。。
             {
-                var bimStorey = new THBimStorey(CurrentGIndex(), project.Root.GlobalId + "StoreyNumber", 0, 3000, "", project.Root.GlobalId + "StoreyUuid");
+                var bimStorey = new THBimStorey(CurrentGIndex(), storey.Number.ToString(), storey.Elevation, storey.Height, "", storey.Root.GlobalId);
                 var suDefinitions = project.Definitions;
                 bimStorey.Matrix3D = XbimMatrix3D.CreateTranslation(new XbimVector3D(0, 0, 0));
                 {
                     //多线程有少数据导致后面报错，后续再处理
                     var moveVector = new XbimVector3D(0, 0, 0);
-                    Parallel.ForEach(project.Buildings, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, component =>
+                    Parallel.ForEach(storey.Buildings, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, component =>
                     {
                         var componentId = CurrentGIndex();
                         var bimComponent = new THBimUntypedEntity(componentId, 

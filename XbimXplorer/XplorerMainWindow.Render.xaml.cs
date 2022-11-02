@@ -79,8 +79,8 @@ namespace XbimXplorer
             Log.Info(string.Format("渲染前准备工作完成，耗时：{0}s", totalTime));
             _dispatcherTimer.Start();
             ProgressChanged(this, new ProgressChangedEventArgs(0, ""));
-            //Thread thread = new Thread(new ThreadStart(Func));
-            //thread.Start();
+            Thread thread = new Thread(new ThreadStart(Func));
+            thread.Start();
             ExampleScene.Render();
             
         }

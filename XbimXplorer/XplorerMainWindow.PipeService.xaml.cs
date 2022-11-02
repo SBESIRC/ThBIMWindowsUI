@@ -57,10 +57,10 @@ namespace XbimXplorer
             file_backgroundWorker.RunWorkerCompleted += file_BackgroundWorker_RunWorkerCompleted;
             file_backgroundWorker.RunWorkerAsync();
 
-            cutData_backgroundWork = new BackgroundWorker();
-            cutData_backgroundWork.DoWork += CutData_backgroundWork_DoWork;
-            cutData_backgroundWork.RunWorkerCompleted += CutData_backgroundWork_RunWorkerCompleted;
-            cutData_backgroundWork.RunWorkerAsync();
+            //cutData_backgroundWork = new BackgroundWorker();
+            //cutData_backgroundWork.DoWork += CutData_backgroundWork_DoWork;
+            //cutData_backgroundWork.RunWorkerCompleted += CutData_backgroundWork_RunWorkerCompleted;
+            //cutData_backgroundWork.RunWorkerAsync();
         }
 
         private void CutData_backgroundWork_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -72,10 +72,14 @@ namespace XbimXplorer
             if (CurrentDocument != null && CurrentDocument.AllBimProjects.Count > 0)
             {
                 var prjName = CurrentDocument.AllBimProjects.First().ProjectIdentity.Split('.').First() + "-100%.ifc";
-                CurrentDocument.DocumentChanged -= RunCutData_DocumentChanged;
-                CurrentDocument.ClearAllData();
-                CurrentDocument.DocumentChanged += RunCutData_DocumentChanged;
-                LoadFileToCurrentDocument(prjName, null);
+                var ifcStore = ThBimCutData.GetIfcStore(prjName);
+                var readGeomtry = new IfcStoreReadGeomtry(new XbimMatrix3D());
+                var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out List<PointNormal> allGeoPointNormals);
+                ThBimCutData.Run(ifcStore, allGeoModels, allGeoPointNormals);
+                //CurrentDocument.DocumentChanged -= RunCutData_DocumentChanged;
+                //CurrentDocument.ClearAllData();
+                //CurrentDocument.DocumentChanged += RunCutData_DocumentChanged;
+                //LoadFileToCurrentDocument(prjName, null);
             }
 
             cutData_backgroundWork.RunWorkerAsync();

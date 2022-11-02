@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Xbim.Common;
 using Xbim.Ifc;
 
 namespace XbimXplorer.Extensions.ModelMerge
@@ -63,6 +64,13 @@ namespace XbimXplorer.Extensions.ModelMerge
                 }
             }
             StoreyDic = StoreyDic.OrderBy(x => x.Item1).ToList();
+
+            PropertyTranformDelegate semanticFilter = (property, parentObject) =>
+            {
+                return property.PropertyInfo.GetValue(parentObject, null);
+            };
+            //single map should be used for all insertions between two models
+            var map = new XbimInstanceHandleMap(smallModel, bigModel);
 
             //处理5%
             foreach (Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey BuildingStorey in smallBuildings.BuildingStoreys)
@@ -144,25 +152,29 @@ namespace XbimXplorer.Extensions.ModelMerge
                         ////示例： 一个墙最终表达到Viewer的坐标。 是自己的坐标 + wall_Location + Storey_Location
                         //var wall_z = ((wall.ObjectPlacement as Xbim.Ifc2x3.GeometricConstraintResource.IfcLocalPlacement).RelativePlacement as Xbim.Ifc2x3.GeometryResource.IfcPlacement).Location.Z;
                     }
-                    foreach (var wall in walls)
+                    using (var txn = bigModel.BeginTransaction("Insert copy"))
                     {
-                        var newWall = wall.CloneAndCreateNew(bigModel);
-                        CreatWalls.Add(newWall);
-                    }
-                    foreach (var slab in slabs)
-                    {
-                        var newSlab = slab.CloneAndCreateNew(bigModel);
-                        CreatSlabs.Add(newSlab);
-                    }
-                    foreach (var beam in beams)
-                    {
-                        var newBeam = beam.CloneAndCreateNew(bigModel);
-                        CreatBeams.Add(newBeam);
-                    }
-                    foreach (var column in columns)
-                    {
-                        var newColumn = column.CloneAndCreateNew(bigModel);
-                        CreatColumns.Add(newColumn);
+                        foreach (var wall in walls)
+                        {
+                            var newWall = bigModel.InsertCopy(wall, map, semanticFilter, false, false);
+                            CreatWalls.Add(newWall);
+                        }
+                        foreach (var slab in slabs)
+                        {
+                            var newSlab = bigModel.InsertCopy(slab, map, semanticFilter, false, false);
+                            CreatSlabs.Add(newSlab);
+                        }
+                        foreach (var beam in beams)
+                        {
+                            var newBeam = bigModel.InsertCopy(beam, map, semanticFilter, false, false);
+                            CreatBeams.Add(newBeam);
+                        }
+                        foreach (var column in columns)
+                        {
+                            var newColumn = bigModel.InsertCopy(column, map, semanticFilter, false, false);
+                            CreatColumns.Add(newColumn);
+                        }
+                        txn.Commit();
                     }
                 }
                 using (var txn = bigModel.BeginTransaction("relContainEntitys2Storey"))
@@ -182,6 +194,34 @@ namespace XbimXplorer.Extensions.ModelMerge
 
             //返回
             return bigModel;
+        }
+
+        public IfcStore ModelMerge(IfcStore model)
+        {
+            //暂时认为Model版本是2x3的
+            var project = model.Instances.FirstOrDefault<Xbim.Ifc2x3.Kernel.IfcProject>();
+            var sites = project.Sites;
+            if(sites.Count() == 2)
+            {
+                var structureSite = sites.First();//结构Site
+                var architectureSite = sites.Last();//建筑Site
+                var structureBuilding = structureSite.Buildings.FirstOrDefault() as Xbim.Ifc2x3.ProductExtension.IfcBuilding;
+                var architectureBuilding = architectureSite.Buildings.FirstOrDefault() as Xbim.Ifc2x3.ProductExtension.IfcBuilding;
+                foreach (Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey architectureStorey in architectureBuilding.BuildingStoreys)
+                {
+                    var structureStorey = structureBuilding.BuildingStoreys.FirstOrDefault(o => Math.Abs((double)architectureStorey.Elevation.Value - (double)o.Elevation.Value) < 200);
+                    if(structureStorey != null)
+                    {
+                        //Pset_BuildingStoreyCommon
+                        //architectureStorey.PropertySets
+                    }
+                }
+                return null;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

@@ -72,6 +72,7 @@ namespace XbimXplorer.Extensions.ModelMerge
             }
         }
 
+        [Obsolete(("请使用IfcStore.InsertCopy方法"),false)]
         public static IfcWall CloneAndCreateNew(this IfcWall sourceWall, IfcStore model)
         {
             using (var txn = model.BeginTransaction("Create Wall"))
@@ -113,7 +114,7 @@ namespace XbimXplorer.Extensions.ModelMerge
                 return ret;
             }
         }
-
+        [Obsolete(("请使用IfcStore.InsertCopy方法"), false)]
         public static IfcSlab CloneAndCreateNew(this IfcSlab sourceSlab, IfcStore model)
         {
             using (var txn = model.BeginTransaction("Create Slab"))
@@ -155,7 +156,7 @@ namespace XbimXplorer.Extensions.ModelMerge
                 return ret;
             }
         }
-
+        [Obsolete(("请使用IfcStore.InsertCopy方法"), false)]
         public static IfcBeam CloneAndCreateNew(this IfcBeam sourceBeam, IfcStore model)
         {
             using (var txn = model.BeginTransaction("Create Beam"))
@@ -197,7 +198,7 @@ namespace XbimXplorer.Extensions.ModelMerge
                 return ret;
             }
         }
-
+        [Obsolete(("请使用IfcStore.InsertCopy方法"), false)]
         public static IfcColumn CloneAndCreateNew(this IfcColumn sourceColumn, IfcStore model)
         {
             using (var txn = model.BeginTransaction("Create Column"))

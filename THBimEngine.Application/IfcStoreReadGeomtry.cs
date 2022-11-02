@@ -16,7 +16,7 @@ using Xbim.IO.Memory;
 
 namespace THBimEngine.Application
 {
-    class IfcStoreReadGeomtry
+    public class IfcStoreReadGeomtry
 	{
 		public event ProgressChangedEventHandler ProgressChanged;
 		protected List<IPersistEntity> ifcInstances;

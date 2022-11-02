@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Windows;
+using THBimEngine.Application;
 using THBimEngine.Domain;
 using THBimEngine.Domain.Grid;
 using THBimEngine.Presention;
@@ -78,8 +79,8 @@ namespace XbimXplorer
             Log.Info(string.Format("渲染前准备工作完成，耗时：{0}s", totalTime));
             _dispatcherTimer.Start();
             ProgressChanged(this, new ProgressChangedEventArgs(0, ""));
-            Thread thread = new Thread(new ThreadStart(Func));
-            thread.Start();
+            //Thread thread = new Thread(new ThreadStart(Func));
+            //thread.Start();
             ExampleScene.Render();
             
         }
@@ -121,11 +122,15 @@ namespace XbimXplorer
 
 
                 var prjName = CurrentDocument.AllBimProjects.First().ProjectIdentity.Split('.').First() + "-100%.ifc";
+                var ifcStore = ThBimCutData.GetIfcStore(prjName);
+                var readGeomtry = new IfcStoreReadGeomtry(new XbimMatrix3D());
+                var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out List<PointNormal> allGeoPointNormals);
+                ThBimCutData.Run(ifcStore, allGeoModels, allGeoPointNormals);
 
-                CurrentDocument.DocumentChanged -= XplorerMainWindow_DocumentChanged;
-                CurrentDocument.ClearAllData();
-                CurrentDocument.DocumentChanged += XplorerMainWindow_DocumentChanged;
-                LoadFileToCurrentDocument(prjName, null);
+                //CurrentDocument.DocumentChanged -= XplorerMainWindow_DocumentChanged;
+                //CurrentDocument.ClearAllData();
+                //CurrentDocument.DocumentChanged += XplorerMainWindow_DocumentChanged;
+                //LoadFileToCurrentDocument(prjName, null);
                 ViewerMutex.ReleaseMutex();
             }
             catch (Exception ex)

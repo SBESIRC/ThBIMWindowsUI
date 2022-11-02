@@ -1,7 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Text;
+using System.Windows.Controls;
 using THBimEngine.Domain;
 using THBimEngine.Domain.MidModel;
+using Xbim.Ifc;
+using Xbim.IO.Esent;
+using Xbim.ModelGeometry.Scene;
 
 namespace XbimXplorer.ThBIMEngine
 {
@@ -24,6 +31,37 @@ namespace XbimXplorer.ThBIMEngine
                 }
             }
             tempData.WriteMidFile(bimProjects.First().ProjectIdentity);
+        }
+
+        public static void Run(IfcStore ifcStore, List<GeometryMeshModel> allGeoModels, List<PointNormal> allGeoPointNormals)
+        {
+            var tempData = new TempModel();
+            var resList = new Dictionary<string, GeometryMeshModel>();
+            foreach (var item in allGeoModels)
+            {
+                resList.Add(item.EntityLable, item);
+            }
+            tempData.GetIfcFile(ifcStore, resList, allGeoPointNormals);
+            tempData.WriteMidFile(ifcStore.FileName);
+        }
+
+        public static IfcStore GetIfcStore(string ifcFileName)
+        {
+            var model = IfcStore.Open(ifcFileName, null, null, null, XbimDBAccess.Read);
+            if (model.GeometryStore.IsEmpty)
+            {
+                try
+                {
+                    var context = new Xbim3DModelContext(model);
+                    context.UseSimplifiedFastExtruder = false;
+                    context.CreateContext(null, App.ContextWcsAdjustment);
+                }
+                catch (Exception ex)
+                {
+                    ;
+                }
+            }
+            return model;
         }
     }
 }

@@ -53,15 +53,19 @@ namespace THBimEngine.Domain.MidModel
 
         public void GetIfcFile(IfcStore ifcStore, THBimProject bimProject)
         {
+            GetIfcFile(ifcStore, bimProject.AllGeoModels(), bimProject.AllGeoPointNormals());
+        }
+
+        public void GetIfcFile(IfcStore ifcStore, Dictionary<string ,GeometryMeshModel> allGeoModels,List<PointNormal> allGeoPointNormals)
+        {
             int ptIndex = 0;//点索引
             int componentIndex = 0;//属性索引(门、窗等)
             int edgeIndex = 0;//边索引
             int triangleIndex = 0;//三角面片索引
             int uniComponentIndex = 0;//物体索引
 
-            var allGeoModels = bimProject.AllGeoModels();
             int offsetIndex = allPoints.Count;
-            foreach (var pt in bimProject.AllGeoPointNormals())
+            foreach (var pt in allGeoPointNormals)
             {
                 allPoints.Add(pt.GetRealData());
             }

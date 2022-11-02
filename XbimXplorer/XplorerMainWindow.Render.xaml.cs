@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using System.Threading;
 using System.Windows;
+using THBimEngine.Application;
 using THBimEngine.Domain;
 using THBimEngine.Domain.Grid;
 using THBimEngine.Presention;
@@ -76,7 +79,70 @@ namespace XbimXplorer
             Log.Info(string.Format("渲染前准备工作完成，耗时：{0}s", totalTime));
             _dispatcherTimer.Start();
             ProgressChanged(this, new ProgressChangedEventArgs(0, ""));
+            //Thread thread = new Thread(new ThreadStart(Func));
+            //thread.Start();
             ExampleScene.Render();
+            
+        }
+
+        static Mutex CadMutex = null;
+        static Mutex ViewerMutex = null;
+        static void InitMutex()
+        {
+            var viewerMutexName = "viewerMutex";
+            try
+            {
+                ViewerMutex = new Mutex(true, viewerMutexName, out bool viewerMutexCreated);
+            }
+            catch
+            {
+
+                ViewerMutex = Mutex.OpenExisting(viewerMutexName, System.Security.AccessControl.MutexRights.FullControl);
+                ViewerMutex.Dispose();
+
+                ViewerMutex = new Mutex(true, viewerMutexName, out bool viewerMutexCreated);
+            }
+        }
+        public void Func()
+        {
+            InitMutex();
+            try
+            {
+                Mutex CadMutex;
+                while (true)
+                {
+                    if (CurrentDocument == null || CurrentDocument.AllBimProjects.Count < 1)
+                        return;
+                    var flag = Mutex.TryOpenExisting("cutdata", out CadMutex);
+                    if (flag) break;
+                    Thread.Sleep(100);
+                }
+
+                CadMutex.WaitOne();
+
+
+                var prjName = CurrentDocument.AllBimProjects.First().ProjectIdentity.Split('.').First() + "-100%.ifc";
+                var ifcStore = ThBimCutData.GetIfcStore(prjName);
+                var readGeomtry = new IfcStoreReadGeomtry(new XbimMatrix3D());
+                var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out List<PointNormal> allGeoPointNormals);
+                ThBimCutData.Run(ifcStore, allGeoModels, allGeoPointNormals);
+
+                //CurrentDocument.DocumentChanged -= XplorerMainWindow_DocumentChanged;
+                //CurrentDocument.ClearAllData();
+                //CurrentDocument.DocumentChanged += XplorerMainWindow_DocumentChanged;
+                //LoadFileToCurrentDocument(prjName, null);
+                ViewerMutex.ReleaseMutex();
+            }
+            catch (Exception ex)
+            {
+                ;
+            }
+            finally
+            {
+                ViewerMutex?.Dispose();
+                CadMutex?.Dispose();
+            }
+
         }
 
         public void SelectEntityIds(List<int> selectIds)

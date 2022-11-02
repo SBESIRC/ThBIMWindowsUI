@@ -5,10 +5,14 @@ using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using THBimEngine.Application;
 using THBimEngine.Domain;
 using THBimEngine.Presention;
+using Xbim.Common.Geometry;
 using Xbim.Ifc;
 using XbimXplorer.Extensions.ModelMerge;
+using XbimXplorer.ThBIMEngine;
 
 namespace XbimXplorer
 {
@@ -26,6 +30,7 @@ namespace XbimXplorer
         BackgroundWorker SU_backgroundWorker = null;
         BackgroundWorker ifc_backgroundWorker = null;
         BackgroundWorker file_backgroundWorker = null;
+        BackgroundWorker cutData_backgroundWork = null;
         private void InitPipeService() 
         {
             pipeServer = new NamedPipeServerStream("THCAD2P3DPIPE", PipeDirection.In);
@@ -51,6 +56,58 @@ namespace XbimXplorer
             file_backgroundWorker.DoWork += file_Background_DoWork;
             file_backgroundWorker.RunWorkerCompleted += file_BackgroundWorker_RunWorkerCompleted;
             file_backgroundWorker.RunWorkerAsync();
+
+            cutData_backgroundWork = new BackgroundWorker();
+            cutData_backgroundWork.DoWork += CutData_backgroundWork_DoWork;
+            cutData_backgroundWork.RunWorkerCompleted += CutData_backgroundWork_RunWorkerCompleted;
+            cutData_backgroundWork.RunWorkerAsync();
+        }
+
+        private void CutData_backgroundWork_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            //var ifcStore = ThBimCutData.GetIfcStore(prjName);
+            //var readGeomtry = new IfcStoreReadGeomtry(new XbimMatrix3D());
+            //var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out List<PointNormal> allGeoPointNormals);
+            //ThBimCutData.Run(ifcStore, allGeoModels, allGeoPointNormals);
+            if (CurrentDocument != null && CurrentDocument.AllBimProjects.Count > 0)
+            {
+                var prjName = CurrentDocument.AllBimProjects.First().ProjectIdentity.Split('.').First() + "-100%.ifc";
+                CurrentDocument.DocumentChanged -= RunCutData_DocumentChanged;
+                CurrentDocument.ClearAllData();
+                CurrentDocument.DocumentChanged += RunCutData_DocumentChanged;
+                LoadFileToCurrentDocument(prjName, null);
+            }
+
+            cutData_backgroundWork.RunWorkerAsync();
+        }
+
+        private void CutData_backgroundWork_DoWork(object sender, DoWorkEventArgs e)
+        {
+            InitMutex();
+            try
+            {
+                Mutex CadMutex;
+                while (true)
+                {
+                    //if (CurrentDocument == null || CurrentDocument.AllBimProjects.Count < 1)
+                    //    return;
+                    var flag = Mutex.TryOpenExisting("cutdata", out CadMutex);
+                    if (flag) break;
+                    Thread.Sleep(100);
+                }
+
+                CadMutex.WaitOne();
+                ViewerMutex.ReleaseMutex();
+            }
+            catch (Exception ex)
+            {
+                ;
+            }
+            finally
+            {
+                ViewerMutex?.Dispose();
+                CadMutex?.Dispose();
+            }
         }
         #region 接收数据并解析数据渲染
         private void Background_DoWork(object sender, DoWorkEventArgs e)

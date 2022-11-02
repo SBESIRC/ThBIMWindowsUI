@@ -1067,17 +1067,17 @@ namespace XbimXplorer
                 return;
             var prjName = CurrentDocument.AllBimProjects.First().ProjectIdentity.Split('.').First()+"-100%.ifc";
 
-            CurrentDocument.DocumentChanged -= XplorerMainWindow_DocumentChanged;
+            CurrentDocument.DocumentChanged -= RunCutData_DocumentChanged;
             CurrentDocument.ClearAllData();
-            CurrentDocument.DocumentChanged += XplorerMainWindow_DocumentChanged;
+            CurrentDocument.DocumentChanged += RunCutData_DocumentChanged;
             LoadFileToCurrentDocument(prjName,null);
-            
+            //ThBimCutData.Run(CurrentDocument.AllBimProjects);
         }
 
-        private void XplorerMainWindow_DocumentChanged(object sender, EventArgs e)
+        private void RunCutData_DocumentChanged(object sender, EventArgs e)
         {
             ThBimCutData.Run(CurrentDocument.AllBimProjects);
-            CurrentDocument.DocumentChanged -= XplorerMainWindow_DocumentChanged;
+            CurrentDocument.DocumentChanged -= RunCutData_DocumentChanged;
         }
 
         private void ExportCut_Click_architecture(object sender, RoutedEventArgs e)

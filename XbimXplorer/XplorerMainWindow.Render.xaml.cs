@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO.MemoryMappedFiles;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows;
@@ -10,6 +12,8 @@ using THBimEngine.Domain.Grid;
 using THBimEngine.Presention;
 using Xbim.Common.Geometry;
 using XbimXplorer.ThBIMEngine;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace XbimXplorer
 {
@@ -79,28 +83,38 @@ namespace XbimXplorer
             Log.Info(string.Format("渲染前准备工作完成，耗时：{0}s", totalTime));
             _dispatcherTimer.Start();
             ProgressChanged(this, new ProgressChangedEventArgs(0, ""));
-            Thread thread = new Thread(new ThreadStart(Func));
-            thread.Start();
+            //Thread thread = new Thread(new ThreadStart(Func));
+            //thread.Start();
             ExampleScene.Render();
             
         }
 
         static Mutex CadMutex = null;
         static Mutex ViewerMutex = null;
+        static Mutex FileMutex = null;
         static void InitMutex()
         {
             var viewerMutexName = "viewerMutex";
+            var fileMutexName = "fileMutex";
             try
             {
-                ViewerMutex = new Mutex(true, viewerMutexName, out bool viewerMutexCreated);
+                ViewerMutex = new Mutex(true, viewerMutexName, out _);
             }
             catch
             {
-
                 ViewerMutex = Mutex.OpenExisting(viewerMutexName, System.Security.AccessControl.MutexRights.FullControl);
                 ViewerMutex.Dispose();
-
-                ViewerMutex = new Mutex(true, viewerMutexName, out bool viewerMutexCreated);
+                ViewerMutex = new Mutex(true, viewerMutexName, out _);
+            }
+            try
+            {
+                FileMutex = new Mutex(true, fileMutexName, out _);
+            }
+            catch
+            {
+                FileMutex = Mutex.OpenExisting(fileMutexName, System.Security.AccessControl.MutexRights.FullControl);
+                FileMutex.Dispose();
+                FileMutex = new Mutex(true, fileMutexName, out _);
             }
         }
         public void Func()
@@ -118,20 +132,26 @@ namespace XbimXplorer
                     Thread.Sleep(100);
                 }
 
-                CadMutex.WaitOne();
-
-
                 var prjName = CurrentDocument.AllBimProjects.First().ProjectIdentity.Split('.').First() + "-100%.ifc";
+
+                var fileName = Path.Combine(System.IO.Path.GetDirectoryName(prjName), "BimEngineData.get");
+                using (MemoryMappedFile mmf = MemoryMappedFile.CreateOrOpen("getFileName", 1024 * 1024, MemoryMappedFileAccess.ReadWrite))
+                {
+                    using (var stream = mmf.CreateViewStream())
+                    {
+                        IFormatter formatter = new BinaryFormatter();
+                        formatter.Serialize(stream, fileName);
+                        FileMutex.ReleaseMutex();
+                        CadMutex.WaitOne();
+                    }
+                }
+
                 var ifcStore = ThBimCutData.GetIfcStore(prjName);
                 var readGeomtry = new IfcStoreReadGeomtry(new XbimMatrix3D());
                 var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out List<PointNormal> allGeoPointNormals);
                 ThBimCutData.Run(ifcStore, allGeoModels, allGeoPointNormals);
-
-                //CurrentDocument.DocumentChanged -= XplorerMainWindow_DocumentChanged;
-                //CurrentDocument.ClearAllData();
-                //CurrentDocument.DocumentChanged += XplorerMainWindow_DocumentChanged;
-                //LoadFileToCurrentDocument(prjName, null);
                 ViewerMutex.ReleaseMutex();
+      
             }
             catch (Exception ex)
             {
@@ -142,7 +162,6 @@ namespace XbimXplorer
                 ViewerMutex?.Dispose();
                 CadMutex?.Dispose();
             }
-
         }
 
         public void SelectEntityIds(List<int> selectIds)

@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.IO.MemoryMappedFiles;
 using System.IO.Pipes;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
 using THBimEngine.Application;
@@ -57,31 +60,15 @@ namespace XbimXplorer
             file_backgroundWorker.RunWorkerCompleted += file_BackgroundWorker_RunWorkerCompleted;
             file_backgroundWorker.RunWorkerAsync();
 
-            //cutData_backgroundWork = new BackgroundWorker();
-            //cutData_backgroundWork.DoWork += CutData_backgroundWork_DoWork;
-            //cutData_backgroundWork.RunWorkerCompleted += CutData_backgroundWork_RunWorkerCompleted;
-            //cutData_backgroundWork.RunWorkerAsync();
+            cutData_backgroundWork = new BackgroundWorker();
+            cutData_backgroundWork.DoWork += CutData_backgroundWork_DoWork;
+            cutData_backgroundWork.RunWorkerCompleted += CutData_backgroundWork_RunWorkerCompleted;
+            cutData_backgroundWork.RunWorkerAsync();
         }
 
         private void CutData_backgroundWork_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            //var ifcStore = ThBimCutData.GetIfcStore(prjName);
-            //var readGeomtry = new IfcStoreReadGeomtry(new XbimMatrix3D());
-            //var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out List<PointNormal> allGeoPointNormals);
-            //ThBimCutData.Run(ifcStore, allGeoModels, allGeoPointNormals);
-            if (CurrentDocument != null && CurrentDocument.AllBimProjects.Count > 0)
-            {
-                var prjName = CurrentDocument.AllBimProjects.First().ProjectIdentity.Split('.').First() + "-100%.ifc";
-                var ifcStore = ThBimCutData.GetIfcStore(prjName);
-                var readGeomtry = new IfcStoreReadGeomtry(new XbimMatrix3D());
-                var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out List<PointNormal> allGeoPointNormals);
-                ThBimCutData.Run(ifcStore, allGeoModels, allGeoPointNormals);
-                //CurrentDocument.DocumentChanged -= RunCutData_DocumentChanged;
-                //CurrentDocument.ClearAllData();
-                //CurrentDocument.DocumentChanged += RunCutData_DocumentChanged;
-                //LoadFileToCurrentDocument(prjName, null);
-            }
-
+            
             cutData_backgroundWork.RunWorkerAsync();
         }
 
@@ -90,17 +77,35 @@ namespace XbimXplorer
             InitMutex();
             try
             {
-                Mutex CadMutex;
+                //Mutex CadMutex;
                 while (true)
                 {
-                    //if (CurrentDocument == null || CurrentDocument.AllBimProjects.Count < 1)
-                    //    return;
-                    var flag = Mutex.TryOpenExisting("cutdata", out CadMutex);
+                    var flag = Mutex.TryOpenExisting("cadMutex", out CadMutex);
                     if (flag) break;
                     Thread.Sleep(100);
                 }
+                var prjName = CurrentDocument.AllBimProjects.First().ProjectIdentity.Split('.').First() + "-100%.ifc";
 
-                CadMutex.WaitOne();
+                var fileName = Path.Combine(System.IO.Path.GetDirectoryName(prjName), "BimEngineData.get");
+                using (MemoryMappedFile mmf = MemoryMappedFile.CreateOrOpen("getFileName", 1024 * 1024, MemoryMappedFileAccess.ReadWrite))
+                {
+                    using (var stream = mmf.CreateViewStream())
+                    {
+                        IFormatter formatter = new BinaryFormatter();
+                        formatter.Serialize(stream, fileName);
+                    }
+                    FileMutex.ReleaseMutex();
+                    CadMutex.WaitOne();
+                }
+                if (CurrentDocument != null && CurrentDocument.AllBimProjects.Count > 0)
+                {
+                    //var prjName = CurrentDocument.AllBimProjects.First().ProjectIdentity.Split('.').First() + "-100%.ifc";
+                    var ifcStore = ThBimCutData.GetIfcStore(prjName);
+                    var readGeomtry = new IfcStoreReadGeomtry(new XbimMatrix3D());
+                    var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out List<PointNormal> allGeoPointNormals);
+                    ThBimCutData.Run(ifcStore, allGeoModels, allGeoPointNormals);
+                }
+
                 ViewerMutex.ReleaseMutex();
             }
             catch (Exception ex)
@@ -111,6 +116,7 @@ namespace XbimXplorer
             {
                 ViewerMutex?.Dispose();
                 CadMutex?.Dispose();
+                FileMutex?.Dispose();
             }
         }
         #region 接收数据并解析数据渲染

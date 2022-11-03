@@ -246,8 +246,6 @@
     <Compile Include="EditableTextBlock\EditableTextBlockAdorner.cs" />
     <Compile Include="Extensions\ModelMerge\ThIFC2x3CloneExtension.cs" />
     <Compile Include="Extensions\ModelMerge\THModelMergeService.cs" />
-    <Compile Include="Geometry\ThNTSExtension.cs" />
-    <Compile Include="Geometry\ThNTSOperation.cs" />
     <Compile Include="Geometry\ThXbimCircle3D.cs" />
     <Compile Include="Geometry\ThXbimCommon.cs" />
     <Compile Include="Geometry\ThXbimCoordinateSystem3D.cs" />
@@ -289,6 +287,13 @@
     <Compile Include="LogViewer\LogViewer.xaml.cs">
       <DependentUpon>LogViewer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="NTS\ThIFCNTSExtension.cs" />
+    <Compile Include="NTS\ThIFCNTSFixedPrecision.cs" />
+    <Compile Include="NTS\ThIFCNTSService.cs" />
+    <Compile Include="NTS\ThIFCNTSSpatialIndex.cs" />
+    <Compile Include="NTS\ThNTSOperation.cs" />
+    <Compile Include="NTS\ThTCHNTSExtension.cs" />
+    <Compile Include="NTS\ThTCHNTSOperation.cs" />
     <Compile Include="PluginSystem\IPackageExtensions.cs" />
     <Compile Include="PluginSystem\PluginActionUI.xaml.cs">
       <DependentUpon>PluginActionUI.xaml</DependentUpon>

@@ -260,32 +260,32 @@ namespace XbimXplorer
         {
             if (!string.IsNullOrEmpty(ifc_ProjectPath))
             {
-                //#region 临时代码(结构ydb和su合模代码)
-                //IfcStore ydbIfc = null;
-                //foreach (var item in CurrentDocument.AllBimProjects)
-                //{
-                //    if (item.SourceProject == null)
-                //        continue;
-                //    var ifcS = item.SourceProject as IfcStore;
-                //    if (null == ifcS)
-                //        continue;
-                //    if (ifcS.FileName.ToLower().EndsWith("ifc") && ifcS.FileName != ifc_ProjectPath)
-                //    {
-                //        ydbIfc = ifcS;
-                //        break;
-                //    }
-                //}
-                //if (null != ydbIfc)
-                //{
-                //    var mergeService = new THModelMergeService();
-                //    var mergeIfc = mergeService.ModelMerge(ydbIfc.FileName, ifc_ProjectPath);
-                //    var fileName = Path.GetFileNameWithoutExtension(ydbIfc.FileName);
-                //    var dirName = Path.GetDirectoryName(ydbIfc.FileName);
-                //    fileName = string.Format("{0}-100%.ifc", fileName);
-                //    var newName = Path.Combine(dirName, fileName);
-                //    mergeIfc.SaveAs(newName);
-                //}
-                //#endregion
+                #region 临时代码(结构ydb和su合模代码)
+                IfcStore ydbIfc = null;
+                foreach (var item in CurrentDocument.AllBimProjects)
+                {
+                    if (item.SourceProject == null)
+                        continue;
+                    var ifcS = item.SourceProject as IfcStore;
+                    if (null == ifcS)
+                        continue;
+                    if (ifcS.FileName.ToLower().EndsWith("ifc") && ifcS.FileName != ifc_ProjectPath)
+                    {
+                        ydbIfc = ifcS;
+                        break;
+                    }
+                }
+                if (null != ydbIfc)
+                {
+                    var mergeService = new THModelMergeService();
+                    var mergeIfc = mergeService.ModelMerge(ydbIfc.FileName, ifc_ProjectPath);
+                    var fileName = Path.GetFileNameWithoutExtension(ydbIfc.FileName);
+                    var dirName = Path.GetDirectoryName(ydbIfc.FileName);
+                    fileName = string.Format("{0}-100%.ifc", fileName);
+                    var newName = Path.Combine(dirName, fileName);
+                    mergeIfc.SaveAs(newName);
+                }
+                #endregion
                 file_pipeServer = null;
                 file_backgroundWorker.RunWorkerAsync();
                 LoadFileToCurrentDocument(ifc_ProjectPath, null);

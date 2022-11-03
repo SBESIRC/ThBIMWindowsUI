@@ -125,7 +125,9 @@
     <Compile Include="ProtoData\ThTCHSlabData.cs" />
     <Compile Include="ProtoData\ThTCHWallData.cs" />
     <Compile Include="ProtoData\ThTCHWindowData.cs" />
+    <Compile Include="THBimBeam.cs" />
     <Compile Include="THBimBuilding.cs" />
+    <Compile Include="THBimColumn.cs" />
     <Compile Include="THBimDomainCommon.cs" />
     <Compile Include="THBimElement.cs" />
     <Compile Include="THBimElementRelation.cs" />

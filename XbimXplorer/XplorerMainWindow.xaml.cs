@@ -1046,15 +1046,15 @@ namespace XbimXplorer
             CurrentDocument.ClearAllData();
             RenderScene();
         }
-        
+
         private void MenuItem_Click_3(object sender, RoutedEventArgs e)
         {
             if (CurrentDocument == null)
                 return;
             var structure95Project = CurrentDocument.AllBimProjects.FirstOrDefault();
             var structure5Project = CurrentDocument.AllBimProjects.LastOrDefault();
-            if(structure95Project != null && structure5Project != null 
-                && structure95Project.SourceProject is IfcStore ifcStore 
+            if (structure95Project != null && structure5Project != null
+                && structure95Project.SourceProject is IfcStore ifcStore
                 && structure5Project.SourceProject is ThSUProjectData projectData)
             {
                 if (ifcStore.FileName.ToLower().EndsWith("ifc") && ifcStore.FileName != ifc_ProjectPath)
@@ -1062,7 +1062,6 @@ namespace XbimXplorer
                     try
                     {
                         var mergeService = new Extensions.ModelMerge.THModelMergeService();
-                        ifcStore = IfcStore.Create(IfcSchemaVersion.Ifc2X3, XbimStoreType.InMemoryModel);
                         var mergeIfc = mergeService.ModelMerge(ifcStore, projectData);
                         var fileName = Path.GetFileNameWithoutExtension(ifcStore.FileName);
                         var dirName = Path.GetDirectoryName(ifcStore.FileName);
@@ -1076,10 +1075,8 @@ namespace XbimXplorer
                         MessageBox.Show("合模失败,未能成功合模！", "合模失败", MessageBoxButton.OK);
                     }
                 }
-                MessageBox.Show("合模失败，请检查是否具有合模条件", "合模失败", MessageBoxButton.OK);
+                //RenderScene();
             }
-            MessageBox.Show("合模失败，请检查是否具有合模条件", "合模失败", MessageBoxButton.OK);
-            //RenderScene();
         }
         
 

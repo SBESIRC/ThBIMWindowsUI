@@ -1047,6 +1047,41 @@ namespace XbimXplorer
             RenderScene();
         }
         
+        private void MenuItem_Click_3(object sender, RoutedEventArgs e)
+        {
+            if (CurrentDocument == null)
+                return;
+            var structure95Project = CurrentDocument.AllBimProjects.FirstOrDefault();
+            var structure5Project = CurrentDocument.AllBimProjects.LastOrDefault();
+            if(structure95Project != null && structure5Project != null 
+                && structure95Project.SourceProject is IfcStore ifcStore 
+                && structure5Project.SourceProject is ThSUProjectData projectData)
+            {
+                if (ifcStore.FileName.ToLower().EndsWith("ifc") && ifcStore.FileName != ifc_ProjectPath)
+                {
+                    try
+                    {
+                        var mergeService = new Extensions.ModelMerge.THModelMergeService();
+                        ifcStore = IfcStore.Create(IfcSchemaVersion.Ifc2X3, XbimStoreType.InMemoryModel);
+                        var mergeIfc = mergeService.ModelMerge(ifcStore, projectData);
+                        var fileName = Path.GetFileNameWithoutExtension(ifcStore.FileName);
+                        var dirName = Path.GetDirectoryName(ifcStore.FileName);
+                        fileName = string.Format("{0}-100%.ifc", fileName);
+                        var newName = Path.Combine(dirName, fileName);
+                        mergeIfc.SaveAs(newName);
+                        MessageBox.Show($"合模成功，已保存至[{newName}]", "合模成功", MessageBoxButton.OK);
+                    }
+                    catch
+                    {
+                        MessageBox.Show("合模失败,未能成功合模！", "合模失败", MessageBoxButton.OK);
+                    }
+                }
+                MessageBox.Show("合模失败，请检查是否具有合模条件", "合模失败", MessageBoxButton.OK);
+            }
+            MessageBox.Show("合模失败，请检查是否具有合模条件", "合模失败", MessageBoxButton.OK);
+            //RenderScene();
+        }
+        
 
         private void ExportCut_Click(object sender, RoutedEventArgs e)
         {

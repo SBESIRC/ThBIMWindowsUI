@@ -62,13 +62,55 @@ namespace THBimEngine.Geometry.ProjectFactory
                     Parallel.ForEach(storey.Buildings, new ParallelOptions() { MaxDegreeOfParallelism = 1 }, component =>
                     {
                         var componentId = CurrentGIndex();
-                        var bimComponent = new THBimUntypedEntity(componentId, 
-                            string.Format("component#{0}", "", componentId), 
+                        THBimEntity bimComponent;
+                        {
+                            if (component.Component.IfcClassification.StartsWith("IfcWall"))
+                            {
+                                bimComponent = new THBimWall(componentId,
+                            string.Format("component#{0}", "", componentId),
                             "",
-                            MeshFlag ? null : suDefinitions[component.Component.DefinitionIndex].THSUGeometryParam(component.Component.Transformations), 
-                            "", 
+                            MeshFlag ? null : suDefinitions[component.Component.DefinitionIndex].THSUGeometryParam(component.Component.Transformations),
+                            "",
                             component.Root.GlobalId);
-                        bimComponent.EntityTypeName = "SU构件";
+                            }
+                            else if (component.Component.IfcClassification.StartsWith("IfcBeam"))
+                            {
+                                bimComponent = new THBimBeam(componentId,
+                            string.Format("component#{0}", "", componentId),
+                            "",
+                            MeshFlag ? null : suDefinitions[component.Component.DefinitionIndex].THSUGeometryParam(component.Component.Transformations),
+                            "",
+                            component.Root.GlobalId);
+                            }
+                            else if (component.Component.IfcClassification.StartsWith("IfcColumn"))
+                            {
+                                bimComponent = new THBimColumn(componentId,
+                            string.Format("component#{0}", "", componentId),
+                            "",
+                            MeshFlag ? null : suDefinitions[component.Component.DefinitionIndex].THSUGeometryParam(component.Component.Transformations),
+                            "",
+                            component.Root.GlobalId);
+                            }
+                            else if (component.Component.IfcClassification.StartsWith("IfcSlab"))
+                            {
+                                bimComponent = new THBimSlab(componentId,
+                            string.Format("component#{0}", "", componentId),
+                            "",
+                            MeshFlag ? null : suDefinitions[component.Component.DefinitionIndex].THSUGeometryParam(component.Component.Transformations),
+                            "",
+                            component.Root.GlobalId);
+                            }
+                            else
+                            {
+                                bimComponent = new THBimUntypedEntity(componentId,
+                            string.Format("component#{0}", "", componentId),
+                            "",
+                            MeshFlag ? null : suDefinitions[component.Component.DefinitionIndex].THSUGeometryParam(component.Component.Transformations),
+                            "",
+                            component.Root.GlobalId);
+                                ((THBimUntypedEntity)bimComponent).EntityTypeName = "SU构件";
+                            }
+                        }
                         bimComponent.ParentUid = bimStorey.Uid;
 
                         var componentRelation = new THBimElementRelation(bimComponent.Id, bimComponent.Name, bimComponent, bimComponent.Describe, bimComponent.Uid);

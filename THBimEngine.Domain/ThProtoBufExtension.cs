@@ -13,6 +13,7 @@ namespace THBimEngine.Domain
         public static readonly XbimVector3D YAxis = new XbimVector3D(0, 1, 0);
         public static readonly XbimVector3D ZAxis = new XbimVector3D(0, 0, 1);
         public static readonly XbimMatrix3D WordMatrix = new XbimMatrix3D(XbimVector3D.Zero);
+        public static readonly XbimMatrix3D XZMatrix = new XbimMatrix3D(1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
         public static XbimVector3D Point3D2Vector(this ThTCHPoint3d pt)
         {
             return new XbimVector3D(pt.X, pt.Y, pt.Z);

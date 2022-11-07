@@ -49,9 +49,9 @@ namespace XbimXplorer.LeftTabItme.LeftTabControls
             filterViewModel = new FilterViewModel(engineApp);
             mainGrid.DataContext = filterViewModel;
             ShowFilterByCurrentDocument();
-            engineApplication.DocumentManage.SelectDocumentChanged += EngineApplication_SelectDocumentChanged;
-            if(engineApplication.DocumentManage.CurrentDocument != null)
-                engineApplication.DocumentManage.CurrentDocument.DocumentChanged += EngineApplication_DocumentChanged;
+            engineApplication.DocumentManager.SelectDocumentChanged += EngineApplication_SelectDocumentChanged;
+            if(engineApplication.DocumentManager.CurrentDocument != null)
+                engineApplication.DocumentManager.CurrentDocument.DocumentChanged += EngineApplication_DocumentChanged;
         }
 
         private void EngineApplication_DocumentChanged(object sender, EventArgs e)
@@ -60,8 +60,8 @@ namespace XbimXplorer.LeftTabItme.LeftTabControls
         }
         private void EngineApplication_SelectDocumentChanged(object sender, EventArgs e)
         {
-            if (engineApp.DocumentManage.CurrentDocument != null)
-                engineApp.DocumentManage.CurrentDocument.DocumentChanged += EngineApplication_DocumentChanged;
+            if (engineApp.DocumentManager.CurrentDocument != null)
+                engineApp.DocumentManager.CurrentDocument.DocumentChanged += EngineApplication_DocumentChanged;
             ShowFilterByCurrentDocument();
 
         }

@@ -20,7 +20,7 @@ namespace THBimEngine.Application
         /// <summary>
         /// 所有Document
         /// </summary>
-        THDocumentManage DocumentManage { get; set; }
+        THDocumentManager DocumentManager { get; set; }
         /// <summary>
         /// 加载文件到当前Document中
         /// </summary>

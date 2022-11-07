@@ -78,7 +78,7 @@
   <ItemGroup>
     <Compile Include="ProjectParameter.cs" />
     <Compile Include="SUProjectReadGeomtry.cs" />
-    <Compile Include="THDocumentManage.cs" />
+    <Compile Include="THDocumentManager.cs" />
     <Compile Include="DocumentProjectEngine.cs" />
     <Compile Include="EnginePluginAttribute.cs" />
     <Compile Include="IEngineApplication.cs" />

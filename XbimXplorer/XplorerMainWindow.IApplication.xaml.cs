@@ -9,25 +9,25 @@ namespace XbimXplorer
     {
         public THBimScene CurrentScene { get; set; }
         public THDocument CurrentDocument { get; set; }
-        public THDocumentManage DocumentManage { get; set; }
+        public THDocumentManager DocumentManager { get; set; }
         public event EventHandler SelectEntityChanged;
         private void InitDocument() 
         {
-            this.DocumentManage = new THDocumentManage(ProgressChanged);
+            this.DocumentManager = new THDocumentManager(ProgressChanged);
 
             var testProject = new THDocument(Guid.NewGuid().ToString(), "测试", ProgressChanged,Log);
             testProject.UnShowEntityTypes.Add("open");
             testProject.UnShowEntityTypes.Add(typeof(THBimOpening).Name);
             testProject.UnShowEntityTypes.Add("hole");
-            DocumentManage.AddNewDoucment(testProject);
-            DocumentManage.SelectDocumentChanged += DocumentManage_SelectDocumentChanged;
-            DocumentManage.CurrentDocument = DocumentManage.AllDocuments.FirstOrDefault();
+            DocumentManager.AddNewDoucment(testProject);
+            DocumentManager.SelectDocumentChanged += DocumentManage_SelectDocumentChanged;
+            DocumentManager.CurrentDocument = DocumentManager.AllDocuments.FirstOrDefault();
             
         }
 
         private void DocumentManage_SelectDocumentChanged(object sender, EventArgs e)
         {
-            CurrentDocument = DocumentManage.CurrentDocument;
+            CurrentDocument = DocumentManager.CurrentDocument;
             if (null == CurrentDocument)
                 return;
             this.CurrentDocument.DocumentChanged += CurrentDocument_DocumentChanged;

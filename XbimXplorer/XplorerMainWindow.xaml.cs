@@ -1144,27 +1144,27 @@ namespace XbimXplorer
             foreach (var sPrj in allSubPrjs) 
             {
                 var id = string.Format("{0}_{1}", pPrj.PrjId, sPrj.PrjId);
-                if (!DocumentManage.AllDocuments.Any(c => c.DocumentId == id))
+                if (!DocumentManager.AllDocuments.Any(c => c.DocumentId == id))
                     addSubPrjs.Add(sPrj);
                 else
                     hisIds.Add(id);
             }
-            foreach (var item in DocumentManage.AllDocuments) 
+            foreach (var item in DocumentManager.AllDocuments) 
             {
                 if (!hisIds.Any(c=> c== item.DocumentId))
                     rmDocs.Add(item);
             }
             foreach (var item in rmDocs)
-                DocumentManage.RemoveDoucment(item);
+                DocumentManager.RemoveDoucment(item);
             foreach (var sPrj in addSubPrjs) 
             {
                 var id = string.Format("{0}_{1}", pPrj.PrjId, sPrj.PrjId);
                 THDocument addDoc = new THDocument(id, sPrj.ShowName, ProgressChanged, Log);
                 addDoc.ProjectLoaclPath = prjLocalPath;
-                DocumentManage.AddNewDoucment(addDoc);
+                DocumentManager.AddNewDoucment(addDoc);
             }
-            if (DocumentManage.CurrentDocument == null)
-                DocumentManage.CurrentDocument = DocumentManage.AllDocuments.FirstOrDefault();
+            if (DocumentManager.CurrentDocument == null)
+                DocumentManager.CurrentDocument = DocumentManager.AllDocuments.FirstOrDefault();
         }
     }
     

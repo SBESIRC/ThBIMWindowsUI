@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace THBimEngine.Application
 {
-    public class THDocumentManage
+    public class THDocumentManager
     {
         private event ProgressChangedEventHandler progressChanged;
         /// <summary>
@@ -25,7 +25,7 @@ namespace THBimEngine.Application
                 SelectDocumentChanged.Invoke(document, null);
             }
         }
-        public THDocumentManage(ProgressChangedEventHandler progress) 
+        public THDocumentManager(ProgressChangedEventHandler progress) 
         {
             progressChanged = progress;
             AllDocuments = new List<THDocument>();

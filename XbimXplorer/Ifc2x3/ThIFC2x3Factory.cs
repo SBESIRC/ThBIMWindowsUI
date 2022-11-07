@@ -33,7 +33,7 @@ namespace ThBIMServer.Ifc2x3
                 {
                     s.Items.Add(item);
                     s.ContextOfItems = context;
-                    s.RepresentationType = "SurfaceModel";
+                    s.RepresentationType = "Brep";
                     s.RepresentationIdentifier = "Body";
                 });
             }

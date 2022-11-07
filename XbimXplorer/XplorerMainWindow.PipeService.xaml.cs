@@ -209,6 +209,14 @@ namespace XbimXplorer
             if (null != suProject)
             {
                 var project = suProject;
+                ////打印SU过来的管道数据
+                //var Model = ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Factory.CreateAndInitModel("ThSU2IFCProject", project.Root.GlobalId);
+                //if (Model != null)
+                //{
+                //    ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.BuildIfcModel(Model, project);
+                //    ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.SaveIfcModel(Model, @"D:\test.ifc");
+                //    Model.Dispose();
+                //}
                 suProject = null;
                 SU_pipeServer = null;
                 SU_backgroundWorker.RunWorkerAsync();

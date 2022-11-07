@@ -202,18 +202,19 @@ namespace ThBIMServer.Ifc2x3
             }
         }
 
-        public static void SetStoreyPropertie(IfcStore model, IfcBuildingStorey storey, int storeyName, double storey_heigth, int stdFlrNo)
+        public static void SetStoreyPropertie(IfcStore model, IfcBuildingStorey storey, int storeyName, double relatedElement_minz, double storey_heigth, int stdFlrNo)
         {
             // add properties
             using (var txn = model.BeginTransaction("Add Storey Properties"))
             {
+                storey.Elevation = relatedElement_minz;
                 model.Instances.New<Xbim.Ifc2x3.Kernel.IfcRelDefinesByProperties>(rel =>
                 {
                     rel.Name = "THifc properties";
                     rel.RelatedObjects.Add(storey);
                     rel.RelatingPropertyDefinition = model.Instances.New<Xbim.Ifc2x3.Kernel.IfcPropertySet>(pset =>
                     {
-                        pset.Name = "Basic set of THifc properties";
+                        pset.Name = "Custom";
                         pset.HasProperties.Add(model.Instances.New<IfcPropertySingleValue>(p =>
                         {
                             p.Name = "FloorNo";
@@ -886,7 +887,7 @@ namespace ThBIMServer.Ifc2x3
                             rel.RelatedObjects.Add(ret);
                             rel.RelatingPropertyDefinition = model.Instances.New<IfcPropertySet>(pset =>
                             {
-                                pset.Name = "Basic set of THifc properties";
+                                pset.Name = "Profile";
                                 pset.HasProperties.Add(model.Instances.New<IfcPropertySingleValue>(p =>
                                 {
                                     p.Name = "Remark";

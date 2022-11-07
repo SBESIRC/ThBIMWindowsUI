@@ -301,7 +301,7 @@ namespace XbimXplorer.Extensions.ModelMerge
                     var relatedElement_minz = suElements.Min(o => ((o.ObjectPlacement as Xbim.Ifc2x3.GeometricConstraintResource.IfcLocalPlacement).RelativePlacement as  Xbim.Ifc2x3.GeometryResource.IfcPlacement).Location.Z);
                     var relatedElement_maxz = suElements.Max(o => ((o.ObjectPlacement as Xbim.Ifc2x3.GeometricConstraintResource.IfcLocalPlacement).RelativePlacement as  Xbim.Ifc2x3.GeometryResource.IfcPlacement).Location.Z);
                     var storey_heigth = relatedElement_maxz - relatedElement_minz;
-                    ThProtoBuf2IFC2x3Factory.SetStoreyPropertie(bigModel, storey, BuildingStorey.Number, storey_heigth, BuildingStorey.StdFlrNo);
+                    ThProtoBuf2IFC2x3Factory.SetStoreyPropertie(bigModel, storey, BuildingStorey.Number, relatedElement_minz, storey_heigth, BuildingStorey.StdFlrNo);
                     storeys.Add(storey);
                 }
                 using (var txn = bigModel.BeginTransaction("relContainEntitys2Storey"))
@@ -319,34 +319,6 @@ namespace XbimXplorer.Extensions.ModelMerge
             ThProtoBuf2IFC2x3RelAggregatesFactory.Create(bigModel, bigBuildings, storeys);
             //返回
             return bigModel;
-        }
-
-        public IfcStore ModelMerge(IfcStore model)
-        {
-            //暂时认为Model版本是2x3的
-            var project = model.Instances.FirstOrDefault<Xbim.Ifc2x3.Kernel.IfcProject>();
-            var sites = project.Sites;
-            if(sites.Count() == 2)
-            {
-                var structureSite = sites.First();//结构Site
-                var architectureSite = sites.Last();//建筑Site
-                var structureBuilding = structureSite.Buildings.FirstOrDefault() as Xbim.Ifc2x3.ProductExtension.IfcBuilding;
-                var architectureBuilding = architectureSite.Buildings.FirstOrDefault() as Xbim.Ifc2x3.ProductExtension.IfcBuilding;
-                foreach (Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey architectureStorey in architectureBuilding.BuildingStoreys)
-                {
-                    var structureStorey = structureBuilding.BuildingStoreys.FirstOrDefault(o => Math.Abs((double)architectureStorey.Elevation.Value - (double)o.Elevation.Value) < 200);
-                    if(structureStorey != null)
-                    {
-                        //Pset_BuildingStoreyCommon
-                        //architectureStorey.PropertySets
-                    }
-                }
-                return null;
-            }
-            else
-            {
-                return null;
-            }
         }
     }
 }

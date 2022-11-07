@@ -1,9 +1,5 @@
-﻿using System;
-using System.IO;
-using System.Net;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
+﻿using RestSharp;
+using System;
 using THBimEngine.Common;
 
 namespace THBimEngine.HttpService
@@ -20,14 +16,14 @@ namespace THBimEngine.HttpService
         public UserInfo UserLoginByNamePsw(string uName, string uPsw) 
         {
             var loginRes = UserLogin(uName, uPsw);
-            if (string.IsNullOrEmpty(loginRes.Body))
+            if (string.IsNullOrEmpty(loginRes))
             {
                 throw new Exception("用户登录失败，请检查用户名密码");
             }
             UserLoginRes userLogin;
             try
             {
-                userLogin = JsonHelper.DeserializeJsonToObject<UserLoginRes>(loginRes.Body);
+                userLogin = JsonHelper.DeserializeJsonToObject<UserLoginRes>(loginRes);
             }
             catch (Exception ex) 
             {
@@ -36,14 +32,14 @@ namespace THBimEngine.HttpService
             if(userLogin == null || string.IsNullOrEmpty(userLogin.Token))
                 throw new Exception("用户登录失败，请检查用户名密码");
             var userInfoRes = UserInfo(userLogin.Token);
-            if (string.IsNullOrEmpty(userInfoRes.Body))
+            if (string.IsNullOrEmpty(userInfoRes))
             {
                 throw new Exception("用户登录失败，请检查用户名密码");
             }
             UserInfo userInfo;
             try
             {
-                userInfo = JsonHelper.DeserializeJsonToObject<UserInfo>(userInfoRes.Body);
+                userInfo = JsonHelper.DeserializeJsonToObject<UserInfo>(userInfoRes);
             }
             catch (Exception ex)
             {
@@ -52,84 +48,26 @@ namespace THBimEngine.HttpService
             userInfo.UserLogin = userLogin;
             return userInfo;
         }
-        private HttpResponseParameter UserLogin(string uName,string uPsw) 
+        private string UserLogin(string uName,string uPsw) 
         {
-            Encoding encoding = Encoding.UTF8;
-            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(new Uri(loginUrl, UriKind.RelativeOrAbsolute));
-            webRequest.Method = "POST";
-            webRequest.KeepAlive = false;
-            webRequest.AllowAutoRedirect = false;
-            webRequest.ProtocolVersion = HttpVersion.Version11;
-            webRequest.CookieContainer = new CookieContainer();
-            SetHand(webRequest);
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls;
-            ServicePointManager.ServerCertificateValidationCallback = CheckValidationResult;
-            StringBuilder data = new StringBuilder(string.Empty);
-            string body = "{\"user\":{\"username\":\"" + uName + "\",\"password\":\""+ uPsw + "\"}}";
-            byte[] bytePosts = encoding.GetBytes(body);
-            webRequest.ContentLength = bytePosts.Length;
-            using (Stream requestStream = webRequest.GetRequestStream())
-            {
-                requestStream.Write(bytePosts, 0, bytePosts.Length);
-                requestStream.Close();
-            }
-            return SetResponse(webRequest, encoding);
+            string body = "{\"user\":{\"username\":\"" + uName + "\",\"password\":\"" + uPsw + "\"}}";
+            var client = new RestClient();
+            var request = new RestRequest(new Uri(loginUrl, UriKind.RelativeOrAbsolute), Method.Post);
+            request.AddHeader("JWT-AUD", JWTAUD);
+            request.RequestFormat = DataFormat.Json;
+            request.AddBody(body);
+            var response = client.Execute(request);
+            return response.Content;
         }
-        private HttpResponseParameter UserInfo(string token) 
+        private string UserInfo(string token) 
         {
-            Encoding encoding = Encoding.UTF8;
-            HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(new Uri(infoUrl, UriKind.RelativeOrAbsolute));
-            webRequest.Method = "OPTIONS";
-            webRequest.KeepAlive = false;
-            webRequest.AllowAutoRedirect = false;
-            SetHand(webRequest);
-            webRequest.Headers.Add("Authorization", string.Format("Bearer {0}", token));
-            webRequest.ProtocolVersion = HttpVersion.Version11;
-            webRequest.CookieContainer = new CookieContainer();
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls;
-            ServicePointManager.ServerCertificateValidationCallback = CheckValidationResult;
-            StringBuilder data = new StringBuilder(string.Empty);
-            string body = "{}";
-            byte[] bytePosts = encoding.GetBytes(body);
-            webRequest.ContentLength = bytePosts.Length;
-            using (Stream requestStream = webRequest.GetRequestStream())
-            {
-                requestStream.Write(bytePosts, 0, bytePosts.Length);
-                requestStream.Close();
-            }
-            return SetResponse(webRequest, encoding);
-        }
-        /// <summary>
-        /// ssl/https请求
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="certificate"></param>
-        /// <param name="chain"></param>
-        /// <param name="errors"></param>
-        /// <returns></returns>
-        bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors)
-        {
-            return true;
-        }
-        HttpResponseParameter SetResponse(HttpWebRequest webRequest, Encoding encoding)
-        {
-            HttpResponseParameter responseParameter = new HttpResponseParameter();
-            using (HttpWebResponse webResponse = (HttpWebResponse)webRequest.GetResponse())
-            {
-                responseParameter.Uri = webResponse.ResponseUri;
-                responseParameter.StatusCode = webResponse.StatusCode;
-                using (StreamReader reader = new StreamReader(webResponse.GetResponseStream(), encoding))
-                {
-                    responseParameter.Body = reader.ReadToEnd();
-                }
-            }
-            return responseParameter;
-        }
-        void SetHand(HttpWebRequest webRequest) 
-        {
-            webRequest.ContentType = "application/json";
-            webRequest.Accept = "application/json";
-            webRequest.Headers.Add("JWT-AUD", JWTAUD);
+            var client = new RestClient();
+            var request = new RestRequest(new Uri(infoUrl, UriKind.RelativeOrAbsolute), Method.Options);
+            request.AddHeader("JWT-AUD", JWTAUD);
+            request.AddHeader("Authorization", string.Format("Bearer {0}", token));
+            request.RequestFormat = DataFormat.Json;
+            var response = client.Execute(request);
+            return response.Content;
         }
     }
 }

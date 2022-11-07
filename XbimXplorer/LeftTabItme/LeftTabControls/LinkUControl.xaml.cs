@@ -28,10 +28,16 @@ namespace XbimXplorer.LeftTabItme.LeftTabControls
         }
         private void btnAddLink_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(currentPrjRootPath)) 
+            if (engineApp.CurrentDocument == null || string.IsNullOrEmpty(engineApp.CurrentDocument.ProjectLoaclPath))
             {
-                currentPrjRootPath = SelectProjectRootPath();
+                MessageBox.Show("没有选中任何项目，请在项目管理中选择项目后再进行后续操作","操作提醒",MessageBoxButton.OK,MessageBoxImage.Warning);
+                return;
             }
+            currentPrjRootPath = engineApp.CurrentDocument.ProjectLoaclPath;
+            //if (string.IsNullOrEmpty()) 
+            //{
+            //    currentPrjRootPath = SelectProjectRootPath();
+            //}
             if (string.IsNullOrEmpty(currentPrjRootPath)) 
             {
                 MessageBox.Show("没有项目文件路径，无法进行后续操作");

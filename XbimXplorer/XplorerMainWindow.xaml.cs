@@ -425,7 +425,7 @@ namespace XbimXplorer
                 if (_loadFileBackgroundWorker != null && _loadFileBackgroundWorker.IsBusy)
                     _loadFileBackgroundWorker.CancelAsync(); //tell it to stop
                 
-                SetOpenedModelFileName(null);
+                //SetOpenedModelFileName(null);
                 if (Model != null)
                 {
                     Model.Dispose();
@@ -1130,7 +1130,41 @@ namespace XbimXplorer
         {
             var projectManage = new ProjectManage("TU1909XQ");//("TU190AXD");
             projectManage.Owner = this;
-            projectManage.ShowDialog();
+            var res = projectManage.ShowDialog();
+            if (res.Value != true)
+                return;
+            var pPrj = projectManage.GetSelectPrjSubPrj(out ShowProject subPrj,out List<ShowProject> allSubPrjs, out string prjLocalPath);
+            if (pPrj == null)
+                return;
+            SetOpenedModelFileName(pPrj.ShowName);
+            //检查Document删除和增加的数据
+            var addSubPrjs = new List<ShowProject>();
+            List<THDocument> rmDocs = new List<THDocument>();
+            var hisIds = new List<string>();
+            foreach (var sPrj in allSubPrjs) 
+            {
+                var id = string.Format("{0}_{1}", pPrj.PrjId, sPrj.PrjId);
+                if (!DocumentManage.AllDocuments.Any(c => c.DocumentId == id))
+                    addSubPrjs.Add(sPrj);
+                else
+                    hisIds.Add(id);
+            }
+            foreach (var item in DocumentManage.AllDocuments) 
+            {
+                if (!hisIds.Any(c=> c== item.DocumentId))
+                    rmDocs.Add(item);
+            }
+            foreach (var item in rmDocs)
+                DocumentManage.RemoveDoucment(item);
+            foreach (var sPrj in addSubPrjs) 
+            {
+                var id = string.Format("{0}_{1}", pPrj.PrjId, sPrj.PrjId);
+                THDocument addDoc = new THDocument(id, sPrj.ShowName, ProgressChanged, Log);
+                addDoc.ProjectLoaclPath = prjLocalPath;
+                DocumentManage.AddNewDoucment(addDoc);
+            }
+            if (DocumentManage.CurrentDocument == null)
+                DocumentManage.CurrentDocument = DocumentManage.AllDocuments.FirstOrDefault();
         }
     }
     

@@ -18,6 +18,10 @@ namespace THBimEngine.Application
 		/// 
 		/// </summary>
 		public string DocumentName { get; set; }
+		/// <summary>
+		/// 项目的当前地址
+		/// </summary>
+		public string ProjectLoaclPath { get; set; }
 		#region
 		private DocumentProjectEngine projectEngine;
 		private ILog appLog;

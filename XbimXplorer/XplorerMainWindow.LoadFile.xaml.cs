@@ -51,7 +51,7 @@ namespace XbimXplorer
             {
                 // there's no going back; if it fails after this point the current file should be closed anyway
                 CloseAndDeleteTemporaryFiles();
-                SetOpenedModelFileName(filePath.ToLower());
+                //SetOpenedModelFileName(filePath.ToLower());
                 ProgressStatusBar.Visibility = Visibility.Visible;
                 SetWorkerForFileLoad();
                 switch (ext)
@@ -147,7 +147,7 @@ namespace XbimXplorer
                             if (File.Exists(_temporaryXbimFileName))
                                 File.Delete(_temporaryXbimFileName); //tidy up;
                             _temporaryXbimFileName = null;
-                            SetOpenedModelFileName(null);
+                            //SetOpenedModelFileName(null);
                         }
                         catch (Exception ex)
                         {
@@ -185,7 +185,7 @@ namespace XbimXplorer
                 if (worker == null)
                     throw new Exception("Background thread could not be accessed");
                 _temporaryXbimFileName = Path.GetTempFileName();
-                SetOpenedModelFileName(selectedFilename);
+                //SetOpenedModelFileName(selectedFilename);
                 var model = IfcStore.Open(selectedFilename, null, null, worker.ReportProgress, FileAccessMode);
                 if (_meshModel)
                 {
@@ -237,7 +237,7 @@ namespace XbimXplorer
                             if (File.Exists(_temporaryXbimFileName))
                                 File.Delete(_temporaryXbimFileName); //tidy up;
                             _temporaryXbimFileName = null;
-                            SetOpenedModelFileName(null);
+                            //SetOpenedModelFileName(null);
                         }
                         catch (Exception ex)
                         {
@@ -385,7 +385,7 @@ namespace XbimXplorer
                 }
                 ProgressBar.Value = 0;
                 StatusMsg.Text = "Error/Ready";
-                SetOpenedModelFileName("");
+                //SetOpenedModelFileName("");
             }
             FireLoadingComplete(s, args);
         }

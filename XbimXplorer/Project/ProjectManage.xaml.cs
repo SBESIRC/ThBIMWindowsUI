@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using THBimEngine.Application;
@@ -26,6 +27,25 @@ namespace XbimXplorer
             UId = userId;
             
             InitUserProjects();
+        }
+        public ShowProject GetSelectPrjSubPrj(out ShowProject subProject, out List<ShowProject> allSubPrjs, out string loaclPrjPath) 
+        {
+            ShowProject pProject = null;
+            subProject = null; 
+            allSubPrjs = new List<ShowProject>();
+            loaclPrjPath = string.Empty;
+            var selectPrj = projectVM.SelectProject;
+            if (selectPrj == null)
+                return pProject;
+            allSubPrjs = projectVM.GetOneProject(selectPrj);
+            pProject = allSubPrjs.First();
+            if (selectPrj.IsChild)
+            {
+                subProject = selectPrj;
+            }
+            allSubPrjs.Remove(pProject);
+            loaclPrjPath = projectVM.GetProjectDir(pProject);
+            return pProject;
         }
         private void InitUserProjects()
         {
@@ -121,6 +141,17 @@ namespace XbimXplorer
             if (!File.Exists(filePath))
                 return;
             Process.Start(filePath);
+        }
+
+        private void btnOK_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = true;
+            this.Close();
+        }
+        private void btnCancel_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = false;
+            this.Close();
         }
     }
     class ProjectVM : NotifyPropertyChangedBase
@@ -291,7 +322,7 @@ namespace XbimXplorer
             }
         }
         
-        private List<ShowProject> GetOneProject(ShowProject showProject)
+        public List<ShowProject> GetOneProject(ShowProject showProject)
         {
             var prjects = new List<ShowProject>();
             var pPrj = GetParentPrject(showProject);
@@ -362,7 +393,7 @@ namespace XbimXplorer
                 Directory.CreateDirectory(path);
         }
     }
-    class ShowProject : NotifyPropertyChangedBase
+    public class ShowProject : NotifyPropertyChangedBase
     {
         public string PrjId { get; set; }
         public string ParentId { get; }

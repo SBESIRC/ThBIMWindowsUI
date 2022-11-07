@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace THBimEngine.Application
 {
@@ -52,7 +53,10 @@ namespace THBimEngine.Application
         /// <param name="docId"></param>
         public void RemoveDoucment(string docId) 
         {
-        
+            if (string.IsNullOrEmpty(docId))
+                return;
+            var rmDoc = AllDocuments.Where(c => c.DocumentId == docId).FirstOrDefault();
+            RemoveDoucment(rmDoc);
         }
         /// <summary>
         /// 移除Document
@@ -60,7 +64,12 @@ namespace THBimEngine.Application
         /// <param name="docId"></param>
         public void RemoveDoucment(THDocument rmDocument)
         {
-
+            if (null == rmDocument)
+                return;
+            var rmIsCurrent = rmDocument == CurrentDocument;
+            AllDocuments.Remove(rmDocument);
+            if (rmIsCurrent)
+                CurrentDocument = AllDocuments.FirstOrDefault();
         }
         public void RemoveAllDocument() 
         {

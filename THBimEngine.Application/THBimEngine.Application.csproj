@@ -76,6 +76,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ProjectParameter.cs" />
     <Compile Include="SUProjectReadGeomtry.cs" />
     <Compile Include="THDocumentManage.cs" />
     <Compile Include="DocumentProjectEngine.cs" />

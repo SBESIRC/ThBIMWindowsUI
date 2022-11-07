@@ -40,7 +40,6 @@ namespace THBimEngine.Geometry.ProjectFactory
                 return null;
             bimProject = new THBimProject(CurrentGIndex(), ifcProject.Name, "", ifcProject.GlobalId);
             bimProject.ProjectIdentity = ifcStore.FileName;
-            bimProject.SourceName = "IFC";
             THBimSite bimSite = null;
             bool haveLoopup = shapeGeoLoopups != null && shapeGeoLoopups.Count > 0;
             foreach (var item in dicEntitys)

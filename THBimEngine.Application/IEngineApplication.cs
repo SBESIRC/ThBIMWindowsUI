@@ -26,7 +26,7 @@ namespace THBimEngine.Application
         /// </summary>
         /// <param name="filePath"></param>
         /// <param name="matrix3D"></param>
-        void LoadFileToCurrentDocument(string filePath, XbimMatrix3D? matrix3D);
+        void LoadFileToCurrentDocument(ProjectParameter openFileParameter);
         /// <summary>
         /// 移除当前Document中的一个Project
         /// </summary>

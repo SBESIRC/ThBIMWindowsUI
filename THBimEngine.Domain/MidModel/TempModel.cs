@@ -266,7 +266,7 @@ namespace THBimEngine.Domain.MidModel
 
         public void AddIfcFileByItem(IfcStore ifcStore, THBimProject bimProject)
         {
-            bool reverse = bimProject.SourceName == "SU";
+            bool reverse = bimProject.ApplcationName == EApplcationName.SU;
             int ptIndex = Points.Count;
             int componentIndex = Components.Count;
             int edgeIndex = Edges.Count;

@@ -173,7 +173,13 @@ namespace XbimXplorer
                 thProject = null;
                 pipeServer = null;
                 backgroundWorker.RunWorkerAsync();
-                CurrentDocument.AddProject(project, projectMatrix3D);
+                CurrentDocument.AddProject(project, new ProjectParameter
+                {
+                    ProjectId = project.Root.GlobalId,
+                    Matrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero),
+                    Source = EApplcationName.CAD,
+                    Major = EMajor.Architecture,
+                }); 
                 
             }
         }
@@ -220,7 +226,13 @@ namespace XbimXplorer
                 suProject = null;
                 SU_pipeServer = null;
                 SU_backgroundWorker.RunWorkerAsync();
-                CurrentDocument.AddProject(project, projectMatrix3D);
+                CurrentDocument.AddProject(project, new ProjectParameter
+                {
+                    ProjectId = project.Root.GlobalId,
+                    Matrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero),
+                    Source = EApplcationName.SU,
+                    Major = EMajor.Architecture,
+                });
             }
         }
 
@@ -302,7 +314,14 @@ namespace XbimXplorer
                 #endregion
                 file_pipeServer = null;
                 file_backgroundWorker.RunWorkerAsync();
-                LoadFileToCurrentDocument(ifc_ProjectPath, null);
+                LoadFileToCurrentDocument(new ProjectParameter
+                {
+                    OpenFilePath = ifc_ProjectPath,
+                    ProjectId = ifc_ProjectPath,
+                    Matrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero),
+                    Source = EApplcationName.SU,
+                    Major = EMajor.Architecture,
+                });
             }
         }
         #endregion

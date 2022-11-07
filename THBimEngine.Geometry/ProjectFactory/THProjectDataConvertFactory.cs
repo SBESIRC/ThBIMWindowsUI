@@ -122,7 +122,6 @@ namespace THBimEngine.Geometry.ProjectFactory
             if (null == project)
                 return;
             bimProject = new THBimProject(CurrentGIndex(), project.Root.Name, "", project.Root.GlobalId);
-            bimProject.SourceName = "CAD";
             bimProject.ProjectIdentity = project.Root.GlobalId;
             var bimSite = new THBimSite(CurrentGIndex(), "", "", project.Site.Root.GlobalId);
             var building = project.Site.Buildings.First();

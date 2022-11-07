@@ -4,18 +4,6 @@ namespace THBimEngine.Domain
 {
     public enum BuildingCatagory
     {
-       
-        [Description("结构")]
-        Structure =10,
-        [Description("建筑")]
-        Architecture =20,
-        [Description("暖通")]
-        HVAC =30,
-        [Description("电气")]
-        Electrical =40,
-        [Description("水")]
-        Water =50,
-
         [Description("墙")]
         Wall =100010,
         [Description("结构墙")]

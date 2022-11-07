@@ -12,10 +12,10 @@ namespace XbimXplorer.LeftTabItme
 {
     class ProjectFileViewModel : NotifyPropertyChangedBase
     {
-        private List<ProjectModel> allProjectAllFileModels;
-        ObservableCollection<ProjectModel> _projectAllFileModels { get; set; }
+        private List<ProjectFileInfo> allProjectAllFileModels;
+        ObservableCollection<ProjectFileInfo> _projectAllFileModels { get; set; }
         
-        public ObservableCollection<ProjectModel> ProjectAllFileModels
+        public ObservableCollection<ProjectFileInfo> ProjectAllFileModels
         {
             get { return _projectAllFileModels; }
             set
@@ -56,43 +56,15 @@ namespace XbimXplorer.LeftTabItme
         }
         public ProjectFileViewModel(FileProject fileProject)
         {
-            ProjectAllFileModels = new ObservableCollection<ProjectModel>();
+            ProjectAllFileModels = new ObservableCollection<ProjectFileInfo>();
             BuildingNames = new ObservableCollection<string>();
             CatagoryNames = new ObservableCollection<string>();
             SystemNames = new ObservableCollection<string>();
-            allProjectAllFileModels = new List<ProjectModel>();
-            foreach (var building in fileProject.ProjectBuilds)
-            {
-                foreach (var catagory in building.FileCatagories)
-                {
-                    foreach (var model in catagory.ModelFiles)
-                    {
-                        FileInfo fileInfo = new FileInfo(model.MidFilePath);
-
-                        var tempModel = new ProjectModel
-                        {
-                            BuildingName = building.ShowName,
-                            Catagory = catagory.ShowName,
-                            SystemType = model.SystemType,
-                            FileName = model.MidFilePath,
-                            ShowName = model.ShowName,
-                            LastUpdataTime = fileInfo.LastWriteTime,
-                            Owner = "未知",
-                        }; 
-                        FileSecurity fileSecurity = fileInfo.GetAccessControl();
-                        if (null != fileSecurity) 
-                        {
-                            var identityReference = fileSecurity.GetOwner(typeof(NTAccount));
-                            if (null != identityReference)
-                                tempModel.Owner = identityReference.Value;
-                        }
-                        allProjectAllFileModels.Add(tempModel);
-                    }
-                }
-            }
-            var allBuildingNames = allProjectAllFileModels.Select(c => c.BuildingName).Distinct().ToList();
-            var allTypes = allProjectAllFileModels.Select(c => c.SystemType).Distinct().ToList();
-            var allCatagory = allProjectAllFileModels.Select(c => c.Catagory).Distinct().ToList();
+            allProjectAllFileModels = fileProject.GetProjectFiles().Where(c=>c.CanLink).ToList();
+            
+            var allBuildingNames = allProjectAllFileModels.Select(c => c.SubPrjName).Distinct().ToList();
+            var allTypes = allProjectAllFileModels.Select(c => c.ShowSourceName).Distinct().ToList();
+            var allCatagory = allProjectAllFileModels.Select(c => c.MajorName).Distinct().ToList();
             BuildingNames.Add("全部");
             foreach (var item in allBuildingNames)
             {
@@ -153,24 +125,14 @@ namespace XbimXplorer.LeftTabItme
             ProjectAllFileModels.Clear();
             foreach (var item in allProjectAllFileModels) 
             {
-                if (!string.IsNullOrEmpty(filterBuilding) && filterBuilding != item.BuildingName)
+                if (!string.IsNullOrEmpty(filterBuilding) && filterBuilding != item.SubPrjName)
                     continue;
-                if (!string.IsNullOrEmpty(filterSystem) && filterSystem != item.SystemType)
+                if (!string.IsNullOrEmpty(filterSystem) && filterSystem != item.ShowSourceName)
                     continue;
-                if (!string.IsNullOrEmpty(filterCatagory) && filterCatagory != item.Catagory)
+                if (!string.IsNullOrEmpty(filterCatagory) && filterCatagory != item.MajorName)
                     continue;
                 ProjectAllFileModels.Add(item);
             }
         }
-    }
-    public class ProjectModel 
-    {
-        public string BuildingName { get; set; }
-        public string Catagory { get; set; }
-        public string SystemType { get; set; }
-        public string FileName { get; set; }
-        public string ShowName { get; set; }
-        public DateTime LastUpdataTime { get; set; }
-        public string Owner { get; set; }
     }
 }

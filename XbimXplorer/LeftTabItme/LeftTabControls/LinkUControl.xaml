@@ -21,9 +21,9 @@
             <DataGrid Grid.Row="1" Margin="5" AutoGenerateColumns="False" SelectionMode="Single" CanUserAddRows="False" RowHeaderWidth="0" 
                       x:Name="dataGridLink" ColumnHeaderHeight="30" ItemsSource="{Binding AllLinkModel}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Width="4*" Header="链接名称" Binding="{Binding Project.ShowName}" IsReadOnly="True"></DataGridTextColumn>
-                    <DataGridTextColumn Width="2*" Header="专业" Binding="{Binding Project.Catagory}"  IsReadOnly="True"></DataGridTextColumn>
-                    <DataGridTextColumn Width="2*" Header="类型" Binding="{Binding Project.SystemType}"  IsReadOnly="True"></DataGridTextColumn>
+                    <DataGridTextColumn Width="4*" Header="链接名称" Binding="{Binding Project.ShowFileName}" IsReadOnly="True"></DataGridTextColumn>
+                    <DataGridTextColumn Width="2*" Header="专业" Binding="{Binding Project.MajorName}"  IsReadOnly="True"></DataGridTextColumn>
+                    <DataGridTextColumn Width="2*" Header="类型" Binding="{Binding Project.ShowSourceName}"  IsReadOnly="True"></DataGridTextColumn>
                     <DataGridTextColumn Width="3*" Header="状态" Binding="{Binding LinkState}"  IsReadOnly="True"></DataGridTextColumn>
                 </DataGrid.Columns>
             </DataGrid>

@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using THBimEngine.Application;
+using THBimEngine.Domain;
 using Xbim.Common.Geometry;
 
 namespace XbimXplorer.LeftTabItme
@@ -33,7 +34,7 @@ namespace XbimXplorer.LeftTabItme
     }
     public class LinkModel
     {
-        public ProjectModel Project { get; set; }
+        public ProjectFileInfo Project { get; set; }
         public string LinkState { get; set; }
         public XbimMatrix3D MoveMatrix3D { get; set; }
         public double RotainAngle { get; set; }

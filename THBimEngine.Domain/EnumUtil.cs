@@ -60,6 +60,72 @@ namespace THBimEngine.Domain
             DescriptionAttribute description = (DescriptionAttribute)objs[0];
             return description.Description;
         }
+        public static List<string> GetEnumDescriptions<T>() where T:Enum
+        {
+            var allDes = new List<string>();
+            var enumType = typeof(T);
+            string[] allEnums = Enum.GetNames(enumType);
+            if (null == allEnums || allEnums.Length < 1)
+                return allDes;
+            foreach (var item in allEnums)
+            {
+                var enumItem = enumType.GetField(item);
+                object[] objs = enumItem.GetCustomAttributes(typeof(DescriptionAttribute), false);
+                string des = "";
+                if (objs.Length == 0)
+                    des = item;
+                else
+                    des = ((DescriptionAttribute)objs[0]).Description;
+                allDes.Add(des);
+            }
+            return allDes;
+        }
+        public static Dictionary<int,string> GetEnumValueDicDescriptions<T>() where T : Enum
+        {
+            var allDes = new Dictionary<int,string>();
+            var enumType = typeof(T);
+            string[] allEnums = Enum.GetNames(enumType);
+            if (null == allEnums || allEnums.Length < 1)
+                return allDes;
+            foreach (var item in allEnums)
+            {
+                var enumItem = enumType.GetField(item);
+                int value = (int)enumItem.GetValue(item);
+                if (allDes.ContainsKey(value))
+                    continue;
+                object[] objs = enumItem.GetCustomAttributes(typeof(DescriptionAttribute), false);
+                string des = "";
+                if (objs.Length == 0)
+                    des = item;
+                else
+                    des = ((DescriptionAttribute)objs[0]).Description;
+                allDes.Add(value,des);
+            }
+            return allDes;
+        }
+        public static Dictionary<T, string> GetEnumDicDescriptions<T>() where T : Enum
+        {
+            var allDes = new Dictionary<T, string>();
+            var enumType = typeof(T);
+            string[] allEnums = Enum.GetNames(enumType);
+            if (null == allEnums || allEnums.Length < 1)
+                return allDes;
+            foreach (var item in allEnums)
+            {
+                var enumItem = enumType.GetField(item);
+                var enumIt = (T)enumItem.GetValue(item);
+                if (allDes.ContainsKey(enumIt))
+                    continue;
+                object[] objs = enumItem.GetCustomAttributes(typeof(DescriptionAttribute), false);
+                string des = "";
+                if (objs.Length == 0)
+                    des = item;
+                else
+                    des = ((DescriptionAttribute)objs[0]).Description;
+                allDes.Add(enumIt, des);
+            }
+            return allDes;
+        }
         #endregion
     }
 }

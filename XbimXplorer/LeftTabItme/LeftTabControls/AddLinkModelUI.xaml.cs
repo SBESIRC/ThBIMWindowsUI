@@ -40,7 +40,7 @@ namespace XbimXplorer.LeftTabItme.LeftTabControls
                 linkModel = new LinkModel()
                 {
                     MoveMatrix3D = XbimMatrix3D.CreateTranslation(x, y, z),
-                    Project = modelDataGrid.SelectedItem as ProjectModel,
+                    Project = modelDataGrid.SelectedItem as ProjectFileInfo,
                     LinkState = "已链接",
                     RotainAngle = rotation,
                 };

@@ -72,9 +72,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApplicationDefaultConfig.cs" />
     <Compile Include="BuildingCatagory.cs" />
     <Compile Include="ElementFilter.cs" />
     <Compile Include="EnumUtil.cs" />
+    <Compile Include="EApplcationName.cs" />
     <Compile Include="FileProject.cs" />
     <Compile Include="GeometryModel\FaceTriangle.cs" />
     <Compile Include="GeometryModel\GeometryMeshModel.cs" />

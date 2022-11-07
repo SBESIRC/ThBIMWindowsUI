@@ -28,11 +28,11 @@
                   RowHeaderWidth="0" Margin="5"
                   ItemsSource="{Binding ProjectAllFileModels}">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="模型名称" Width="6*" Binding="{Binding ShowName}" IsReadOnly="True"></DataGridTextColumn>
-                <DataGridTextColumn Header="楼栋" Width="1*" Binding="{Binding BuildingName}" IsReadOnly="True"></DataGridTextColumn>
-                <DataGridTextColumn Header="类型" Width="1*" Binding="{Binding SystemType}" IsReadOnly="True"></DataGridTextColumn>
-                <DataGridTextColumn Header="专业" Width="1*" Binding="{Binding Catagory}" IsReadOnly="True"></DataGridTextColumn>
-                <DataGridTextColumn Header="上传人" Width="3*" Binding="{Binding Owner}" IsReadOnly="True"></DataGridTextColumn>
+                <DataGridTextColumn Header="模型名称" Width="6*" Binding="{Binding ShowFileName}" IsReadOnly="True"></DataGridTextColumn>
+                <DataGridTextColumn Header="楼栋" Width="1*" Binding="{Binding SubPrjName}" IsReadOnly="True"></DataGridTextColumn>
+                <DataGridTextColumn Header="类型" Width="1*" Binding="{Binding ShowSourceName}" IsReadOnly="True"></DataGridTextColumn>
+                <DataGridTextColumn Header="专业" Width="1*" Binding="{Binding MajorName}" IsReadOnly="True"></DataGridTextColumn>
+                <DataGridTextColumn Header="上传人" Width="3*" Binding="{Binding OwnerName}" IsReadOnly="True"></DataGridTextColumn>
                 <DataGridTextColumn Header="更新时间" Width="3*" Binding="{Binding LastUpdataTime}" IsReadOnly="True"></DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>

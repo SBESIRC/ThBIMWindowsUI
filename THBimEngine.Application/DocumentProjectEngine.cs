@@ -20,15 +20,18 @@ namespace THBimEngine.Application
         {
             progressChanged = progress;
         }
-        public void AddProject(THDocument currentDocument, ThTCHProjectData project, XbimMatrix3D matrix3D)
+        public void AddProject(THDocument currentDocument, ThTCHProjectData project, ProjectParameter projectParameter)
         {
             HaveChange = false;
             convertFactory = new THProjectDataConvertFactory(Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3);
-            bool isAdd = currentDocument.IsAddProject(project.Root.GlobalId);
+            bool isAdd = currentDocument.IsAddProject(projectParameter.ProjectId);
             if (isAdd)
             {
                 var convertResult = convertFactory.ProjectConvert(project, true);
-                convertResult.BimProject.Matrix3D = matrix3D;
+                convertResult.BimProject.Matrix3D = projectParameter.Matrix3D;
+                convertResult.BimProject.ApplcationName = projectParameter.Source;
+                convertResult.BimProject.ProjectIdentity = projectParameter.ProjectId;
+                convertResult.BimProject.Major = projectParameter.Major;
                 foreach (var item in currentDocument.UnShowEntityTypes) 
                 {
                     convertResult.BimProject.UnShowEntityTypes.Add(item);
@@ -43,23 +46,26 @@ namespace THBimEngine.Application
             else
             {
                 var convertResult = convertFactory.ProjectConvert(project, false);
-                convertResult.BimProject.Matrix3D = matrix3D;
+                convertResult.BimProject.Matrix3D = projectParameter.Matrix3D;
+                convertResult.BimProject.ApplcationName = projectParameter.Source;
+                convertResult.BimProject.ProjectIdentity = projectParameter.ProjectId;
+                convertResult.BimProject.Major = projectParameter.Major;
                 UpdateProject(currentDocument, convertResult);
             }
 
         }
-        public void AddProject(THDocument currentDocument, ThSUProjectData project, XbimMatrix3D matrix3D)
+        public void AddProject(THDocument currentDocument, ThSUProjectData project, ProjectParameter projectParameter)
         {
             HaveChange = false;
             convertFactory = new THSUProjectConvertFactory(Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3);
-            bool isAdd = currentDocument.IsAddProject(project.Root.GlobalId);
+            bool isAdd = currentDocument.IsAddProject(projectParameter.ProjectId);
             if (!isAdd)
             {
                 //这里增量跟新没有做，先删除原来的数据，再增加现在的数据
                 //currentDocument.DeleteProjectData(project.Root.GlobalId);
 
                 var convertResult = convertFactory.ProjectConvert(project, false);
-                convertResult.BimProject.Matrix3D = matrix3D;
+                convertResult.BimProject.Matrix3D = projectParameter.Matrix3D;
                 UpdateProject(currentDocument,convertResult);
             }
             else
@@ -68,12 +74,14 @@ namespace THBimEngine.Application
                 {
                     var convertResult = convertFactory.ProjectConvert(project, false);
                     var bimProject = convertResult.BimProject;
-                    bimProject.ProjectIdentity = project.Root.GlobalId;
+                    bimProject.ApplcationName = projectParameter.Source;
+                    bimProject.ProjectIdentity = projectParameter.ProjectId;
+                    bimProject.Major = projectParameter.Major;
                     bimProject.SourceProject = project;
                     bimProject.NeedReadEntityMesh = false;
                     var allGeoPointNormals = new List<PointNormal>();
                     var readGeomtry = new SUProjectReadGeomtry();
-                    var allGeoModels = readGeomtry.ReadGeomtry(project, matrix3D, out allGeoPointNormals);
+                    var allGeoModels = readGeomtry.ReadGeomtry(project, projectParameter.Matrix3D, out allGeoPointNormals);
                     bimProject.AddGeoMeshModels(allGeoModels, allGeoPointNormals);
                     currentDocument.AllBimProjects.Add(bimProject);
                     HaveChange = true;
@@ -81,8 +89,11 @@ namespace THBimEngine.Application
                 else
                 {
                     var convertResult = convertFactory.ProjectConvert(project, true);
-                    convertResult.BimProject.Matrix3D = matrix3D;
+                    convertResult.BimProject.Matrix3D = projectParameter.Matrix3D;
                     var bimProject = convertResult.BimProject;
+                    bimProject.ApplcationName = projectParameter.Source;
+                    bimProject.ProjectIdentity = projectParameter.ProjectId;
+                    bimProject.Major = projectParameter.Major;
                     bimProject.ProjectIdentity = project.Root.GlobalId;
                     bimProject.SourceProject = project;
                     bimProject.ProjectChanged();
@@ -98,10 +109,10 @@ namespace THBimEngine.Application
         /// 这里目前只处理Mesh后的IfcStore
         /// </summary>
         /// <param name="ifcStore"></param>
-        public void AddProject(THDocument currentDocument, IfcStore ifcStore, XbimMatrix3D matrix3D)
+        public void AddProject(THDocument currentDocument, IfcStore ifcStore, ProjectParameter projectParameter)
         {
             convertFactory = new THIfcStoreMeshConvertFactory(ifcStore.IfcSchemaVersion);
-            var isAdd = currentDocument.IsAddProject(ifcStore.FileName);
+            var isAdd = currentDocument.IsAddProject(projectParameter.ProjectId);
             if (!isAdd)
             {
                 //这里增量跟新没有做，先删除原来的数据，再增加现在的数据
@@ -110,12 +121,13 @@ namespace THBimEngine.Application
             var prjName = Path.GetFileNameWithoutExtension(ifcStore.FileName);
             var ifcProject = ifcStore.Instances.FirstOrDefault<IIfcProject>();
             var bimProject = new THBimProject(0, prjName, "", ifcProject.GlobalId);
-            bimProject.SourceName = "IFC";
-            bimProject.ProjectIdentity = ifcStore.FileName;
+            bimProject.ApplcationName = projectParameter.Source;
+            bimProject.ProjectIdentity = projectParameter.ProjectId;
+            bimProject.Major = projectParameter.Major;
             bimProject.SourceProject = ifcStore;
             bimProject.NeedReadEntityMesh = false;
             var allGeoPointNormals = new List<PointNormal>();
-            var readGeomtry = new IfcStoreReadGeomtry(matrix3D);
+            var readGeomtry = new IfcStoreReadGeomtry(projectParameter.Matrix3D);
             readGeomtry.ProgressChanged += progressChanged;
             var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out allGeoPointNormals);
             bimProject.AddGeoMeshModels(allGeoModels, allGeoPointNormals);

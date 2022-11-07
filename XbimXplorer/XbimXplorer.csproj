@@ -218,6 +218,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Project\BoolToVisibilty.cs" />
     <Compile Include="Business\RenderEngineToHome.cs" />
     <Compile Include="Commands\Fix.cs" />
     <Compile Include="Commands\FixExtensions.cs" />
@@ -281,6 +282,9 @@
     </Compile>
     <Compile Include="LeftTabItme\LinkViewModel.cs" />
     <Compile Include="LeftTabItme\ProjectFileViewModel.cs" />
+    <Compile Include="Login.xaml.cs">
+      <DependentUpon>Login.xaml</DependentUpon>
+    </Compile>
     <Compile Include="LogViewer\EventAppender.cs" />
     <Compile Include="LogViewer\EventViewModel.cs" />
     <Compile Include="LogViewer\LogEventArgs.cs" />
@@ -318,6 +322,12 @@
     <Compile Include="Commands\TreeQueryItem.cs" />
     <Compile Include="Commands\wdwCommands.xaml.cs">
       <DependentUpon>wdwCommands.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Project\ProjectManage.xaml.cs">
+      <DependentUpon>ProjectManage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Project\SelectUploadFile.xaml.cs">
+      <DependentUpon>SelectUploadFile.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="IfcValidation\ValidationWindow.xaml.cs">
@@ -384,6 +394,10 @@
       <SubType>Designer</SubType>
       <Generator>XamlIntelliSenseFileGenerator</Generator>
     </Page>
+    <Page Include="Login.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="LogViewer\LogViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -401,6 +415,14 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Commands\wdwCommands.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Project\ProjectManage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Project\SelectUploadFile.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -528,6 +550,14 @@
       <Project>{f238cf71-3aad-463a-8304-39d2e5c64403}</Project>
       <Name>THBimEngine.Application</Name>
     </ProjectReference>
+    <ProjectReference Include="..\THBimEngine.Common\THBimEngine.Common.csproj">
+      <Project>{69892AD6-C1B7-4794-942B-F4E6AA1B066A}</Project>
+      <Name>THBimEngine.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\THBimEngine.DBOperation\THBimEngine.DBOperation.csproj">
+      <Project>{3173668D-6DCB-46AC-A8F4-0107FC792BDF}</Project>
+      <Name>THBimEngine.DBOperation</Name>
+    </ProjectReference>
     <ProjectReference Include="..\THBimEngine.Domain\THBimEngine.Domain.csproj">
       <Project>{989BF8B8-DCB6-423A-80D2-3540E8817335}</Project>
       <Name>THBimEngine.Domain</Name>
@@ -535,6 +565,10 @@
     <ProjectReference Include="..\THBimEngine.Geometry\THBimEngine.Geometry.csproj">
       <Project>{2284FAE2-6876-42CF-886F-B74F8F83DF77}</Project>
       <Name>THBimEngine.Geometry</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\THBimEngine.HttpService\THBimEngine.HttpService.csproj">
+      <Project>{4AE99897-1C64-41A6-8108-7A4232EEB6FB}</Project>
+      <Name>THBimEngine.HttpService</Name>
     </ProjectReference>
     <ProjectReference Include="..\THBimEngine.Presention\THBimEngine.Presention.csproj">
       <Project>{2b4a996d-85a9-455d-99eb-9233f020fce8}</Project>

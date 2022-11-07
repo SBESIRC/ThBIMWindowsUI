@@ -78,28 +78,28 @@ namespace THBimEngine.Application
 		/// </summary>
 		/// <param name="project"></param>
 		/// <param name="matrix3d"></param>
-		public void AddProject(object project, XbimMatrix3D? matrix3d)
+		public void AddProject(object project, ProjectParameter projectParameter)
 		{
 			if (project == null)
 				return;
 			var startTime = System.DateTime.Now;
-			XbimMatrix3D projectMatrix3D = matrix3d.HasValue? matrix3d.Value: XbimMatrix3D.CreateTranslation(XbimVector3D.Zero);
 			if (project is IfcStore ifcStore)
 			{
-				projectEngine.AddProject(this, ifcStore, projectMatrix3D);
+				projectEngine.AddProject(this, ifcStore, projectParameter);
 			}
 			else if (project is ThTCHProjectData thTCHProject)
 			{
-				projectEngine.AddProject(this, thTCHProject, projectMatrix3D);
+				projectEngine.AddProject(this, thTCHProject, projectParameter);
 			}
 			else if (project is ThSUProjectData thSUProject)
 			{
-				projectEngine.AddProject(this, thSUProject, projectMatrix3D);
+				projectEngine.AddProject(this, thSUProject, projectParameter);
 			}
 			else 
 			{
 				throw new NotSupportedException();
 			}
+			
 			var endTime = System.DateTime.Now;
 			var totalTime = (endTime - startTime).TotalSeconds;
 			if (null != appLog)

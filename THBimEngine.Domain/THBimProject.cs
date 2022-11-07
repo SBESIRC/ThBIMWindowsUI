@@ -19,19 +19,19 @@ namespace THBimEngine.Domain
 		/// 项目Id，唯一Id
 		/// </summary>
         public string ProjectIdentity { get; set; }
-		/// <summary>
-		/// 项目分类
-		/// </summary>
-        public BuildingCatagory Catagory { get; set; }
-        public THBimSite ProjectSite { get; set; }
+		public THBimSite ProjectSite { get; set; }
 		/// <summary>
 		/// 原项目
 		/// </summary>
         public object SourceProject { get; set; }
 		/// <summary>
-		/// 项目名称
+		/// 专业信息
 		/// </summary>
-		public string SourceName { get; set; }
+		public EMajor Major { get; set; }
+		/// <summary>
+		/// 来源信息
+		/// </summary>
+		public EApplcationName ApplcationName { get; set; }
 		/// <summary>
 		/// 是否需要根据创建的实体读取Mesh
 		/// </summary>

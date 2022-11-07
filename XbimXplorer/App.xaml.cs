@@ -117,7 +117,7 @@ namespace XbimXplorer
                 {
                     // does not support the load of two models
                     bOneModelLoaded = true;
-                    mainView.LoadFileToCurrentDocument(thisArg,null);
+                    //mainView.LoadFileToCurrentDocument(thisArg,null);
                 }
             }
         }

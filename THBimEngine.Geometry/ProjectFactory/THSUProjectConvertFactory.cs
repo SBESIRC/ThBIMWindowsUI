@@ -47,7 +47,6 @@ namespace THBimEngine.Geometry.ProjectFactory
             if (null == project)
                 return;
             bimProject = new THBimProject(CurrentGIndex(), project.Root.Name, "", project.Root.GlobalId);
-            bimProject.SourceName = "SU";
             bimProject.ProjectIdentity = project.Root.GlobalId;
             var bimSite = new THBimSite(CurrentGIndex(), "", "", project.Root.GlobalId + "Site");//project.Site.Uuid 暂时SU还没有Site的概念，后续补充
             var bimBuilding = new THBimBuilding(CurrentGIndex(), project.Root.GlobalId + "BuildingName", "", project.Root.GlobalId + "BuildingUuid");//同理，暂时SU也没有Building的概念，后续补充

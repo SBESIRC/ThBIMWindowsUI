@@ -14,21 +14,17 @@ using Xbim.ModelGeometry.Scene;
 
 using THBimEngine.Presention;
 using XbimXplorer.ThBIMEngine;
+using THBimEngine.Application;
 
 namespace XbimXplorer
 {
     public partial class XplorerMainWindow
     {
-        public void LoadFileToCurrentDocument(string filePath, XbimMatrix3D? matrix3D)
+        ProjectParameter openParameter;
+        public void LoadFileToCurrentDocument(ProjectParameter openFileParameter)
         {
-            if (matrix3D.HasValue)
-            {
-                projectMatrix3D = matrix3D.Value;
-            }
-            else
-            {
-                projectMatrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero);
-            }
+            openParameter = openFileParameter;
+            string filePath = openFileParameter.OpenFilePath;
             var fInfo = new FileInfo(filePath);
             if (!fInfo.Exists) // file does not exist; do nothing
                 return;
@@ -311,7 +307,7 @@ namespace XbimXplorer
                                 var th_Project = new ThTCHProjectData();
                                 Google.Protobuf.MessageExtensions.MergeFrom(th_Project, DataBody);
                                 th_Project.Root.GlobalId = fileName;
-                                CurrentDocument.AddProject(th_Project, projectMatrix3D);
+                                CurrentDocument.AddProject(th_Project, openParameter);
                                 break;
                             }
                         case 2:
@@ -321,7 +317,7 @@ namespace XbimXplorer
                                 var su_Project = new ThSUProjectData();
                                 Google.Protobuf.MessageExtensions.MergeFrom(su_Project, DataBody);
                                 su_Project.Root.GlobalId = fileName;
-                                CurrentDocument.AddProject(su_Project, projectMatrix3D);
+                                CurrentDocument.AddProject(su_Project, openParameter);
                                 break;
                             }
                         default:
@@ -354,14 +350,14 @@ namespace XbimXplorer
                 MessageBox.Show("打开YDB失败!", "打开文件说明", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            LoadFileToCurrentDocument(ifcPath,null);
+            //LoadFileToCurrentDocument(ifcPath,null);
         }
         private void FileLoadCompleted(object s, RunWorkerCompletedEventArgs args)
         {
             if (args.Result is IfcStore ifcStore) //all ok
             {
                 DateTime startTime = DateTime.Now;
-                CurrentDocument.AddProject(ifcStore, projectMatrix3D);
+                CurrentDocument.AddProject(ifcStore, openParameter);
                 DateTime endTime = DateTime.Now;
                 var totalTime = (endTime - startTime).TotalSeconds;
                 Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));

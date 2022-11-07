@@ -67,7 +67,7 @@ namespace XbimXplorer.LeftTabItme.LeftTabControls
             bool isAdd = true;
             foreach (var item in linkViewModel.AllLinkModel) 
             {
-                if (item.Project.FileName == linkModel.Project.FileName)
+                if (item.Project.LinkFilePath == linkModel.Project.LinkFilePath)
                 {
                     isAdd = false;
                     break;
@@ -76,14 +76,14 @@ namespace XbimXplorer.LeftTabItme.LeftTabControls
             if (!isAdd)
                 return;
             linkViewModel.AllLinkModel.Add(linkModel);
-            engineApp.LoadFileToCurrentDocument(linkModel.Project.FileName, linkModel.MoveMatrix3D);
+            OpenLinkModel(linkModel);
         }
         private void RemoveLinkModel(LinkModel linkModel) 
         {
             if (null == linkModel)
                 return;
             linkViewModel.AllLinkModel.Remove(linkModel);
-            engineApp.RemoveProjectFormCurrentDocument(linkModel.Project.FileName);
+            engineApp.RemoveProjectFormCurrentDocument(linkModel.Project.LinkFilePath);
         }
 
         private void changeLink_Click(object sender, RoutedEventArgs e)
@@ -99,10 +99,22 @@ namespace XbimXplorer.LeftTabItme.LeftTabControls
                 linkModel.LinkState = "已链接";
                 linkModel.RotainAngle = rotation;
                 linkModel.MoveMatrix3D = XbimMatrix3D.CreateTranslation(x, y, z);
-                engineApp.LoadFileToCurrentDocument(linkModel.Project.FileName, linkModel.MoveMatrix3D);
+                OpenLinkModel(linkModel);
             }
         }
-
+        private void OpenLinkModel(LinkModel linkModel) 
+        {
+            var openParameter = new ProjectParameter()
+            {
+                OpenFilePath = linkModel.Project.LinkFilePath,
+                ProjectId = linkModel.Project.LinkFilePath,
+                Matrix3D = linkModel.MoveMatrix3D,
+                Major = linkModel.Project.Major,
+                Source = linkModel.Project.ApplcationName,
+                SourceShowName = linkModel.Project.ShowSourceName,
+            };
+            engineApp.LoadFileToCurrentDocument(openParameter);
+        }
         private void btnDelLink_Click(object sender, RoutedEventArgs e)
         {
             if (dataGridLink.SelectedItem == null)

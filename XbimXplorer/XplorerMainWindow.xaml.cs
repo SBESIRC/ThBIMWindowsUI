@@ -245,9 +245,9 @@ namespace XbimXplorer
 
         private void dlg_OpenAnyFile(object sender, CancelEventArgs e)
         {
-            var dlg = sender as OpenFileDialog;
-            if (dlg != null)
-                LoadFileToCurrentDocument(dlg.FileName,null);
+            //var dlg = sender as OpenFileDialog;
+            //if (dlg != null)
+            //    LoadFileToCurrentDocument(dlg.FileName,null);
             //var fInfo = new FileInfo(dlg.FileName);
             //var ext = fInfo.Extension.ToLower();
             //if (ext == ".midfile")
@@ -347,11 +347,11 @@ namespace XbimXplorer
 
         private void CommandBinding_Refresh(object sender, ExecutedRoutedEventArgs e)
         {
-            if (string.IsNullOrEmpty(_openedModelFileName))
-                return;
-            if (!File.Exists(_openedModelFileName))
-                return;
-            LoadFileToCurrentDocument(_openedModelFileName,null);
+            //if (string.IsNullOrEmpty(_openedModelFileName))
+            //    return;
+            //if (!File.Exists(_openedModelFileName))
+            //    return;
+            //LoadFileToCurrentDocument(_openedModelFileName,null);
         }
         
         private void CommandBinding_SaveAs(object sender, ExecutedRoutedEventArgs e)
@@ -768,15 +768,15 @@ namespace XbimXplorer
 
         private void RecentFileClick(object sender, RoutedEventArgs e)
         {
-            var obMenuItem = e.OriginalSource as MenuItem;
-            if (obMenuItem == null) 
-                return;
-            var fileName = obMenuItem.Header.ToString();
-            if (!File.Exists(fileName))
-            {
-                return;
-            }
-            LoadFileToCurrentDocument(fileName,null);
+            //var obMenuItem = e.OriginalSource as MenuItem;
+            //if (obMenuItem == null) 
+            //    return;
+            //var fileName = obMenuItem.Header.ToString();
+            //if (!File.Exists(fileName))
+            //{
+            //    return;
+            //}
+            //LoadFileToCurrentDocument(fileName,null);
         }
 
         private void SetDefaultModeStyler(object sender, RoutedEventArgs e)
@@ -1102,7 +1102,7 @@ namespace XbimXplorer
             CurrentDocument.DocumentChanged -= RunCutData_DocumentChanged;
             CurrentDocument.ClearAllData();
             CurrentDocument.DocumentChanged += RunCutData_DocumentChanged;
-            LoadFileToCurrentDocument(prjName,null);
+            //LoadFileToCurrentDocument(prjName,null);
             //ThBimCutData.Run(CurrentDocument.AllBimProjects);
         }
 
@@ -1118,6 +1118,19 @@ namespace XbimXplorer
             if (CurrentDocument == null || CurrentDocument.AllBimProjects.Count < 1)
                 return;
             ThBimCutData.Run(CurrentDocument.AllBimProjects);
+        }
+        private void mItemLogin_Click(object sender, RoutedEventArgs e)
+        {
+            var login = new Login();
+            login.Owner = this;
+            login.ShowDialog();
+        }
+
+        private void mItemProject_Click(object sender, RoutedEventArgs e)
+        {
+            var projectManage = new ProjectManage("TU1909XQ");//("TU190AXD");
+            projectManage.Owner = this;
+            projectManage.ShowDialog();
         }
     }
     

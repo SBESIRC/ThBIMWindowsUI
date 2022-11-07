@@ -1,5 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Security.AccessControl;
+using System.Security.Principal;
 
 namespace THBimEngine.Domain
 {
@@ -10,22 +14,93 @@ namespace THBimEngine.Domain
     }
     public class FileProject : BimFileBase
     {
-        public List<FileBuilding> ProjectBuilds { get; }
+        private string prjId;
         public FileProject(string prjFilePath) 
         {
-            ProjectBuilds = new List<FileBuilding>();
             this.FilePath = prjFilePath;
-            this.ShowName = Path.GetFileNameWithoutExtension(this.FilePath);
+            var dirName = Path.GetFileNameWithoutExtension(this.FilePath);
+            var spliteIndex = dirName.IndexOf("_");
+            ShowName = dirName;
+            if (spliteIndex > 0)
+            {
+                prjId = dirName.Substring(0, spliteIndex);
+                ShowName = dirName.Substring(spliteIndex + 1);
+            }
+        }
+        public List<FileBuilding> GetDirFileBuilding() 
+        {
+            var projectBuilds = new List<FileBuilding>();
             DirectoryInfo directory = new DirectoryInfo(this.FilePath);
             DirectoryInfo[] dirs = directory.GetDirectories();
-            foreach (DirectoryInfo dir in dirs) 
+            foreach (DirectoryInfo dir in dirs)
             {
                 var buildind = new FileBuilding(dir.FullName);
                 if (null != buildind)
                 {
-                    ProjectBuilds.Add(buildind);
+                    projectBuilds.Add(buildind);
                 }
             }
+            return projectBuilds;
+        }
+        public List<ProjectFileInfo> GetProjectFiles() 
+        {
+            var projectBuilds = GetDirFileBuilding();
+            var linkFileInfos = new List<ProjectFileInfo>();
+            var mainFileInfos = new List<ProjectFileInfo>();
+            foreach (var building in projectBuilds)
+            {
+                foreach (var catagory in building.FileCatagories)
+                {
+                    foreach (var model in catagory.ModelFiles)
+                    {
+                        ProjectFileInfo showFile = new ProjectFileInfo();
+                        showFile.PrjId = prjId;
+                        showFile.SubPrjId = catagory.SubPrjId;
+                        showFile.Major = catagory.Major;
+                        showFile.SubPrjName = catagory.ShowName;
+                        showFile.ApplcationName = model.SourceType;
+                        showFile.ShowSourceName = model.ShowTypeName;
+                        showFile.ShowFileName = model.ShowName;
+                        showFile.LoaclPath = model.FilePath;
+                        FileInfo fileInfo = new FileInfo(model.FilePath);
+                        showFile.LastUpdataTime = fileInfo.LastWriteTime;
+                        FileSecurity fileSecurity = fileInfo.GetAccessControl();
+                        if (null != fileSecurity)
+                        {
+                            var identityReference = fileSecurity.GetOwner(typeof(NTAccount));
+                            if (null != identityReference)
+                                showFile.OwnerName = identityReference.Value;
+                        }
+                        var config = ApplicationDefaultConfig.DefaultConfig.Where(c => c.Source == model.SourceType).FirstOrDefault();
+                        if (model.SourceType == EApplcationName.IFC)
+                        {
+                            showFile.LinkFilePath = model.FilePath;
+                            mainFileInfos.Add(showFile);
+                        }
+                        else
+                        {
+                            if (config.FileExt.Contains(model.FileExt))
+                            {
+                                mainFileInfos.Add(showFile);
+                            }
+                            else
+                            {
+                                linkFileInfos.Add(showFile);
+                            }
+                        }
+                    }
+                }
+            }
+            foreach (var item in mainFileInfos)
+            {
+                if (!string.IsNullOrEmpty(item.LinkFilePath))
+                    continue;
+                var linkModel = linkFileInfos.Where(c => c.SubPrjId == item.SubPrjId && c.Major == item.Major && c.ShowFileName == item.ShowFileName).FirstOrDefault();
+                if (linkModel == null)
+                    continue;
+                item.LinkFilePath = linkModel.LoaclPath;
+            }
+            return mainFileInfos;
         }
     }
     public class FileBuilding:BimFileBase
@@ -38,9 +113,28 @@ namespace THBimEngine.Domain
             FileCatagories = new List<FileCatagory>();
             DirectoryInfo directory = new DirectoryInfo(this.FilePath);
             DirectoryInfo[] dirs = directory.GetDirectories();
+            var majorConfig = ApplicationDefaultConfig.GetMajorConfig();
             foreach (var dir in dirs) 
             {
-                var catagory = new FileCatagory(dir.FullName);
+                EMajor? major = null;
+                var dirName = Path.GetFileNameWithoutExtension(this.FilePath);
+                var spliteIndex = dirName.IndexOf("_");
+                var subPrjId = "";
+                if (spliteIndex > 0)
+                {
+                    subPrjId = dirName.Substring(0, spliteIndex);
+                }
+                foreach (var item in majorConfig) 
+                {
+                    if (dirName.Contains(dirName))
+                    {
+                        major = item.Key;
+                        break;
+                    }
+                }
+                if (!major.HasValue)
+                    continue;
+                var catagory = new FileCatagory(dir.FullName, major.Value, subPrjId);
                 if (null != catagory)
                     FileCatagories.Add(catagory);
             }
@@ -48,52 +142,49 @@ namespace THBimEngine.Domain
     }
     public class FileCatagory: BimFileBase
     {
+        public string SubPrjId { get; }
+        public EMajor Major { get; }
         public List<ModelFile> ModelFiles { get; }
-        public FileCatagory(string modelPath) 
+        public FileCatagory(string modelPath, EMajor major,string subPrjId) 
         {
             this.FilePath = modelPath;
+            Major = major;
             this.ShowName = Path.GetFileNameWithoutExtension(this.FilePath);
+            SubPrjId = subPrjId;
             ModelFiles = new List<ModelFile>();
+            CalcFileDir();
+        }
+        private void CalcFileDir() 
+        {
             DirectoryInfo directory = new DirectoryInfo(this.FilePath);
             DirectoryInfo[] dirs = directory.GetDirectories();
             foreach (var dir in dirs)
             {
                 var files = dir.GetFiles();
-                var strName = dir.Name.ToLower();
-                if (strName.Contains("cad"))
+                var strName = dir.Name.ToUpper();
+                SourceConfig sourceProject = null;
+                foreach (var item in ApplicationDefaultConfig.DefaultConfig) 
                 {
-                    foreach (var file in files) 
+                    if (strName.Contains(item.DirNameContain))
                     {
-                        if (file.Extension.ToLower() == ".thbim")
-                        {
-                            var cadModelFile = new ModelFile(file.FullName, "主体");
-                            cadModelFile.MidFilePath = file.FullName;
-                            ModelFiles.Add(cadModelFile);
-                        }
-                    }
+                        sourceProject = item;
+                        break;
+                    }    
                 }
-                else if (strName.Contains("ifc"))
+                if (sourceProject == null)
+                    continue;
+                foreach (var file in files)
                 {
-                    foreach (var file in files)
+                    var ext = file.Extension.ToLower();
+                    if (null != sourceProject.FileExt && sourceProject.FileExt.Contains(ext))
                     {
-                        if (file.Extension.ToLower() == ".ifc")
-                        {
-                            var ifcModelFile = new ModelFile(file.FullName, "IFC");
-                            ifcModelFile.MidFilePath = file.FullName;
-                            ModelFiles.Add(ifcModelFile);
-                        }
+                        var cadModelFile = new ModelFile(file.FullName, sourceProject.ShowName,sourceProject.Source);
+                        ModelFiles.Add(cadModelFile);
                     }
-                }
-                else if (strName.Contains("su")) 
-                {
-                    foreach (var file in files)
+                    else if(null != sourceProject.LinkFileExt && sourceProject.LinkFileExt.Contains(ext)) 
                     {
-                        if (file.Extension.ToLower() == ".thbim")
-                        {
-                            var suModelFile = new ModelFile(file.FullName, "SU");
-                            suModelFile.MidFilePath = file.FullName;
-                            ModelFiles.Add(suModelFile);
-                        }
+                        var cadModelFile = new ModelFile(file.FullName, sourceProject.ShowName, sourceProject.Source);
+                        ModelFiles.Add(cadModelFile);
                     }
                 }
             }
@@ -101,13 +192,46 @@ namespace THBimEngine.Domain
     }
     public class ModelFile : BimFileBase
     {
-        public string SystemType { get; }
-        public string MidFilePath { get; set; }
-        public ModelFile(string path,string systemType) 
+        public string ShowTypeName { get; }
+        public EApplcationName SourceType { get; }
+        public string FileExt { get; }
+        public ModelFile(string path,string systemType, EApplcationName source) 
         {
             this.FilePath = path;
             this.ShowName = Path.GetFileNameWithoutExtension(this.FilePath);
-            SystemType = systemType;
+            FileExt = Path.GetExtension(this.FilePath).ToLower();
+            ShowTypeName = systemType;
+            SourceType = source;
         }
+    }
+
+    public class ProjectFileInfo
+    {
+        public string PrjId { get; set; }
+        public string SubPrjId { get; set; }
+        public string SubPrjName { get; set; }
+        public string FileId { get; set; }
+        public string LoaclPath { get; set; }
+        public string ShowFileName { get; set; }
+        public EMajor Major { get; set; }
+        public string MajorName 
+        {
+            get 
+            {
+                return EnumUtil.GetEnumDescription(Major);
+            }
+        }
+        public EApplcationName ApplcationName { get; set; }
+        public string ShowSourceName { get; set; }
+        public DateTime LastUpdataTime { get; set; }
+        public string OwnerId { get; set; }
+        public string OwnerName { get; set; }
+        public string OccupyId { get; set; }
+        public string OccupyName { get; set; }
+        public bool CanLink
+        {
+            get { return !string.IsNullOrEmpty(LinkFilePath); }
+        }
+        public string LinkFilePath { get; set; }
     }
 }

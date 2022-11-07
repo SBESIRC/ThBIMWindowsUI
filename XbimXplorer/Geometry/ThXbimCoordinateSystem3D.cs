@@ -20,11 +20,6 @@ namespace ThBIMServer.Geometries
             CS = CreateCoordinateSystem(ToXbimMatrix3D(m));
         }
 
-        public ThXbimCoordinateSystem3D(XbimMatrix3D m)
-        {
-            CS = CreateCoordinateSystem(m);
-        }
-
         private CoordinateSystem CreateCoordinateSystem(XbimMatrix3D m)
         {
             return new CoordinateSystem(new DenseMatrix(4, 4, m.ToDoubleArray()));

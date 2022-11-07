@@ -74,36 +74,23 @@ namespace ThBIMServer.Ifc2x3
             return faceBasedSurface;
         }
 
-        public static IfcFacetedBrep ToIfcFacetedBrep(this IfcStore model, ThSUCompDefinitionData def, bool isRightHandedCoordinate = true)
+        public static IfcFacetedBrep ToIfcFacetedBrep(this IfcStore model, ThSUCompDefinitionData def)
         {
             var NewBrep = model.Instances.New<IfcFacetedBrep>();
             var ifcClosedShell = model.Instances.New<IfcClosedShell>();
             foreach (var face in def.BrepFaces)
             {
                 var ifcface = model.Instances.New<IfcFace>();
-                if (isRightHandedCoordinate)
-                {
-                    ifcface.Bounds.Add(model.ToIfcFaceOuterBound(face.OuterLoop.Points.ToList()));
-                }
-                else
-                {
-                    ifcface.Bounds.Add(model.ToIfcFaceOuterBound(face.OuterLoop.Points.Select(o => new ThTCHPoint3d() { X = o.X, Y = -o.Y, Z = o.Z }).ToList()));
-                }
+                ifcface.Bounds.Add(model.ToIfcFaceOuterBound(face.OuterLoop.Points.ToList()));
                 var innerBounds = face.InnerLoops;
                 if (innerBounds != null && innerBounds.Count > 0)
                 {
                     foreach (var innerBound in innerBounds)
                     {
-                        if (isRightHandedCoordinate)
-                        {
-                            ifcface.Bounds.Add(model.ToIfcFaceBound(innerBound.Points.ToList()));
-                        }
-                        else
-                        {
-                            ifcface.Bounds.Add(model.ToIfcFaceBound(innerBound.Points.Select(o => new ThTCHPoint3d() { X = o.X, Y = -o.Y, Z = o.Z }).ToList()));
-                        }
+                        ifcface.Bounds.Add(model.ToIfcFaceBound(innerBound.Points.ToList()));
                     }
                 }
+
                 ifcClosedShell.CfsFaces.Add(ifcface);
             }
             NewBrep.Outer = ifcClosedShell;

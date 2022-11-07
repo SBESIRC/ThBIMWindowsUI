@@ -49,16 +49,6 @@ namespace ThBIMServer.Ifc2x3
         }
 
         public static IfcLocalPlacement ToIfcLocalPlacement(this IfcStore model,
-           XbimMatrix3D matrix, IfcObjectPlacement relative_to = null)
-        {
-            return model.Instances.New<IfcLocalPlacement>(l =>
-            {
-                l.PlacementRelTo = relative_to;
-                l.RelativePlacement = model.ToIfcAxis2Placement3D(matrix);
-            });
-        }
-
-        public static IfcLocalPlacement ToIfcLocalPlacement(this IfcStore model,
             ThTCHPoint3d origin, IfcObjectPlacement relative_to = null)
         {
             return model.Instances.New<IfcLocalPlacement>(l =>
@@ -117,11 +107,6 @@ namespace ThBIMServer.Ifc2x3
         }
 
         private static IfcAxis2Placement3D ToIfcAxis2Placement3D(this IfcStore model, ThTCHMatrix3d m)
-        {
-            return model.ToIfcAxis2Placement3D(new ThXbimCoordinateSystem3D(m));
-        }
-
-        private static IfcAxis2Placement3D ToIfcAxis2Placement3D(this IfcStore model, XbimMatrix3D m)
         {
             return model.ToIfcAxis2Placement3D(new ThXbimCoordinateSystem3D(m));
         }

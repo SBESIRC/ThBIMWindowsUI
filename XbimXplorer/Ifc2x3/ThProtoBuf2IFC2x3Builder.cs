@@ -92,7 +92,6 @@ namespace ThBIMServer.Ifc2x3
 
         public static void BuildIfcModel(IfcStore model, ThSUProjectData project)
         {
-            var SUIsFaceMesh = project.IsFaceMesh;
             if (model != null)
             {
                 var storeys = new List<IfcBuildingStorey>();
@@ -112,14 +111,7 @@ namespace ThBIMServer.Ifc2x3
                         {
                             var def = definitions[element.Component.DefinitionIndex];
                             IfcBuildingElement ifcBuildingElement;
-                            if (SUIsFaceMesh)
-                            {
-                                ifcBuildingElement = ThProtoBuf2IFC2x3Factory.CreatedSUElementWithSUMesh(model, def, element.Component);
-                            }
-                            else
-                            {
-                                ifcBuildingElement = ThProtoBuf2IFC2x3Factory.CreatedSUElement(model, def, element.Component);
-                            }
+                            ifcBuildingElement = ThProtoBuf2IFC2x3Factory.CreatedSUElement(model, def, element.Component);
                             suElements.Add(ifcBuildingElement);
                         }
                         ThProtoBuf2IFC2x3Factory.RelContainsSUElements2Storey(model, suElements, ifcStorey);

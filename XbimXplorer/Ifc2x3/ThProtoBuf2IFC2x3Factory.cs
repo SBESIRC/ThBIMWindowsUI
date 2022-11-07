@@ -19,6 +19,7 @@ using Xbim.Ifc2x3.RepresentationResource;
 
 using ThBIMServer.NTS;
 using ThBIMServer.Geometries;
+using THBimEngine.Domain;
 
 namespace ThBIMServer.Ifc2x3
 {
@@ -198,6 +199,40 @@ namespace ThBIMServer.Ifc2x3
                 });
                 txn.Commit();
                 return ret;
+            }
+        }
+
+        public static void SetStoreyPropertie(IfcStore model, IfcBuildingStorey storey, int storeyName, double relatedElement_minz, double storey_heigth, int stdFlrNo)
+        {
+            // add properties
+            using (var txn = model.BeginTransaction("Add Storey Properties"))
+            {
+                storey.Elevation = relatedElement_minz;
+                model.Instances.New<Xbim.Ifc2x3.Kernel.IfcRelDefinesByProperties>(rel =>
+                {
+                    rel.Name = "THifc properties";
+                    rel.RelatedObjects.Add(storey);
+                    rel.RelatingPropertyDefinition = model.Instances.New<Xbim.Ifc2x3.Kernel.IfcPropertySet>(pset =>
+                    {
+                        pset.Name = "Custom";
+                        pset.HasProperties.Add(model.Instances.New<IfcPropertySingleValue>(p =>
+                        {
+                            p.Name = "FloorNo";
+                            p.NominalValue = new IfcText(storeyName.ToString());
+                        }));
+                        pset.HasProperties.Add(model.Instances.New<IfcPropertySingleValue>(p =>
+                        {
+                            p.Name = "Height";
+                            p.NominalValue = new IfcLengthMeasure(storey_heigth);
+                        }));
+                        pset.HasProperties.Add(model.Instances.New<IfcPropertySingleValue>(p =>
+                        {
+                            p.Name = "StdFlrNo";
+                            p.NominalValue = new IfcText(stdFlrNo.ToString());
+                        }));
+                    });
+                });
+                txn.Commit();
             }
         }
 
@@ -852,7 +887,7 @@ namespace ThBIMServer.Ifc2x3
                             rel.RelatedObjects.Add(ret);
                             rel.RelatingPropertyDefinition = model.Instances.New<IfcPropertySet>(pset =>
                             {
-                                pset.Name = "Basic set of THifc properties";
+                                pset.Name = "Profile";
                                 pset.HasProperties.Add(model.Instances.New<IfcPropertySingleValue>(p =>
                                 {
                                     p.Name = "Remark";
@@ -887,17 +922,22 @@ namespace ThBIMServer.Ifc2x3
                     });
                 }
 
-                IfcFacetedBrep mesh = model.ToIfcFacetedBrep(def);
+                var xBimMatrix3D = componentData.Transformations.ToXBimMatrix3D();
+                var isRightHandedCoordinate = IsRightHandedCoordinate(xBimMatrix3D);
+                if(!isRightHandedCoordinate)
+                {
+                    xBimMatrix3D = ThProtoBufExtension.XZMatrix * xBimMatrix3D;
+                }
+                IfcFacetedBrep mesh = model.ToIfcFacetedBrep(def, isRightHandedCoordinate);
                 var shape = ThIFC2x3Factory.CreateFaceBasedSurfaceBody(model, mesh);
                 ret.Representation = ThIFC2x3Factory.CreateProductDefinitionShape(model, shape);
 
                 //object placement
-                ret.ObjectPlacement = model.ToIfcLocalPlacement(componentData.Transformations);
+                ret.ObjectPlacement = model.ToIfcLocalPlacement(xBimMatrix3D);
 
                 txn.Commit();
                 return ret;
             }
-
         }
 
         public static IfcBuildingElement CreatedSUElementWithSUMesh(IfcStore model, ThSUCompDefinitionData def, ThSUComponentData componentData)
@@ -957,6 +997,11 @@ namespace ThBIMServer.Ifc2x3
                 return ret;
             }
 
+        }
+
+        private static bool IsRightHandedCoordinate(XbimMatrix3D matrix)
+        {
+            return matrix.Backward.Angle(matrix.Right.CrossProduct(matrix.Up)) < 1e-4;
         }
         #endregion
     }

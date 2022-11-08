@@ -57,7 +57,7 @@ namespace THBimEngine.Domain
                         showFile.PrjId = prjId;
                         showFile.SubPrjId = catagory.SubPrjId;
                         showFile.Major = catagory.Major;
-                        showFile.SubPrjName = catagory.ShowName;
+                        showFile.SubPrjName = catagory.SubName;
                         showFile.ApplcationName = model.SourceType;
                         showFile.ShowSourceName = model.ShowTypeName;
                         showFile.ShowFileName = model.ShowName;
@@ -113,20 +113,22 @@ namespace THBimEngine.Domain
             FileCatagories = new List<FileCatagory>();
             DirectoryInfo directory = new DirectoryInfo(this.FilePath);
             DirectoryInfo[] dirs = directory.GetDirectories();
+
+            var spliteIndex = ShowName.IndexOf("_");
+            var subPrjId = "";
+            var sbuPrjName = "";
+            if (spliteIndex > 0)
+            {
+                subPrjId = ShowName.Substring(0, spliteIndex);
+                sbuPrjName = ShowName.Substring(spliteIndex + 1);
+            }
             var majorConfig = ApplicationDefaultConfig.GetMajorConfig();
             foreach (var dir in dirs) 
             {
                 EMajor? major = null;
-                var dirName = Path.GetFileNameWithoutExtension(this.FilePath);
-                var spliteIndex = dirName.IndexOf("_");
-                var subPrjId = "";
-                if (spliteIndex > 0)
-                {
-                    subPrjId = dirName.Substring(0, spliteIndex);
-                }
                 foreach (var item in majorConfig) 
                 {
-                    if (dirName.Contains(dirName))
+                    if (dir.Name.Contains(item.Value))
                     {
                         major = item.Key;
                         break;
@@ -134,7 +136,7 @@ namespace THBimEngine.Domain
                 }
                 if (!major.HasValue)
                     continue;
-                var catagory = new FileCatagory(dir.FullName, major.Value, subPrjId);
+                var catagory = new FileCatagory(dir.FullName, major.Value, subPrjId, sbuPrjName);
                 if (null != catagory)
                     FileCatagories.Add(catagory);
             }
@@ -143,12 +145,14 @@ namespace THBimEngine.Domain
     public class FileCatagory: BimFileBase
     {
         public string SubPrjId { get; }
+        public string SubName { get; }
         public EMajor Major { get; }
         public List<ModelFile> ModelFiles { get; }
-        public FileCatagory(string modelPath, EMajor major,string subPrjId) 
+        public FileCatagory(string modelPath, EMajor major,string subPrjId,string subName) 
         {
             this.FilePath = modelPath;
             Major = major;
+            SubName = subName;
             this.ShowName = Path.GetFileNameWithoutExtension(this.FilePath);
             SubPrjId = subPrjId;
             ModelFiles = new List<ModelFile>();

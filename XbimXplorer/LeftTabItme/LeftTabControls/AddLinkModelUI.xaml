@@ -16,7 +16,7 @@
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
             <Label Content="模型名称："></Label>
-            <TextBox Width="100" Height="22"></TextBox>
+            <TextBox Width="100" Height="22" VerticalContentAlignment="Center"></TextBox>
             <Label Content="子项："></Label>
             <ComboBox Width="100" Height="22" ItemsSource="{Binding BuildingNames}" SelectedItem="{Binding SelectBuilding}"></ComboBox>
             <Label Content="专业"></Label>

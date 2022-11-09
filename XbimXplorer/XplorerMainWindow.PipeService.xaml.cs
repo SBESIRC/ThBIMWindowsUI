@@ -21,8 +21,8 @@ namespace XbimXplorer
 {
     public partial class XplorerMainWindow
     {
-        private ThTCHProjectData thProject = null;
-        private ThSUProjectData suProject = null;
+        private ProtobufMessage thMessage = null;
+        private ProtobufMessage suMessage = null;
         private StreamParameter streamParameter = null;
         private string ifc_ProjectPath = string.Empty;
         NamedPipeServerStream pipeServer = null;
@@ -122,26 +122,19 @@ namespace XbimXplorer
         #region 接收数据并解析数据渲染
         private void Background_DoWork(object sender, DoWorkEventArgs e)
         {
-            thProject = null;
+            thMessage = null;
             if (null == pipeServer)
                 pipeServer = new NamedPipeServerStream("THCAD2P3DPIPE", PipeDirection.In);
             pipeServer.WaitForConnection();
             try
             {
-                thProject = new ThTCHProjectData();
+                thMessage = new ProtobufMessage();
                 byte[] PipeData = ReadPipeData(pipeServer);
-                if (PipeData.VerifyPipeData())
-                {
-                    Google.Protobuf.MessageExtensions.MergeFrom(thProject, PipeData.Skip(10).ToArray());
-                }
-                else
-                {
-                    throw new Exception("无法识别的CAD-Push数据!");
-                }
+                Google.Protobuf.MessageExtensions.MergeFrom(thMessage, PipeData);
             }
             catch (IOException ioEx)
             {
-                thProject = null;
+                thMessage = null;
                 Log.Error(string.Format("ERROR: {0}", ioEx.Message));
             }
             pipeServer.Dispose();
@@ -167,20 +160,34 @@ namespace XbimXplorer
 
         private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (null != thProject)
+            if (null != thMessage)
             {
-                var project = thProject;
-                thProject = null;
+                var message = thMessage;
+                thMessage = null;
                 pipeServer = null;
                 backgroundWorker.RunWorkerAsync();
-                CurrentDocument.AddProject(project, new ProjectParameter
+                var majer = message.Header.Major;//专业
+                foreach (var project in message.CadProjects)
                 {
-                    ProjectId = project.Root.GlobalId,
-                    Matrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero),
-                    Source = EApplcationName.CAD,
-                    Major = EMajor.Architecture,
-                }); 
-                
+                    var ProjectId = project.ProjectId;//项目信息
+                    var ProjectChildId = project.ProjectChildId;//子项信息
+                    var ProjectPath = project.ProjectPath;//完整路径
+                    ////打印CAD管道数据
+                    //var Model = ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Factory.CreateAndInitModel("ThCAD2IFCProject", project.Root.GlobalId);
+                    //if (Model != null)
+                    //{
+                    //    ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.BuildIfcModel(Model, project);
+                    //    ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.SaveIfcModel(Model, @"D:\testCAD.ifc");
+                    //    Model.Dispose();
+                    //}
+                    CurrentDocument.AddProject(project, new ProjectParameter
+                    {
+                        ProjectId = project.Root.GlobalId,
+                        Matrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero),
+                        Source = EApplcationName.CAD,
+                        Major = EMajor.Architecture,
+                    });
+                }
             }
         }
 
@@ -191,20 +198,13 @@ namespace XbimXplorer
             SU_pipeServer.WaitForConnection();
             try
             {
-                suProject = new ThSUProjectData();
+                suMessage = new ProtobufMessage();
                 byte[] PipeData = ReadPipeData(SU_pipeServer);
-                if (PipeData.VerifyPipeData())
-                {
-                    Google.Protobuf.MessageExtensions.MergeFrom(suProject, PipeData.Skip(10).ToArray());
-                }
-                else
-                {
-                    throw new Exception("无法识别的SU-Push数据!");
-                }
+                Google.Protobuf.MessageExtensions.MergeFrom(suMessage, PipeData);
             }
             catch (IOException ioEx)
             {
-                suProject = null;
+                suMessage = null;
                 Log.Error(string.Format("ERROR: {0}", ioEx.Message));
             }
             SU_pipeServer.Dispose();
@@ -212,27 +212,32 @@ namespace XbimXplorer
 
         private void SU_BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (null != suProject)
+            if (null != suMessage)
             {
-                var project = suProject;
-                ////打印SU过来的管道数据
-                //var Model = ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Factory.CreateAndInitModel("ThSU2IFCProject", project.Root.GlobalId);
-                //if (Model != null)
-                //{
-                //    ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.BuildIfcModel(Model, project);
-                //    ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.SaveIfcModel(Model, @"D:\test.ifc");
-                //    Model.Dispose();
-                //}
-                suProject = null;
+                var message = suMessage;
+                suMessage = null;
                 SU_pipeServer = null;
                 SU_backgroundWorker.RunWorkerAsync();
-                CurrentDocument.AddProject(project, new ProjectParameter
+                var majer = message.Header.Major;//专业
+                foreach (var project in message.SuProjects)
                 {
-                    ProjectId = project.Root.GlobalId,
-                    Matrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero),
-                    Source = EApplcationName.SU,
-                    Major = EMajor.Architecture,
-                });
+                    var ProjectPath = project.ProjectPath;//完整路径
+                    ////打印SU过来的管道数据
+                    //var Model = ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Factory.CreateAndInitModel("ThSU2IFCProject", project.Root.GlobalId);
+                    //if (Model != null)
+                    //{
+                    //    ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.BuildIfcModel(Model, project);
+                    //    ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.SaveIfcModel(Model, @"D:\testSU.ifc");
+                    //    Model.Dispose();
+                    //}
+                    CurrentDocument.AddProject(project, new ProjectParameter
+                    {
+                        ProjectId = project.Root.GlobalId,
+                        Matrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero),
+                        Source = EApplcationName.SU,
+                        Major = EMajor.Architecture,
+                    });
+                }
             }
         }
 

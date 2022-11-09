@@ -123,8 +123,9 @@ namespace THBimEngine.Geometry.ProjectFactory
                 return;
             bimProject = new THBimProject(CurrentGIndex(), project.Root.Name, "", project.Root.GlobalId);
             bimProject.ProjectIdentity = project.Root.GlobalId;
-            var bimSite = new THBimSite(CurrentGIndex(), "", "", project.Site.Root.GlobalId);
-            var building = project.Site.Buildings.First();
+            var Site = project.Sites.First();
+            var bimSite = new THBimSite(CurrentGIndex(), "", "", Site.Root.GlobalId);
+            var building = Site.Buildings.First();
             var bimBuilding = new THBimBuilding(CurrentGIndex(), building.Root.Name, "", building.Root.GlobalId);
             foreach (var storey in building.Storeys)
             {

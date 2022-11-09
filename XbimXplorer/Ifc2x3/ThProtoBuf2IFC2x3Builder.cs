@@ -6,6 +6,7 @@ using Xbim.IO;
 using Xbim.Ifc;
 using Xbim.Ifc2x3.ProductExtension;
 using Xbim.Ifc2x3.SharedBldgElements;
+using System.Linq;
 
 namespace ThBIMServer.Ifc2x3
 {
@@ -17,9 +18,10 @@ namespace ThBIMServer.Ifc2x3
             {
                 var storeys = new List<IfcBuildingStorey>();
                 var site = ThProtoBuf2IFC2x3Factory.CreateSite(model);
-                var building = ThProtoBuf2IFC2x3Factory.CreateBuilding(model, site, project.Site.Buildings[0]);
-                foreach (var thtchstorey in project.Site.Buildings[0].Storeys)
+                var building = ThProtoBuf2IFC2x3Factory.CreateBuilding(model, site, project.Sites[0].Buildings[0]);
+                foreach (var thtchstorey in project.Sites[0].Buildings[0].Storeys)
                 {
+                    var storeyData = thtchstorey;
                     var walls = new List<IfcWall>();
                     var columns = new List<IfcColumn>();
                     var beams = new List<IfcBeam>();
@@ -29,8 +31,12 @@ namespace ThBIMServer.Ifc2x3
                     var railings = new List<IfcRailing>();
                     var rooms = new List<IfcSpace>();
                     var storey = ThProtoBuf2IFC2x3Factory.CreateStorey(model, building, thtchstorey);
+                    if(!string.IsNullOrEmpty(thtchstorey.MemoryStoreyId))
+                    {
+                        storeyData = project.Sites[0].Buildings[0].Storeys.FirstOrDefault(o => o.BuildElement.Root.GlobalId == thtchstorey.MemoryStoreyId);
+                    }
                     storeys.Add(storey);
-                    foreach (var thtchwall in thtchstorey.Walls)
+                    foreach (var thtchwall in storeyData.Walls)
                     {
                         var wall = ThProtoBuf2IFC2x3Factory.CreateWall(model, storey, thtchwall);
                         walls.Add(wall);
@@ -58,17 +64,17 @@ namespace ThBIMServer.Ifc2x3
                     //    var beam = ThProtoBuf2IFC2x3Factory.CreateBeam(Model, thtchbeam, floor_origin);
                     //    beams.Add(beam);
                     //}
-                    foreach (var thtchslab in thtchstorey.Slabs)
+                    foreach (var thtchslab in storeyData.Slabs)
                     {
                         var slab = ThProtoBuf2IFC2x3Factory.CreateBrepSlab(model, storey, thtchslab);
                         slabs.Add(slab);
                     }
-                    foreach (var thtchrailing in thtchstorey.Railings)
+                    foreach (var thtchrailing in storeyData.Railings)
                     {
                         var railing = ThProtoBuf2IFC2x3Factory.CreateRailing(model, storey, thtchrailing);
                         railings.Add(railing);
                     }
-                    foreach (var thtchRoom in thtchstorey.Rooms)
+                    foreach (var thtchRoom in storeyData.Rooms)
                     {
                         var room = ThProtoBuf2IFC2x3Factory.CreateRoom(model, storey, thtchRoom);
                         rooms.Add(room);

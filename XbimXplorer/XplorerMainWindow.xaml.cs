@@ -29,6 +29,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using THBimEngine.Application;
 using THBimEngine.Domain;
+using THBimEngine.HttpService;
 using THBimEngine.Presention;
 using Xbim.Common;
 using Xbim.Common.Geometry;
@@ -101,10 +102,11 @@ namespace XbimXplorer
         public event PropertyChangedEventHandler PropertyChanged;
         public event EventHandler ApplicationClosing;
         public event ProgressChangedEventHandler ProgressChanged;
-        public XplorerMainWindow(bool preventPluginLoad = false)
+        private UserInfo loginUser;
+        public XplorerMainWindow(UserInfo user, bool preventPluginLoad = false)
         {
             InitializeComponent();
-
+            loginUser = user;
             ProgressChanged = OnProgressChanged;
             _geoIndexIfcIndexMap = new Dictionary<int, int>();
             _dispatcherTimer = new DispatcherTimer();
@@ -1087,12 +1089,7 @@ namespace XbimXplorer
                 return;
             ThBimCutData.Run(CurrentDocument.AllBimProjects);
         }
-        public void AddProjectToCurrentScene(THBimProject bimProject)
-        {
-            throw new NotImplementedException();
-        }
-
-
+        
         private void ExportCut_Click_structure(object sender, RoutedEventArgs e)
         {
             if (CurrentDocument == null || CurrentDocument.AllBimProjects.Count < 1)
@@ -1119,52 +1116,47 @@ namespace XbimXplorer
                 return;
             ThBimCutData.Run(CurrentDocument.AllBimProjects);
         }
-        private void mItemLogin_Click(object sender, RoutedEventArgs e)
-        {
-            var login = new Login();
-            login.Owner = this;
-            login.ShowDialog();
-        }
-
         private void mItemProject_Click(object sender, RoutedEventArgs e)
         {
-            var projectManage = new ProjectManage("TU1909XQ");//("TU190AXD");
+            if (null == loginUser)
+                return;
+            var projectManage = new ProjectManage(loginUser);
             projectManage.Owner = this;
             var res = projectManage.ShowDialog();
             if (res.Value != true)
                 return;
-            var pPrj = projectManage.GetSelectPrjSubPrj(out ShowProject subPrj,out List<ShowProject> allSubPrjs, out string prjLocalPath);
+            var operateType = projectManage.GetOperateType();
+            if (operateType == OperateType.Close)
+                return;
+            var pPrj = projectManage.GetSelectPrjSubPrj(out ShowProject subPrj, out List<ShowProject> allSubPrjs, out string prjLocalPath);
             if (pPrj == null)
                 return;
-            SetOpenedModelFileName(pPrj.ShowName);
+            var selectProjectFile = projectManage.GetOpenModel();
+            if (selectProjectFile == null)
+                return;
+            SetOpenedModelFileName(string.Format("{0}_{1}_{2}", pPrj.ShowName,subPrj.ShowName, selectProjectFile.ShowFileName));
+            var id = string.Format("{0}_{1}_{2}", pPrj.PrjId, subPrj.PrjId, selectProjectFile.LoaclPath);
+
             //检查Document删除和增加的数据
-            var addSubPrjs = new List<ShowProject>();
             List<THDocument> rmDocs = new List<THDocument>();
-            var hisIds = new List<string>();
-            foreach (var sPrj in allSubPrjs) 
-            {
-                var id = string.Format("{0}_{1}", pPrj.PrjId, sPrj.PrjId);
-                if (!DocumentManager.AllDocuments.Any(c => c.DocumentId == id))
-                    addSubPrjs.Add(sPrj);
-                else
-                    hisIds.Add(id);
-            }
             foreach (var item in DocumentManager.AllDocuments) 
             {
-                if (!hisIds.Any(c=> c== item.DocumentId))
+                if (item.DocumentId == id)
                     rmDocs.Add(item);
             }
             foreach (var item in rmDocs)
                 DocumentManager.RemoveDoucment(item);
-            foreach (var sPrj in addSubPrjs) 
+            THDocument addDoc = new THDocument(id, subPrj.ShowName, ProgressChanged, Log);
+            addDoc.ProjectLoaclPath = prjLocalPath;
+            DocumentManager.AddNewDoucment(addDoc);
+            DocumentManager.CurrentDocument = addDoc;
+            LoadFileToCurrentDocument(new ProjectParameter()
             {
-                var id = string.Format("{0}_{1}", pPrj.PrjId, sPrj.PrjId);
-                THDocument addDoc = new THDocument(id, sPrj.ShowName, ProgressChanged, Log);
-                addDoc.ProjectLoaclPath = prjLocalPath;
-                DocumentManager.AddNewDoucment(addDoc);
-            }
-            if (DocumentManager.CurrentDocument == null)
-                DocumentManager.CurrentDocument = DocumentManager.AllDocuments.FirstOrDefault();
+                OpenFilePath = selectProjectFile.LinkFilePath,
+                ProjectId = selectProjectFile.LinkFilePath,
+                Major = selectProjectFile.Major,
+                Source = selectProjectFile.ApplcationName,
+            }) ;
         }
     }
     

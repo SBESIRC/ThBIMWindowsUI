@@ -136,6 +136,11 @@
                         <DataGridTextColumn Header="专业" Binding="{Binding MajorName}" IsReadOnly="True"  CanUserSort="False" CanUserResize="False"></DataGridTextColumn>
                         <DataGridTextColumn Header="更新时间" Width="1*" Binding="{Binding LastUpdataTime}" IsReadOnly="True"></DataGridTextColumn>
                     </DataGrid.Columns>
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridRow">
+                            <EventSetter Event="MouseDoubleClick" Handler="Row_DoubleClick"/>
+                        </Style>
+                    </DataGrid.Resources>
                 </DataGrid>
                 <Button Content="上传ydb" x:Name="btnUploadYDB" Grid.Row="3" Height="25" Width="80" Margin="10,5,0,5" HorizontalAlignment="Left" Click="btnUploadYDB_Click"></Button>
             </Grid>
@@ -180,6 +185,11 @@
                         <DataGridTextColumn Header="专业" Binding="{Binding MajorName}" IsReadOnly="True"  CanUserSort="False" CanUserResize="False"></DataGridTextColumn>
                         <DataGridTextColumn Header="更新时间" Width="1*" Binding="{Binding LastUpdataTime}" IsReadOnly="True"></DataGridTextColumn>
                     </DataGrid.Columns>
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridRow">
+                            <EventSetter Event="MouseDoubleClick" Handler="Row_DoubleClick"/>
+                        </Style>
+                    </DataGrid.Resources>
                 </DataGrid>
                 <Button Content="上传IFC" x:Name="btnUploadIFC" Grid.Row="2" Height="25" Width="80" Margin="10,5,0,5" HorizontalAlignment="Left" Click="btnUploadIFC_Click"></Button>
             </Grid>

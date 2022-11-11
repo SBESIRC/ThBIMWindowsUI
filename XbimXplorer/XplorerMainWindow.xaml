@@ -102,7 +102,6 @@
                         <DockPanel HorizontalAlignment="Stretch"/>
                     </ItemsPanelTemplate>
                 </Menu.ItemsPanel>
-                <MenuItem Header="登录" Name="mItemLogin" Click="mItemLogin_Click" Visibility="Collapsed"></MenuItem>
                 <MenuItem Header="项目" Name="mItemProject" Click="mItemProject_Click"></MenuItem>
                 <MenuItem Header="_File" Visibility="Collapsed">
                     <MenuItem Header="_Open" Command="Open" ToolTip="Load a single Ifc, Xbim, IfcZip or IfcXML file." />

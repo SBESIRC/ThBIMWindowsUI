@@ -179,10 +179,10 @@ namespace XbimXplorer.Commands
                         _parentWindow.Focus();
                     else
                     {
-                        // todo: bonghi: open the model in xplorer if needed.
-                        var xp = new XplorerMainWindow();
-                        _parentWindow = xp;
-                        xp.Show();
+                        //// todo: bonghi: open the model in xplorer if needed.
+                        //var xp = new XplorerMainWindow();
+                        //_parentWindow = xp;
+                        //xp.Show();
                     }
                     continue;
                 }

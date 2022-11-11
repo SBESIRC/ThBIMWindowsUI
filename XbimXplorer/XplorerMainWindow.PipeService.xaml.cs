@@ -183,7 +183,6 @@ namespace XbimXplorer
                     CurrentDocument.AddProject(project, new ProjectParameter
                     {
                         ProjectId = project.Root.GlobalId,
-                        Matrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero),
                         Source = EApplcationName.CAD,
                         Major = EMajor.Architecture,
                     });
@@ -233,7 +232,6 @@ namespace XbimXplorer
                     CurrentDocument.AddProject(project, new ProjectParameter
                     {
                         ProjectId = project.Root.GlobalId,
-                        Matrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero),
                         Source = EApplcationName.SU,
                         Major = EMajor.Architecture,
                     });
@@ -323,7 +321,6 @@ namespace XbimXplorer
                 {
                     OpenFilePath = ifc_ProjectPath,
                     ProjectId = ifc_ProjectPath,
-                    Matrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero),
                     Source = EApplcationName.SU,
                     Major = EMajor.Architecture,
                 });

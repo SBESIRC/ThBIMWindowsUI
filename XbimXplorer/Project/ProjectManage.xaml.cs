@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using THBimEngine.Application;
 using THBimEngine.DBOperation;
 using THBimEngine.Domain;
+using THBimEngine.HttpService;
 using XbimXplorer.ThBIMEngine;
 
 namespace XbimXplorer
@@ -19,15 +20,26 @@ namespace XbimXplorer
     {
         ProjectDBHelper projectDBHelper = new ProjectDBHelper();
         ProjectVM projectVM;
-        private string UId { get; }
+        OperateType operateType;
+        ProjectFileInfo selectProjectFile;
+        UserInfo loginUser;
         
-        public ProjectManage(string userId)
+        public ProjectManage(UserInfo user)
         {
             InitializeComponent();
-            UId = userId;
-            
+            loginUser = user;
+            operateType = OperateType.Close;
             InitUserProjects();
         }
+        public OperateType GetOperateType() 
+        {
+            return operateType;
+        }
+        public ProjectFileInfo GetOpenModel() 
+        {
+            return selectProjectFile;
+        }
+
         public ShowProject GetSelectPrjSubPrj(out ShowProject subProject, out List<ShowProject> allSubPrjs, out string loaclPrjPath) 
         {
             ShowProject pProject = null;
@@ -49,7 +61,7 @@ namespace XbimXplorer
         }
         private void InitUserProjects()
         {
-            var userPojects = projectDBHelper.GetUserProjects(UId);
+            var userPojects = projectDBHelper.GetUserProjects(loginUser.PreSSOId);
             projectVM = new ProjectVM(userPojects);
             this.DataContext = projectVM;
         }
@@ -111,7 +123,7 @@ namespace XbimXplorer
                 var templatePath = Path.Combine(currentDir, "Template\\THSKPTemplate2020.skp");
                 path = Path.Combine(path, fileName + ".skp");
                 File.Copy(templatePath, path, true);
-                OpenFile(path);
+                //OpenFile(path);
                 projectVM.ChangeSelectSubProject();
             }
             btn.IsEnabled = true;
@@ -126,13 +138,26 @@ namespace XbimXplorer
 
         private void Row_DoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (sender is DataGridRow dataGridRow) 
+            if (sender == null)
+                return;
+            var dGridRow = sender as DataGridRow;
+            if (dGridRow == null)
+                return;
+            var fileInfo = dGridRow.DataContext as ProjectFileInfo;
+            if (fileInfo == null)
+                return;
+            if (fileInfo.ApplcationName == EApplcationName.SU)
             {
-                if (dataGridRow.DataContext is ProjectFileInfo fileInfo)
-                {
-                    OpenFile(fileInfo.LoaclPath);
-                }
+                OpenFile(fileInfo.LoaclPath);
             }
+            else if(fileInfo.CanLink)
+            {
+                selectProjectFile = fileInfo;
+                operateType = OperateType.OpenFile;
+                this.DialogResult = true;
+                this.Close();
+            }
+            
         }
         private void OpenFile(string filePath) 
         {
@@ -146,11 +171,13 @@ namespace XbimXplorer
         private void btnOK_Click(object sender, RoutedEventArgs e)
         {
             this.DialogResult = true;
+            operateType = OperateType.Close;
             this.Close();
         }
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
             this.DialogResult = false;
+            operateType = OperateType.Close;
             this.Close();
         }
     }
@@ -436,5 +463,9 @@ namespace XbimXplorer
         }
     }
 
-    
+    public enum OperateType
+    {
+        Close=-1,
+        OpenFile,
+    }
 }

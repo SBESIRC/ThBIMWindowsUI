@@ -16,6 +16,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using THBimEngine.HttpService;
 using Xbim.IO.Esent;
 using XbimXplorer.Properties;
 
@@ -61,12 +62,17 @@ namespace XbimXplorer
                 Settings.Default.SettingsUpdateRequired = false;
                 Settings.Default.Save();
             }
-
-            var mainView = new XplorerMainWindow(blockPlugin);
+#if DEBUG
+            UserInfo debugUser = new UserInfo();
+            debugUser.ChineseName = "测试用户";
+            debugUser.PreSSOId = "TU1909XQ";
+            debugUser.UserLogin = new UserLoginRes();
+            debugUser.UserLogin.Username = "thbimtestuser";
+            var mainView = new XplorerMainWindow(debugUser, blockPlugin);
             mainView.Show();
             //mainView.DrawingControl.ViewHome();
             var bOneModelLoaded = false;
-            for (var i = 0; i< e.Args.Length; i++)
+            for (var i = 0; i < e.Args.Length; i++)
             {
                 var thisArg = e.Args[i];
                 if (string.Compare("/AccessMode", thisArg, StringComparison.OrdinalIgnoreCase) == 0)
@@ -88,7 +94,7 @@ namespace XbimXplorer
                         mainView.LoadPlugin(di, true, fi.Name);
                         continue;
                     }
-                    if (Directory.Exists(pluginName) )
+                    if (Directory.Exists(pluginName))
                     {
                         var di = new DirectoryInfo(pluginName);
                         mainView.LoadPlugin(di, true);
@@ -110,7 +116,7 @@ namespace XbimXplorer
                             return;
                         if (mainView.Model.Instances[iSel] == null)
                             return;
-                        mainView.SelectedItem = mainView.Model.Instances[iSel];    
+                        mainView.SelectedItem = mainView.Model.Instances[iSel];
                     };
                 }
                 else if (File.Exists(thisArg) && bOneModelLoaded == false)
@@ -120,6 +126,10 @@ namespace XbimXplorer
                     //mainView.LoadFileToCurrentDocument(thisArg,null);
                 }
             }
+#else
+            var login = new Login();
+            login.ShowDialog();
+#endif
         }
     }
 }

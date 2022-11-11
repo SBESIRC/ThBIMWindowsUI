@@ -32,5 +32,16 @@ namespace THBimEngine.Application
         /// 项目来源显示信息（如果CAD显示是主体）
         /// </summary>
         public string SourceShowName { get; set; }
+        public ProjectParameter() 
+        {
+            Matrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero);
+        }
+        public ProjectParameter(string filePath, EMajor major, EApplcationName applcationName) : this()
+        {
+            OpenFilePath = filePath;
+            ProjectId = filePath;
+            Major = major;
+            Source = applcationName;
+        }
     }
 }

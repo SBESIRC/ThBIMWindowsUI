@@ -200,6 +200,8 @@ namespace XbimXplorer.Extensions.ModelMerge
 
         public IfcStore ModelMerge(IfcStore bigModel, ThSUProjectData suProject)
         {
+            if(suProject == null)
+                return bigModel;
             //先做一个最简单的，两个Ifc2X3的IFC模型合并，后续再考虑版本问题
             var bigProject = bigModel.Instances.FirstOrDefault<Xbim.Ifc2x3.Kernel.IfcProject>();
             //var smallProject = smallModel.Instances.FirstOrDefault<Xbim.Ifc2x3.Kernel.IfcProject>();

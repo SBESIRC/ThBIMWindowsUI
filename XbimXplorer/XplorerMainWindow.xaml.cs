@@ -1053,14 +1053,13 @@ namespace XbimXplorer
                 return;
             var structure95Project = CurrentDocument.AllBimProjects.FirstOrDefault();
             var structure5Project = CurrentDocument.AllBimProjects.LastOrDefault();
-            if (structure95Project != null && structure5Project != null
-                && structure95Project.SourceProject is IfcStore ifcStore
-                && structure5Project.SourceProject is ThSUProjectData projectData)
+            if (structure95Project != null && structure95Project.SourceProject is IfcStore ifcStore)
             {
                 if (ifcStore.FileName.ToLower().EndsWith("ifc") && ifcStore.FileName != ifc_ProjectPath)
                 {
                     try
                     {
+                        var projectData = structure5Project?.SourceProject as ThSUProjectData;
                         var mergeService = new Extensions.ModelMerge.THModelMergeService();
                         var mergeIfc = mergeService.ModelMerge(ifcStore, projectData);
                         var fileName = Path.GetFileNameWithoutExtension(ifcStore.FileName);

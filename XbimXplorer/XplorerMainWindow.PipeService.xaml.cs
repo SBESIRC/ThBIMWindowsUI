@@ -170,7 +170,8 @@ namespace XbimXplorer
                 foreach (var project in message.CadProjects)
                 {
                     var ProjectId = project.ProjectId;//项目信息
-                    var ProjectChildId = project.ProjectChildId;//子项信息
+                    var ProjectChildId = project.ProjectSubId;//子项信息
+                    var BindingName = project.BindingName;//楼栋名称
                     var ProjectPath = project.ProjectPath;//完整路径
                     ////打印CAD管道数据
                     //var Model = ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Factory.CreateAndInitModel("ThCAD2IFCProject", project.Root.GlobalId);

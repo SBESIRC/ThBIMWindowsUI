@@ -29,6 +29,7 @@ namespace XbimXplorer
     /// </summary>
     public partial class App
     {
+        private static System.Threading.Mutex mutex;
         // todo: the whole concept of ContextWcsAdjustment need to be reviewed in the geometry engine.
 
         /// <summary>
@@ -43,6 +44,13 @@ namespace XbimXplorer
         /// <param name="e">A <see cref="T:System.Windows.StartupEventArgs"/> that contains the event data.</param>
         protected override void OnStartup(StartupEventArgs e)
         {
+            mutex = new System.Threading.Mutex(true, "THBimViewer");
+            if (!mutex.WaitOne(0, false))
+            {
+                MessageBox.Show("程序已经在运行！", "提示");
+                this.Shutdown();
+                return;
+            }
             // evaluate special parameters before loading MainWindow
             var blockPlugin = false;
             foreach (var thisArg in e.Args)

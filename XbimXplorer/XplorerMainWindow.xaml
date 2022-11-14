@@ -199,7 +199,7 @@
                     <MenuItem IsCheckable="True" Header="结构" Click="ExportCut_Click_structure" />
                     <MenuItem IsCheckable="True" Header="建筑" Click="ExportCut_Click_architecture" />
                 </MenuItem>
-                <MenuItem Header="上传DB平台" Click="MenuItem_Click_3" Width="70" HorizontalAlignment="Left"
+                <MenuItem Header="上传DB平台" Click="MenuItem_Click_3" Width="80" HorizontalAlignment="Left"
                       VerticalContentAlignment="Center"
                       HorizontalContentAlignment="Center"></MenuItem>
             </Menu>

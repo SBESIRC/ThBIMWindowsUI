@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SqlSugar;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,46 +7,58 @@ using System.Threading.Tasks;
 
 namespace THBimEngine.DBOperation
 {
-    class ProjectFileHelper
+    public class ProjectFileHelper
     {
-        public void InsertFileUploadResult(DBFile file)
+        ConnectionConfig dbMySqlConfig = new ConnectionConfig()
         {
-            string sql = string.Format("insert into FileUpload(FileUrl,FileRealName,Uploader,UploaderName) " +
-                "values('{0}','{1}','{2}','{3}')", file.FileUrl, file.FileRealName, file.Uploader, file.UploaderName);
-             MySqlHelper.ExecuteNonQuery(sql);
-            sql = "select max(Id) from FileUpload";
-            var res = MySqlHelper.ExecuteScalar(sql);
-            int.TryParse(res.ToString(), out int newId);
-            file.Id = newId;
+            ConfigId = "DBMySql",
+            DbType = SqlSugar.DbType.MySql,
+            ConnectionString = string.Format("Server={0};Port={1};Database={2};Uid={3};Pwd={4};", "172.17.1.37", "3306", "thbim_project", "thbim_project", "5Z_7e6B8d54b"),
+            IsAutoCloseConnection = true,
+        };
+        public List<DBProjectFile> GetProjectFiles(string prjId,string subPrjId) 
+        {
+            var sqlClient = new SqlSugarClient(dbMySqlConfig);
+            SqlSugarProvider sqlDB = sqlClient.GetConnection(dbMySqlConfig.ConfigId);
+            var expressionable = new Expressionable<DBProjectFile>();
+            expressionable.And(c => c.PrjId == prjId);
+            expressionable.And(c => c.SubPrjId == subPrjId);
+            expressionable.And(c => c.IsDel == 0);
+            var prjFiles = sqlDB.Queryable<DBProjectFile>().Where(expressionable.ToExpression()).ToList();
+            //foreach(var item in prjFiles)
+            //{
+            //    //获取相应的文件信息
+            //    item.FileUploads = new List<DBProjectFileUpload>();
+            //    var expFile = new Expressionable<DBProjectFileUpload>();
+            //    expFile.And(c => c.IsDel == 0);
+            //    expFile.And(c=>c.ProjectFileId == )
+            //}
+            return prjFiles;
         }
-        public void InsertProjectFileUploadResult(DBProjectFileUpload projectFile)
+        public bool InsertFileUploadResult(DBFile file)
         {
-            string sql = string.Format("insert into ProjectFileUpload(PrjFileId,FileUploadId) " +
-                "values('{0}','{1}')", projectFile.PrjFileId, projectFile.FileInfo.Id);
-            MySqlHelper.ExecuteNonQuery(sql);
-            sql = "select max(Id) from FileUpload";
-            var res = MySqlHelper.ExecuteScalar(sql);
-            int.TryParse(res.ToString(), out int newId);
-            projectFile.Id = newId;
-        }
-        public void InsertProjectFile(DBProjectFile projectFile)
-        {
-            string sql = string.Format("insert into ProjectFiles(PrjNum,SubPrjNum,FileName,SystemType,MajorName,Creater,CreaterName) " +
-                "values('{0}','{1}','{2}','{3}')", projectFile.PrjNum, projectFile.SubPrjNum, projectFile.FileRealName, projectFile.SystemType, projectFile.MajorName, projectFile.Creater, projectFile.CreaterName);
-            MySqlHelper.ExecuteNonQuery(sql);
-            //获取插入后的最新Id
-            sql = "select max(Id) from ProjectFiles";
-            var res = MySqlHelper.ExecuteScalar(sql);
-            int.TryParse(res.ToString(), out int newId);
-            projectFile.Id = newId;
-        }
-        public void ProjectFile(DBProjectFile projectFile) 
-        {
-            InsertProjectFile(projectFile);
-            projectFile.FileUpload.PrjFileId = projectFile.Id;
-            InsertFileUploadResult(projectFile.FileUpload.FileInfo);
-            InsertProjectFileUploadResult(projectFile.FileUpload);
+            SqlSugarClient sqlClient = new SqlSugarClient(dbMySqlConfig);
+            SqlSugarProvider sqlDB = sqlClient.GetConnection(dbMySqlConfig.ConfigId);
+            //插入新数据
+            int res = sqlDB.Insertable(file).ExecuteCommand();
+            return res > 0;
 
+        }
+        public bool InsertProjectFileUploadResult(DBProjectFileUpload projectFile)
+        {
+            SqlSugarClient sqlClient = new SqlSugarClient(dbMySqlConfig);
+            SqlSugarProvider sqlDB = sqlClient.GetConnection(dbMySqlConfig.ConfigId);
+            //插入新数据
+            int res = sqlDB.Insertable(projectFile).ExecuteCommand();
+            return res > 0;
+        }
+        public bool InsertProjectFile(DBProjectFile projectFile)
+        {
+            SqlSugarClient sqlClient = new SqlSugarClient(dbMySqlConfig);
+            SqlSugarProvider sqlDB = sqlClient.GetConnection(dbMySqlConfig.ConfigId);
+            //插入新数据
+            int res = sqlDB.Insertable(projectFile).ExecuteCommand();
+            return res > 0;
         }
     }
 }

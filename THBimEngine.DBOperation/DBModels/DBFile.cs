@@ -1,8 +1,12 @@
-﻿namespace THBimEngine.DBOperation
+﻿using SqlSugar;
+
+namespace THBimEngine.DBOperation
 {
+    [SugarTable("FileUpload")]
     public class DBFile
     {
-        public int Id { get; set; }
+        public string UploadId { get; set; }
+        public string FileMD5 { get; set; }
         public string FileUrl { get; set; }
         public string FileRealName { get; set; }
         public string Uploader { get; set; }

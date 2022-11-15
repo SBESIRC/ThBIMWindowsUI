@@ -544,81 +544,87 @@ namespace THBimEngine.Domain.MidModel
      
         public void GetProfileName(IIfcProduct ifcEntity, UniComponent uniComponent)
         {
-            var profileName = "";
-            if(ifcEntity.Name.Value.ToString().Contains("SU")&& ifcEntity.GetType().Name.Contains("Beam"))
+            try
             {
-                var x = (ifcEntity as Xbim.Ifc2x3.Kernel.IfcObject).IsDefinedByProperties;// as Xbim.Ifc2x3.Kernel.IfcRelDefinesByProperties);
-                var y= ((Xbim.Ifc2x3.Kernel.IfcPropertySet)x.First().RelatingPropertyDefinition).HasProperties.First();
-                var z = (string)(y as Xbim.Ifc2x3.PropertyResource.IfcPropertySingleValue).NominalValue.Value;
-                var val1 = z.Split(',')[1];
-                var val2 = z.Split(',').Last();
-                profileName = "Rec_"+ val1 + "*" + val2;
-            }
-            else if (ifcEntity.Model.SchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
-            {
-                var ifcProduct = ifcEntity as Xbim.Ifc2x3.Kernel.IfcProduct;
-                var item = ifcProduct.Representation.Representations.First().Items[0];
-                if (item.GetType().Name == "IfcMappedItem")
+                var profileName = "";
+                if (ifcEntity.Name.Value.ToString().Contains("SU") && ifcEntity.GetType().Name.Contains("Beam"))
                 {
-                    var source = (item as Xbim.Ifc2x3.GeometryResource.IfcMappedItem)
-                        .MappingSource.MappedRepresentation.Items[0];
-                    profileName = ((Xbim.Ifc2x3.GeometricModelResource.IfcSweptAreaSolid)source).SweptArea.ProfileName.ToString();
+                    var x = (ifcEntity as Xbim.Ifc2x3.Kernel.IfcObject).IsDefinedByProperties;// as Xbim.Ifc2x3.Kernel.IfcRelDefinesByProperties);
+                    var y = ((Xbim.Ifc2x3.Kernel.IfcPropertySet)x.First().RelatingPropertyDefinition).HasProperties.First();
+                    var z = (string)(y as Xbim.Ifc2x3.PropertyResource.IfcPropertySingleValue).NominalValue.Value;
+                    var val1 = z.Split(',')[1];
+                    var val2 = z.Split(',').Last();
+                    profileName = "Rec_" + val1 + "*" + val2;
+                }
+                else if (ifcEntity.Model.SchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
+                {
+                    var ifcProduct = ifcEntity as Xbim.Ifc2x3.Kernel.IfcProduct;
+                    var item = ifcProduct.Representation.Representations.First().Items[0];
+                    if (item.GetType().Name == "IfcMappedItem")
+                    {
+                        var source = (item as Xbim.Ifc2x3.GeometryResource.IfcMappedItem)
+                            .MappingSource.MappedRepresentation.Items[0];
+                        profileName = ((Xbim.Ifc2x3.GeometricModelResource.IfcSweptAreaSolid)source).SweptArea.ProfileName.ToString();
+                    }
+                    else
+                    {
+                        var solid = item as Xbim.Ifc2x3.GeometricModelResource.IfcExtrudedAreaSolid;
+                        if (solid is null)
+                        {
+                            var rst = item as Xbim.Ifc2x3.GeometricModelResource.IfcBooleanResult;
+                            if (rst is null)
+                            {
+                                return;
+                            }
+                            var solid2 = rst.FirstOperand;
+                            profileName = ((Xbim.Ifc2x3.GeometricModelResource.IfcSweptAreaSolid)solid2).SweptArea.ProfileName.ToString();
+                        }
+                        else
+                        {
+                            profileName = solid.SweptArea.ProfileName.ToString();
+                        }
+                    }
                 }
                 else
                 {
-                    var solid = item as Xbim.Ifc2x3.GeometricModelResource.IfcExtrudedAreaSolid;
+                    var ifcProduct = ifcEntity as Xbim.Ifc4.Kernel.IfcProduct;
+                    if (!ifcProduct.Name.ToString().Contains("Beam"))
+                    {
+                        return;
+                    }
+                    var item = ifcProduct.Representation.Representations.First().Items[0];
+                    var solid = item as Xbim.Ifc4.GeometricModelResource.IfcExtrudedAreaSolid;
                     if (solid is null)
                     {
-                        var rst = item as Xbim.Ifc2x3.GeometricModelResource.IfcBooleanResult;
+                        var rst = item as Xbim.Ifc4.GeometricModelResource.IfcBooleanResult;
                         if (rst is null)
                         {
                             return;
                         }
-                        var solid2 = rst.FirstOperand;
-                        profileName = ((Xbim.Ifc2x3.GeometricModelResource.IfcSweptAreaSolid)solid2).SweptArea.ProfileName.ToString();
+                        var solid2 = rst.FirstOperand as Xbim.Ifc4.GeometricModelResource.IfcSweptAreaSolid;
+                        profileName = solid2.SweptArea.ProfileName.ToString();
                     }
                     else
                     {
                         profileName = solid.SweptArea.ProfileName.ToString();
                     }
                 }
-            }
-            else
-            {
-                var ifcProduct = ifcEntity as Xbim.Ifc4.Kernel.IfcProduct;
-                if(!ifcProduct.Name.ToString().Contains("Beam"))
-                {
-                    return;
-                }
-                var item = ifcProduct.Representation.Representations.First().Items[0];
-                var solid = item as Xbim.Ifc4.GeometricModelResource.IfcExtrudedAreaSolid;
-                if (solid is null)
-                {
-                    var rst = item as Xbim.Ifc4.GeometricModelResource.IfcBooleanResult;
-                    if (rst is null)
-                    {
-                        return;
-                    }
-                    var solid2 = rst.FirstOperand as Xbim.Ifc4.GeometricModelResource.IfcSweptAreaSolid;
-                    profileName = solid2.SweptArea.ProfileName.ToString();
-                }
-                else
-                {
-                    profileName = solid.SweptArea.ProfileName.ToString();
-                }
-            }
 
-            if (profileName.Contains("_") && profileName.Contains("*"))
-            {
-                string[] xyLen = profileName.Split('_')[1].Split('*');
-                uniComponent.x_len = Convert.ToDouble(xyLen[0]);
-                uniComponent.y_len = Convert.ToDouble(xyLen[1]);
+                if (profileName.Contains("_") && profileName.Contains("*"))
+                {
+                    string[] xyLen = profileName.Split('_')[1].Split('*');
+                    uniComponent.x_len = Convert.ToDouble(xyLen[0]);
+                    uniComponent.y_len = Convert.ToDouble(xyLen[1]);
+                }
+                else if (profileName.StartsWith("21"))
+                {
+                    uniComponent.description = profileName;
+                }
             }
-            else if(profileName.StartsWith("21"))
+            catch(Exception ex)
             {
-                uniComponent.description = profileName;
-            }
 
+            }
         }
        
         public List<Edge> GetEdgesByDir(OutingPolygon outingPolygon, List<PointNormal> allPoints, ref int edgeIndex, int parentId)

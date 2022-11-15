@@ -50,6 +50,11 @@ namespace THBimEngine.Domain
             };
         }
 
+        public static ThTCHPoint3d XBimVertex2Point3D(this IXbimVertex point)
+        {
+            return point.VertexGeometry.XBimPoint2Point3D();
+        }
+
         public static int ToInt(this uint value)
         {
             return int.Parse(value.ToString());
@@ -112,6 +117,42 @@ namespace THBimEngine.Domain
                 }
             }
             return outLineGeoParam;
+        }
+
+        public static ThSULoopData XBimVertexSet2SULoopData(this IXbimVertexSet vertices)
+        {
+            ThSULoopData loopData = new ThSULoopData();
+            foreach (var vertex in vertices)
+            {
+                loopData.Points.Add(vertex.XBimVertex2Point3D());
+            }
+            return loopData;
+        }
+
+        public static ThTCHMatrix3d IfcAxis2Placement3D2ThTCHMatrix3d(this Xbim.Ifc2x3.GeometryResource.IfcAxis2Placement3D placement3D)
+        {
+            var xBimAxis = new XbimVector3D(placement3D.Axis.X, placement3D.Axis.Y, placement3D.Axis.Z);
+            var xBimRefDirection = new XbimVector3D(placement3D.RefDirection.X, placement3D.RefDirection.Y, placement3D.RefDirection.Z);
+            var Yxis = xBimAxis.CrossProduct(xBimRefDirection).Normalized();
+            return new ThTCHMatrix3d()
+            {
+                Data11 = xBimAxis.X,
+                Data12 = xBimAxis.Y,
+                Data13 = xBimAxis.Z,
+                Data14 = 0,
+                Data21 = YAxis.X,
+                Data22 = YAxis.Y,
+                Data23 = YAxis.Z,
+                Data24 = 0,
+                Data31 = xBimRefDirection.X,
+                Data32 = xBimRefDirection.Y,
+                Data33 = xBimRefDirection.Z,
+                Data34 = 0,
+                Data41 = placement3D.Location.X,
+                Data42 = placement3D.Location.Y,
+                Data43 = placement3D.Location.Z,
+                Data44 = 1,
+            };
         }
 
         public static bool VerifyPipeData(this byte[] data)

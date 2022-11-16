@@ -19,7 +19,7 @@ namespace XbimXplorer
     public partial class ProjectManage : Window
     {
         ProjectDBHelper projectDBHelper = new ProjectDBHelper();
-        ProjectVM projectVM;
+        static ProjectVM projectVM =null;
         OperateType operateType;
         ProjectFileInfo selectProjectFile;
         UserInfo loginUser;
@@ -61,8 +61,11 @@ namespace XbimXplorer
         }
         private void InitUserProjects()
         {
-            var userPojects = projectDBHelper.GetUserProjects(loginUser.PreSSOId);
-            projectVM = new ProjectVM(userPojects);
+            if (null == projectVM) 
+            {
+                var userPojects = projectDBHelper.GetUserProjects(loginUser.PreSSOId);
+                projectVM = new ProjectVM(userPojects);
+            }
             this.DataContext = projectVM;
         }
 

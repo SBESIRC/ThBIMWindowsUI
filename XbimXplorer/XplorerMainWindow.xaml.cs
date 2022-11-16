@@ -1069,7 +1069,7 @@ namespace XbimXplorer
                         fileName = string.Format("{0}-100%.ifc", fileName);
                         var newName = Path.Combine(dirName, fileName);
                         mergeIfc.SaveAs(newName);
-                        MessageBox.Show($"合模成功，已保存至[{newName}]", "合模成功", MessageBoxButton.OK);
+                        MessageBox.Show($"合模成功!", "合模成功", MessageBoxButton.OK);
                     }
                     catch
                     {

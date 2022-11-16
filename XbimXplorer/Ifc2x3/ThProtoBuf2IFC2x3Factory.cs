@@ -877,25 +877,6 @@ namespace ThBIMServer.Ifc2x3
                         d.Name = "SU Element";
                         d.GlobalId = IfcGloballyUniqueId.FromGuid(Guid.NewGuid());
                     });
-                    if (componentData.InstanceName != null)
-                    {
-                        var info = componentData.InstanceName.Replace(" ", "").Replace("x", ",").Replace("X", ",").Replace("×", ",").Replace("*", ",");
-                        info = "su," + info;
-                        model.Instances.New<IfcRelDefinesByProperties>(rel =>
-                        {
-                            rel.Name = "THifc properties";
-                            rel.RelatedObjects.Add(ret);
-                            rel.RelatingPropertyDefinition = model.Instances.New<IfcPropertySet>(pset =>
-                            {
-                                pset.Name = "Profile";
-                                pset.HasProperties.Add(model.Instances.New<IfcPropertySingleValue>(p =>
-                                {
-                                    p.Name = "Remark";
-                                    p.NominalValue = new IfcText(info);
-                                }));
-                            });
-                        });
-                    }
                 }
                 else if (componentData.IfcClassification.StartsWith("IfcColumn"))
                 {
@@ -921,7 +902,40 @@ namespace ThBIMServer.Ifc2x3
                         d.GlobalId = IfcGloballyUniqueId.FromGuid(Guid.NewGuid());
                     });
                 }
-
+                if (componentData.InstanceName != null)
+                {
+                    
+                }
+                if (componentData.InstanceName != null)
+                {
+                    var configs = componentData.InstanceName.Split(';');
+                    foreach (var config in configs)
+                    {
+                        if(config.StartsWith("S_"))
+                        {
+                            ret.Description = config;
+                        }
+                        else if(ret is IfcBeam)
+                        {
+                            var info = config.Replace(" ", "").Replace("x", ",").Replace("X", ",").Replace("×", ",").Replace("*", ",");
+                            info = "su," + info;
+                            model.Instances.New<IfcRelDefinesByProperties>(rel =>
+                            {
+                                rel.Name = "THifc properties";
+                                rel.RelatedObjects.Add(ret);
+                                rel.RelatingPropertyDefinition = model.Instances.New<IfcPropertySet>(pset =>
+                                {
+                                    pset.Name = "Profile";
+                                    pset.HasProperties.Add(model.Instances.New<IfcPropertySingleValue>(p =>
+                                    {
+                                        p.Name = "Remark";
+                                        p.NominalValue = new IfcText(info);
+                                    }));
+                                });
+                            });
+                        }
+                    }
+                }
                 var xBimMatrix3D = componentData.Transformations.ToXBimMatrix3D();
                 var isRightHandedCoordinate = IsRightHandedCoordinate(xBimMatrix3D);
                 if(!isRightHandedCoordinate)

@@ -51,6 +51,7 @@ namespace XbimXplorer
             else 
             {
                 userConfig.Config.UpdateOrAddAppConfig("RemembPsw", "False");
+                userConfig.Config.UpdateOrAddAppConfig("UserPsw", "");
             }
             XplorerMainWindow xplorer = new XplorerMainWindow(userInfo);
             this.Close();

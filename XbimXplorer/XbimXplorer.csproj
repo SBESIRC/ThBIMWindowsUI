@@ -342,6 +342,7 @@
     <Compile Include="THPluginSystem\LeftPluginViewModel.cs" />
     <Compile Include="THPluginSystem\PluginService.cs" />
     <Compile Include="THPluginSystem\TopPluginViewModel.cs" />
+    <Compile Include="UserConfig.cs" />
     <Compile Include="XplorerMainWindow.IApplication.xaml.cs">
       <DependentUpon>XplorerMainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

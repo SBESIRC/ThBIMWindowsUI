@@ -9,9 +9,17 @@ namespace XbimXplorer
     /// </summary>
     public partial class Login : Window
     {
+        UserConfig userConfig;
         public Login()
         {
             InitializeComponent();
+            userConfig = new UserConfig();
+            bool isRememb = userConfig.Config.AppConfigBoolValue("RemembPsw");
+            string uName = userConfig.Config.AppConfigStringValue("UserName");
+            string uPsw = userConfig.Config.AppConfigStringValue("UserPsw");
+            ckbRemberPsw.IsChecked = isRememb;
+            txtUName.Text = uName;
+            txtUPsw.Password = uPsw;
         }
 
         private void btnLogin_Click(object sender, RoutedEventArgs e)
@@ -28,14 +36,39 @@ namespace XbimXplorer
             {
                 userInfo = userLogin.UserLoginByNamePsw(uName, uPsw);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "登录失败提醒", MessageBoxButton.OK);
                 return;
+            }
+            //保存登录的用户信息
+            userConfig.Config.UpdateOrAddAppConfig("UserName", uName);
+            if (ckbRemberPsw.IsChecked == true)
+            {
+                userConfig.Config.UpdateOrAddAppConfig("RemembPsw", "True");
+                userConfig.Config.UpdateOrAddAppConfig("UserPsw", uPsw);
+            }
+            else 
+            {
+                userConfig.Config.UpdateOrAddAppConfig("RemembPsw", "False");
             }
             XplorerMainWindow xplorer = new XplorerMainWindow(userInfo);
             this.Close();
             xplorer.Show();
         }
+
+        private void ckbRemberPsw_Checked(object sender, RoutedEventArgs e)
+        {
+            if (ckbRemberPsw.IsChecked == true)
+            {
+                userConfig.Config.UpdateOrAddAppConfig("RemembPsw", "True");
+            }
+            else
+            {
+                userConfig.Config.UpdateOrAddAppConfig("RemembPsw", "False");
+            }
+        }
     }
+
+
 }

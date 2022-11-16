@@ -8,6 +8,7 @@
 
 #region Directives
 
+using Google.Protobuf;
 using log4net;
 using log4net.Config;
 using log4net.Repository.Hierarchy;
@@ -44,6 +45,7 @@ using Xbim.Presentation.FederatedModel;
 using Xbim.Presentation.XplorerPluginSystem;
 using XbimXplorer.Dialogs;
 using XbimXplorer.Dialogs.ExcludedTypes;
+using XbimXplorer.Extensions;
 using XbimXplorer.LogViewer;
 using XbimXplorer.Properties;
 using XbimXplorer.ThBIMEngine;
@@ -1079,7 +1081,60 @@ namespace XbimXplorer
                 //RenderScene();
             }
         }
-        
+
+        private void MenuItem_Click_4(object sender, RoutedEventArgs e)
+        {
+            if (CurrentDocument == null)
+                return;
+            var architectureIFCs = CurrentDocument.AllBimProjects.Where(o => o.Major == EMajor.Architecture && o.SourceProject is IfcStore).Select(o => o.SourceProject as IfcStore);
+            var project = IFCReverse.ReverseSU(architectureIFCs.FirstOrDefault());
+
+            ProtobufMessage message = new ProtobufMessage();
+            MessageHeader header = new MessageHeader();
+            header.Major = "建筑";
+            header.Source = MessageSourceEnum.Platform3D;
+            message.Header = header;
+            message.SuProjects.Add(project);
+            var CTS = new System.Threading.CancellationTokenSource();
+            var Token = CTS.Token;
+            //这里有一个小坑，只有设置了PipeOptions.Asynchronous，管道才会接受取消令牌的取消请求，不然不会生效
+            var pipeServer = new System.IO.Pipes.NamedPipeServerStream("THCAD2SUPIPE", System.IO.Pipes.PipeDirection.InOut, 1, System.IO.Pipes.PipeTransmissionMode.Message, System.IO.Pipes.PipeOptions.Asynchronous);
+            var task = new System.Threading.Tasks.Task(() =>
+            {
+                try
+                {
+                    pipeServer.WaitForConnection();
+                    var bytes = message.ToByteArray();
+                    pipeServer.Write(bytes, 0, bytes.Length);
+
+                    pipeServer.Close();
+                    pipeServer.Dispose();
+                }
+                catch (System.Exception ex)
+                {
+                    //线程被外部取消，说明等待连接超时
+                    pipeServer.Dispose();
+                }
+            }, Token);
+            task.Start();
+            task.Wait(10000);
+            if (task.Status == System.Threading.Tasks.TaskStatus.Running)
+            {
+                CTS.Cancel();
+                pipeServer.Close();
+                pipeServer.Dispose();
+                //Active.Database.GetEditor().WriteMessage("未连接到SU ！\r\n");
+            }
+            else if (task.Status == System.Threading.Tasks.TaskStatus.RanToCompletion)
+            {
+                //Active.Database.GetEditor().WriteMessage("已成功发送数据至SU！\r\n");
+            }
+            else
+            {
+                //Active.Database.GetEditor().WriteMessage("其他异常 ！\r\n");
+            }
+        }
+
 
         private void ExportCut_Click(object sender, RoutedEventArgs e)
         {

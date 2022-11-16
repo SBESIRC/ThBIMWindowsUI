@@ -202,6 +202,9 @@
                 <MenuItem Header="上传DB平台" Click="MenuItem_Click_3" Width="80" HorizontalAlignment="Left"
                       VerticalContentAlignment="Center"
                       HorizontalContentAlignment="Center"></MenuItem>
+                <MenuItem Header="建筑数据导入SU平台" Click="MenuItem_Click_4" Width="130" HorizontalAlignment="Left"
+                      VerticalContentAlignment="Center"
+                      HorizontalContentAlignment="Center"></MenuItem>
             </Menu>
             <Grid Grid.Column="1" x:Name="topPluginGrid" VerticalAlignment="Stretch">
                 <ItemsControl VerticalAlignment="Stretch" ItemsSource="{Binding TopPluginButtons,Mode=OneWay,NotifyOnSourceUpdated=True,UpdateSourceTrigger=PropertyChanged}">

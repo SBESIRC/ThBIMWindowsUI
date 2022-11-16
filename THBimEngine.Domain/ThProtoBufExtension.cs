@@ -119,12 +119,12 @@ namespace THBimEngine.Domain
             return outLineGeoParam;
         }
 
-        public static ThSULoopData XBimVertexSet2SULoopData(this IXbimVertexSet vertices)
+        public static ThSULoopData XBimVertexSet2SULoopData(this IEnumerable<XbimPoint3D> vertices)
         {
             ThSULoopData loopData = new ThSULoopData();
             foreach (var vertex in vertices)
             {
-                loopData.Points.Add(vertex.XBimVertex2Point3D());
+                loopData.Points.Add(vertex.XBimPoint2Point3D());
             }
             return loopData;
         }
@@ -136,17 +136,17 @@ namespace THBimEngine.Domain
             var Yxis = xBimAxis.CrossProduct(xBimRefDirection).Normalized();
             return new ThTCHMatrix3d()
             {
-                Data11 = xBimAxis.X,
-                Data12 = xBimAxis.Y,
-                Data13 = xBimAxis.Z,
+                Data11 = xBimRefDirection.X,
+                Data12 = xBimRefDirection.Y,
+                Data13 = xBimRefDirection.Z,
                 Data14 = 0,
                 Data21 = YAxis.X,
                 Data22 = YAxis.Y,
                 Data23 = YAxis.Z,
                 Data24 = 0,
-                Data31 = xBimRefDirection.X,
-                Data32 = xBimRefDirection.Y,
-                Data33 = xBimRefDirection.Z,
+                Data31 = xBimAxis.X,
+                Data32 = xBimAxis.Y,
+                Data33 = xBimAxis.Z,
                 Data34 = 0,
                 Data41 = placement3D.Location.X,
                 Data42 = placement3D.Location.Y,

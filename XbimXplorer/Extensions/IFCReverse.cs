@@ -111,6 +111,9 @@ namespace XbimXplorer.Extensions
                         foreach (IfcBuildingStorey ifcBuildingStorey in ifcBuilding.BuildingStoreys)
                         {
                             ThSUBuildingStoreyData storey = new ThSUBuildingStoreyData();
+                            storey.Root = new ThTCHRootData();
+                            storey.Root.Name = ifcBuildingStorey.Name;
+                            storey.Root.GlobalId = System.Guid.NewGuid().ToString();
                             foreach (var item in ifcBuildingStorey.ContainsElements.Cast<IfcRelContainedInSpatialStructure>())
                             {
                                 foreach (var ifcElement in item.RelatedElements)
@@ -130,6 +133,22 @@ namespace XbimXplorer.Extensions
                                     else if (ifcElement is IfcSpace ifcRoom)
                                     {
 
+                                    }
+                                    else if(ifcElement is IfcWindow ifcWindow)
+                                    {
+
+                                    }
+                                    else if (ifcElement is IfcDoor ifcDoor)
+                                    {
+
+                                    }
+                                    else
+                                    {
+
+                                    }
+                                    if(!(ifcElement is IfcWindow))
+                                    {
+                                        continue;
                                     }
                                     IfcRepresentationItem body = ifcElement.Representation.Representations.FirstOrDefault().Items.FirstOrDefault();
                                     XbimGeometryEngine engine = new XbimGeometryEngine();
@@ -151,11 +170,12 @@ namespace XbimXplorer.Extensions
                                     foreach (var xbimface in xbimSolid.Faces)
                                     {
                                         ThSUFaceBrepData thSUFaceBrepData = new ThSUFaceBrepData();
-                                        thSUFaceBrepData.OuterLoop = xbimface.OuterBound.Vertices.XBimVertexSet2SULoopData();
+                                        thSUFaceBrepData.OuterLoop = xbimface.OuterBound.Points.XBimVertexSet2SULoopData();
                                         foreach (var bound in xbimface.InnerBounds)
                                         {
-                                            thSUFaceBrepData.InnerLoops.Add(bound.Vertices.XBimVertexSet2SULoopData());
+                                            thSUFaceBrepData.InnerLoops.Add(bound.Points.XBimVertexSet2SULoopData());
                                         }
+                                        compDef.BrepFaces.Add(thSUFaceBrepData);
                                     }
                                     project.Definitions.Add(compDef);
 

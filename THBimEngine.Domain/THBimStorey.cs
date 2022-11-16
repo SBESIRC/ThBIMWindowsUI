@@ -108,7 +108,16 @@ namespace THBimEngine.Domain
         {
             var newStoreyUids = newStorey.FloorEntityRelations.Keys;
             var storeyUids = FloorEntityRelations.Keys;
-            return storeyUids.Except(newStoreyUids).ToList();
+            var removedUids = storeyUids.Except(newStoreyUids).ToList();
+            foreach (var uid in storeyUids)
+            {
+                if (removedUids.Contains(uid)) continue;
+                if(!this.FloorEntitys[uid].GetType().Name.Equals(newStorey.FloorEntitys[uid].GetType().Name))
+                {
+                    removedUids.Add(uid);
+                }
+            }
+            return removedUids;
         }
 
         public List<string> GetUpdatedComponentUids(THBimStorey newStorey)

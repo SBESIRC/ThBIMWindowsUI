@@ -88,6 +88,9 @@ namespace THBimEngine.Domain.MidModel
 
                         foreach (var item in elements)
                         {
+                            var description = GetDescription(item);
+                            if (description == "S_BEAM_梯梁"|| description=="S_COLU_梯柱")
+                                continue;
                             var type = item.ToString().Split('.').Last();
                             bool isVirtualElement = false;
                             if (type.Contains("IfcVirtualElement"))
@@ -112,7 +115,7 @@ namespace THBimEngine.Domain.MidModel
                             }
                             catch { }
 
-                            var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, buildingStorey, Components[type], materialType);
+                            var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, buildingStorey, Components[type], materialType,description);
 
                             GetProfileName(item, uniComponent);
 
@@ -145,6 +148,16 @@ namespace THBimEngine.Domain.MidModel
             }
         }
 
+        private string GetDescription(IIfcProduct ifcEntity)
+        {
+            var description = "";
+            var ifcRoot = ifcEntity as Xbim.Ifc2x3.Kernel.IfcRoot;
+            if(ifcRoot!=null)
+            {
+                description = ifcRoot?.Description;
+            }
+            return description;
+        }
         public void GetFromBimData(THBimProject bimProject)
         {
             var typeName2IFCTypeName = new Dictionary<string, string>();

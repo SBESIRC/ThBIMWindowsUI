@@ -63,7 +63,7 @@ namespace THBimEngine.Domain.MidModel
             }
         }
 
-        public UniComponent(string uid, THBimMaterial bimMaterial, ref int uniComponentIndex, Buildingstorey buildingStorey, Component component,string materialType) : base(component.name, component.type_id)
+        public UniComponent(string uid, THBimMaterial bimMaterial, ref int uniComponentIndex, Buildingstorey buildingStorey, Component component,string materialType,string descrip) : base(component.name, component.type_id)
         {
             unique_id = uniComponentIndex++;
             guid = uid;
@@ -72,6 +72,8 @@ namespace THBimEngine.Domain.MidModel
             rgb = new double[3] { bimMaterial.Color_R, bimMaterial.Color_G, bimMaterial.Color_B };
             material = materialType;
             comp_name = component.name;
+            if (descrip == "S_CONS_构造柱" || description == "S_CONS_通高墙" || description == "S_CONS_窗台墙")
+                description = "specialStructure";
 
             properties.Add("type", name);
         }

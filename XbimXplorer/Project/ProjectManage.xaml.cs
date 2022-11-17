@@ -98,12 +98,12 @@ namespace XbimXplorer
                 if (Path.Equals(filePath, path))
                     return;
                 File.Copy(filePath, path, true);
-                projectVM.ChangeSelectSubProject();
                 if (type == "YDB") 
                 {
                     ThYDBToIfcConvertService ydbToIfc = new ThYDBToIfcConvertService();
                     ydbToIfc.Convert(path);
                 }
+                projectVM.ChangeSelectSubProject();
             }
         }
         private void btnAddSUFile_Click(object sender, RoutedEventArgs e)

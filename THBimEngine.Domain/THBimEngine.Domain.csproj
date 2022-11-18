@@ -79,7 +79,9 @@
     <Compile Include="EApplcationName.cs" />
     <Compile Include="FileProject.cs" />
     <Compile Include="GeometryModel\FaceTriangle.cs" />
+    <Compile Include="GeometryModel\GeometryFaceModel.cs" />
     <Compile Include="GeometryModel\GeometryMeshModel.cs" />
+    <Compile Include="GeometryModel\GeometryMeshModelForSUProject.cs" />
     <Compile Include="GeometryParam.cs" />
     <Compile Include="Grid\GridCircle.cs" />
     <Compile Include="Grid\GridLine.cs" />

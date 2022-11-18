@@ -14,6 +14,7 @@ using Xbim.Geometry.Engine.Interop;
 using Xbim.Ifc2x3.GeometryResource;
 using THBimEngine.Domain;
 using Xbim.Ifc2x3.GeometricConstraintResource;
+using THBimEngine.Application;
 
 namespace XbimXplorer.Extensions
 {
@@ -97,6 +98,9 @@ namespace XbimXplorer.Extensions
         /// </summary>
         public static ThSUProjectData ReverseSU(IfcStore ifcStore)
         {
+            IfcStoreReadGeomtry2SUProject ifcStoreReadGeomtry2SUProject = new IfcStoreReadGeomtry2SUProject();
+            var allGeoPointNormals = new List<PointNormal>();
+            var ifcGeomtrys = ifcStoreReadGeomtry2SUProject.ReadGeomtry(ifcStore, out allGeoPointNormals);
             if (ifcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
             {
                 ThSUProjectData project = new ThSUProjectData();
@@ -118,74 +122,45 @@ namespace XbimXplorer.Extensions
                             {
                                 foreach (var ifcElement in item.RelatedElements)
                                 {
-                                    if (ifcElement is IfcWall ifcWall)
+                                    var ifcGeomtry = ifcGeomtrys.FirstOrDefault(o => o.EntityLable == ifcElement.EntityLabel.ToString());
+                                    if (ifcGeomtry == null)
                                     {
-                                        
-                                    }
-                                    else if (ifcElement is IfcSlab ifcSlab)
-                                    {
-
-                                    }
-                                    else if (ifcElement is IfcRailing ifcRailing)
-                                    {
-
-                                    }
-                                    else if (ifcElement is IfcSpace ifcRoom)
-                                    {
-
-                                    }
-                                    else if(ifcElement is IfcWindow ifcWindow)
-                                    {
-
-                                    }
-                                    else if (ifcElement is IfcDoor ifcDoor)
-                                    {
-
+                                        //
                                     }
                                     else
                                     {
-
-                                    }
-                                    if(!(ifcElement is IfcWindow))
-                                    {
-                                        continue;
-                                    }
-                                    IfcRepresentationItem body = ifcElement.Representation.Representations.FirstOrDefault().Items.FirstOrDefault();
-                                    XbimGeometryEngine engine = new XbimGeometryEngine();
-                                    IXbimSolid xbimSolid = null;
-                                    if (body is Xbim.Ifc2x3.GeometricModelResource.IfcExtrudedAreaSolid solid)
-                                    {
-                                        xbimSolid = engine.CreateSolid(solid);
-                                    }
-                                    else if (body is Xbim.Ifc2x3.GeometricModelResource.IfcFacetedBrep brep)
-                                    {
-                                        xbimSolid = engine.CreateSolid(brep);
-                                    }
-                                    else
-                                    {
-                                        xbimSolid = null;
-                                        throw new System.Exception();
-                                    }
-                                    ThSUCompDefinitionData compDef = new ThSUCompDefinitionData();
-                                    foreach (var xbimface in xbimSolid.Faces)
-                                    {
-                                        ThSUFaceBrepData thSUFaceBrepData = new ThSUFaceBrepData();
-                                        thSUFaceBrepData.OuterLoop = xbimface.OuterBound.Points.XBimVertexSet2SULoopData();
-                                        foreach (var bound in xbimface.InnerBounds)
+                                        ThSUCompDefinitionData compDef = new ThSUCompDefinitionData();
+                                        foreach (var face in ifcGeomtry.Faces)
                                         {
-                                            thSUFaceBrepData.InnerLoops.Add(bound.Points.XBimVertexSet2SULoopData());
+                                            ThSUFaceMeshData thSUFaceMeshData = new ThSUFaceMeshData();
+                                            var Mesh = new ThSUPolygonMesh();
+                                            foreach (var polygon in face.faceTriangles)
+                                            {
+                                                var polygonIndex = Mesh.Points.Count;
+                                                foreach (var ptIndex in polygon.ptIndex)
+                                                {
+                                                    var pt = allGeoPointNormals[ptIndex].Point;
+                                                    Mesh.Points.Add(new ThTCHPoint3d() { X = pt.X, Y = pt.Y, Z = pt.Z });
+                                                }
+                                                var suPolygon = new ThSUPolygon();
+                                                suPolygon.Indices.Add(polygonIndex);
+                                                suPolygon.Indices.Add(polygonIndex + 1);
+                                                suPolygon.Indices.Add(polygonIndex + 2);
+                                                thSUFaceMeshData.Mesh.Polygons.Add(suPolygon);
+                                            }
+                                            thSUFaceMeshData.Mesh = Mesh;
+                                            compDef.MeshFaces.Add(thSUFaceMeshData);
                                         }
-                                        compDef.BrepFaces.Add(thSUFaceBrepData);
-                                    }
-                                    project.Definitions.Add(compDef);
+                                        project.Definitions.Add(compDef);
 
-                                    var index = project.Definitions.Count - 1;
-                                    ThSUBuildingElementData element = new ThSUBuildingElementData();
-                                    element.Component = new ThSUComponentData();
-                                    element.Component.DefinitionIndex = index;
-                                    IfcLocalPlacement placement = ifcElement.ObjectPlacement as IfcLocalPlacement;
-                                    element.Component.Transformations = (placement.RelativePlacement as IfcAxis2Placement3D).IfcAxis2Placement3D2ThTCHMatrix3d();
-                                    storey.Buildings.Add(element);
+                                        var index = project.Definitions.Count - 1;
+                                        ThSUBuildingElementData element = new ThSUBuildingElementData();
+                                        element.Component = new ThSUComponentData();
+                                        element.Component.DefinitionIndex = index;
+                                        IfcLocalPlacement placement = ifcElement.ObjectPlacement as IfcLocalPlacement;
+                                        element.Component.Transformations = (placement.RelativePlacement as IfcAxis2Placement3D).IfcAxis2Placement3D2ThTCHMatrix3d();
+                                        storey.Buildings.Add(element);
+                                    }
                                 }
                             }
                             buildingData.Storeys.Add(storey);

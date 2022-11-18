@@ -147,6 +147,7 @@
     <Compile Include="THBimOpening.cs" />
     <Compile Include="THBimRailing.cs" />
     <Compile Include="THBimSlab.cs" />
+    <Compile Include="ThBimStoreyManager.cs" />
     <Compile Include="THBimUntypedEntity.cs" />
     <Compile Include="THBimWall.cs" />
     <Compile Include="THBimWindow.cs" />

@@ -89,15 +89,15 @@ namespace XbimXplorer.LeftTabItme
                         continue;
                     foreach (var filter in floorFilters) 
                     {
-                        if (filter.Describe != floorKeyValue.Key)
+                        if (filter.Describe != floorKeyValue.Name)
                             continue;
                         if (prjStoreyFilters.ContainsKey(filters.Key))
                             continue;
                         prjStoreyFilters.Add(filters.Key, filter);
                     }
                 }
-                var showElevation = (floorKeyValue.Value.First().Elevation / 1000.0).ToString("N3");
-                var addFilter = new FloorFilterViewModel(floorKeyValue.Key, showElevation, floorKeyValue.Value.First().LevelHeight.ToString());
+                var showElevation = (floorKeyValue.Elevation / 1000.0).ToString("N3");
+                var addFilter = new FloorFilterViewModel(floorKeyValue.Name, showElevation, floorKeyValue.Height.ToString());
                 foreach (var item in prjStoreyFilters) 
                 {
                     addFilter.ProjectFilters.Add(item.Key, item.Value);

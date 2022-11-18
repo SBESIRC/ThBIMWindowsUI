@@ -8,13 +8,13 @@ namespace THBimEngine.Domain
 {
     public static class ProjectExtension
     {
-        public static List<Type> ProjrctEntityTypes(this THBimProject project) 
+        public static List<Type> ProjrctEntityTypes(this THBimProject project)
         {
             var types = new HashSet<Type>();
             if (null == project)
                 return types.ToList();
             if (project.SourceProject != null && project.SourceProject is IfcStore ifcStore)
-			{
+            {
                 var ifcProject = ifcStore.Instances.FirstOrDefault<IIfcProject>();
                 if (ifcProject.Sites == null || ifcProject.Sites.Count() < 1)
                     return types.ToList();
@@ -58,19 +58,19 @@ namespace THBimEngine.Domain
                     }
                 }
             }
-			else
-			{
-				var allTypes = project.PrjAllEntitys.Values.Select(c => c.GetType()).ToList();
-                foreach (var item in allTypes) 
+            else
+            {
+                var allTypes = project.PrjAllEntitys.Values.Select(c => c.GetType()).ToList();
+                foreach (var item in allTypes)
                 {
                     if (types.Contains(item))
                         continue;
                     types.Add(item);
                 }
-			}
-			return types.ToList();
+            }
+            return types.ToList();
         }
-        public static List<THBimStorey> ProjectAllStorey(this THBimProject project) 
+        public static List<THBimStorey> ProjectAllStorey(this THBimProject project)
         {
             var storeys = new List<THBimStorey>();
             if (project.SourceProject != null && project.SourceProject is IfcStore ifcStore)
@@ -90,7 +90,7 @@ namespace THBimEngine.Domain
                             var bimStorey = IfcStoreyToBimStorey(storey23);
                             storeys.Add(bimStorey);
                         }
-                        else if (ifcStorey is Xbim.Ifc4.ProductExtension.IfcBuildingStorey storey4) 
+                        else if (ifcStorey is Xbim.Ifc4.ProductExtension.IfcBuildingStorey storey4)
                         {
                             var bimStorey = IfcStoreyToBimStorey(storey4);
                             storeys.Add(bimStorey);
@@ -98,7 +98,7 @@ namespace THBimEngine.Domain
                     }
                 }
                 storeys = storeys.OrderBy(c => c.LevelHeight).ToList();
-                for (int i = 0; i < storeys.Count - 1; i++) 
+                for (int i = 0; i < storeys.Count - 1; i++)
                 {
                     var btStorey = storeys[i];
                     var upStorey = storeys[i + 1];
@@ -107,19 +107,19 @@ namespace THBimEngine.Domain
             }
             else
             {
-                foreach (var item in project.ProjectSite.SiteBuildings) 
+                foreach (var item in project.ProjectSite.SiteBuildings)
                 {
                     storeys.AddRange(item.Value.BuildingStoreys.Values);
                 }
             }
             return storeys;
         }
-        public static Dictionary<BuildingCatagory, List<Type>> AllProjectTypes(List<THBimProject> allProjects) 
+        public static Dictionary<BuildingCatagory, List<Type>> AllProjectTypes(List<THBimProject> allProjects)
         {
             var resTypes = new Dictionary<BuildingCatagory, List<Type>>();
-            foreach (var project in allProjects) 
+            foreach (var project in allProjects)
             {
-                var prjTypes = project.ProjrctEntityTypes(); 
+                var prjTypes = project.ProjrctEntityTypes();
                 foreach (var item in prjTypes)
                 {
                     var realType = BuildingCatagory.Unknown;
@@ -164,7 +164,7 @@ namespace THBimEngine.Domain
                     {
                         realType = BuildingCatagory.Roof;
                     }
-                    else if (name.Contains("grid")) 
+                    else if (name.Contains("grid"))
                     {
                         realType = BuildingCatagory.Grid;
                     }
@@ -180,79 +180,108 @@ namespace THBimEngine.Domain
             }
             return resTypes;
         }
-        public static Dictionary<string, List<THBimStorey>> AllProjectStoreys(List<THBimProject> allProjects) 
+
+        public static List<ThBimStoreyManager> AllProjectStoreys(List<THBimProject> allProjects)
         {
-            var resStoreys = new Dictionary<string, List<THBimStorey>>();
-            foreach (var project in allProjects) 
+            var resStoreys = new List<ThBimStoreyManager>();
+            foreach (var project in allProjects)
             {
-                var storeys = project.PrjAllStoreys.Count()<1 ? project.ProjectAllStorey() : project.PrjAllStoreys.Values.ToList();
-                foreach (var storey in storeys) 
+                var storeys = project.PrjAllStoreys.Count() < 1 ? project.ProjectAllStorey() : project.PrjAllStoreys.Values.ToList();
+                foreach (var storey in storeys)
                 {
-                    if (resStoreys.ContainsKey(storey.Name)) 
+                    var manager = resStoreys.Where(o => Math.Abs(o.Elevation - storey.Elevation) < 500.0).FirstOrDefault();
+                    if (manager == null)
                     {
-                        resStoreys[storey.Name].Add(storey);
+                        var resStorey = new ThBimStoreyManager(storey.LevelHeight);
+                        resStorey.Storeys.Add(project.Major, new List<THBimStorey> { storey });
+                        resStoreys.Add(resStorey);
                     }
-                    else 
+                    else
                     {
-                        resStoreys.Add(storey.Name, new List<THBimStorey> { storey });
+                        if (manager.Storeys.ContainsKey(project.Major))
+                        {
+                            manager.Storeys[project.Major].Add(storey);
+                        }
+                        else
+                        {
+                            manager.Storeys.Add(project.Major, new List<THBimStorey> { storey });
+                        }
                     }
                 }
             }
+
+            // 重新计算层高
+            resStoreys = resStoreys.OrderBy(o => o.Elevation).ToList();
+            for (var i = 1; i < resStoreys.Count; i++)
+            {
+                resStoreys[0].Height = resStoreys[1].Elevation - resStoreys[0].Elevation;
+            }
+            if (resStoreys.Count > 1)
+            {
+                resStoreys[resStoreys.Count - 1].Height = resStoreys[resStoreys.Count - 2].Height;
+            }
+
             return resStoreys;
         }
 
-        public static List<TypeFilter> GetProjectTypeFilters(List<THBimProject> allProjects) 
+        public static List<TypeFilter> GetProjectTypeFilters(List<THBimProject> allProjects)
         {
             var filters = new List<TypeFilter>();
             var allTypes = AllProjectTypes(allProjects);
             var allEntitys = allProjects.SelectMany(c => c.PrjAllEntitys.Values).ToList();
             var allUnTypeEntitys = allEntitys.OfType<THBimUntypedEntity>().ToList();
-            foreach (var item in allTypes.OrderBy(c => c.Key)) 
+            foreach (var item in allTypes.OrderBy(c => c.Key))
             {
                 if (item.Key == BuildingCatagory.UnTypeElement)
                 {
                     var allUntypeRealNames = allUnTypeEntitys.Select(c => c.EntityTypeName).Distinct().ToList();
-                    foreach (var realName in allUntypeRealNames) 
+                    foreach (var realName in allUntypeRealNames)
                     {
                         var newFilter = new UnTypeEntityFilter(new List<string> { realName });
                         if (string.IsNullOrEmpty(realName))
                         {
                             newFilter.Describe = EnumUtil.GetEnumDescription(item.Key);
                         }
-                        else 
+                        else
                         {
                             newFilter.Describe = realName;
                         }
                         filters.Add(newFilter);
                     }
                 }
-                else 
+                else
                 {
                     var newFilter = new TypeFilter(item.Value);
                     newFilter.Describe = EnumUtil.GetEnumDescription(item.Key);
                     filters.Add(newFilter);
                 }
-                
+
             }
             return filters;
         }
+
         public static List<StoreyFilter> GetProjectStoreyFilters(List<THBimProject> allProjects)
         {
             var filters = new List<StoreyFilter>();
             var allStoreys = AllProjectStoreys(allProjects); // storeyId--eachProjectStorey
             foreach (var item in allStoreys)
             {
-                var newFilter = new StoreyFilter(item.Value.Select(c=>c.Uid).ToList());
-                newFilter.Describe = item.Key;
+                var storeys = new List<THBimStorey>();
+                foreach (var o in item.Storeys)
+                {
+                    storeys.AddRange(o.Value);
+                }
+                var newFilter = new StoreyFilter(storeys.Select(c => c.Uid).ToList());
+                newFilter.Describe = item.Name;
                 filters.Add(newFilter);
             }
             return filters;
         }
 
-        public static List<ProjectFilter> GetProjectFilters(List<THBimProject> allProjects) 
+        public static List<ProjectFilter> GetProjectFilters(List<THBimProject> allProjects)
         {
             var filters = new List<ProjectFilter>();
-            foreach (var item in allProjects) 
+            foreach (var item in allProjects)
             {
                 var filter = new ProjectFilter(new List<string> { item.ProjectIdentity });
                 filters.Add(filter);
@@ -268,38 +297,38 @@ namespace THBimEngine.Domain
                 storey_Elevation = storey.Elevation.Value;
             }
             var bimStorey = new THBimStorey(storey.EntityLabel, storey.Name, storey_Elevation, storey_Height, "", storey.GlobalId);
- //           if (storey.PropertySets == null)
- //               return bimStorey;
- //           var propSets = storey.PropertySets.ToList();
- //           if (propSets.Count<1)
- //               return bimStorey;
- //           foreach (var item in propSets)
- //           {
- //               if (item.PropertySetDefinitions == null)
- //                   continue;
- //               var defs = item.PropertySetDefinitions.ToList();
- //               foreach (var prop in defs)
- //               {
- //                   var propertySet = prop as IIfcPropertySet;
- //                   if (propertySet == null) 
- //                       continue;
- //                   foreach (var realProp in propertySet.HasProperties)
- //                   {
- //                       if (realProp.Name == "Height")
- //                       {
- //                           if (realProp is IIfcPropertySingleValue propValue)
- //                           {
- //                               if (double.TryParse(propValue.NominalValue.ToString(), out double height))
- //                               {
- //                                   storey_Height = height;
- //                                   goto StoreyHeightSetted;
- //                               }
- //                           }
- //                       }
- //                   }
- //               }
- //           }
- //StoreyHeightSetted:
+            //           if (storey.PropertySets == null)
+            //               return bimStorey;
+            //           var propSets = storey.PropertySets.ToList();
+            //           if (propSets.Count<1)
+            //               return bimStorey;
+            //           foreach (var item in propSets)
+            //           {
+            //               if (item.PropertySetDefinitions == null)
+            //                   continue;
+            //               var defs = item.PropertySetDefinitions.ToList();
+            //               foreach (var prop in defs)
+            //               {
+            //                   var propertySet = prop as IIfcPropertySet;
+            //                   if (propertySet == null) 
+            //                       continue;
+            //                   foreach (var realProp in propertySet.HasProperties)
+            //                   {
+            //                       if (realProp.Name == "Height")
+            //                       {
+            //                           if (realProp is IIfcPropertySingleValue propValue)
+            //                           {
+            //                               if (double.TryParse(propValue.NominalValue.ToString(), out double height))
+            //                               {
+            //                                   storey_Height = height;
+            //                                   goto StoreyHeightSetted;
+            //                               }
+            //                           }
+            //                       }
+            //                   }
+            //               }
+            //           }
+            //StoreyHeightSetted:
             //bimStorey.LevelHeight = storey_Height;
             return bimStorey;
         }
@@ -354,7 +383,7 @@ namespace THBimEngine.Domain
             return bimStorey;
         }
 
-        public static void PorjectFilterEntitys(this THBimProject project,List<FilterBase> allFilters) 
+        public static void PorjectFilterEntitys(this THBimProject project, List<FilterBase> allFilters)
         {
             bool validFilter = false;
             foreach (var filter in allFilters)
@@ -401,7 +430,7 @@ namespace THBimEngine.Domain
                     }
                 }
             }
-            else 
+            else
             {
                 if (project.ProjectSite == null || project.ProjectSite.SiteBuildings.Count < 1) { return; }
                 foreach (var building in project.ProjectSite.SiteBuildings)  // 遍历site中的每一个building
@@ -409,7 +438,7 @@ namespace THBimEngine.Domain
                     //check valid
                     foreach (var filter in allFilters)
                     {
-                        if (!filter.ProjectValid) 
+                        if (!filter.ProjectValid)
                             continue;
                         filter.CheckBuilding(building.Value);
                     }
@@ -418,7 +447,7 @@ namespace THBimEngine.Domain
                         //check valid
                         foreach (var filter in allFilters)
                         {
-                            if (!filter.ProjectValid || !filter.BuildingValid) 
+                            if (!filter.ProjectValid || !filter.BuildingValid)
                                 continue;
                             filter.CheckStory(story.Value);
                         }
@@ -437,7 +466,7 @@ namespace THBimEngine.Domain
                     }
                 }
             }
-            
+
         }
     }
 }

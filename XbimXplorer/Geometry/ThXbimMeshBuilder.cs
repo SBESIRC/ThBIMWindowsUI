@@ -15,14 +15,16 @@ namespace XbimXplorer.Geometry
 
         public XbimMesher ToMesh(XbimShapeInstance shapeInstance)
         {
-            IXbimShapeGeometryData shapeGeom = Reader.ShapeGeometry(shapeInstance.ShapeGeometryLabel);
-            if (shapeGeom.Format != (byte)XbimGeometryType.PolyhedronBinary)
+            // Reference:
+            //  https://github.com/xBimTeam/XbimGltf/blob/master/Xbim.GLTF.IO/Builder.cs
+            var shapeGeom = Reader.ShapeGeometryOfInstance(shapeInstance);
+            if (shapeGeom.Format != XbimGeometryType.PolyhedronBinary)
             {
                 throw new NotSupportedException();
             }
 
             var xbimMesher = new XbimMesher();
-            xbimMesher.AddMesh(shapeGeom.ShapeData);
+            xbimMesher.AddMesh((shapeGeom as IXbimShapeGeometryData).ShapeData);
             return xbimMesher;
         }
     }

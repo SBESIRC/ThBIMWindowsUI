@@ -247,26 +247,6 @@
     <Compile Include="EditableTextBlock\EditableTextBlockAdorner.cs" />
     <Compile Include="Extensions\ModelMerge\ThIFC2x3CloneExtension.cs" />
     <Compile Include="Extensions\ModelMerge\THModelMergeService.cs" />
-    <Compile Include="Geometry\ThXbimCircle3D.cs" />
-    <Compile Include="Geometry\ThXbimCommon.cs" />
-    <Compile Include="Geometry\ThXbimCoordinateSystem3D.cs" />
-    <Compile Include="Geometry\ThXbimExtension.cs" />
-    <Compile Include="Geometry\ThXbimPlane3D.cs" />
-    <Compile Include="Geometry\ThXbimProtoBufExtension.cs" />
-    <Compile Include="Geometry\ThXbimRay3D.cs" />
-    <Compile Include="Ifc2x3\ThIFC2x3Factory.cs" />
-    <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3BrepExtension.cs" />
-    <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3Builder.cs" />
-    <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3CSGSolidExtension.cs" />
-    <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3CurveExtension.cs" />
-    <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3Factory.cs" />
-    <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3GeExtension.cs" />
-    <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3ProfileExtension.cs" />
-    <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3RelAggregatesFactory.cs" />
-    <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3RelDefinesFactory.cs" />
-    <Compile Include="Ifc2x3\ThProtoBuf2IFCSolid3dExtension.cs" />
-    <Compile Include="Ifc2x3\ThXbimGeometryService.cs" />
-    <Compile Include="Ifc2x3\ThXbimSlabEngine.cs" />
     <Compile Include="LeftTabItme\FilterViewModel.cs" />
     <Compile Include="LeftTabItme\LeftTabControls\AddLinkModelUI.xaml.cs">
       <DependentUpon>AddLinkModelUI.xaml</DependentUpon>
@@ -291,13 +271,6 @@
     <Compile Include="LogViewer\LogViewer.xaml.cs">
       <DependentUpon>LogViewer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NTS\ThIFCNTSExtension.cs" />
-    <Compile Include="NTS\ThIFCNTSFixedPrecision.cs" />
-    <Compile Include="NTS\ThIFCNTSService.cs" />
-    <Compile Include="NTS\ThIFCNTSSpatialIndex.cs" />
-    <Compile Include="NTS\ThNTSOperation.cs" />
-    <Compile Include="NTS\ThTCHNTSExtension.cs" />
-    <Compile Include="NTS\ThTCHNTSOperation.cs" />
     <Compile Include="PluginSystem\IPackageExtensions.cs" />
     <Compile Include="PluginSystem\PluginActionUI.xaml.cs">
       <DependentUpon>PluginActionUI.xaml</DependentUpon>
@@ -570,6 +543,10 @@
     <ProjectReference Include="..\THBimEngine.HttpService\THBimEngine.HttpService.csproj">
       <Project>{4AE99897-1C64-41A6-8108-7A4232EEB6FB}</Project>
       <Name>THBimEngine.HttpService</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\THBimEngine.IO\THBimEngine.IO.csproj">
+      <Project>{09bf25dd-c40e-459e-8349-8044075c608c}</Project>
+      <Name>THBimEngine.IO</Name>
     </ProjectReference>
     <ProjectReference Include="..\THBimEngine.Presention\THBimEngine.Presention.csproj">
       <Project>{2b4a996d-85a9-455d-99eb-9233f020fce8}</Project>

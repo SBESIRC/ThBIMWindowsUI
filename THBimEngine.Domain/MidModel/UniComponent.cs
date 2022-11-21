@@ -90,6 +90,17 @@ namespace THBimEngine.Domain.MidModel
             properties.Add("type", name);
         }
 
+        public UniComponent(string uid, THBimMaterial bimMaterial, ref int uniComponentIndex, Component component, string materialType, string descrip) : base(component.name, component.type_id)
+        {
+            unique_id = uniComponentIndex++;
+            guid = uid;
+            rgb = new double[3] { bimMaterial.Color_R, bimMaterial.Color_G, bimMaterial.Color_B };
+            material = materialType;
+            comp_name = component.name;
+
+            properties.Add("type", name);
+        }
+
 
         public new void WriteToFile(BinaryWriter writer)
         {

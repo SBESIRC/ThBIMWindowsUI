@@ -44,6 +44,24 @@ namespace XbimXplorer.ThBIMEngine
             tempData.GetIfcFile(ifcStore, resList, allGeoPointNormals);
             tempData.WriteMidFile(ifcStore.FileName);
         }
+        public static void Run(IfcStore ifcStore, List<GeometryMeshModel> allGeoModels, List<PointNormal> allGeoPointNormals,
+            IfcStore ifcStorePC, List<GeometryMeshModel> allGeoModelsPC, List<PointNormal> allGeoPointNormalsPC)
+        {
+            var tempData = new TempModel();
+            var resList = new Dictionary<string, GeometryMeshModel>();
+            foreach (var item in allGeoModels)
+            {
+                resList.Add(item.EntityLable, item);
+            }
+            tempData.GetIfcFile(ifcStore, resList, allGeoPointNormals);
+            var resListPC = new Dictionary<string, GeometryMeshModel>();
+            foreach (var item in allGeoModelsPC)
+            {
+                resListPC.Add(item.EntityLable, item);
+            }
+            tempData.AddIfcFile(ifcStorePC, resListPC, allGeoPointNormalsPC);
+            tempData.WriteMidFile(ifcStore.FileName);
+        }
 
         public static IfcStore GetIfcStore(string ifcFileName)
         {

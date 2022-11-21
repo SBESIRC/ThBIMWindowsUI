@@ -92,10 +92,13 @@ namespace XbimXplorer
         static Mutex CadMutex = null;
         static Mutex ViewerMutex = null;
         static Mutex FileMutex = null;
+        static Mutex FlagMutex = null;
+        static Mutex ViewerMutex2 = null;
         static void InitMutex()
         {
             var viewerMutexName = "viewerMutex";
             var fileMutexName = "fileMutex";
+            var flagMutexName = "flagMutex";
             try
             {
                 ViewerMutex = new Mutex(true, viewerMutexName, out _);
@@ -116,6 +119,17 @@ namespace XbimXplorer
                 FileMutex.Dispose();
                 FileMutex = new Mutex(true, fileMutexName, out _);
             }
+            try
+            {
+                FlagMutex = new Mutex(true, flagMutexName, out _);
+            }
+            catch
+            {
+                FlagMutex = Mutex.OpenExisting(flagMutexName, System.Security.AccessControl.MutexRights.FullControl);
+                FlagMutex.Dispose();
+                FlagMutex = new Mutex(true, flagMutexName, out _);
+            }
+
         }
         public void Func()
         {

@@ -5,13 +5,14 @@ using System.Linq;
 using System.Text;
 using Xbim.Ifc;
 using Xbim.Ifc4.Interfaces;
+using Xbim.IO.Xml.BsConf;
 
 namespace THBimEngine.Domain.MidModel
 {
     public class TempModel
     {
         public List<Vec3> Points;
-        public Dictionary<int,Buildingstorey> Buildingstoreys;
+        public Dictionary<int, Buildingstorey> Buildingstoreys;
         public Dictionary<string, Component> Components;
         public List<Edge> Edges;
         public List<OutingPolygon> OutingPolygons;
@@ -56,7 +57,7 @@ namespace THBimEngine.Domain.MidModel
             GetIfcFile(ifcStore, bimProject.AllGeoModels(), bimProject.AllGeoPointNormals());
         }
 
-        public void GetIfcFile(IfcStore ifcStore, Dictionary<string ,GeometryMeshModel> allGeoModels,List<PointNormal> allGeoPointNormals)
+        public void GetIfcFile(IfcStore ifcStore, Dictionary<string, GeometryMeshModel> allGeoModels, List<PointNormal> allGeoPointNormals)
         {
             int ptIndex = 0;//点索引
             int componentIndex = 0;//属性索引(门、窗等)
@@ -89,7 +90,7 @@ namespace THBimEngine.Domain.MidModel
                         foreach (var item in elements)
                         {
                             var description = GetDescription(item);
-                            if (description == "S_BEAM_梯梁"|| description=="S_COLU_梯柱")
+                            if (description == "S_BEAM_梯梁" || description == "S_COLU_梯柱")
                                 continue;
                             var type = item.ToString().Split('.').Last();
                             bool isVirtualElement = false;
@@ -115,7 +116,7 @@ namespace THBimEngine.Domain.MidModel
                             }
                             catch { }
 
-                            var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, buildingStorey, Components[type], materialType,description);
+                            var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, buildingStorey, Components[type], materialType, description);
 
                             GetProfileName(item, uniComponent);
 
@@ -148,11 +149,127 @@ namespace THBimEngine.Domain.MidModel
             }
         }
 
+        public void AddIfcFile(IfcStore ifcStore, Dictionary<string, GeometryMeshModel> allGeoModels, List<PointNormal> allGeoPointNormals)
+        {
+            int ptIndex = Points.Count;
+            int componentIndex = Components.Count;
+            int edgeIndex = Edges.Count;
+            int triangleIndex = OutingPolygons.Count;
+            int uniComponentIndex = UniComponents.Count;
+
+            int offsetIndex = allPoints.Count;
+            foreach (var pt in allGeoPointNormals)
+            {
+                allPoints.Add(pt.GetRealData());
+            }
+
+            var ifcProject = ifcStore.Instances.FirstOrDefault<IIfcProject>();
+            var site = ifcProject.Sites.First();
+            var buildings = site.Buildings.ToList();
+            foreach (var building in buildings)
+            {
+                foreach (var ifcStorey in building.BuildingStoreys)
+                {
+                    foreach (var spatialStructure in ifcStorey.ContainsElements)
+                    {
+                        var elements = spatialStructure.RelatedElements;
+                        if (elements.Count == 0) continue;
+                        foreach (var item in elements)
+                        {
+                            var type = item.ToString().Split('.').Last();
+
+                            //过滤掉除了梁以外的构件
+                            if (!type.Contains("IfcBeam")) 
+                                continue;
+                            else 
+                                type = "IfcWall";
+                            var materialType = "";
+                            try
+                            {
+                                if (item.Material != null)
+                                {
+                                    materialType = ((Xbim.Ifc2x3.MaterialResource.IfcMaterialLayerSetUsage)((Xbim.Ifc2x3.Kernel.IfcObjectDefinition)item).Material).ForLayerSet.LayerSetName.Value;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                ;
+                            }
+
+                            bool isVirtualElement = false;
+                            if (type.Contains("IfcVirtualElement"))
+                            {
+                                type = "IfcSlab";
+                                isVirtualElement = true;
+                            }
+                            var component = new Component(type, componentIndex);
+
+                            if (!Components.ContainsKey(type))
+                            {
+                                Components.Add(type, component);
+                                componentIndex++;
+                            }
+
+                            var uid = item.EntityLabel.ToString();
+                            var material = THBimMaterial.GetTHBimEntityMaterial(type, true);
+
+
+                            var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, Components[type], materialType,"PC墙");
+                            GetProfileName(item, uniComponent);
+
+                            uniComponent.edge_ind_s = edgeIndex;
+                            uniComponent.tri_ind_s = triangleIndex;
+                            if (allGeoModels.ContainsKey(uid))
+                            {
+                                var triangles = allGeoModels[uid].FaceTriangles;
+                                GetTrianglesAndEdges(triangles, allPoints, offsetIndex, ref triangleIndex, ref edgeIndex, uniComponent, ref ptIndex);
+                                var minFloorNo = GetMinFloorNo(uniComponent.z_l);
+                                var maxFloorNo = GetMinFloorNo(uniComponent.z_r);
+                                if (minFloorNo == maxFloorNo)
+                                {
+                                    if (Buildingstoreys.ContainsKey(minFloorNo))
+                                    {
+                                        Buildingstoreys[minFloorNo].element_index_s.Add(uniComponentIndex - 1);
+                                        Buildingstoreys[minFloorNo].element_index_e.Add(uniComponentIndex - 1);
+                                    }
+                                    else continue;
+                                }
+                                else
+                                {
+                                    for (int i = minFloorNo; i <= maxFloorNo; i++)
+                                    {
+                                        if (Buildingstoreys.ContainsKey(i))
+                                        {
+                                            Buildingstoreys[i].element_index_s.Add(uniComponentIndex - 1);
+                                            Buildingstoreys[i].element_index_e.Add(uniComponentIndex - 1);
+                                        }
+                                    }
+                                }
+
+                                uniComponent.edge_ind_e = edgeIndex - 1;
+                                uniComponent.tri_ind_e = triangleIndex - 1;
+                                uniComponent.bg = uniComponent.z_r - Buildingstoreys[minFloorNo].elevation;
+                                if (isVirtualElement)
+                                {
+                                    uniComponent.depth = 10;
+                                }
+                                else
+                                {
+                                    uniComponent.depth = uniComponent.z_r - uniComponent.z_l;
+                                }
+                                UniComponents.Add(uniComponent);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         private string GetDescription(IIfcProduct ifcEntity)
         {
             var description = "";
             var ifcRoot = ifcEntity as Xbim.Ifc2x3.Kernel.IfcRoot;
-            if(ifcRoot!=null)
+            if (ifcRoot != null)
             {
                 description = ifcRoot?.Description;
             }
@@ -186,11 +303,11 @@ namespace THBimEngine.Domain.MidModel
             }
 
             var storeys = bimProject.ProjectSite.SiteBuildings.Values.First().BuildingStoreys.Values;
-            foreach(var storey in storeys)
+            foreach (var storey in storeys)
             {
                 int floorNum = Convert.ToInt32(storey.Name.Split('F').First());
 
-                if (storey.MemoryStoreyId=="")
+                if (storey.MemoryStoreyId == "")
                 {
                     var buildingStorey = new Buildingstorey(storey, floorNum, stdFloorIndex);
                     floorStdDic.Add(storey.Uid, stdFloorIndex);
@@ -207,9 +324,9 @@ namespace THBimEngine.Domain.MidModel
                             continue;
                         }
                         var ifcType = typeName2IFCTypeName[type];
-                        if (!bimProject.PrjAllEntitys.ContainsKey(uid)) 
+                        if (!bimProject.PrjAllEntitys.ContainsKey(uid))
                             continue;
-                        
+
                         var component = new Component(ifcType, componentIndex);
                         if (!Components.ContainsKey(ifcType))
                         {
@@ -217,14 +334,14 @@ namespace THBimEngine.Domain.MidModel
                             componentIndex++;
                         }
                         var material = THBimMaterial.GetTHBimEntityMaterial(ifcType, true);
-             
+
                         var uniComponent = new UniComponent(bimProject.PrjAllEntitys[uid], material, ref uniComponentIndex, buildingStorey, Components[ifcType]);
                         uniComponent.edge_ind_s = edgeIndex;
                         uniComponent.tri_ind_s = triangleIndex;
                         if (allGeoModels.ContainsKey(uid))
                         {
                             var triangles = allGeoModels[relation.RelationElementUid].FaceTriangles;
-                            GetTrianglesAndEdges(triangles, allPoints, offsetIndex,ref triangleIndex, ref edgeIndex, uniComponent, ref ptIndex);
+                            GetTrianglesAndEdges(triangles, allPoints, offsetIndex, ref triangleIndex, ref edgeIndex, uniComponent, ref ptIndex);
                         }
                         uniComponent.edge_ind_e = edgeIndex - 1;
                         uniComponent.tri_ind_e = triangleIndex - 1;
@@ -234,7 +351,7 @@ namespace THBimEngine.Domain.MidModel
                         UniComponents.Add(uniComponent);
                     }
                     buildingStorey.element_index_e.Add(uniComponentIndex - 1);
-                    Buildingstoreys.Add(floorNum,buildingStorey);
+                    Buildingstoreys.Add(floorNum, buildingStorey);
                 }
             }
             foreach (var storey in storeys)
@@ -253,7 +370,7 @@ namespace THBimEngine.Domain.MidModel
                         var type = bimProject.PrjAllEntitys[uid].FriendlyTypeName;
                         if (!typeName2IFCTypeName.ContainsKey(type))
                             continue;
-                        
+
                         var ifcType = typeName2IFCTypeName[type];
                         var material = THBimMaterial.GetTHBimEntityMaterial(ifcType, true);
                         var uniComponent = new UniComponent(bimProject.PrjAllEntitys[uid], material, ref uniComponentIndex, buildingStorey, Components[ifcType]);
@@ -262,7 +379,7 @@ namespace THBimEngine.Domain.MidModel
                         if (allGeoModels.ContainsKey(uid))
                         {
                             var triangles = allGeoModels[relation.Uid].FaceTriangles;
-                            GetTrianglesAndEdges(triangles, allPoints, offsetIndex,ref triangleIndex, ref edgeIndex, uniComponent, ref ptIndex);
+                            GetTrianglesAndEdges(triangles, allPoints, offsetIndex, ref triangleIndex, ref edgeIndex, uniComponent, ref ptIndex);
                         }
                         uniComponent.edge_ind_e = edgeIndex - 1;
                         uniComponent.tri_ind_e = triangleIndex - 1;
@@ -271,7 +388,7 @@ namespace THBimEngine.Domain.MidModel
                         UniComponents.Add(uniComponent);
                     }
                     buildingStorey.element_index_e.Add(uniComponentIndex - 1);
-                    Buildingstoreys.Add(floorNum,buildingStorey);
+                    Buildingstoreys.Add(floorNum, buildingStorey);
                 }
             }
         }
@@ -310,12 +427,12 @@ namespace THBimEngine.Domain.MidModel
                             var materialType = "";
                             try
                             {
-                                if(item.Material != null)
+                                if (item.Material != null)
                                 {
                                     materialType = ((Xbim.Ifc2x3.MaterialResource.IfcMaterialLayerSetUsage)((Xbim.Ifc2x3.Kernel.IfcObjectDefinition)item).Material).ForLayerSet.LayerSetName.Value;
                                 }
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 ;
                             }
@@ -347,10 +464,10 @@ namespace THBimEngine.Domain.MidModel
                             if (allGeoModels.ContainsKey(uid))
                             {
                                 var triangles = allGeoModels[uid].FaceTriangles;
-                                GetTrianglesAndEdges(triangles, allPoints, offsetIndex, ref triangleIndex, ref edgeIndex, uniComponent, ref ptIndex,reverse);
+                                GetTrianglesAndEdges(triangles, allPoints, offsetIndex, ref triangleIndex, ref edgeIndex, uniComponent, ref ptIndex, reverse);
                                 var minFloorNo = GetMinFloorNo(uniComponent.z_l);
                                 var maxFloorNo = GetMinFloorNo(uniComponent.z_r);
-                                if(minFloorNo==maxFloorNo)
+                                if (minFloorNo == maxFloorNo)
                                 {
                                     if (Buildingstoreys.ContainsKey(minFloorNo))
                                     {
@@ -370,7 +487,7 @@ namespace THBimEngine.Domain.MidModel
                                         }
                                     }
                                 }
-                    
+
                                 uniComponent.edge_ind_e = edgeIndex - 1;
                                 uniComponent.tri_ind_e = triangleIndex - 1;
                                 uniComponent.bg = uniComponent.z_r - Buildingstoreys[minFloorNo].elevation;
@@ -409,7 +526,7 @@ namespace THBimEngine.Domain.MidModel
             string fileName = Path.Combine(System.IO.Path.GetTempPath(), "BimEngineData.get");
             string storeyFileName = Path.Combine(System.IO.Path.GetTempPath(), "BimEngineData.storeys.txt");
 
-            if (ifcPath!=null)
+            if (ifcPath != null)
             {
                 fileName = Path.Combine(System.IO.Path.GetDirectoryName(ifcPath), "BimEngineData.get");
                 storeyFileName = Path.Combine(System.IO.Path.GetDirectoryName(ifcPath), "BimEngineData.storeys.txt");
@@ -462,7 +579,7 @@ namespace THBimEngine.Domain.MidModel
         {
             int floorNum = -100, stdFlrNum = -100;
             double height = -100;
-            if(ifcStorey.Model.SchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
+            if (ifcStorey.Model.SchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
             {
                 var storey = ifcStorey as Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey;
                 foreach (var item in storey.PropertySets)
@@ -475,17 +592,17 @@ namespace THBimEngine.Domain.MidModel
                         foreach (var realProp in propertySet.HasProperties)
                         {
                             var name = realProp.Name;
-                            if (name == "FloorNo"|| name == "名称")
+                            if (name == "FloorNo" || name == "名称")
                             {
                                 if (realProp is IIfcPropertySingleValue propValue)
                                 {
                                     var val = propValue.NominalValue.ToString();
-                                    if (val.Contains("B")&& val.Contains("F"))
+                                    if (val.Contains("B") && val.Contains("F"))
                                     {
                                         int.TryParse(val.Split('B').Last().Split('F').First(), out floorNum);
                                         floorNum *= -1;
                                     }
-                                    else if(val.Contains("F"))
+                                    else if (val.Contains("F"))
                                     {
                                         int.TryParse(val.Split('F').First(), out floorNum);
                                     }
@@ -502,7 +619,7 @@ namespace THBimEngine.Domain.MidModel
                                     int.TryParse(propValue.NominalValue.ToString(), out stdFlrNum);
                                 }
                             }
-                            if (name == "Height" || name =="层高")
+                            if (name == "Height" || name == "层高")
                             {
                                 if (realProp is IIfcPropertySingleValue propValue)
                                 {
@@ -554,7 +671,7 @@ namespace THBimEngine.Domain.MidModel
             if (stdFlrNum < 0) stdFlrNum = floorNum;
             return new FloorPara(floorNum, stdFlrNum, height);
         }
-     
+
         public void GetProfileName(IIfcProduct ifcEntity, UniComponent uniComponent)
         {
             try
@@ -634,12 +751,12 @@ namespace THBimEngine.Domain.MidModel
                     uniComponent.description = profileName;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
             }
         }
-       
+
         public List<Edge> GetEdgesByDir(OutingPolygon outingPolygon, List<PointNormal> allPoints, ref int edgeIndex, int parentId)
         {
             var edges = new List<Edge>();
@@ -661,11 +778,11 @@ namespace THBimEngine.Domain.MidModel
 
         public double GetLength(PointVector pt1, PointVector pt2)
         {
-            return Math.Abs(pt1.X-pt2.X) + Math.Abs(pt1.Y-pt2.Y) + Math.Abs(pt1.Z-pt2.Z);
+            return Math.Abs(pt1.X - pt2.X) + Math.Abs(pt1.Y - pt2.Y) + Math.Abs(pt1.Z - pt2.Z);
         }
 
         public void GetTrianglesAndEdges(List<FaceTriangle> triangles, List<PointNormal> allPoints, int offsetIndex, ref int triangleIndex, ref int edgeIndex,
-            UniComponent uniComponent, ref int ptIndex,bool reverse=false)
+            UniComponent uniComponent, ref int ptIndex, bool reverse = false)
         {
             bool firstTriangles = true;
             var allEdges = new List<Edge>();
@@ -689,9 +806,9 @@ namespace THBimEngine.Domain.MidModel
                     var vec3 = pt1.Dir(pt2);
 
                     bool added = false;
-                    foreach(var vec in edgeDic.Keys)
+                    foreach (var vec in edgeDic.Keys)
                     {
-                        if(vec.Equals(vec3))
+                        if (vec.Equals(vec3))
                         {
                             edgeDic[vec].Add(edge);
                             if (edgeDic[vec].Count > maxCnt) maxCnt = edgeDic[vec].Count;

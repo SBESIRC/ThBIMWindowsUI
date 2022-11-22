@@ -140,13 +140,13 @@ namespace XbimXplorer.Extensions
                                                 foreach (var ptIndex in polygon.ptIndex)
                                                 {
                                                     var pt = allGeoPointNormals[ptIndex].Point;
-                                                    Mesh.Points.Add(new ThTCHPoint3d() { X = pt.X, Y = pt.Y, Z = pt.Z });
+                                                    Mesh.Points.Add(new ThTCHPoint3d() { X = pt.X, Y = pt.Z, Z = pt.Y });
                                                 }
                                                 var suPolygon = new ThSUPolygon();
                                                 suPolygon.Indices.Add(polygonIndex);
                                                 suPolygon.Indices.Add(polygonIndex + 1);
                                                 suPolygon.Indices.Add(polygonIndex + 2);
-                                                thSUFaceMeshData.Mesh.Polygons.Add(suPolygon);
+                                                Mesh.Polygons.Add(suPolygon);
                                             }
                                             thSUFaceMeshData.Mesh = Mesh;
                                             compDef.MeshFaces.Add(thSUFaceMeshData);

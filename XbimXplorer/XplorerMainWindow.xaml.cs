@@ -1069,11 +1069,11 @@ namespace XbimXplorer
                         fileName = string.Format("{0}-100%.ifc", fileName);
                         var newName = Path.Combine(dirName, fileName);
                         mergeIfc.SaveAs(newName);
-                        MessageBox.Show($"合模成功!", "合模成功", MessageBoxButton.OK);
+                        MessageBox.Show($"上传成功!", "上传成功", MessageBoxButton.OK);
                     }
                     catch
                     {
-                        MessageBox.Show("合模失败,未能成功合模！", "合模失败", MessageBoxButton.OK);
+                        MessageBox.Show("上传失败,未能成功上传！", "上传失败", MessageBoxButton.OK);
                     }
                 }
                 //RenderScene();

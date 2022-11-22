@@ -76,6 +76,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IfcStoreReadGeomtry2SUProject.cs" />
     <Compile Include="ProjectParameter.cs" />
     <Compile Include="SUProjectReadGeomtry.cs" />
     <Compile Include="THDocumentManager.cs" />

@@ -173,7 +173,7 @@ namespace XbimXplorer
                     var ProjectChildId = project.ProjectSubId;//子项信息
                     var BindingName = project.BindingName;//楼栋名称
                     var ProjectPath = project.ProjectPath;//完整路径
-                    ////打印CAD管道数据
+                    //打印CAD管道数据
                     //var Model = ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Factory.CreateAndInitModel("ThCAD2IFCProject", project.Root.GlobalId);
                     //if (Model != null)
                     //{

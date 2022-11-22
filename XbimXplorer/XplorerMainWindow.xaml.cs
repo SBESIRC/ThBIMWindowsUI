@@ -8,6 +8,7 @@
 
 #region Directives
 
+using Google.Protobuf;
 using log4net;
 using log4net.Config;
 using log4net.Repository.Hierarchy;
@@ -44,6 +45,7 @@ using Xbim.Presentation.FederatedModel;
 using Xbim.Presentation.XplorerPluginSystem;
 using XbimXplorer.Dialogs;
 using XbimXplorer.Dialogs.ExcludedTypes;
+using XbimXplorer.Extensions;
 using XbimXplorer.LogViewer;
 using XbimXplorer.Properties;
 using XbimXplorer.ThBIMEngine;
@@ -1079,7 +1081,65 @@ namespace XbimXplorer
                 //RenderScene();
             }
         }
-        
+
+        private void MenuItem_Click_4(object sender, RoutedEventArgs e)
+        {
+            if (CurrentDocument == null)
+                return;
+            var architectureIFC = CurrentDocument.AllBimProjects.FirstOrDefault(o => o.Major == EMajor.Architecture && o.ApplcationName == EApplcationName.CAD && o.SourceProject is IfcStore);
+            if(architectureIFC == null)
+            {
+                MessageBox.Show("导入SU失败,未找到相应的建筑外链！", "导入失败", MessageBoxButton.OK);
+                return;
+            }
+            var project = IFCReverse.ReverseSU(architectureIFC.SourceProject as IfcStore);
+            
+            ProtobufMessage message = new ProtobufMessage();
+            MessageHeader header = new MessageHeader();
+            header.Major = "建筑";
+            header.Source = MessageSourceEnum.Platform3D;
+            message.Header = header;
+            message.SuProjects.Add(project);
+            var CTS = new System.Threading.CancellationTokenSource();
+            var Token = CTS.Token;
+            //这里有一个小坑，只有设置了PipeOptions.Asynchronous，管道才会接受取消令牌的取消请求，不然不会生效
+            var pipeServer = new System.IO.Pipes.NamedPipeServerStream("THCAD2SUPIPE", System.IO.Pipes.PipeDirection.InOut, 1, System.IO.Pipes.PipeTransmissionMode.Message, System.IO.Pipes.PipeOptions.Asynchronous);
+            var task = new System.Threading.Tasks.Task(() =>
+            {
+                try
+                {
+                    pipeServer.WaitForConnection();
+                    var bytes = message.ToByteArray();
+                    pipeServer.Write(bytes, 0, bytes.Length);
+
+                    pipeServer.Close();
+                    pipeServer.Dispose();
+                }
+                catch (System.Exception ex)
+                {
+                    //线程被外部取消，说明等待连接超时
+                    pipeServer.Dispose();
+                }
+            }, Token);
+            task.Start();
+            task.Wait(10000);
+            if (task.Status == System.Threading.Tasks.TaskStatus.Running)
+            {
+                CTS.Cancel();
+                pipeServer.Close();
+                pipeServer.Dispose();
+                //Active.Database.GetEditor().WriteMessage("未连接到SU ！\r\n");
+            }
+            else if (task.Status == System.Threading.Tasks.TaskStatus.RanToCompletion)
+            {
+                MessageBox.Show("导入SU成功！", "导入成功", MessageBoxButton.OK);
+            }
+            else
+            {
+                MessageBox.Show("导入SU失败！", "导入失败", MessageBoxButton.OK);
+            }
+        }
+
 
         private void ExportCut_Click(object sender, RoutedEventArgs e)
         {

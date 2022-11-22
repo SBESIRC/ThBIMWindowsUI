@@ -866,7 +866,7 @@ namespace ThBIMServer.Ifc2x3
                 {
                     ret = model.Instances.New<IfcWall>(d =>
                     {
-                        d.Name = "SU Element";
+                        d.Name = "SU Wall";
                         d.GlobalId = IfcGloballyUniqueId.FromGuid(Guid.NewGuid());
                     });
                 }
@@ -874,7 +874,7 @@ namespace ThBIMServer.Ifc2x3
                 {
                     ret = model.Instances.New<IfcBeam>(d =>
                     {
-                        d.Name = "SU Element";
+                        d.Name = "SU Beam";
                         d.GlobalId = IfcGloballyUniqueId.FromGuid(Guid.NewGuid());
                     });
                 }
@@ -882,7 +882,7 @@ namespace ThBIMServer.Ifc2x3
                 {
                     ret = model.Instances.New<IfcColumn>(d =>
                     {
-                        d.Name = "SU Element";
+                        d.Name = "SU Column";
                         d.GlobalId = IfcGloballyUniqueId.FromGuid(Guid.NewGuid());
                     });
                 }
@@ -890,7 +890,7 @@ namespace ThBIMServer.Ifc2x3
                 {
                     ret = model.Instances.New<IfcSlab>(d =>
                     {
-                        d.Name = "SU Element";
+                        d.Name = "SU Slab";
                         d.GlobalId = IfcGloballyUniqueId.FromGuid(Guid.NewGuid());
                     });
                 }
@@ -901,10 +901,6 @@ namespace ThBIMServer.Ifc2x3
                         d.Name = "SU Element";
                         d.GlobalId = IfcGloballyUniqueId.FromGuid(Guid.NewGuid());
                     });
-                }
-                if (componentData.InstanceName != null)
-                {
-                    
                 }
                 if (componentData.InstanceName != null)
                 {

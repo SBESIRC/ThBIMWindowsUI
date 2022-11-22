@@ -214,7 +214,7 @@ namespace THBimEngine.Domain.MidModel
                             var material = THBimMaterial.GetTHBimEntityMaterial(type, true);
 
 
-                            var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, Components[type], materialType,"PC墙");
+                            var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, Components[type], materialType,"PCWall");
                             GetProfileName(item, uniComponent);
 
                             uniComponent.edge_ind_s = edgeIndex;

@@ -97,7 +97,7 @@ namespace THBimEngine.Domain.MidModel
             rgb = new double[3] { bimMaterial.Color_R, bimMaterial.Color_G, bimMaterial.Color_B };
             material = materialType;
             comp_name = component.name;
-
+            description = descrip;
             properties.Add("type", name);
         }
 

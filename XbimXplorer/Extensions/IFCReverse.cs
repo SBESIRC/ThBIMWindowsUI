@@ -117,15 +117,17 @@ namespace XbimXplorer.Extensions
                             ThSUBuildingStoreyData storey = new ThSUBuildingStoreyData();
                             storey.Root = new ThTCHRootData();
                             storey.Root.Name = ifcBuildingStorey.Name;
-                            storey.Root.GlobalId = System.Guid.NewGuid().ToString();
+                            storey.Root.GlobalId = "ThDefinition" + ifcBuildingStorey.Name + ifcBuildingStorey.GlobalId;
                             foreach (var item in ifcBuildingStorey.ContainsElements.Cast<IfcRelContainedInSpatialStructure>())
                             {
                                 foreach (var ifcElement in item.RelatedElements)
                                 {
-                                    var ifcGeomtry = ifcGeomtrys.FirstOrDefault(o => o.EntityLable == ifcElement.EntityLabel.ToString());
+                                    var ifcElementEntityLable = ifcElement.EntityLabel.ToString();
+                                    var ifcGeomtry = ifcGeomtrys.FirstOrDefault(o => o.EntityLable == ifcElementEntityLable);
                                     if (ifcGeomtry == null)
                                     {
-                                        //
+                                        //do not
+                                        continue;
                                     }
                                     else
                                     {
@@ -157,8 +159,38 @@ namespace XbimXplorer.Extensions
                                         ThSUBuildingElementData element = new ThSUBuildingElementData();
                                         element.Component = new ThSUComponentData();
                                         element.Component.DefinitionIndex = index;
-                                        IfcLocalPlacement placement = ifcElement.ObjectPlacement as IfcLocalPlacement;
-                                        element.Component.Transformations = (placement.RelativePlacement as IfcAxis2Placement3D).IfcAxis2Placement3D2ThTCHMatrix3d();
+                                        if (ifcElement is IfcWall)
+                                        {
+                                            element.Component.IfcClassification = "IfcWall";
+                                        }
+                                        else if (ifcElement is IfcWindow)
+                                        {
+                                            element.Component.IfcClassification = "IfcWindow";
+                                        }
+                                        else if (ifcElement is IfcDoor)
+                                        {
+                                            element.Component.IfcClassification = "IfcDoor";
+                                        }
+                                        if (ifcElement is IfcBeam)
+                                        {
+                                            element.Component.IfcClassification = "IfcBeam";
+                                        }
+                                        if (ifcElement is IfcColumn)
+                                        {
+                                            element.Component.IfcClassification = "IfcColumn";
+                                        }
+                                        else if (ifcElement is IfcSlab)
+                                        {
+                                            element.Component.IfcClassification = "IfcSlab";
+                                        }
+                                        else if (ifcElement is IfcSlab)
+                                        {
+                                            element.Component.IfcClassification = "IfcSlab";
+                                        }
+                                        else if (ifcElement is IfcRailing)
+                                        {
+                                            element.Component.IfcClassification = "IfcRailing";
+                                        }
                                         storey.Buildings.Add(element);
                                     }
                                 }

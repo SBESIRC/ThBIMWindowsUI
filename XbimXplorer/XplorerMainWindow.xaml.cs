@@ -1086,9 +1086,14 @@ namespace XbimXplorer
         {
             if (CurrentDocument == null)
                 return;
-            var architectureIFCs = CurrentDocument.AllBimProjects.Where(o => o.Major == EMajor.Architecture && o.SourceProject is IfcStore).Select(o => o.SourceProject as IfcStore);
-            var project = IFCReverse.ReverseSU(architectureIFCs.FirstOrDefault());
-
+            var architectureIFC = CurrentDocument.AllBimProjects.FirstOrDefault(o => o.Major == EMajor.Architecture && o.ApplcationName == EApplcationName.CAD && o.SourceProject is IfcStore);
+            if(architectureIFC == null)
+            {
+                MessageBox.Show("导入SU失败,未找到相应的建筑外链！", "导入失败", MessageBoxButton.OK);
+                return;
+            }
+            var project = IFCReverse.ReverseSU(architectureIFC.SourceProject as IfcStore);
+            
             ProtobufMessage message = new ProtobufMessage();
             MessageHeader header = new MessageHeader();
             header.Major = "建筑";
@@ -1127,11 +1132,11 @@ namespace XbimXplorer
             }
             else if (task.Status == System.Threading.Tasks.TaskStatus.RanToCompletion)
             {
-                //Active.Database.GetEditor().WriteMessage("已成功发送数据至SU！\r\n");
+                MessageBox.Show("导入SU成功！", "导入成功", MessageBoxButton.OK);
             }
             else
             {
-                //Active.Database.GetEditor().WriteMessage("其他异常 ！\r\n");
+                MessageBox.Show("导入SU失败！", "导入失败", MessageBoxButton.OK);
             }
         }
 

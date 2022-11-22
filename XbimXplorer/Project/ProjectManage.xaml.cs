@@ -123,7 +123,7 @@ namespace XbimXplorer
                 if (string.IsNullOrEmpty(path))
                     return;
                 var currentDir = System.Environment.CurrentDirectory;
-                var templatePath = Path.Combine(currentDir, "Template\\THSKPTemplate2020.skp");
+                var templatePath = Path.Combine(currentDir, "Template\\THSKPTemplate_S_2020.skp");
                 path = Path.Combine(path, fileName + ".skp");
                 File.Copy(templatePath, path, true);
                 //OpenFile(path);
@@ -274,6 +274,12 @@ namespace XbimXplorer
             }
             foreach (var item in Projects)
                 item.PropertyChanged += Project_PropertyChanged;
+            foreach (var item in Projects)
+            {
+                if (item.IsChild)
+                    continue;
+                item.IsExpand = false;
+            }
         }
         public void ChangeSelectSubProject() 
         {

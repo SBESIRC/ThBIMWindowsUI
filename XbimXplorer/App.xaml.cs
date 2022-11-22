@@ -134,6 +134,7 @@ namespace XbimXplorer
                     //mainView.LoadFileToCurrentDocument(thisArg,null);
                 }
             }
+            mainView.RenderScene();
 #else
             var login = new Login();
             login.ShowDialog();

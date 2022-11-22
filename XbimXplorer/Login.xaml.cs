@@ -56,6 +56,7 @@ namespace XbimXplorer
             XplorerMainWindow xplorer = new XplorerMainWindow(userInfo);
             this.Close();
             xplorer.Show();
+            xplorer.RenderScene();
         }
 
         private void ckbRemberPsw_Checked(object sender, RoutedEventArgs e)

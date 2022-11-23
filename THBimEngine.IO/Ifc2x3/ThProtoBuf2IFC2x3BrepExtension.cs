@@ -115,21 +115,11 @@ namespace ThBIMServer.Ifc2x3
 
         public static IfcRepresentationItem ToIfcExtrudedAreaSolid(this IfcStore model, IfcFacetedBrep ifcFacetedBrep)
         {
-            Xbim.Ifc4.Interfaces.IXbimGeometryEngine geomEngine = new Xbim.Geometry.Engine.Interop.XbimGeometryEngine(); ;
+            Xbim.Ifc4.Interfaces.IXbimGeometryEngine geomEngine = new Xbim.Geometry.Engine.Interop.XbimGeometryEngine();
             var solid = geomEngine.CreateSolid(ifcFacetedBrep);
-            //var shapeGeometry = geomEngine.CreateShapeGeometry(solid, 0.001, 10, 0.5, XbimGeometryType.PolyhedronBinary);
-            //var ms = new System.IO.MemoryStream((shapeGeometry as IXbimShapeGeometryData).ShapeData);
-            //var testData = ms.ToArray();
-            //var br = new System.IO.BinaryReader(ms);
-            //var tr = br.ReadShapeTriangulation();
-            //if (tr.Faces.Count == 6)
-            //{
-
-            //}
-            if(solid.Faces.Count == 6 && solid.Vertices.Count == 8)
+            if (solid.Faces.Count == 6 && solid.Vertices.Count == 8)
             {
                 //不符合长方体(6个面，8个点)规则的我们认为是异形梁，不予转成拉伸体
-                //IfcExtrudedAreaSolid
                 var BeamCrossSections = solid.Faces.OrderBy(o => o.Area).Take(2);
                 var profile = model.ToIfcArbitraryClosedProfileDef(BeamCrossSections.First().OuterBound);
                 var pt1 = BeamCrossSections.First().OuterBound.Points.First();
@@ -138,7 +128,7 @@ namespace ThBIMServer.Ifc2x3
                 var depth = pt2.PointDistanceToPoint(pt1);
                 var ifcAreaSolid = model.ToIfcExtrudedAreaSolid(profile, direction, depth);
                 return ifcAreaSolid;
-            }    
+            }
             return ifcFacetedBrep;
         }
 

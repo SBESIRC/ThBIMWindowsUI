@@ -938,12 +938,12 @@ namespace ThBIMServer.Ifc2x3
                 {
                     xBimMatrix3D = ThProtoBufExtension.XZMatrix * xBimMatrix3D;
                 }
-                IfcRepresentationItem brepData = model.ToIfcFacetedBrep(def, isRightHandedCoordinate);
+                IfcRepresentationItem body = model.ToIfcFacetedBrep(def, isRightHandedCoordinate);
                 if (componentData.IfcClassification.StartsWith("IfcBeam"))
                 {
-                    brepData = model.ToIfcExtrudedAreaSolid(brepData as IfcFacetedBrep);
+                    body = model.ToIfcExtrudedAreaSolid(body as IfcFacetedBrep);
                 }
-                var shape = ThIFC2x3Factory.CreateFaceBasedSurfaceBody(model, brepData);
+                var shape = ThIFC2x3Factory.CreateFaceBasedSurfaceBody(model, body);
                 ret.Representation = ThIFC2x3Factory.CreateProductDefinitionShape(model, shape);
 
                 //object placement

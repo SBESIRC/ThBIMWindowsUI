@@ -183,11 +183,26 @@ namespace XbimXplorer
             operateType = OperateType.Close;
             this.Close();
         }
+
+        private void ButtonSearch_Click(object sender, RoutedEventArgs e)
+        {
+            if (null != projectVM)
+                projectVM.FilterProject(Search_Text.Text.Trim());
+        }
+
+        private void Search_Text_PreviewKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key != System.Windows.Input.Key.Enter)
+                return;
+            if (null != projectVM)
+                projectVM.FilterProject(Search_Text.Text.Trim());
+        }
     }
     class ProjectVM : NotifyPropertyChangedBase
     {
         public List<string> MajorNames = new List<string>();
         public List<string> TypeNames = new List<string>();
+        public List<ShowProject> AllProjects { get; set; }
         ObservableCollection<ShowProject> _projectModels { get; set; }
         public ObservableCollection<ShowProject> Projects
         {
@@ -257,6 +272,7 @@ namespace XbimXplorer
         
         public ProjectVM(List<DBProject> projects)
         {
+            AllProjects = new List<ShowProject>();
             Projects = new ObservableCollection<ShowProject>();
             var allName = EnumUtil.GetEnumDescriptions<EMajor>();
             MajorNames.AddRange(allName);
@@ -265,11 +281,52 @@ namespace XbimXplorer
             foreach (var item in projects)
             {
                 var prj = new ShowProject(item.Id, item.PrjNo, item.PrjName);
-                Projects.Add(prj);
+                AllProjects.Add(prj);
                 foreach (var subPrj in item.SubProjects)
                 {
                     var subShowPrj = new ShowProject(subPrj.SubentryId, subPrj.SubentryId, subPrj.SubEntryName, item.Id);
-                    Projects.Add(subShowPrj);
+                    AllProjects.Add(subShowPrj);
+                }
+            }
+            FilterProject("");
+        }
+        public void FilterProject(string searchText) 
+        {
+            foreach (var item in Projects)
+                item.PropertyChanged -= Project_PropertyChanged;
+            Projects.Clear();
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                var showPPrjIds = new List<string>();
+                foreach (var item in AllProjects)
+                {
+                    if (item.PrjNum.Contains(searchText) || item.ShowName.Contains(searchText))
+                    {
+                        string addId = item.PrjId;
+                        if (item.IsChild)
+                            addId = item.ParentId;
+                        if (showPPrjIds.Contains(addId))
+                            continue;
+                        showPPrjIds.Add(addId);
+                    }
+                }
+                foreach (var pId in showPPrjIds) 
+                {
+                    var prjs = AllProjects.Where(c => c.PrjId == pId || c.ParentId == pId).ToList();
+                    var pPrj = prjs.Where(c => c.PrjId == pId).First();
+                    Projects.Add(pPrj);
+                    foreach (var item in prjs) 
+                    {
+                        if(item.IsChild)
+                            Projects.Add(item);
+                    }
+                }
+            }
+            else 
+            {
+                foreach (var item in AllProjects)
+                {
+                    Projects.Add(item);
                 }
             }
             foreach (var item in Projects)

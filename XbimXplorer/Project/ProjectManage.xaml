@@ -31,8 +31,66 @@
             </Grid.RowDefinitions>
             <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
                 <Label Content="项目搜索" FontSize="20"></Label>
-                <TextBox Height="30" BorderThickness="1" BorderBrush="Gray" Margin="5,0,5,0"></TextBox>
-                
+                <Grid Margin="5,0,5,0" Height="30">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="30"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="99"
+                            SnapsToDevicePixels="True"
+                            BorderThickness="1" BorderBrush="Gray" 
+                            x:Name="searchBorder">
+                        <Border.Style>
+                            <Style TargetType="{x:Type Border}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=Search_Text,Path=IsFocused}" Value="True">
+                                        <Setter  Property="BorderBrush" Value="Blue"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                    </Border>
+                    <Button Grid.Column="0" x:Name="Btn_Search" Width="20" Height="20"  BorderThickness="0" Click="ButtonSearch_Click">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Grid>
+                                    <Image x:Name="Uc_Image" Source="/XbimXplorer;component/Resources/Images/search.png" Height="16" Width="16"></Image>
+                                    <ContentPresenter></ContentPresenter>
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="true">
+                                        <Setter TargetName="Uc_Image" Property="Height" Value="14"></Setter>
+                                        <Setter TargetName="Uc_Image" Property="Width" Value="14"></Setter>
+                                        <Setter TargetName="Uc_Image" Property="Cursor" Value="Hand"></Setter>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                    <TextBox Grid.Column="1" x:Name="Search_Text"  Height="25" Margin="0,0,5,0"
+                             PreviewKeyUp="Search_Text_PreviewKeyUp"
+                             VerticalContentAlignment="Center" BorderThickness="0">
+                        <TextBox.Resources>
+                            <VisualBrush x:Key="HintText" TileMode="None" Opacity="0.5" Stretch="None" AlignmentX="Left">
+                                <VisualBrush.Visual>
+                                    <TextBlock FontStyle="Normal" IsEnabled="False" Text="请输入编号或项目名称"/>
+                                </VisualBrush.Visual>
+                            </VisualBrush>
+                        </TextBox.Resources>
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Style.Triggers>
+                                    <Trigger Property="Text" Value="{x:Null}">
+                                        <Setter Property="Background" Value="{StaticResource HintText}"/>
+                                    </Trigger>
+                                    <Trigger Property="Text" Value="">
+                                        <Setter Property="Background" Value="{StaticResource HintText}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                </Grid>
             </StackPanel>
             <DataGrid AutoGenerateColumns="False" SelectionMode="Single" x:Name="prjDGrid"
                       VerticalAlignment="Stretch" Grid.Row="1"

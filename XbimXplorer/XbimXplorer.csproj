@@ -567,7 +567,9 @@
   <ItemGroup>
     <Resource Include="LogViewer\LogViewer.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\Images\search.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <Year>$([System.DateTime]::Now.ToString("yy"))</Year>

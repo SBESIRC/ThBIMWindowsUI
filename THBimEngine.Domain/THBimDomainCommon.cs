@@ -30,7 +30,7 @@ namespace THBimEngine.Domain
             var disX = (point.X - targetPoint.X);
             var disY = (point.Y - targetPoint.Y);
             var disZ = (point.Z - targetPoint.Z);
-            return Math.Sqrt(disX * disX + disY * disY + disZ + disZ);
+            return Math.Sqrt(disX * disX + disY * disY + disZ * disZ);
         }
     }
 }

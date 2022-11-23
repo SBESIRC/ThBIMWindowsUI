@@ -2,6 +2,7 @@
 using Xbim.Common.Geometry;
 using Xbim.Ifc2x3.GeometryResource;
 using ThBIMServer.Geometries;
+using System.Linq;
 
 namespace ThBIMServer.Ifc2x3
 {
@@ -34,8 +35,32 @@ namespace ThBIMServer.Ifc2x3
             }
             return compositeCurve;
         }
+        
+        public static IfcCompositeCurve ToIfcCompositeCurve(this IfcStore model, IXbimWire wire)
+        {
+            var compositeCurve = ThIFC2x3Factory.CreateIfcCompositeCurve(model);
+            var pts = wire.Points.ToList();
+            for (int i = 0; i < pts.Count; i++)
+            {
+                var curveSegement = ThIFC2x3Factory.CreateIfcCompositeCurveSegment(model);
+                if(i != pts.Count - 1)
+                    curveSegement.ParentCurve = model.ToIfcPolyline(pts[i], pts[i + 1]);
+                else
+                    curveSegement.ParentCurve = model.ToIfcPolyline(pts[i], pts[0]);
+                compositeCurve.Segments.Add(curveSegement);
+            }
+            return compositeCurve;
+        }
 
         private static IfcPolyline ToIfcPolyline(this IfcStore model, ThTCHPoint3d startPt, ThTCHPoint3d endPt)
+        {
+            var poly = model.Instances.New<IfcPolyline>();
+            poly.Points.Add(model.ToIfcCartesianPoint(startPt));
+            poly.Points.Add(model.ToIfcCartesianPoint(endPt));
+            return poly;
+        }
+
+        private static IfcPolyline ToIfcPolyline(this IfcStore model, XbimPoint3D startPt, XbimPoint3D endPt)
         {
             var poly = model.Instances.New<IfcPolyline>();
             poly.Points.Add(model.ToIfcCartesianPoint(startPt));

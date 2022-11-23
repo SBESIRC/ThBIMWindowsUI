@@ -54,7 +54,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ThCGALUtils.cs" />
     <Compile Include="ExampleScene.cs" />
     <Compile Include="GLControl.cs">
       <SubType>Component</SubType>

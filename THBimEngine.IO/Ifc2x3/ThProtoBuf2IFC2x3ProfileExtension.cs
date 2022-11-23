@@ -39,6 +39,15 @@ namespace ThBIMServer.Ifc2x3
             });
         }
 
+        public static IfcArbitraryClosedProfileDef ToIfcArbitraryClosedProfileDef(this IfcStore model, IXbimWire wire)
+        {
+            return model.Instances.New<IfcArbitraryClosedProfileDef>(d =>
+            {
+                d.ProfileType = IfcProfileTypeEnum.AREA;
+                d.OuterCurve = model.ToIfcCompositeCurve(wire);
+            });
+        }
+
         public static IfcArbitraryClosedProfileDef ToIfcArbitraryClosedProfileDef(this IfcStore model, ThTCHPolyline e)
         {
             return model.Instances.New<IfcArbitraryClosedProfileDef>(d =>

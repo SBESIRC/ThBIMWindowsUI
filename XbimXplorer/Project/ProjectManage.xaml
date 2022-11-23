@@ -37,7 +37,7 @@
             <DataGrid AutoGenerateColumns="False" SelectionMode="Single" x:Name="prjDGrid"
                       VerticalAlignment="Stretch" Grid.Row="1"
                       ItemsSource="{Binding Projects}" 
-                      CanUserAddRows="False"
+                      CanUserAddRows="False" CanUserDeleteRows="False"
                       SelectedItem="{Binding SelectProject}"
                       RowHeaderWidth="0" RowHeight="22"
                       CanUserResizeRows="False"  HorizontalGridLinesBrush="Gray" VerticalGridLinesBrush="Gray"

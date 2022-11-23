@@ -19,7 +19,7 @@
                     </StackPanel>
                     <DataGrid x:Name="floorDGrid" Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False" 
                               VerticalAlignment="Stretch"
-                              RowHeight="22" 
+                              RowHeight="22"  CanUserDeleteRows="False"
                               SelectionMode="Extended" SelectionUnit="FullRow" RowHeaderWidth="0"
                               SelectionChanged="DataGrid_SelectionChanged" BorderThickness="1,1,0,0"
                               ScrollViewer.VerticalScrollBarVisibility="Auto"

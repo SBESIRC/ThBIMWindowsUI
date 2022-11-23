@@ -19,7 +19,7 @@
                 <Button x:Name="btnDelLink" Content="删除" Height="25" Width="50"  Margin="5,0,0,0" Click="btnDelLink_Click"></Button>
             </StackPanel>
             <DataGrid Grid.Row="1" Margin="5" AutoGenerateColumns="False" SelectionMode="Single" CanUserAddRows="False" RowHeaderWidth="0" 
-                      x:Name="dataGridLink" ColumnHeaderHeight="30" ItemsSource="{Binding AllLinkModel}">
+                      x:Name="dataGridLink" ColumnHeaderHeight="30" CanUserDeleteRows="False" ItemsSource="{Binding AllLinkModel}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Width="4*" Header="链接名称" Binding="{Binding Project.ShowFileName}" IsReadOnly="True"></DataGridTextColumn>
                     <DataGridTextColumn Width="2*" Header="专业" Binding="{Binding Project.MajorName}"  IsReadOnly="True"></DataGridTextColumn>

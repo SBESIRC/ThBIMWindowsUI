@@ -25,7 +25,7 @@
             <ComboBox Width="100" Height="22" ItemsSource="{Binding SystemNames}" SelectedItem="{Binding SelectSystem}"></ComboBox>
         </StackPanel>
         <DataGrid CanUserAddRows="False" Grid.Row="1" x:Name="modelDataGrid" AutoGenerateColumns="False" SelectionMode="Single" 
-                  RowHeaderWidth="0" Margin="5"
+                  RowHeaderWidth="0" Margin="5" CanUserDeleteRows="False"
                   ItemsSource="{Binding ProjectAllFileModels}">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="模型名称" Width="6*" Binding="{Binding ShowFileName}" IsReadOnly="True"></DataGridTextColumn>

@@ -34,6 +34,7 @@ namespace XbimXplorer
         BackgroundWorker ifc_backgroundWorker = null;
         BackgroundWorker file_backgroundWorker = null;
         BackgroundWorker cutData_backgroundWork = null;
+        BackgroundWorker cutData_backgroundWork2 = null;
         private void InitPipeService() 
         {
             pipeServer = new NamedPipeServerStream("THCAD2P3DPIPE", PipeDirection.In);
@@ -77,13 +78,32 @@ namespace XbimXplorer
             InitMutex();
             try
             {
-                //Mutex CadMutex;
+                string getFileType = "";
+
+               
                 while (true)
                 {
                     var flag = Mutex.TryOpenExisting("cadMutex", out CadMutex);
                     if (flag) break;
                     Thread.Sleep(100);
                 }
+                while (true)
+                {
+                    var flag = Mutex.TryOpenExisting("viewerMutex2", out ViewerMutex2);
+                    if (flag) break;
+                    Thread.Sleep(100);
+                }
+                ViewerMutex2.WaitOne();
+                using (MemoryMappedFile mmf = MemoryMappedFile.OpenExisting("getFileType"))
+                {
+                    using (MemoryMappedViewStream stream = mmf.CreateViewStream(0L, 0L, MemoryMappedFileAccess.Read))
+                    {
+                        IFormatter formatter = new BinaryFormatter();
+                        getFileType = (string)formatter.Deserialize(stream);
+                    }
+                }
+                FlagMutex.ReleaseMutex();
+
                 var prjName = CurrentDocument.AllBimProjects.First().ProjectIdentity.Split('.').First() + "-100%.ifc";
 
                 var fileName = Path.Combine(System.IO.Path.GetDirectoryName(prjName), "BimEngineData.get");
@@ -97,14 +117,34 @@ namespace XbimXplorer
                     FileMutex.ReleaseMutex();
                     CadMutex.WaitOne();
                 }
-                if (CurrentDocument != null && CurrentDocument.AllBimProjects.Count > 0)
+
+                if (getFileType== "structrue")
                 {
-                    //var prjName = CurrentDocument.AllBimProjects.First().ProjectIdentity.Split('.').First() + "-100%.ifc";
-                    var ifcStore = ThBimCutData.GetIfcStore(prjName);
-                    var readGeomtry = new IfcStoreReadGeomtry(new XbimMatrix3D());
-                    var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out List<PointNormal> allGeoPointNormals);
-                    ThBimCutData.Run(ifcStore, allGeoModels, allGeoPointNormals);
+                    
+                    if (CurrentDocument != null && CurrentDocument.AllBimProjects.Count > 0)
+                    {
+                        //var prjName = CurrentDocument.AllBimProjects.First().ProjectIdentity.Split('.').First() + "-100%.ifc";
+                        var ifcStore = ThBimCutData.GetIfcStore(prjName);
+                        var readGeomtry = new IfcStoreReadGeomtry(new XbimMatrix3D());
+                        var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out List<PointNormal> allGeoPointNormals);
+                        ThBimCutData.Run(ifcStore, allGeoModels, allGeoPointNormals);
+                    }
                 }
+                else
+                {
+                    if (CurrentDocument != null && CurrentDocument.AllBimProjects.Count > 0)
+                    {
+                        var ifcStore = ThBimCutData.GetIfcStore(prjName);
+                        var pcPrjName = Path.Combine(System.IO.Path.GetDirectoryName(CurrentDocument.AllBimProjects.First().ProjectIdentity), "【PC】1114-同润二期1#楼tekla不带钢筋信息.ifc");
+                        var ifcStorePC = ThBimCutData.GetIfcStore(pcPrjName);
+                        var readGeomtry = new IfcStoreReadGeomtry(new XbimMatrix3D());
+                        var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out List<PointNormal> allGeoPointNormals);
+                        var readGeomtryPC = new IfcStoreReadGeomtry(new XbimMatrix3D());
+                        var allGeoModelsPC = readGeomtryPC.ReadGeomtry(ifcStorePC, out List<PointNormal> allGeoPointNormalsPC);
+                        ThBimCutData.Run(ifcStore, allGeoModels, allGeoPointNormals, ifcStorePC, allGeoModelsPC, allGeoPointNormalsPC);
+                    }
+                }
+                
 
                 ViewerMutex.ReleaseMutex();
             }
@@ -114,11 +154,15 @@ namespace XbimXplorer
             }
             finally
             {
-                ViewerMutex?.Dispose();
                 CadMutex?.Dispose();
+                ViewerMutex?.Dispose();
                 FileMutex?.Dispose();
+                FlagMutex?.Dispose();
+                ViewerMutex2?.Dispose();
             }
         }
+
+
         #region 接收数据并解析数据渲染
         private void Background_DoWork(object sender, DoWorkEventArgs e)
         {

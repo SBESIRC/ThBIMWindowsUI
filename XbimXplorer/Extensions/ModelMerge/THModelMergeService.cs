@@ -244,7 +244,6 @@ namespace XbimXplorer.Extensions.ModelMerge
             {
                 var bigStorey = StoreyDic.FirstOrDefault(o => o.Item1 == BuildingStorey.Number);
                 double Storey_z = 0;
-                bool IsNewStorey = false;
                 if (bigStorey == null)
                 {
                     Storey_z = BuildingStorey.Elevation;
@@ -284,8 +283,8 @@ namespace XbimXplorer.Extensions.ModelMerge
                 var storey = bigBuildings.BuildingStoreys.FirstOrDefault(o => o.Name==storeyName) as Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey;
                 if (storey == null)
                 {
-                    storey = ThProtoBuf2IFC2x3Factory.CreateStorey(bigModel, bigBuildings, BuildingStorey.Number.ToString());
-                    IsNewStorey = true;
+                    storey = ThProtoBuf2IFC2x3Factory.CreateStorey(bigModel, bigBuildings, BuildingStorey);
+                    storeys.Add(storey);
                 }
                 var suElements = new List<IfcBuildingElement>();
                 foreach (var element in BuildingStorey.Buildings)
@@ -294,17 +293,6 @@ namespace XbimXplorer.Extensions.ModelMerge
                     IfcBuildingElement ifcBuildingElement;
                     ifcBuildingElement = ThProtoBuf2IFC2x3Factory.CreatedSUElement(bigModel, def, element.Component);
                     suElements.Add(ifcBuildingElement);
-
-                    //ThProtoBuf2IFC2x3Factory.RelContainsSUElements2Storey(bigModel, suElements, storey);
-                }
-                if(IsNewStorey)
-                {
-                    //找到该楼层的所有构建，找到最低的Location.Z
-                    var relatedElement_minz = suElements.Min(o => ((o.ObjectPlacement as Xbim.Ifc2x3.GeometricConstraintResource.IfcLocalPlacement).RelativePlacement as  Xbim.Ifc2x3.GeometryResource.IfcPlacement).Location.Z);
-                    var relatedElement_maxz = suElements.Max(o => ((o.ObjectPlacement as Xbim.Ifc2x3.GeometricConstraintResource.IfcLocalPlacement).RelativePlacement as  Xbim.Ifc2x3.GeometryResource.IfcPlacement).Location.Z);
-                    var storey_heigth = relatedElement_maxz - relatedElement_minz;
-                    ThProtoBuf2IFC2x3Factory.SetStoreyPropertie(bigModel, storey, BuildingStorey.Number, relatedElement_minz, storey_heigth, BuildingStorey.StdFlrNo);
-                    storeys.Add(storey);
                 }
                 using (var txn = bigModel.BeginTransaction("relContainEntitys2Storey"))
                 {

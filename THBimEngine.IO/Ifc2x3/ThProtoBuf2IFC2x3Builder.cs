@@ -110,7 +110,7 @@ namespace ThBIMServer.Ifc2x3
                 {
                     if (storey.Buildings.Count > 0)
                     {
-                        var ifcStorey = ThProtoBuf2IFC2x3Factory.CreateStorey(model, building, storey.Number.ToString());
+                        var ifcStorey = ThProtoBuf2IFC2x3Factory.CreateStorey(model, building, storey);
                         storeys.Add(ifcStorey);
                         var suElements = new List<IfcBuildingElement>();
                         foreach (var element in storey.Buildings)

@@ -187,52 +187,43 @@ namespace ThBIMServer.Ifc2x3
             }
         }
 
-        public static IfcBuildingStorey CreateStorey(IfcStore model, IfcBuilding building, string storeyName)
+        public static IfcBuildingStorey CreateStorey(IfcStore model, IfcBuilding building, ThSUBuildingStoreyData storey)
         {
             using (var txn = model.BeginTransaction("Create Storey"))
             {
                 var ret = model.Instances.New<IfcBuildingStorey>(s =>
                 {
-                    s.Name = storeyName;
+                    s.Name = storey.Number.ToString();
                     s.ObjectPlacement = model.ToIfcLocalPlacement(building.ObjectPlacement);
+                    s.Elevation = storey.Elevation;
                     s.GlobalId = IfcGloballyUniqueId.FromGuid(Guid.NewGuid());
                 });
-                txn.Commit();
-                return ret;
-            }
-        }
-
-        public static void SetStoreyPropertie(IfcStore model, IfcBuildingStorey storey, int storeyName, double relatedElement_minz, double storey_heigth, int stdFlrNo)
-        {
-            // add properties
-            using (var txn = model.BeginTransaction("Add Storey Properties"))
-            {
-                storey.Elevation = relatedElement_minz;
-                model.Instances.New<Xbim.Ifc2x3.Kernel.IfcRelDefinesByProperties>(rel =>
+                model.Instances.New<IfcRelDefinesByProperties>(rel =>
                 {
                     rel.Name = "THifc properties";
-                    rel.RelatedObjects.Add(storey);
-                    rel.RelatingPropertyDefinition = model.Instances.New<Xbim.Ifc2x3.Kernel.IfcPropertySet>(pset =>
+                    rel.RelatedObjects.Add(ret);
+                    rel.RelatingPropertyDefinition = model.Instances.New<IfcPropertySet>(pset =>
                     {
                         pset.Name = "Custom";
                         pset.HasProperties.Add(model.Instances.New<IfcPropertySingleValue>(p =>
                         {
                             p.Name = "FloorNo";
-                            p.NominalValue = new IfcText(storeyName.ToString());
+                            p.NominalValue = new IfcText(storey.Number.ToString());
                         }));
                         pset.HasProperties.Add(model.Instances.New<IfcPropertySingleValue>(p =>
                         {
                             p.Name = "Height";
-                            p.NominalValue = new IfcLengthMeasure(storey_heigth);
+                            p.NominalValue = new IfcLengthMeasure(storey.Height);
                         }));
                         pset.HasProperties.Add(model.Instances.New<IfcPropertySingleValue>(p =>
                         {
                             p.Name = "StdFlrNo";
-                            p.NominalValue = new IfcText(stdFlrNo.ToString());
+                            p.NominalValue = new IfcText(storey.StdFlrNo.ToString());
                         }));
                     });
                 });
                 txn.Commit();
+                return ret;
             }
         }
 

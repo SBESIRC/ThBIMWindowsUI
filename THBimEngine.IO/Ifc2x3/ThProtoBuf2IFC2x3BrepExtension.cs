@@ -121,13 +121,31 @@ namespace ThBIMServer.Ifc2x3
             {
                 //不符合长方体(6个面，8个点)规则的我们认为是异形梁，不予转成拉伸体
                 var BeamCrossSections = solid.Faces.OrderBy(o => o.Area).Take(2);
-                var profile = model.ToIfcArbitraryClosedProfileDef(BeamCrossSections.First().OuterBound);
-                var pt1 = BeamCrossSections.First().OuterBound.Points.First();
-                var pt2 = BeamCrossSections.Last().OuterBound.Points.OrderBy(o => o.PointDistanceToPoint(pt1)).First();
-                var direction = pt2 - pt1;
-                var depth = pt2.PointDistanceToPoint(pt1);
-                var ifcAreaSolid = model.ToIfcExtrudedAreaSolid(profile, direction, depth);
-                return ifcAreaSolid;
+                var CrossSection1 = BeamCrossSections.First();
+                var CrossSection2 = BeamCrossSections.Last();
+                if (Math.Abs(CrossSection1.Area - CrossSection2.Area) < 10)
+                {
+                    var edge = solid.Edges.FirstOrDefault(e => !CrossSection1.OuterBound.Edges.Contains(e) && !CrossSection2.OuterBound.Edges.Contains(e));
+                    var pt1 = edge.EdgeStart.VertexGeometry;
+                    var pt2 = edge.EdgeEnd.VertexGeometry;
+                    XbimVector3D direction = XbimVector3D.Zero;
+                    if (CrossSection1.OuterBound.Points.Any(o => o.Equals(pt1)) && CrossSection2.OuterBound.Points.Any(o => o.Equals(pt2)))
+                    {
+                        direction = pt2 - pt1;
+                    }
+                    else if (CrossSection2.OuterBound.Points.Any(o => o.Equals(pt1)) && CrossSection1.OuterBound.Points.Any(o => o.Equals(pt2)))
+                    {
+                        direction = pt1 - pt2;
+                    }
+                    else
+                    {
+                        return ifcFacetedBrep;
+                    }
+                    var profile = model.ToIfcArbitraryClosedProfileDef(CrossSection1.OuterBound);
+                    var depth = pt2.PointDistanceToPoint(pt1);
+                    var ifcAreaSolid = model.ToIfcExtrudedAreaSolid(profile, direction, depth);
+                    return ifcAreaSolid;
+                }
             }
             return ifcFacetedBrep;
         }

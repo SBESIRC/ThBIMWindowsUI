@@ -65,6 +65,7 @@ namespace THBimEngine.Domain.MidModel
             int triangleIndex = 0;//三角面片索引
             int uniComponentIndex = 0;//物体索引
 
+            var uniCompDepthDic = new Dictionary<string, double>();//“折板”构件名：标高
             int offsetIndex = allPoints.Count;
             foreach (var pt in allGeoPointNormals)
             {
@@ -92,6 +93,10 @@ namespace THBimEngine.Domain.MidModel
                             var description = GetDescription(item);
                             if (description == "S_BEAM_梯梁" || description == "S_COLU_梯柱")
                                 continue;
+                            if(uniCompDepthDic.ContainsKey(item.Name))
+                            {
+                                description ="折板";
+                            }
                             var type = item.ToString().Split('.').Last();
                             bool isVirtualElement = false;
                             if (type.Contains("IfcVirtualElement"))
@@ -134,6 +139,29 @@ namespace THBimEngine.Domain.MidModel
                             if (isVirtualElement)
                             {
                                 uniComponent.depth = 10;
+                            }
+                            else if(description == "折板")
+                            {
+                                if(uniCompDepthDic.ContainsKey(item.Name))
+                                {
+                                    uniComponent.depth = uniCompDepthDic[item.Name];
+                                }
+                                else
+                                {
+                                    for (int i = uniComponent.edge_ind_s; i <= uniComponent.edge_ind_e; i++)
+                                    {
+                                        var edge = Edges[i];
+                                        var pt1 = Points[edge.ptsIndex[0]];
+                                        var pt2 = Points[edge.ptsIndex[1]];
+                                        if (Math.Abs(pt1.x - pt2.x) < 1 && Math.Abs(pt1.y - pt2.y) < 1)
+                                        {
+                                            uniComponent.depth = Math.Abs(pt1.z - pt2.z);
+                                            uniCompDepthDic.Add(item.Name + "_cloned", uniComponent.depth);
+                                            break;
+                                        }
+                                    }
+                                }
+        
                             }
                             else
                             {

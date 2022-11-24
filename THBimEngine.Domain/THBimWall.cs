@@ -18,7 +18,15 @@ namespace THBimEngine.Domain
 
         public override int GetHashCode()
         {
-            return base.GetHashCode() ^ Doors.Count ^ Windows.Count;
+            var doorC = 0;
+            var windowC = 0;
+            if (Doors != null)
+                doorC = Doors.Count;
+            if (Windows != null)
+                windowC = Windows.Count;
+
+
+            return base.GetHashCode() ^ doorC ^ windowC;
         }
 
         public bool Equals(THBimWall other)

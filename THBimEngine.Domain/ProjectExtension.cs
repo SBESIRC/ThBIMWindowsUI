@@ -214,9 +214,9 @@ namespace THBimEngine.Domain
             resStoreys = resStoreys.OrderBy(o => o.Elevation).ToList();
             for (var i = 1; i < resStoreys.Count; i++)
             {
-                resStoreys[0].Height = resStoreys[1].Elevation - resStoreys[0].Elevation;
+                resStoreys[i - 1].Height = resStoreys[i].Elevation - resStoreys[i - 1].Elevation;
             }
-            if (resStoreys.Count > 1)
+            if (resStoreys.Count > 1 && resStoreys.Last().Height == 0)
             {
                 resStoreys[resStoreys.Count - 1].Height = resStoreys[resStoreys.Count - 2].Height;
             }

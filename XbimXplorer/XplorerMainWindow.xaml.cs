@@ -23,6 +23,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -47,6 +48,7 @@ using XbimXplorer.Dialogs;
 using XbimXplorer.Dialogs.ExcludedTypes;
 using XbimXplorer.Extensions;
 using XbimXplorer.LogViewer;
+using XbimXplorer.Project;
 using XbimXplorer.Properties;
 using XbimXplorer.ThBIMEngine;
 #endregion
@@ -1175,10 +1177,13 @@ namespace XbimXplorer
                 return;
             ThBimCutData.Run(CurrentDocument.AllBimProjects);
         }
+        Dictionary<string, DocumentCacheModel> documentModelCache;
         private void mItemProject_Click(object sender, RoutedEventArgs e)
         {
             if (null == loginUser)
                 return;
+            if (null == documentModelCache)
+                documentModelCache = new Dictionary<string, DocumentCacheModel>();
             var projectManage = new ProjectManage(loginUser);
             projectManage.Owner = this;
             var res = projectManage.ShowDialog();
@@ -1195,7 +1200,6 @@ namespace XbimXplorer
                 return;
             SetOpenedModelFileName(string.Format("{0}_{1}_{2}", pPrj.ShowName,subPrj.ShowName, selectProjectFile.ShowFileName));
             var id = string.Format("{0}_{1}_{2}", pPrj.PrjId, subPrj.PrjId, selectProjectFile.LoaclPath);
-
             //检查Document删除和增加的数据
             List<THDocument> rmDocs = new List<THDocument>();
             foreach (var item in DocumentManager.AllDocuments) 
@@ -1209,14 +1213,73 @@ namespace XbimXplorer
             addDoc.ProjectLoaclPath = prjLocalPath;
             DocumentManager.AddNewDoucment(addDoc);
             DocumentManager.CurrentDocument = addDoc;
-            LoadFileToCurrentDocument(new ProjectParameter()
+            var loadPrjs = new List<ProjectParameter>();
+            loadPrjs.Add(new ProjectParameter()
             {
                 OpenFilePath = selectProjectFile.LinkFilePath,
                 ProjectId = selectProjectFile.LinkFilePath,
                 Major = selectProjectFile.Major,
                 Source = selectProjectFile.ApplcationName,
             }) ;
+            DocumentCacheModel docCache;
+            if (documentModelCache.ContainsKey(id))
+            {
+                docCache = documentModelCache[id];
+            }
+            else 
+            {
+                docCache = new DocumentCacheModel(id, selectProjectFile, prjLocalPath);
+                docCache.ParentProject = pPrj;
+                docCache.SubProject = subPrj;
+                documentModelCache.Add(id, docCache);
+            }
+            foreach (var linkModel in docCache.DocExternalLink.LinkModels)
+            {
+                var openParameter = new ProjectParameter()
+                {
+                    OpenFilePath = linkModel.Project.LinkFilePath,
+                    ProjectId = linkModel.Project.LinkFilePath,
+                    Matrix3D = linkModel.MoveMatrix3D,
+                    Major = linkModel.Project.Major,
+                    Source = linkModel.Project.ApplcationName,
+                    SourceShowName = linkModel.Project.ShowSourceName,
+                };
+                loadPrjs.Add(openParameter);
+            }
+            LoadFilesToCurrentDocument(loadPrjs);
         }
     }
-    
+    class DocumentCacheModel
+    {
+        public string DocumentId { get; }
+        public string RootPath { get; }
+        public ShowProject ParentProject { get; set; }
+        public ShowProject SubProject { get; set; }
+        public ProjectFileInfo MainModel { get; }
+        public List<ProjectFileInfo> ProjectAllFileCache { get; protected set; }
+        public FileExternalLink DocExternalLink { get;}
+        public DocumentCacheModel(string docId, ProjectFileInfo mainModel,string rootPath) 
+        {
+            DocumentId = docId;
+            MainModel = mainModel;
+            RootPath = rootPath;
+            ProjectAllFileCache = new List<ProjectFileInfo>();
+            DocExternalLink = new FileExternalLink(mainModel.LoaclPath, mainModel.ExternalLinkPath);
+            UpdateCacheFile();
+        }
+        public void UpdateCacheFile() 
+        {
+            FileProject fileProject = new FileProject(RootPath);
+            ProjectAllFileCache = fileProject.GetProjectFiles();
+        }
+        public ProjectFileInfo GetProjectFileInfo(string filePath) 
+        {
+            foreach(var item in ProjectAllFileCache) 
+            {
+                if (item.LoaclPath == filePath)
+                    return item;
+            }
+            return null;
+        }
+    }
 }

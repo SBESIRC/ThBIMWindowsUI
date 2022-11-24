@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using THBimEngine.Application;
+using THBimEngine.Domain;
 using Xbim.Common.Geometry;
 
 namespace XbimXplorer.LeftTabItme.LeftTabControls

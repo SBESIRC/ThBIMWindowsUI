@@ -262,23 +262,96 @@ namespace XbimXplorer
                 suMessage = null;
                 SU_pipeServer = null;
                 SU_backgroundWorker.RunWorkerAsync();
+                if (documentModelCache == null || !documentModelCache.ContainsKey(CurrentDocument.DocumentId)) 
+                {
+                    Log.Info("SU端数据和当前打开的项目不是同一项目的同一楼栋，数据已丢弃");
+                    return;
+                }
+                var cacheModel = documentModelCache[CurrentDocument.DocumentId];
+                cacheModel.UpdateCacheFile();
+                var mainDir = "";
+                if (cacheModel.MainModel != null) 
+                {
+                    mainDir = Path.GetDirectoryName(cacheModel.MainModel.LoaclPath);
+                    mainDir = Path.GetDirectoryName(mainDir);
+                }
                 var majer = message.Header.Major;//专业
                 foreach (var project in message.SuProjects)
                 {
                     var ProjectPath = project.ProjectPath;//完整路径
-                    ////打印SU过来的管道数据
-                    //var Model = ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Factory.CreateAndInitModel("ThSU2IFCProject", project.Root.GlobalId);
-                    //if (Model != null)
-                    //{
-                    //    ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.BuildIfcModel(Model, project);
-                    //    ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.SaveIfcModel(Model, @"D:\testSU.ifc");
-                    //    Model.Dispose();
-                    //}
+                    //判断是否是当前打开的项目
+                    if (string.IsNullOrEmpty(ProjectPath)) 
+                    {
+                        Log.Info("SU端数据和当前打开的项目不是同一项目的同一楼栋，数据已丢弃");
+                        continue;
+                    }
+                    var dir = Path.GetDirectoryName(ProjectPath);
+                    dir = Path.GetDirectoryName(dir);
+                    if (!Directory.Equals(mainDir, dir)) 
+                    {
+                        Log.Info("SU端数据和当前打开的项目不是同一项目的同一楼栋，数据已丢弃");
+                        continue;
+                    }
+                    var fileInfo = cacheModel.GetProjectFileInfo(ProjectPath);
+                    if (null == fileInfo)
+                        continue;
+                    //判断是否有外链记录，如果没有这加入
+                    bool haveLink = false;
+                    foreach(var item in cacheModel.DocExternalLink.LinkModels) 
+                    {
+                        if (item.Project.LoaclPath == ProjectPath) 
+                        {
+                            haveLink = true;
+                            break;
+                        }
+                    }
+                    var ifcPath = Path.GetDirectoryName(fileInfo.LoaclPath);
+                    var fileName = Path.GetFileNameWithoutExtension(fileInfo.LoaclPath);
+                    ifcPath = Path.Combine(ifcPath, string.Format("{0}.ifc", fileName));
+                    if (!haveLink)
+                    {
+                        fileInfo.LinkFilePath = ifcPath;
+                        cacheModel.DocExternalLink.LinkModels.Add(new LinkModel()
+                        {
+                            LinkId = Guid.NewGuid().ToString(),
+                            LinkState = "已链接",
+                            Project = fileInfo,
+                            MoveMatrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero),
+                            RotainAngle = 0,
+                        });
+                        cacheModel.DocExternalLink.SaveToFile();
+                    }
+                    else 
+                    {
+                        //判断是否要将已经载入的IFC移除，再次载入SU Push Data
+                        THBimProject rmPrj = null;
+                        foreach (var prj in CurrentDocument.AllBimProjects) 
+                        {
+                            if (prj.ApplcationName != EApplcationName.SU && prj.Major == fileInfo.Major)
+                                continue;
+                            var isIfc = prj.SourceProject is IfcStore;
+                            if (!isIfc)
+                                continue;
+                            if (prj.ProjectIdentity == fileInfo.LinkFilePath)
+                                rmPrj = prj;
+                        }
+                        if(null != rmPrj)
+                            CurrentDocument.DeleteProject(rmPrj.ProjectIdentity);
+                    }
+                    //打印SU过来的管道数据
+                    
+                    var Model = ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Factory.CreateAndInitModel("ThSU2IFCProject", project.Root.GlobalId);
+                    if (Model != null)
+                    {
+                        ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.BuildIfcModel(Model, project);
+                        ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.SaveIfcModel(Model, ifcPath);
+                        Model.Dispose();
+                    }
                     CurrentDocument.AddProject(project, new ProjectParameter
                     {
                         ProjectId = project.Root.GlobalId,
                         Source = EApplcationName.SU,
-                        Major = EMajor.Architecture,
+                        Major = fileInfo.Major,
                     });
                 }
             }

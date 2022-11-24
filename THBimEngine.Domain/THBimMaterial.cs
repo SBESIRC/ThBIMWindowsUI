@@ -14,8 +14,8 @@ namespace THBimEngine.Domain
             { typeof(THBimDoor).Name.ToString().ToLower(),new THBimMaterial{Color_R = 214 / 255f,Color_G = 243 / 255f,Color_B = 242 / 255f,KS_R = 0,KS_B = 0,KS_G = 0,Alpha = 0.15f,NS = 12 } },
             { typeof(THBimSlab).Name.ToString().ToLower(),new THBimMaterial{Color_R = 228 / 255f,Color_G = 227 / 255f,Color_B = 223 / 255f, KS_R = 0,KS_B = 0,KS_G = 0,Alpha = 1f,NS = 12,} },
             { typeof(THBimRailing).Name.ToString().ToLower(),new THBimMaterial{Color_R = 249 / 255f, Color_G = 63 / 255f, Color_B = 38 / 255f, KS_R = 0.5f, KS_B = 0.5f, KS_G = 0.5f,Alpha = 0.5f, NS = 12, } },
-            { "thbeam",new THBimMaterial{ Color_R = 184 / 255f, Color_G = 172 / 255f, Color_B = 208 / 255f, KS_R = 0, KS_B = 0, KS_G = 0, Alpha = 1f, NS = 12, } },
-            { "thcolumn",new THBimMaterial{ Color_R = 249 / 255f, Color_G = 94 / 255f, Color_B = 89 / 255f, KS_R = 0, KS_B = 0, KS_G = 0, Alpha = 1f, NS = 12, } },
+            { typeof(THBimBeam).Name.ToString().ToLower(),new THBimMaterial{ Color_R = 184 / 255f, Color_G = 172 / 255f, Color_B = 208 / 255f, KS_R = 0, KS_B = 0, KS_G = 0, Alpha = 1f, NS = 12, } },
+            { typeof(THBimColumn).Name.ToString().ToLower(),new THBimMaterial{ Color_R = 249 / 255f, Color_G = 94 / 255f, Color_B = 89 / 255f, KS_R = 0, KS_B = 0, KS_G = 0, Alpha = 1f, NS = 12, } },
             { "buildingelementproxy",new THBimMaterial{ Color_R = 186 / 255f, Color_G = 184 / 255f, Color_B = 203 / 255f, KS_R = 0, KS_B = 0, KS_G = 0, Alpha = 1f, NS = 12, } },
             { "sucomponent",new THBimMaterial{ Color_R = 233 / 255f, Color_G = 218 / 255f, Color_B = 217 / 255f, KS_R = 0, KS_B = 0, KS_G = 0, Alpha = 1f, NS = 12, } }
          };

@@ -47,6 +47,7 @@ namespace THBimEngine.Domain
             var projectBuilds = GetDirFileBuilding();
             var linkFileInfos = new List<ProjectFileInfo>();
             var mainFileInfos = new List<ProjectFileInfo>();
+            var linkModelFiles = new List<ProjectFileInfo>();
             foreach (var building in projectBuilds)
             {
                 foreach (var catagory in building.FileCatagories)
@@ -83,9 +84,13 @@ namespace THBimEngine.Domain
                             {
                                 mainFileInfos.Add(showFile);
                             }
-                            else
+                            else if(config.LinkFileExt.Contains(model.FileExt))
                             {
                                 linkFileInfos.Add(showFile);
+                            }
+                            else if(config.LinkModelFileExt == model.FileExt) 
+                            {
+                                linkModelFiles.Add(showFile);
                             }
                         }
                     }
@@ -96,9 +101,18 @@ namespace THBimEngine.Domain
                 if (!string.IsNullOrEmpty(item.LinkFilePath))
                     continue;
                 var linkModel = linkFileInfos.Where(c => c.SubPrjId == item.SubPrjId && c.Major == item.Major && c.ShowFileName == item.ShowFileName).FirstOrDefault();
-                if (linkModel == null)
-                    continue;
-                item.LinkFilePath = linkModel.LoaclPath;
+                if (linkModel != null)
+                    item.LinkFilePath = linkModel.LoaclPath;
+                var linkFile = linkModelFiles.Where(c => c.SubPrjId == item.SubPrjId && c.Major == item.Major && c.ShowFileName == item.ShowFileName).FirstOrDefault();
+                if (null != linkFile)
+                    item.ExternalLinkPath = linkFile.LoaclPath;
+                else 
+                {
+                    var filePath = item.LoaclPath;
+                    var path = Path.GetDirectoryName(filePath);
+                    var fileName = Path.GetFileNameWithoutExtension(filePath);
+                    item.ExternalLinkPath = Path.Combine(path, string.Format("{0}.{1}", fileName, "thlink"));
+                }
             }
             return mainFileInfos;
         }
@@ -182,13 +196,18 @@ namespace THBimEngine.Domain
                     var ext = file.Extension.ToLower();
                     if (null != sourceProject.FileExt && sourceProject.FileExt.Contains(ext))
                     {
-                        var cadModelFile = new ModelFile(file.FullName, sourceProject.ShowName,sourceProject.Source);
-                        ModelFiles.Add(cadModelFile);
+                        var modelFile = new ModelFile(file.FullName, sourceProject.ShowName, sourceProject.Source);
+                        ModelFiles.Add(modelFile);
                     }
-                    else if(null != sourceProject.LinkFileExt && sourceProject.LinkFileExt.Contains(ext)) 
+                    else if (null != sourceProject.LinkFileExt && sourceProject.LinkFileExt.Contains(ext))
                     {
-                        var cadModelFile = new ModelFile(file.FullName, sourceProject.ShowName, sourceProject.Source);
-                        ModelFiles.Add(cadModelFile);
+                        var modelFile = new ModelFile(file.FullName, sourceProject.ShowName, sourceProject.Source);
+                        ModelFiles.Add(modelFile);
+                    }
+                    else if (!string.IsNullOrEmpty(sourceProject.LinkModelFileExt) && sourceProject.LinkModelFileExt == ext) 
+                    {
+                        var modelFile = new ModelFile(file.FullName, sourceProject.ShowName, sourceProject.Source);
+                        ModelFiles.Add(modelFile);
                     }
                 }
             }
@@ -216,6 +235,7 @@ namespace THBimEngine.Domain
         public string SubPrjName { get; set; }
         public string FileId { get; set; }
         public string LoaclPath { get; set; }
+        public string ExternalLinkPath { get; set; }
         public string ShowFileName { get; set; }
         public EMajor Major { get; set; }
         public string MajorName 
@@ -238,4 +258,6 @@ namespace THBimEngine.Domain
         }
         public string LinkFilePath { get; set; }
     }
+
+    
 }

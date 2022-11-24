@@ -70,12 +70,14 @@ namespace THBimEngine.Domain
             FileExt = new List<string>();
             LinkFileExt = new List<string>();
             DirNameContain = contain;
+            LinkModelFileExt = ".thlink";
         }
         public EApplcationName Source { get; }
         public string DirNameContain { get; }
         public string ShowName { get; }
         public List<string> FileExt { get; set; }
         public List<string> LinkFileExt { get; set; }
+        public string LinkModelFileExt { get; set; }
 
     }
 }

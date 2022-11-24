@@ -99,9 +99,13 @@ namespace XbimXplorer
             {
                 filter = "选择IFC文件(.ifc)|*.ifc";
             }
-            else if (typeName == "ydb") 
+            else if (typeName == "ydb")
             {
-                filter = "选择IFC文件(.ydb)|*.ydb";
+                filter = "选择YDB文件(.ydb)|*.ydb";
+            }
+            else if (typeName == "su") 
+            {
+                filter = "选择SU文件(.skp)|*.skp";
             }
             return filter;
 

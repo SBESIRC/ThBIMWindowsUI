@@ -15,6 +15,8 @@ using Xbim.ModelGeometry.Scene;
 using THBimEngine.Presention;
 using XbimXplorer.ThBIMEngine;
 using THBimEngine.Application;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace XbimXplorer
 {
@@ -84,6 +86,45 @@ namespace XbimXplorer
             _loadStreamBackgroundWorker.DoWork += LoadStreamBackgroundWorker_DoWork;
             _loadStreamBackgroundWorker.RunWorkerCompleted += FileLoadCompleted;
             _loadStreamBackgroundWorker.RunWorkerAsync(streamParameter);
+        }
+
+        BackgroundWorker mutilLoadBWorker;
+        List<ProjectParameter> openProjects;
+        void LoadFilesToCurrentDocument(List<ProjectParameter> openFileParameters)
+        {
+            if (null == openFileParameters || openFileParameters.Count<1 || mutilLoadBWorker != null)
+                return;
+            openProjects = new List<ProjectParameter>();
+            openProjects.AddRange(openFileParameters);
+            mutilLoadBWorker = new BackgroundWorker();
+            mutilLoadBWorker.DoWork += MutilLoadBWorker_DoWork;
+            mutilLoadBWorker.RunWorkerCompleted += MutilLoadBWorker_RunWorkerCompleted;
+            mutilLoadBWorker.RunWorkerAsync();
+        }
+
+        private void MutilLoadBWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (null == openProjects || openProjects.Count < 1)
+            {
+                mutilLoadBWorker = null;
+                return;
+            }
+            var loadPrj = openProjects.First();
+            openProjects.Remove(loadPrj);
+            LoadFileToCurrentDocument(loadPrj);
+            mutilLoadBWorker.RunWorkerAsync();
+        }
+
+        private void MutilLoadBWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            while (true)
+            {
+                if (null == _loadFileBackgroundWorker)
+                    break;
+                if (!_loadFileBackgroundWorker.IsBusy)
+                    break;
+                Thread.Sleep(1000);
+            }
         }
 
         private void LoadStreamBackgroundWorker_DoWork(object sender, DoWorkEventArgs args)

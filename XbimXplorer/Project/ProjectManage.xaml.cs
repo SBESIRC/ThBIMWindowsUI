@@ -197,6 +197,54 @@ namespace XbimXplorer
             if (null != projectVM)
                 projectVM.FilterProject(Search_Text.Text.Trim());
         }
+        private void DeleteFile_Click(object sender, RoutedEventArgs e)
+        {
+            var menuItem = sender as MenuItem;
+            var selectItem = menuItem.CommandParameter as ProjectFileInfo;
+            if (null == selectItem)
+                return;
+            var strMsg = string.Format("确定要作废 {0} 下的 {1} 专业的 {2} 文件吗，该过程是不可逆的，是否继续操作？", selectItem.SubPrjName, selectItem.MajorName, selectItem.ShowFileName);
+            var res = MessageBox.Show(strMsg, "操作提醒", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (res != MessageBoxResult.Yes)
+                return;
+            if (!string.IsNullOrEmpty(selectItem.LoaclPath) && File.Exists(selectItem.LoaclPath))
+            {
+                File.Delete(selectItem.LoaclPath);
+            }
+            if (!string.IsNullOrEmpty(selectItem.LinkFilePath) && File.Exists(selectItem.LinkFilePath))
+            {
+                File.Delete(selectItem.LinkFilePath);
+            }
+            if (!string.IsNullOrEmpty(selectItem.ExternalLinkPath) && File.Exists(selectItem.ExternalLinkPath))
+            {
+                File.Delete(selectItem.ExternalLinkPath);
+            }
+            projectVM.ChangeSelectSubProject();
+        }
+        private void UpdateFile_Click(object sender, RoutedEventArgs e)
+        {
+            var menuItem = sender as MenuItem;
+            var selectItem = menuItem.CommandParameter as ProjectFileInfo;
+            if (selectItem == null || string.IsNullOrEmpty(selectItem.LoaclPath))
+                return;
+            var path = selectItem.LoaclPath;
+            var type = selectItem.ApplcationName.ToString();
+            var selectPath = new SelectUploadFile(type, new List<string> { selectItem.MajorName}, true);
+            selectPath.Owner = this;
+            if (selectPath.ShowDialog() == true)
+            {
+                var filePath = selectPath.GetSelectResult(out string major);
+                if (string.IsNullOrEmpty(filePath))
+                    return;
+                File.Copy(filePath, path, true);
+                if (type == "YDB")
+                {
+                    ThYDBToIfcConvertService ydbToIfc = new ThYDBToIfcConvertService();
+                    ydbToIfc.Convert(path);
+                }
+                projectVM.ChangeSelectSubProject();
+            }
+        }
     }
     class ProjectVM : NotifyPropertyChangedBase
     {
@@ -269,7 +317,7 @@ namespace XbimXplorer
                 this.RaisePropertyChanged();
             }
         }
-        
+
         public ProjectVM(List<DBProject> projects)
         {
             AllProjects = new List<ShowProject>();
@@ -331,7 +379,7 @@ namespace XbimXplorer
             }
             foreach (var item in Projects)
                 item.PropertyChanged += Project_PropertyChanged;
-            foreach (var item in Projects)
+            foreach (var item in Projects) 
             {
                 if (item.IsChild)
                     continue;

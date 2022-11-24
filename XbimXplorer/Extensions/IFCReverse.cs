@@ -1,20 +1,14 @@
 ﻿using Xbim.Ifc;
 using System.Linq;
-using Xbim.Ifc2x3.ProductExtension;
+using Xbim.Common.Step21;
 using Xbim.Ifc2x3.Kernel;
+using System.Collections.Generic;
+using Xbim.Ifc2x3.ProductExtension;
 using Xbim.Ifc2x3.PropertyResource;
 using Xbim.Ifc2x3.SharedBldgElements;
-using Xbim.ModelGeometry.Scene;
-using Xbim.Common.Geometry;
-using Newtonsoft.Json;
-using System.IO;
-using Xbim.Common.XbimExtensions;
-using System.Collections.Generic;
-using Xbim.Geometry.Engine.Interop;
-using Xbim.Ifc2x3.GeometryResource;
 using THBimEngine.Domain;
-using Xbim.Ifc2x3.GeometricConstraintResource;
 using THBimEngine.Application;
+
 
 namespace XbimXplorer.Extensions
 {
@@ -28,12 +22,12 @@ namespace XbimXplorer.Extensions
         /// <returns></returns>
         public static ThTCHProjectData ReverseCAD(IfcStore ifcStore)
         {
-            if (ifcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
+            if (ifcStore.SchemaVersion == XbimSchemaVersion.Ifc2X3)
             {
                 ThTCHProjectData project = new ThTCHProjectData();
                 project.Root = new ThTCHRootData();
                 var ifcProject = ifcStore.Instances.FirstOrDefault<IfcProject>();
-                project.Root.GlobalId = ifcProject.Description??"";
+                project.Root.GlobalId = ifcProject.Description ?? "";
                 foreach (IfcSite ifcSite in ifcProject.Sites)
                 {
                     var site = new ThTCHSiteData();
@@ -62,7 +56,7 @@ namespace XbimXplorer.Extensions
                             {
                                 foreach (var ifcElement in item.RelatedElements)
                                 {
-                                    if(ifcElement is IfcWall ifcWall)
+                                    if (ifcElement is IfcWall ifcWall)
                                     {
 
                                     }
@@ -80,14 +74,14 @@ namespace XbimXplorer.Extensions
                                     }
                                 }
                             }
-                            
+
 
                             building.Storeys.Add(BuildingStorey);
                         }
                         site.Buildings.Add(building);
                     }
                     project.Sites.Add(site);
-                } 
+                }
             }
             return null;
         }
@@ -101,12 +95,12 @@ namespace XbimXplorer.Extensions
             IfcStoreReadGeomtry2SUProject ifcStoreReadGeomtry2SUProject = new IfcStoreReadGeomtry2SUProject();
             var allGeoPointNormals = new List<PointNormal>();
             var ifcGeomtrys = ifcStoreReadGeomtry2SUProject.ReadGeomtry(ifcStore, out allGeoPointNormals);
-            if (ifcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
+            if (ifcStore.SchemaVersion == XbimSchemaVersion.Ifc2X3)
             {
                 ThSUProjectData project = new ThSUProjectData();
                 project.Root = new ThTCHRootData();
                 var ifcProject = ifcStore.Instances.FirstOrDefault<IfcProject>();
-                project.Root.GlobalId = ifcProject.Description??"";
+                project.Root.GlobalId = ifcProject.Description ?? "";
                 ThSUBuildingData buildingData = new ThSUBuildingData();
                 foreach (IfcSite ifcSite in ifcProject.Sites)
                 {

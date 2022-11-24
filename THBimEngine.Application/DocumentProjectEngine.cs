@@ -6,6 +6,7 @@ using System.Linq;
 using THBimEngine.Domain;
 using THBimEngine.Geometry.ProjectFactory;
 using Xbim.Common.Geometry;
+using Xbim.Common.Step21;
 using Xbim.Ifc;
 using Xbim.Ifc4.Interfaces;
 
@@ -23,7 +24,7 @@ namespace THBimEngine.Application
         public void AddProject(THDocument currentDocument, ThTCHProjectData project, ProjectParameter projectParameter)
         {
             HaveChange = false;
-            convertFactory = new THProjectDataConvertFactory(Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3);
+            convertFactory = new THProjectDataConvertFactory(XbimSchemaVersion.Ifc2X3);
             bool isAdd = currentDocument.IsAddProject(projectParameter.ProjectId);
             if (isAdd)
             {
@@ -59,7 +60,7 @@ namespace THBimEngine.Application
         public void AddProject(THDocument currentDocument, ThSUProjectData project, ProjectParameter projectParameter)
         {
             HaveChange = false;
-            convertFactory = new THSUProjectConvertFactory(Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3);
+            convertFactory = new THSUProjectConvertFactory(XbimSchemaVersion.Ifc2X3);
             bool isAdd = currentDocument.IsAddProject(projectParameter.ProjectId);
             if (!isAdd)
             {
@@ -115,7 +116,6 @@ namespace THBimEngine.Application
         /// <param name="ifcStore"></param>
         public void AddProject(THDocument currentDocument, IfcStore ifcStore, ProjectParameter projectParameter)
         {
-            convertFactory = new THIfcStoreMeshConvertFactory(ifcStore.IfcSchemaVersion);
             var isAdd = currentDocument.IsAddProject(projectParameter.ProjectId);
             if (!isAdd)
             {

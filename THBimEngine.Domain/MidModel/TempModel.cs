@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using Xbim.Ifc;
 using Xbim.Ifc4.Interfaces;
-using Xbim.IO.Xml.BsConf;
+using Xbim.Common.Step21;
 
 namespace THBimEngine.Domain.MidModel
 {
@@ -607,7 +607,7 @@ namespace THBimEngine.Domain.MidModel
         {
             int floorNum = -100, stdFlrNum = -100;
             double height = -100;
-            if (ifcStorey.Model.SchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
+            if (ifcStorey.Model.SchemaVersion == XbimSchemaVersion.Ifc2X3)
             {
                 var storey = ifcStorey as Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey;
                 foreach (var item in storey.PropertySets)
@@ -714,7 +714,7 @@ namespace THBimEngine.Domain.MidModel
                     var val2 = z.Split(',').Last();
                     profileName = "Rec_" + val1 + "*" + val2;
                 }
-                else if (ifcEntity.Model.SchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
+                else if (ifcEntity.Model.SchemaVersion == XbimSchemaVersion.Ifc2X3)
                 {
                     var ifcProduct = ifcEntity as Xbim.Ifc2x3.Kernel.IfcProduct;
                     var item = ifcProduct.Representation.Representations.First().Items[0];

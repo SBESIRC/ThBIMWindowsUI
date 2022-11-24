@@ -50,15 +50,15 @@
     </Reference>
     <Reference Include="Xbim.Ifc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=11e3655e576ec5a9, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Xbim.Essentials\4.x\Xbim.Ifc.dll</HintPath>
+      <HintPath>..\Xbim.Essentials\5.x\Xbim.Ifc.dll</HintPath>
     </Reference>
     <Reference Include="Xbim.Ifc4, Version=4.0.0.0, Culture=neutral, PublicKeyToken=11e3655e576ec5a9, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Xbim.Essentials\4.x\Xbim.Ifc4.dll</HintPath>
+      <HintPath>..\Xbim.Essentials\5.x\Xbim.Ifc4.dll</HintPath>
     </Reference>
     <Reference Include="Xbim.IO, Version=4.0.0.0, Culture=neutral, PublicKeyToken=11e3655e576ec5a9, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Xbim.Essentials\4.x\Xbim.IO.dll</HintPath>
+      <HintPath>..\Xbim.Essentials\5.x\Xbim.IO.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -924,12 +924,18 @@ namespace ThBIMServer.Ifc2x3
                     }
                 }
                 var xBimMatrix3D = componentData.Transformations.ToXBimMatrix3D();
+                var xZoom = xBimMatrix3D.M11;
+                xBimMatrix3D.M11 = 1;
+                var yZoom = xBimMatrix3D.M22;
+                xBimMatrix3D.M22 = 1;
+                var zZoom = xBimMatrix3D.M33;
+                xBimMatrix3D.M33 = 1;
                 var isRightHandedCoordinate = IsRightHandedCoordinate(xBimMatrix3D);
                 if(!isRightHandedCoordinate)
                 {
                     xBimMatrix3D = ThProtoBufExtension.XZMatrix * xBimMatrix3D;
                 }
-                IfcRepresentationItem body = model.ToIfcFacetedBrep(def, isRightHandedCoordinate);
+                IfcRepresentationItem body = model.ToIfcFacetedBrep(def, isRightHandedCoordinate, xZoom, yZoom, zZoom);
                 if (componentData.IfcClassification.StartsWith("IfcBeam"))
                 {
                     body = model.ToIfcExtrudedAreaSolid(body as IfcFacetedBrep);

@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>GLFW</RootNamespace>
     <Authors>Eric Freed</Authors>
-    <AssemblyVersion>1.0.18.0</AssemblyVersion>
+    <AssemblyVersion>1.0.19.0</AssemblyVersion>
     <Description>Complete, cross-platform, managed wrapper around the GLFW library for creating native windows with an OpenGL context.</Description>
     <RepositoryUrl></RepositoryUrl>
     <PackageReleaseNotes>- Implemented new GLFW 3.3 features
@@ -15,7 +15,7 @@
     <Copyright>Copyright © Eric Freed 2018</Copyright>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Version>1.0.18</Version>
+    <Version>1.0.19</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PackageVersion>3.3.1</PackageVersion>
     <Title>glfw-net</Title>

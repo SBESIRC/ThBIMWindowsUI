@@ -1248,6 +1248,42 @@ namespace XbimXplorer
             }
             LoadFilesToCurrentDocument(loadPrjs);
         }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (null == CurrentDocument || CurrentDocument.AllBimProjects.Count < 1)
+                return;
+            Dictionary<Type, int> typeCount = new Dictionary<Type, int>();
+            foreach (var project in CurrentDocument.AllBimProjects) 
+            {
+                var res = project.ProjrctEntityTypeCounts();
+                if (null == res || res.Count < 1)
+                    continue;
+                foreach (var keyValue in res) 
+                {
+                    var key = keyValue.Key;
+                    var keyCount = keyValue.Value.Count;
+                    if (typeCount.ContainsKey(key))
+                    {
+                        typeCount[key] += keyCount;
+                    }
+                    else 
+                    {
+                        typeCount.Add(key, keyCount);
+                    }
+                }
+            }
+            int sumCount = 0;
+            foreach (var keyValue in typeCount)
+            {
+                var showTypeName = keyValue.Key.Name;
+                var showCount = keyValue.Value;
+                sumCount += showCount;
+                Log.Info(string.Format("Type : {0} Count : {1}", showTypeName, showCount));
+            }
+            Log.Info(string.Format("Total Count : {0}", sumCount));
+            MessageBox.Show("统计完成，请前往日志中查看结果","提醒");
+        }
     }
     class DocumentCacheModel
     {

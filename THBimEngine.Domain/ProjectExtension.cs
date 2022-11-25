@@ -70,6 +70,82 @@ namespace THBimEngine.Domain
             }
             return types.ToList();
         }
+
+        public static Dictionary<Type,List<string>> ProjrctEntityTypeCounts(this THBimProject project)
+        {
+            var types = new Dictionary<Type, List<string>>();
+            if (null == project)
+                return types;
+            if (project.SourceProject != null && project.SourceProject is IfcStore ifcStore)
+            {
+                var ifcProject = ifcStore.Instances.FirstOrDefault<IIfcProject>();
+                if (ifcProject.Sites == null || ifcProject.Sites.Count() < 1)
+                    return types;
+                var site = ifcProject.Sites.First();
+                var allBildings = site.Buildings.ToList();
+                foreach (var building in allBildings)
+                {
+                    var allStoreys = building.BuildingStoreys.ToList();
+                    foreach (var ifcStorey in allStoreys)
+                    {
+                        if (ifcStorey is Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey storey23)
+                        {
+                            foreach (var spatialStructure in storey23.ContainsElements)
+                            {
+                                var elements = spatialStructure.RelatedElements;
+                                if (elements.Count == 0)
+                                    continue;
+                                foreach (var item in elements)
+                                {
+                                    var ifcType = item.GetType();
+                                    if (!types.ContainsKey(ifcType))
+                                        types.Add(ifcType,new List<string> { item.EntityLabel.ToString()});
+                                    else 
+                                    {
+                                        types[ifcType].Add(item.EntityLabel.ToString());
+                                    }
+                                }
+                            }
+                        }
+                        else if (ifcStorey is Xbim.Ifc4.ProductExtension.IfcBuildingStorey storey4)
+                        {
+                            foreach (var spatialStructure in storey4.ContainsElements)
+                            {
+                                var elements = spatialStructure.RelatedElements;
+                                if (elements.Count == 0)
+                                    continue;
+                                foreach (var item in elements)
+                                {
+                                    var ifcType = item.GetType();
+                                    if (!types.ContainsKey(ifcType))
+                                        types.Add(ifcType, new List<string> { item.EntityLabel.ToString() });
+                                    else
+                                    {
+                                        types[ifcType].Add(item.EntityLabel.ToString());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (var item in project.PrjAllRelations)
+                {
+                    var entity = project.PrjAllEntitys[item.Value.RelationElementUid];
+                    var type = entity.GetType();
+                    if (!types.ContainsKey(type))
+                        types.Add(type, new List<string> { item.Key});
+                    else
+                    {
+                        types[type].Add(item.Key);
+                    }
+                }
+            }
+            return types;
+        }
+
         public static List<THBimStorey> ProjectAllStorey(this THBimProject project)
         {
             var storeys = new List<THBimStorey>();

@@ -203,8 +203,8 @@
                     </DataGrid.Resources>
                     <DataGrid.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Header="更新文件" Click="UpdateFile_Click" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}},Path=PlacementTarget.SelectedItem}"></MenuItem>
-                            <MenuItem Header="作废记录" Click="DeleteFile_Click" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}},Path=PlacementTarget.SelectedItem}"></MenuItem>
+                            <MenuItem Header="更新" Click="UpdateFile_Click" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}},Path=PlacementTarget.SelectedItem}"></MenuItem>
+                            <MenuItem Header="作废" Click="DeleteFile_Click" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}},Path=PlacementTarget.SelectedItem}"></MenuItem>
                         </ContextMenu>
                     </DataGrid.ContextMenu>
                 </DataGrid>
@@ -235,8 +235,8 @@
                     </DataGrid.Resources>
                     <DataGrid.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Header="更新文件" Click="UpdateFile_Click" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}},Path=PlacementTarget.SelectedItem}"></MenuItem>
-                            <MenuItem Header="作废记录" Click="DeleteFile_Click" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}},Path=PlacementTarget.SelectedItem}"></MenuItem>
+                            <MenuItem Header="更新" Click="UpdateFile_Click" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}},Path=PlacementTarget.SelectedItem}"></MenuItem>
+                            <MenuItem Header="作废" Click="DeleteFile_Click" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}},Path=PlacementTarget.SelectedItem}"></MenuItem>
                         </ContextMenu>
                     </DataGrid.ContextMenu>
                 </DataGrid>
@@ -264,8 +264,8 @@
                     </DataGrid.Resources>
                     <DataGrid.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Header="更新文件" Click="UpdateFile_Click" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}},Path=PlacementTarget.SelectedItem}"></MenuItem>
-                            <MenuItem Header="作废记录" Click="DeleteFile_Click" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}},Path=PlacementTarget.SelectedItem}"></MenuItem>
+                            <MenuItem Header="更新" Click="UpdateFile_Click" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}},Path=PlacementTarget.SelectedItem}"></MenuItem>
+                            <MenuItem Header="作废" Click="DeleteFile_Click" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}},Path=PlacementTarget.SelectedItem}"></MenuItem>
                         </ContextMenu>
                     </DataGrid.ContextMenu>
                 </DataGrid>

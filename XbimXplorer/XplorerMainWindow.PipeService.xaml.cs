@@ -218,13 +218,13 @@ namespace XbimXplorer
                     var BindingName = project.BindingName;//楼栋名称
                     var ProjectPath = project.ProjectPath;//完整路径
                     //打印CAD管道数据
-                    //var Model = ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Factory.CreateAndInitModel("ThCAD2IFCProject", project.Root.GlobalId);
-                    //if (Model != null)
-                    //{
-                    //    ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.BuildIfcModel(Model, project);
-                    //    ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.SaveIfcModel(Model, @"D:\testCAD.ifc");
-                    //    Model.Dispose();
-                    //}
+                    var Model = ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Factory.CreateAndInitModel("ThCAD2IFCProject", project.Root.GlobalId);
+                    if (Model != null)
+                    {
+                        ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.BuildIfcModel(Model, project);
+                        ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.SaveIfcModel(Model, @"D:\THBimTempFilePath\testCAD.ifc");
+                        Model.Dispose();
+                    }
                     CurrentDocument.AddProject(project, new ProjectParameter
                     {
                         ProjectId = project.Root.GlobalId,

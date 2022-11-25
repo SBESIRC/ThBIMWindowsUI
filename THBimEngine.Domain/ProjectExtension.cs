@@ -198,6 +198,10 @@ namespace THBimEngine.Domain
                     }
                     else
                     {
+                        if (manager.Height == 0 && storey.LevelHeight != 0)
+                        {
+                            manager.Height = storey.LevelHeight;
+                        }
                         if (manager.Storeys.ContainsKey(project.Major))
                         {
                             manager.Storeys[project.Major].Add(storey);
@@ -218,7 +222,7 @@ namespace THBimEngine.Domain
             }
             if (resStoreys.Count > 1 && resStoreys.Last().Height == 0)
             {
-                resStoreys[resStoreys.Count - 1].Height = resStoreys[resStoreys.Count - 2].Height;
+                resStoreys[resStoreys.Count - 1].Height = -1;
             }
 
             return resStoreys;

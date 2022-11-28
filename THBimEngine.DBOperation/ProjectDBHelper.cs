@@ -60,5 +60,26 @@ namespace THBimEngine.DBOperation
             }
             return resPorject;
         }
+        /// <summary>
+        /// 返回项目及其一个子项的信息
+        /// </summary>
+        /// <param name="prjId"></param>
+        /// <param name="subPrjId"></param>
+        /// <returns></returns>
+        public DBSubProject GetProjectAndSubPrj(string prjId, string subPrjId) 
+        {
+            if (string.IsNullOrEmpty(prjId) || string.IsNullOrEmpty(subPrjId))
+                return null;
+            SqlSugarClient sqlClient = new SqlSugarClient(dbSqlServerConfig);
+            SqlSugarProvider sqlDB = sqlClient.GetConnection(dbSqlServerConfig.ConfigId);
+            //step1获取可以看的项目
+            Expressionable<DBSubProject> expressionable = new Expressionable<DBSubProject>();
+            expressionable.And(c => c.Id == prjId);
+            expressionable.And(c => c.SubentryId == subPrjId);
+            var prjs = sqlDB.Queryable<DBSubProject>().Where(expressionable.ToExpression()).Distinct().ToList();
+            if (prjs.Count < 1)
+                return null;
+            return prjs.First();
+        }
     }
 }

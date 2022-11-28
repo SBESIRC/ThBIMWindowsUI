@@ -16,6 +16,8 @@ using Xbim.Common.Geometry;
 using Xbim.Ifc;
 using XbimXplorer.Extensions.ModelMerge;
 using XbimXplorer.ThBIMEngine;
+using THBimEngine.DBOperation;
+using XbimXplorer.Project;
 
 namespace XbimXplorer
 {
@@ -211,26 +213,33 @@ namespace XbimXplorer
                 pipeServer = null;
                 backgroundWorker.RunWorkerAsync();
                 var majer = message.Header.Major;//专业
-                
+                var major = EnumUtil.GetEnumItemByDescription<EMajor>(majer);
+                ProjectDBHelper projectDB = new ProjectDBHelper();
                 foreach (var project in message.CadProjects)
                 {
                     var ProjectId = project.ProjectId;//项目信息
                     var ProjectChildId = project.ProjectSubId;//子项信息
                     var BindingName = project.BindingName;//楼栋名称
                     var ProjectPath = project.ProjectPath;//完整路径
+                    //获取项目
+                    var prj = projectDB.GetProjectAndSubPrj(ProjectId, ProjectChildId);
+                    if (null == prj)
+                        continue;
+                    var fileName = Path.GetFileNameWithoutExtension(ProjectPath);
+                    var ifcPath =Path.Combine(ProjectCommon.GetPrjectSubDir(prj,majer,"CAD"),string.Format("{0}_{1}.ifc",fileName, BindingName));
                     //打印CAD管道数据
                     var Model = ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Factory.CreateAndInitModel("ThCAD2IFCProject", project.Root.GlobalId);
                     if (Model != null)
                     {
                         ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.BuildIfcModel(Model, project);
-                        ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.SaveIfcModel(Model, @"D:\THBimTempFilePath\testCAD.ifc");
+                        ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.SaveIfcModel(Model, ifcPath);
                         Model.Dispose();
                     }
                     CurrentDocument.AddProject(project, new ProjectParameter
                     {
                         ProjectId = project.Root.GlobalId,
                         Source = EApplcationName.CAD,
-                        Major = EMajor.Structure,
+                        Major = EMajor.Architecture,
                     });
                 }
             }

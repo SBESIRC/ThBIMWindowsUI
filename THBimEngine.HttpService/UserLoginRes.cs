@@ -29,6 +29,8 @@ namespace THBimEngine.HttpService
         public string LoginLocation { get; set; }
         [JsonIgnore]
         public string LocationSQLIp { get; set; }
+        [JsonIgnore]
+        public List<string> Majors { get; set; }
         public List<Department> Departments { get; set; }
     }
     public class Department

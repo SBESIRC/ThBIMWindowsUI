@@ -9,6 +9,8 @@ namespace THBimEngine.DBOperation
         /// 项目Id
         /// </summary>
         public string Id { get; set; }
+        public string PrjNo { get; set; }
+        public string PrjName { get; set; }
         /// <summary>
         /// 项目编号
         /// </summary>

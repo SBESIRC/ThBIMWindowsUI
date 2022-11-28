@@ -7,6 +7,7 @@
         WindowStartupLocation="CenterOwner"
         ResizeMode ="CanResize"
         mc:Ignorable="d"
+        x:Name="mainWindow"
         Title="项目模型选择"
         Height="800" 
         Width="1200"
@@ -15,6 +16,33 @@
     <Window.Resources>
         <ResourceDictionary>
             <local:BoolToVisibilty x:Key="boolToVisibility"></local:BoolToVisibilty>
+            <local:EnumToVisibilty x:Key="enumToVisibility"></local:EnumToVisibilty>
+            <local:CheckTwoStringEqualsConverter x:Key="strEqualToBool"/>
+            <Style x:Key="ButtonRadioButton" TargetType="{x:Type RadioButton}">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="Foreground" Value="Gray"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type RadioButton}">
+                            <Border x:Name="fore" Background="Transparent" BorderBrush="Gray" 
+                                    BorderThickness="1" Padding="10,3,10,3" 
+                                    SnapsToDevicePixels="True" Margin="-1,0,0,0"
+                                    VerticalAlignment="Center">
+                                <ContentPresenter x:Name="contant" Margin="0" Content="{TemplateBinding Content}"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="fore" Property="Background" Value="#EEEEEE"></Setter>
+                                    <Setter Property="Foreground" Value="Black"></Setter>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
@@ -171,22 +199,42 @@
         </Grid>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
+                <RowDefinition Height="40"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
             <Border BorderBrush="#BAB8B8" Grid.Row="0" Grid.RowSpan="99" BorderThickness="1,0,1,0"></Border>
-            <Grid Grid.Row="0">
+            <ItemsControl x:Name="majorControl" Margin="5,0,0,0" VerticalAlignment="Center">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <RadioButton GroupName="MajorGroup" x:Name="radio" Content="{Binding .}" Style="{StaticResource ButtonRadioButton}"
+                                     Checked="RadioButton_Checked">
+                            <RadioButton.IsChecked>
+                                <MultiBinding Converter="{StaticResource strEqualToBool}">
+                                    <Binding Path="DataContext.SelectMajorName" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" NotifyOnSourceUpdated="True"  ElementName="mainWindow"></Binding>
+                                    <Binding Path="."></Binding>
+                                </MultiBinding>
+                            </RadioButton.IsChecked>
+                        </RadioButton>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" ScrollViewer.HorizontalScrollBarVisibility="Auto"></WrapPanel>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+            <Grid Grid.Row="1" Visibility="{Binding Path = SelectMajor, Converter={StaticResource enumToVisibility}, ConverterParameter= 10}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
-                <Label Content="主体模型文件管理区"></Label>
-                <Label Grid.Row="1" Content="YJK模型文件管理区"></Label>
+                <Label Content="主体模型管理区"></Label>
+                <Label Grid.Row="1" Content="YJK模型管理区"></Label>
                 <DataGrid Grid.Row="2" Margin="5" CanUserAddRows="False"
-                          SelectionMode="Single"
                           CanUserDeleteRows="False" AutoGenerateColumns="False" 
                           RowHeaderWidth="0"
                           ItemsSource ="{Binding YDBModels}">
@@ -210,15 +258,40 @@
                 </DataGrid>
                 <Button Content="上传ydb" x:Name="btnUploadYDB" Grid.Row="3" Height="25" Width="80" Margin="10,5,0,5" HorizontalAlignment="Left" Click="btnUploadYDB_Click"></Button>
             </Grid>
-            <Grid Grid.Row="1">
+            <Grid Grid.Row="1" Visibility="{Binding Path = SelectMajor, Converter={StaticResource enumToVisibility}, ConverterParameter= 20}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="Auto"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Label Content="主体模型管理区"></Label>
+                <DataGrid Grid.Row="2" Margin="5" CanUserAddRows="False"
+                          CanUserDeleteRows="False" AutoGenerateColumns="False" 
+                          RowHeaderWidth="0"
+                          ItemsSource ="{Binding CadModels}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="模型名称" Width="2*" Binding="{Binding ShowFileName}" IsReadOnly="True"></DataGridTextColumn>
+                        <DataGridTextColumn Header="上传人" Width="1*" Binding="{Binding OwnerName}" IsReadOnly="True"></DataGridTextColumn>
+                        <DataGridTextColumn Header="专业" Binding="{Binding MajorName}" IsReadOnly="True"  CanUserSort="False" CanUserResize="False"></DataGridTextColumn>
+                        <DataGridTextColumn Header="更新时间" Width="1*" Binding="{Binding LastUpdataTime}" IsReadOnly="True"></DataGridTextColumn>
+                    </DataGrid.Columns>
+                    <DataGrid.Resources>
+                        <Style TargetType="DataGridRow">
+                            <EventSetter Event="MouseDoubleClick" Handler="Row_DoubleClick"/>
+                        </Style>
+                    </DataGrid.Resources>
+                </DataGrid>
+            </Grid>
+            <Grid Grid.Row="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
-                <Label Content="SU模型文件管理区"></Label>
+                <Label Content="SU模型管理区"></Label>
                 <DataGrid Grid.Row="1" Margin="5" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" 
-                          RowHeaderWidth="0" SelectionMode="Single"
+                          RowHeaderWidth="0"
                           ItemsSource="{Binding SuModels}"
                           >
                     <DataGrid.Columns>
@@ -242,14 +315,14 @@
                 </DataGrid>
                 <Button Content="新建文件" x:Name="btnAddSUFile" Grid.Row="2" Height="25" Width="80" Margin="10,5,0,5" HorizontalAlignment="Left" Click="btnAddSUFile_Click"></Button>
             </Grid>
-            <Grid Grid.Row="2">
+            <Grid Grid.Row="3">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
-                <Label Content="IFC模型文件管理区"></Label>
-                <DataGrid Grid.Row="1" Margin="5" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" RowHeaderWidth="0" SelectionMode="Single"
+                <Label Content="IFC模型管理区"></Label>
+                <DataGrid Grid.Row="1" Margin="5" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" RowHeaderWidth="0"
                           ItemsSource="{Binding IfcModels}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="模型名称" Width="2*" Binding="{Binding ShowFileName}" IsReadOnly="True"></DataGridTextColumn>

@@ -298,6 +298,7 @@
       <DependentUpon>wdwCommands.xaml</DependentUpon>
     </Compile>
     <Compile Include="Project\FileExternalLink.cs" />
+    <Compile Include="Project\ProjectCommon.cs" />
     <Compile Include="Project\ProjectManage.xaml.cs">
       <DependentUpon>ProjectManage.xaml</DependentUpon>
     </Compile>

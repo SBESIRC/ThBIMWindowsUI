@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -9,6 +10,7 @@ using THBimEngine.Application;
 using THBimEngine.DBOperation;
 using THBimEngine.Domain;
 using THBimEngine.HttpService;
+using XbimXplorer.Project;
 using XbimXplorer.ThBIMEngine;
 
 namespace XbimXplorer
@@ -23,7 +25,8 @@ namespace XbimXplorer
         OperateType operateType;
         ProjectFileInfo selectProjectFile;
         UserInfo loginUser;
-        
+        ShowProject parentProject = null;
+        ShowProject subProject = null;
         public ProjectManage(UserInfo user)
         {
             InitializeComponent();
@@ -40,7 +43,15 @@ namespace XbimXplorer
         {
             return selectProjectFile;
         }
-
+        private void InitSelectProject() 
+        {
+            parentProject = null;
+            subProject = null;
+            if (null == projectVM.SelectProject || !projectVM.SelectProject.IsChild)
+                return;
+            subProject = projectVM.SelectProject;
+            parentProject = projectVM.GetParentPrject(subProject);
+        }
         public ShowProject GetSelectPrjSubPrj(out ShowProject subProject, out List<ShowProject> allSubPrjs, out string loaclPrjPath) 
         {
             ShowProject pProject = null;
@@ -57,7 +68,7 @@ namespace XbimXplorer
                 subProject = selectPrj;
             }
             allSubPrjs.Remove(pProject);
-            loaclPrjPath = projectVM.GetProjectDir(pProject);
+            loaclPrjPath = ProjectCommon.GetProjectDir(pProject);
             return pProject;
         }
         private void InitUserProjects()
@@ -66,6 +77,13 @@ namespace XbimXplorer
             {
                 var userPojects = projectDBHelper.GetUserProjects(loginUser.PreSSOId);
                 projectVM = new ProjectVM(userPojects);
+                projectVM.SelectMajorName = loginUser.Majors.FirstOrDefault();
+            }
+            projectVM.MajorNames.Clear();
+            foreach (var item in loginUser.Majors)
+            {
+                projectVM.MajorNames.Add(item);
+                majorControl.Items.Add(item);
             }
             this.DataContext = projectVM;
         }
@@ -79,9 +97,10 @@ namespace XbimXplorer
         }
         private void SelectAndUploadFile(string type)
         {
+            InitSelectProject();
             if (projectVM.SelectProject == null || !projectVM.SelectProject.IsChild)
                 return;
-            var selectPath = new SelectUploadFile(type, projectVM.MajorNames, true);
+            var selectPath = new SelectUploadFile(type, new List<string> { projectVM.SelectMajorName}, true);
             selectPath.Owner = this;
             if (selectPath.ShowDialog() == true)
             {
@@ -94,7 +113,7 @@ namespace XbimXplorer
                 var osskey = string.Format("{0}{1}", newFileName, extName);
                 //S3HttpFile s3HttpFile = new S3HttpFile();
                 //s3HttpFile.UploadFile(filePath, osskey);
-                var path = projectVM.GetPrjectSubDir(projectVM.SelectProject, major, type);
+                var path = ProjectCommon.GetPrjectSubDir(parentProject,subProject, major, type);
                 path = Path.Combine(path, oldFileName);
                 if (Path.Equals(filePath, path))
                     return;
@@ -113,14 +132,14 @@ namespace XbimXplorer
                 return;
             var btn = sender as Button;
             btn.IsEnabled = false;
-            var selectPath = new SelectUploadFile("SU", projectVM.MajorNames, false);
+            var selectPath = new SelectUploadFile("SU", new List<string> { projectVM.SelectMajorName }, false);
             selectPath.Owner = this;
             if (selectPath.ShowDialog() == true)
             {
                 var fileName = selectPath.GetSelectResult(out string major);
                 if (string.IsNullOrEmpty(fileName))
                     return;
-                var path =projectVM.GetPrjectSubDir(projectVM.SelectProject, major, "SU");
+                var path = ProjectCommon.GetPrjectSubDir(parentProject,subProject, major, "SU");
                 if (string.IsNullOrEmpty(path))
                     return;
                 var currentDir = System.Environment.CurrentDirectory;
@@ -246,11 +265,43 @@ namespace XbimXplorer
                 projectVM.ChangeSelectSubProject();
             }
         }
+
+        private void RadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            var radio = sender as RadioButton;
+            projectVM.SelectMajorName = radio.Content.ToString();
+        }
     }
     class ProjectVM : NotifyPropertyChangedBase
     {
         public List<string> MajorNames = new List<string>();
         public List<string> TypeNames = new List<string>();
+        private string selectMajorName { get; set; }
+        public string SelectMajorName
+        {
+            get { return selectMajorName; }
+            set
+            {
+                selectMajorName = value;
+                if (!string.IsNullOrEmpty(selectMajorName))
+                    SelectMajor = EnumUtil.GetEnumItemByDescription<EMajor>(selectMajorName);
+                this.RaisePropertyChanged();
+            }
+        }
+        private EMajor selectMajor { get; set; }
+        public EMajor SelectMajor
+        {
+            get
+            {
+                return selectMajor;
+            }
+            set
+            {
+                selectMajor = value;
+                FilterByMajor();
+                this.RaisePropertyChanged();
+            }
+        }
         public List<ShowProject> AllProjects { get; set; }
         ObservableCollection<ShowProject> _projectModels { get; set; }
         public ObservableCollection<ShowProject> Projects
@@ -398,8 +449,7 @@ namespace XbimXplorer
                 return;
             CreateProjectDir(selectProject);
             var pProject = GetParentPrject(selectProject);
-            var dir = GetProjectDir(pProject);
-            //dir = Path.Combine(dir, selectProject.ShowName);
+            var dir = ProjectCommon.GetProjectDir(pProject);
             var fileProject = new FileProject(dir);
             var mainFileInfos = fileProject.GetProjectFiles();
             foreach (var item in mainFileInfos) 
@@ -458,7 +508,7 @@ namespace XbimXplorer
                     //var majorDir = GetPrjectSubDir(child, major);
                     foreach (var item in TypeNames)
                     {
-                        GetPrjectSubDir(child, major,item);
+                        ProjectCommon.GetPrjectSubDir(pPrj,child, major,item);
                     }
                 }
             }
@@ -496,43 +546,36 @@ namespace XbimXplorer
             }
             return prjects;
         }
-        public string GetProjectDir(ShowProject project) 
+        private void FilterByMajor()
         {
-            var pProject = project;
-            if (project.IsChild)
-                pProject = GetParentPrject(project);
-            var path = string.Format("D:\\THBimTempFilePath\\{0}_{1}", pProject.PrjId, pProject.ShowName);
-            CheckAndAddDir(path);
-            return path;
-        }
-        public string GetPrjectSubDir(ShowProject subProject) 
-        {
-            var prjPath = GetProjectDir(subProject);
-            var childName = string.Format("{0}_{1}", subProject.PrjId, subProject.ShowName);
-            var childDir = Path.Combine(prjPath, childName);
-            CheckAndAddDir(childDir);
-            return childDir;
-        }
-        public string GetPrjectSubDir(ShowProject subProject,string majorName)
-        {
-            var prjPath = GetPrjectSubDir(subProject);
-            var childDir = Path.Combine(prjPath, majorName);
-            CheckAndAddDir(childDir);
-            return childDir;
-        }
-        public string GetPrjectSubDir(ShowProject subProject, string majorName,string typeName)
-        {
-            var prjPath = GetPrjectSubDir(subProject,majorName);
-            var childDir = Path.Combine(prjPath, typeName);
-            CheckAndAddDir(childDir);
-            return childDir;
-        }
-        private void CheckAndAddDir(string path)
-        {
-            if (string.IsNullOrEmpty(path))
+            if (null == subProjectAllFileModels)
                 return;
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
+            YDBModels = new ObservableCollection<ProjectFileInfo>();
+            CadModels = new ObservableCollection<ProjectFileInfo>();
+            SuModels = new ObservableCollection<ProjectFileInfo>();
+            IfcModels = new ObservableCollection<ProjectFileInfo>();
+            foreach (var item in subProjectAllFileModels)
+            {
+                if (item.SubPrjId != selectProject.PrjId)
+                    continue;
+                if (item.Major != selectMajor)
+                    continue;
+                switch (item.ApplcationName)
+                {
+                    case EApplcationName.CAD:
+                        CadModels.Add(item);
+                        break;
+                    case EApplcationName.IFC:
+                        IfcModels.Add(item);
+                        break;
+                    case EApplcationName.SU:
+                        SuModels.Add(item);
+                        break;
+                    case EApplcationName.YDB:
+                        YDBModels.Add(item);
+                        break;
+                }
+            }
         }
     }
     public class ShowProject : NotifyPropertyChangedBase

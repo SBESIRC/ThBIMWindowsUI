@@ -16,6 +16,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using THBimEngine.Domain;
 using THBimEngine.HttpService;
 using Xbim.IO.Esent;
 using XbimXplorer.Properties;
@@ -76,6 +77,7 @@ namespace XbimXplorer
             debugUser.PreSSOId = "TU1909XQ";
             debugUser.UserLogin = new UserLoginRes();
             debugUser.UserLogin.Username = "thbimtestuser";
+            debugUser.Majors = EnumUtil.GetEnumDescriptions<EMajor>();
             var mainView = new XplorerMainWindow(debugUser, blockPlugin);
             mainView.Show();
             //mainView.DrawingControl.ViewHome();

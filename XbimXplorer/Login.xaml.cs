@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.Windows;
+using THBimEngine.Domain;
 using THBimEngine.HttpService;
 
 namespace XbimXplorer
@@ -12,6 +11,7 @@ namespace XbimXplorer
     public partial class Login : Window
     {
         UserConfig userConfig;
+        List<string> majorNames;
         string configRemembPswKey = "RemembPsw";
         string configUserName = "UserName";
         string configUPsw = "UserPsw";
@@ -20,9 +20,16 @@ namespace XbimXplorer
         public Login()
         {
             InitializeComponent();
+            majorNames = new List<string>();
+            var allName = EnumUtil.GetEnumDescriptions<EMajor>();
+            majorNames.AddRange(allName);
+            comMajor.Items.Clear();
+            foreach (var item in majorNames)
+                comMajor.Items.Add(item);
             userConfig = new UserConfig();
-            InitLoacationInfo();
-            
+            bool isRememb = userConfig.Config.AppConfigBoolValue("RemembPsw");
+            string uName = userConfig.Config.AppConfigStringValue("UserName");
+            string uPsw = userConfig.Config.AppConfigStringValue("UserPsw");
             cbxLocation.Items.Clear();
             foreach (var item in locationSQLIps) 
             {
@@ -68,12 +75,13 @@ namespace XbimXplorer
             {
                 MessageBox.Show("用户名不能为空", "提醒", MessageBoxButton.OK);
             }
-            string uName = txtUName.Text.ToString();
-            string uPsw = txtUPsw.Password.ToString();
-            UserLoginService userLogin = new UserLoginService("TH3DViewer");
             UserInfo userInfo = null;
             try
             {
+                mainWindow.IsEnabled = false;
+                string uName = txtUName.Text.ToString();
+                string uPsw = txtUPsw.Password.ToString();
+                UserLoginService userLogin = new UserLoginService("TH3DViewer");
                 userInfo = userLogin.UserLoginByNamePsw(uName, uPsw);
             }
             catch (Exception ex)
@@ -105,6 +113,41 @@ namespace XbimXplorer
             xplorer.Show();
             xplorer.RenderScene();
         }
+                userInfo.Majors = new List<string>();
+                userInfo.Majors.Add(comMajor.SelectedItem.ToString());
+
+                //保存登录的用户信息
+                userConfig.Config.UpdateOrAddAppConfig("UserName", uName);
+                userConfig.Config.UpdateOrAddAppConfig("Major", string.Join(";", userInfo.Majors));
+                if (ckbRemberPsw.IsChecked == true)
+                {
+                    userConfig.Config.UpdateOrAddAppConfig("RemembPsw", "True");
+                    userConfig.Config.UpdateOrAddAppConfig("UserPsw", uPsw);
+                }
+                else
+                {
+                    userConfig.Config.UpdateOrAddAppConfig("RemembPsw", "False");
+                    userConfig.Config.UpdateOrAddAppConfig("UserPsw", "");
+                }
+            }
+            catch (Exception ex)
+            {
+                userInfo = null;
+                MessageBox.Show(ex.Message, "登录失败提醒", MessageBoxButton.OK);
+                return;
+            }
+            finally 
+            {
+                mainWindow.IsEnabled = true;
+                if (null != userInfo) 
+                {
+                    XplorerMainWindow xplorer = new XplorerMainWindow(userInfo);
+                    this.Close();
+                    xplorer.Show();
+                    xplorer.RenderScene();
+                }
+            }
+        }
 
         private void ckbRemberPsw_Checked(object sender, RoutedEventArgs e)
         {
@@ -118,6 +161,4 @@ namespace XbimXplorer
             }
         }
     }
-
-
 }

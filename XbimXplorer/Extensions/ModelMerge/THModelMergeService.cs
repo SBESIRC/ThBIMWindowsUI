@@ -240,7 +240,6 @@ namespace XbimXplorer.Extensions.ModelMerge
             //处理5%
             var definitions = suProject.Definitions;
             var storeys = new List<IfcBuildingStorey>();
-            var ifcRelDefinesByProperties = bigModel.Instances.OfType<Xbim.Ifc2x3.Kernel.IfcRelDefinesByProperties>();
             foreach (var BuildingStorey in suProject.Building.Storeys)
             {
                 var bigStorey = StoreyDic.FirstOrDefault(o => o.Item1 == BuildingStorey.Number);
@@ -286,22 +285,6 @@ namespace XbimXplorer.Extensions.ModelMerge
                 {
                     storey = ThProtoBuf2IFC2x3Factory.CreateStorey(bigModel, bigBuildings, BuildingStorey);
                     storeys.Add(storey);
-                }
-                else if (BuildingStorey.Elevation == storey.Elevation)
-                {
-                    var property = ifcRelDefinesByProperties.FirstOrDefault(o => o.RelatedObjects.Contains(storey));
-                    if (property != null && property.RelatingPropertyDefinition is Xbim.Ifc2x3.Kernel.IfcPropertySet ifcPropertySet)
-                    {
-                        var pro = ifcPropertySet.HasProperties.OfType<Xbim.Ifc2x3.PropertyResource.IfcPropertySingleValue>().FirstOrDefault(o => o.Name == "Height");
-                        if (pro != null && BuildingStorey.Height != (double)pro.NominalValue.Value)
-                        {
-                            using (var txn = bigModel.BeginTransaction("Change Storey Height"))
-                            {
-                                pro.NominalValue = new Xbim.Ifc2x3.MeasureResource.IfcLengthMeasure(BuildingStorey.Height);
-                                txn.Commit();
-                            }
-                        }
-                    }
                 }
                 var suElements = new List<IfcBuildingElement>();
                 foreach (var element in BuildingStorey.Buildings)

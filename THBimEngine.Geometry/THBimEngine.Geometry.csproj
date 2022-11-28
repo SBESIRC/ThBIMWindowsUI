@@ -93,6 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LineHelper.cs" />
+    <Compile Include="XbimMatrixHelper.cs" />
     <Compile Include="ProjectFactory\ConvertFactoryBase.cs" />
     <Compile Include="ProjectFactory\THIfcStoreMeshConvertFactory.cs" />
     <Compile Include="ProjectFactory\THProjectDataConvertFactory.cs" />

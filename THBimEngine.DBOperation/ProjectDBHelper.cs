@@ -22,21 +22,32 @@ namespace THBimEngine.DBOperation
             SqlSugarClient sqlClient = new SqlSugarClient(dbSqlServerConfig);
             SqlSugarProvider sqlDB = sqlClient.GetConnection(dbSqlServerConfig.ConfigId);
             //step1获取可以看的项目
-            Expressionable<DBProject> expressionable = new Expressionable<DBProject>();
+            Expressionable<DBSubProject> expressionable = new Expressionable<DBSubProject>();
             expressionable.And(c => c.ExecutorId == userId);
-            var prjs = sqlDB.Queryable<DBProject>().Where(expressionable.ToExpression()).Distinct().ToList();
-            var prjIds = prjs.Select(c => c.Id).ToList();
-            Expressionable<DBSubProject> expSubPrj = new Expressionable<DBSubProject>();
-            expSubPrj.And(c => prjIds.Contains(c.Id));
-            var allSubPrjs = sqlDB.Queryable<DBSubProject>().Where(expSubPrj.ToExpression()).Distinct().ToList();
-            //step2根据项目获取项目的完整信息
-            foreach (var prj in prjs)
+            var prjs = sqlDB.Queryable<DBSubProject>().Where(expressionable.ToExpression()).Distinct().ToList();
+            if (prjs.Count < 1)
+                return resPorject;
+            HashSet<string> hisPrjId = new HashSet<string>();
+            HashSet<string> hisSubPrjId = new HashSet<string>();
+            foreach (var item in prjs)
             {
-                prj.ExecutorId = "";
-                prj.SubProjects = new List<DBSubProject>();
-                var subPrjs = allSubPrjs.Where(c => c.Id == prj.Id).Distinct();
-                prj.SubProjects.AddRange(subPrjs);
-                resPorject.Add(prj);
+                DBProject pPrj = null;
+                if (hisPrjId.Contains(item.Id))
+                    pPrj = resPorject.Where(c => c.Id == item.Id).FirstOrDefault();
+                else
+                {
+                    pPrj = new DBProject();
+                    pPrj.Id = item.Id;
+                    pPrj.PrjName = item.PrjName;
+                    pPrj.PrjNo = item.PrjNo;
+                    pPrj.ExecutorId = item.ExecutorId;
+                    pPrj.SubProjects = new List<DBSubProject>();
+                    hisPrjId.Add(item.Id);
+                    resPorject.Add(pPrj);
+                }
+                if (hisSubPrjId.Contains(item.SubentryId))
+                    continue;
+                pPrj.SubProjects.Add(item);
             }
             return resPorject;
         }

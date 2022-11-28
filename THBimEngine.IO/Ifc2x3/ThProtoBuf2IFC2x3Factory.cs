@@ -928,61 +928,28 @@ namespace ThBIMServer.Ifc2x3
                 var xBimMatrix3D = componentData.Transformations.ToXBimMatrix3D();
                 double xZoom = 1.0, yZoom = 1.0, zZoom = 1.0;
                 var right = xBimMatrix3D.Right;
-                if(right.Length != 1)
+                if (Math.Abs(right.Length - 1) > 0.01)
                 {
-                    if(right.IsParallel(XAxis,1.0))
-                    {
-                        xZoom *= right.Length;
-                        xBimMatrix3D.M11 = xBimMatrix3D.M11 > 0 ? 1 : -1;
-                    }
-                    else if (right.IsParallel(YAxis, 1.0))
-                    {
-                        yZoom *= right.Length;
-                        xBimMatrix3D.M12 = xBimMatrix3D.M12 > 0 ? 1 : -1;
-                    }
-                    else if (right.IsParallel(ZAxis, 1.0))
-                    {
-                        zZoom *= right.Length;
-                        xBimMatrix3D.M13 = xBimMatrix3D.M13 > 0 ? 1 : -1;
-                    }
+                    xZoom = right.Length;
+                    xBimMatrix3D.M11 /= right.Length;
+                    xBimMatrix3D.M12 /= right.Length;
+                    xBimMatrix3D.M13 /= right.Length;
                 }
                 var up = xBimMatrix3D.Up;
-                if (up.Length != 1)
+                if (Math.Abs(up.Length - 1) > 0.01)
                 {
-                    if (up.IsParallel(XAxis, 1.0))
-                    {
-                        xZoom *= up.Length;
-                        xBimMatrix3D.M21 = xBimMatrix3D.M21 > 0 ? 1 : -1;
-                    }
-                    else if (up.IsParallel(YAxis, 1.0))
-                    {
-                        yZoom *= up.Length;
-                        xBimMatrix3D.M22 = xBimMatrix3D.M22 > 0 ? 1 : -1;
-                    }
-                    else if (up.IsParallel(ZAxis, 1.0))
-                    {
-                        zZoom *= up.Length;
-                        xBimMatrix3D.M23 = xBimMatrix3D.M23 > 0 ? 1 : -1;
-                    }
+                    yZoom = up.Length;
+                    xBimMatrix3D.M21 /= up.Length;
+                    xBimMatrix3D.M22 /= up.Length;
+                    xBimMatrix3D.M23 /= up.Length;
                 }
                 var backward = xBimMatrix3D.Backward;
-                if (backward.Length != 1)
+                if (Math.Abs(backward.Length - 1) > 0.01)
                 {
-                    if (backward.IsParallel(XAxis, 1.0))
-                    {
-                        xZoom *= backward.Length;
-                        xBimMatrix3D.M31 = xBimMatrix3D.M31 > 0 ? 1 : -1;
-                    }
-                    else if (backward.IsParallel(YAxis, 1.0))
-                    {
-                        yZoom *= backward.Length;
-                        xBimMatrix3D.M32 = xBimMatrix3D.M32 > 0 ? 1 : -1;
-                    }
-                    else if (backward.IsParallel(ZAxis, 1.0))
-                    {
-                        zZoom *= backward.Length;
-                        xBimMatrix3D.M33 = xBimMatrix3D.M33 > 0 ? 1 : -1;
-                    }
+                    zZoom = backward.Length;
+                    xBimMatrix3D.M31 /= backward.Length;
+                    xBimMatrix3D.M32 /= backward.Length;
+                    xBimMatrix3D.M33 /= backward.Length;
                 }
                 var isRightHandedCoordinate = IsRightHandedCoordinate(xBimMatrix3D);
                 if(!isRightHandedCoordinate)
@@ -992,7 +959,9 @@ namespace ThBIMServer.Ifc2x3
                 IfcRepresentationItem body = model.ToIfcFacetedBrep(def, isRightHandedCoordinate, xZoom, yZoom, zZoom);
                 if (componentData.IfcClassification.StartsWith("IfcBeam"))
                 {
-                    body = model.ToIfcExtrudedAreaSolid(body as IfcFacetedBrep);
+                    XbimMatrix3D m;
+                    body = model.ToIfcExtrudedAreaSolid(body as IfcFacetedBrep, out m);
+                    xBimMatrix3D = m * xBimMatrix3D;
                 }
                 var shape = ThIFC2x3Factory.CreateFaceBasedSurfaceBody(model, body);
                 ret.Representation = ThIFC2x3Factory.CreateProductDefinitionShape(model, shape);

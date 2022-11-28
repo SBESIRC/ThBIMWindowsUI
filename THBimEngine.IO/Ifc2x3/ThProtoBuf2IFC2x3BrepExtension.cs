@@ -98,8 +98,9 @@ namespace ThBIMServer.Ifc2x3
             return NewBrep;
         }
 
-        public static IfcRepresentationItem ToIfcExtrudedAreaSolid(this IfcStore model, IfcFacetedBrep ifcFacetedBrep)
+        public static IfcRepresentationItem ToIfcExtrudedAreaSolid(this IfcStore model, IfcFacetedBrep ifcFacetedBrep, out XbimMatrix3D matrix)
         {
+            matrix = XbimMatrix3D.Identity;
             Xbim.Ifc4.Interfaces.IXbimGeometryEngine geomEngine = new Xbim.Geometry.Engine.Interop.XbimGeometryEngine();
             var solid = geomEngine.CreateSolid(ifcFacetedBrep);
             if (solid.Faces.Count == 6 && solid.Vertices.Count == 8)
@@ -108,7 +109,7 @@ namespace ThBIMServer.Ifc2x3
                 var BeamCrossSections = solid.Faces.OrderBy(o => o.Area).Take(2);
                 var CrossSection1 = BeamCrossSections.First();
                 var CrossSection2 = BeamCrossSections.Last();
-                if (Math.Abs(CrossSection1.Area - CrossSection2.Area) < 10)
+                if (Math.Abs(CrossSection1.Area - CrossSection2.Area) < 10 && CrossSection1.Normal.IsParallel(CrossSection2.Normal, 1) && CrossSection1.OuterBound.Vertices.Count == 4)
                 {
                     var edge = solid.Edges.FirstOrDefault(e => !CrossSection1.OuterBound.Edges.Contains(e) && !CrossSection2.OuterBound.Edges.Contains(e));
                     var pt1 = edge.EdgeStart.VertexGeometry;
@@ -126,9 +127,18 @@ namespace ThBIMServer.Ifc2x3
                     {
                         return ifcFacetedBrep;
                     }
-                    var profile = model.ToIfcArbitraryClosedProfileDef(CrossSection1.OuterBound);
-                    var depth = pt2.PointDistanceToPoint(pt1);
-                    var ifcAreaSolid = model.ToIfcExtrudedAreaSolid(profile, direction, depth);
+                    var pts = CrossSection1.OuterBound.Points.ToList();
+                    var centerPt = pts[0].GetCenter(pts[2]);
+                    var upDirection = pts[2] - pts[1];
+                    matrix = XbimMatrix3D.CreateWorld(centerPt.Point3D2Vector(), direction.Normalized().Negated(), upDirection.Normalized());
+                    matrix.M44 = 1;
+                    matrix.Invert();
+                    var BottomFace = CrossSection1.Transform(matrix) as IXbimFace;
+                    var d = matrix.Transform(direction);
+                    var profile = model.ToIfcArbitraryClosedProfileDef(BottomFace.OuterBound);
+                    var ifcAreaSolid = model.ToIfcExtrudedAreaSolid(profile, new XbimVector3D(0, 0, 1), direction.Length);
+                    matrix = XbimMatrix3D.CreateWorld(centerPt.Point3D2Vector(), direction.Normalized().Negated(), upDirection.Normalized());
+                    matrix.M44 = 1;
                     return ifcAreaSolid;
                 }
             }

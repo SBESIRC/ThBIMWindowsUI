@@ -32,5 +32,9 @@ namespace THBimEngine.Domain
             var disZ = (point.Z - targetPoint.Z);
             return Math.Sqrt(disX * disX + disY * disY + disZ * disZ);
         }
+        public static XbimPoint3D GetCenter(this XbimPoint3D point1, XbimPoint3D point2)
+        {
+            return new XbimPoint3D((point1.X + point2.X) / 2, (point1.Y + point2.Y) / 2, (point1.Z + point2.Z) / 2);
+        }
     }
 }

@@ -12,9 +12,9 @@ using ifc23 = Xbim.Ifc2x3;
 using ThBIMServer.NTS;
 using THBimEngine.Domain;
 
-namespace XbimXplorer.Services
+namespace XbimXplorer.Deduct
 {
-    internal class DeductService
+    public class DeductEngine
     {
         public THBimProject ArchiProject;
         public THBimProject StructProject;
@@ -37,13 +37,15 @@ namespace XbimXplorer.Services
             ////{
             ////    TryIfc23(ifcStore);
             ////}
-
-
-
             /////////////////////////////////////////
+           
+
             if (ifcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
             {
-                DeductIFC23Engine(ifcStore);
+                var engine = new DeductEngine23();
+                engine.IfcStore = ifcStore;
+                engine.ArchiProject = ArchiProject;
+                engine.DeductIFC23Engine();
             }
             else if (ifcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc4)
             {
@@ -153,94 +155,6 @@ namespace XbimXplorer.Services
 
 
 
-        private void DeductIFC23Engine(Xbim.Ifc.IfcStore ifcStore)
-        {
-            var project = ifcStore.Instances.FirstOrDefault<ifc4.Kernel.IfcProject>();
-            var buildlings = project.Sites.FirstOrDefault()?.Buildings.FirstOrDefault() as ifc4.ProductExtension.IfcBuilding;
-            var struStoreys = buildlings.BuildingStoreys.OfType<ifc4.ProductExtension.IfcBuildingStorey>().ToList();
-
-            var storeyWallDict = GetSpIdxIfc23(struStoreys);
-
-            var wlist = new List<THBimWall>();
-            var storeyDict = new Dictionary<string, Dictionary<THBimWall, List<Tuple<ifc4.ProfileResource.IfcProfileDef, ifc4.GeometryResource.IfcAxis2Placement>>>>();
-
-            foreach (var building in ArchiProject.ProjectSite.SiteBuildings)
-            {
-                foreach (var storey in building.Value.BuildingStoreys)
-                {
-                    var wChange = new Dictionary<THBimWall, List<Tuple<ifc4.ProfileResource.IfcProfileDef, ifc4.GeometryResource.IfcAxis2Placement>>>();
-                    storeyDict.Add(storey.Key, wChange);
-                    var storeyItem = storey.Value;
-                    if (storeyItem.MemoryStoreyId == string.Empty || storeyItem.MemoryStoreyId == "")
-                    {
-                        //标准层第一层或非标层
-
-                        var sStorey = struStoreys.Where(x =>
-                        {
-                            double elevation = x.Elevation.Value;
-                            if (Math.Abs(elevation - storeyItem.Elevation) <= 50)
-                                return true;
-                            else
-                                return false;
-                        }).FirstOrDefault();
-
-                        if (sStorey != null)
-                        {
-                            storeyWallDict.TryGetValue(sStorey, out var spIdx);
-
-                            if (spIdx != null)
-                            {
-                                foreach (var w in storeyItem.FloorEntitys)
-                                {
-                                    if (w.Value is THBimWall wallItem)
-                                    {
-                                        wlist.Add(wallItem);
-                                        var selectItem = spIdx.SelectCrossingPolygon(wallItem.GeometryParam as GeometryStretch);
-                                        if (selectItem.Count > 0)
-                                        {
-                                            wChange.Add(wallItem, selectItem);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-
-        }
-        private static Dictionary<ifc4.ProductExtension.IfcBuildingStorey, ThIFCNTSSpatialIndex4> GetSpIdxIfc23(List<ifc4.ProductExtension.IfcBuildingStorey> storeys)
-        {
-            var storeyWallDict = new Dictionary<ifc4.ProductExtension.IfcBuildingStorey, ThIFCNTSSpatialIndex4>();
-            foreach (ifc4.ProductExtension.IfcBuildingStorey BuildingStorey in storeys)
-            {
-                var struProfileInfos = new List<Tuple<ifc4.ProfileResource.IfcProfileDef, ifc4.GeometryResource.IfcAxis2Placement>>();
-                foreach (var containElement in BuildingStorey.ContainsElements)
-                {
-                    var walls = containElement.RelatedElements.OfType<ifc4.SharedBldgElements.IfcWall>().ToList();
-                    foreach (var item in walls)
-                    {
-                        if (item.Representation.Representations[0].Items[0] is ifc4.GeometricModelResource.IfcSweptAreaSolid)
-                        {
-                            var profile = ((ifc4.GeometricModelResource.IfcSweptAreaSolid)item.Representation.Representations[0].Items[0]).SweptArea;
-                            var placement = ((ifc4.GeometricConstraintResource.IfcLocalPlacement)item.ObjectPlacement).RelativePlacement;
-                            var wTuple = Tuple.Create(profile, placement);
-                            struProfileInfos.Add(wTuple);
-                        }
-                        else
-                        {
-                            var area = item.Representation.Representations[0].Items[0];
-                        }
-
-                    }
-                }
-                var spIdx = new ThIFCNTSSpatialIndex4(struProfileInfos);
-                storeyWallDict.Add(BuildingStorey, spIdx);
-            }
-
-            return storeyWallDict;
-        }
 
 
 

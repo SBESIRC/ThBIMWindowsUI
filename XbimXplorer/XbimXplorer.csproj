@@ -219,6 +219,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Extensions\IFCReverse.cs" />
+    <Compile Include="Deduct\DeductService.cs" />
+    <Compile Include="Deduct\DeductEngine23.cs" />
     <Compile Include="NTS\ThBimNTSExtension.cs" />
     <Compile Include="NTS\ThIFCNTSExtension4.cs" />
     <Compile Include="NTS\ThIFCNTSSpatialIndex4.cs" />
@@ -311,7 +313,7 @@
     <Compile Include="IfcValidation\ValidationWindow.xaml.cs">
       <DependentUpon>ValidationWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Services\DeductService.cs" />
+    <Compile Include="Deduct\DeductEngine.cs" />
     <Compile Include="ThBIMEngine\DataToEngine.cs" />
     <Compile Include="ThBIMEngine\ThBimCutData.cs" />
     <Compile Include="ThBIMEngine\ThYDBToIfcConvertService.cs" />

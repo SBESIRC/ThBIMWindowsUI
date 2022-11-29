@@ -50,7 +50,7 @@ namespace THBimEngine.Geometry
             return new XbimVector3D(matrix.Backward.X / matrix.M44, matrix.Backward.Y / matrix.M44, matrix.Backward.Z / matrix.M44);
         }
 
-        public static bool Flipped(this XbimMatrix3D matrix)
+        public static bool IsFlipped(this XbimMatrix3D matrix)
         {
             var dotx = matrix.AxesDotProductX();
             var doty = matrix.AxesDotProductY();

@@ -122,6 +122,10 @@
       <Project>{989bf8b8-dcb6-423a-80d2-3540e8817335}</Project>
       <Name>THBimEngine.Domain</Name>
     </ProjectReference>
+    <ProjectReference Include="..\THBimEngine.Geometry\THBimEngine.Geometry.csproj">
+      <Project>{2284fae2-6876-42cf-886f-b74f8f83df77}</Project>
+      <Name>THBimEngine.Geometry</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

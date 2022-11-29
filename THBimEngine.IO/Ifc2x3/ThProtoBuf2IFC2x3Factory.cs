@@ -20,6 +20,7 @@ using Xbim.Ifc2x3.RepresentationResource;
 using ThBIMServer.NTS;
 using ThBIMServer.Geometries;
 using THBimEngine.Domain;
+using THBimEngine.Geometry;
 
 namespace ThBIMServer.Ifc2x3
 {
@@ -927,31 +928,31 @@ namespace ThBIMServer.Ifc2x3
                 }
                 var xBimMatrix3D = componentData.Transformations.ToXBimMatrix3D();
                 double xZoom = 1.0, yZoom = 1.0, zZoom = 1.0;
-                var right = xBimMatrix3D.Right;
-                if (Math.Abs(right.Length - 1) > 0.01)
+                var XScale = xBimMatrix3D.XScale();
+                if (Math.Abs(XScale - 1) > 0.01)
                 {
-                    xZoom = right.Length;
-                    xBimMatrix3D.M11 /= right.Length;
-                    xBimMatrix3D.M12 /= right.Length;
-                    xBimMatrix3D.M13 /= right.Length;
+                    xZoom = XScale;
+                    xBimMatrix3D.M11 /= XScale;
+                    xBimMatrix3D.M12 /= XScale;
+                    xBimMatrix3D.M13 /= XScale;
                 }
-                var up = xBimMatrix3D.Up;
-                if (Math.Abs(up.Length - 1) > 0.01)
+                var YScale = xBimMatrix3D.YScale();
+                if (Math.Abs(YScale - 1) > 0.01)
                 {
-                    yZoom = up.Length;
-                    xBimMatrix3D.M21 /= up.Length;
-                    xBimMatrix3D.M22 /= up.Length;
-                    xBimMatrix3D.M23 /= up.Length;
+                    yZoom = YScale;
+                    xBimMatrix3D.M21 /= YScale;
+                    xBimMatrix3D.M22 /= YScale;
+                    xBimMatrix3D.M23 /= YScale;
                 }
-                var backward = xBimMatrix3D.Backward;
-                if (Math.Abs(backward.Length - 1) > 0.01)
+                var ZScale = xBimMatrix3D.ZScale();
+                if (Math.Abs(ZScale - 1) > 0.01)
                 {
-                    zZoom = backward.Length;
-                    xBimMatrix3D.M31 /= backward.Length;
-                    xBimMatrix3D.M32 /= backward.Length;
-                    xBimMatrix3D.M33 /= backward.Length;
+                    zZoom = ZScale;
+                    xBimMatrix3D.M31 /= ZScale;
+                    xBimMatrix3D.M32 /= ZScale;
+                    xBimMatrix3D.M33 /= ZScale;
                 }
-                var isRightHandedCoordinate = IsRightHandedCoordinate(xBimMatrix3D);
+                var isRightHandedCoordinate = !xBimMatrix3D.IsFlipped();
                 if(!isRightHandedCoordinate)
                 {
                     xBimMatrix3D = ThProtoBufExtension.XZMatrix * xBimMatrix3D;
@@ -1031,11 +1032,6 @@ namespace ThBIMServer.Ifc2x3
                 return ret;
             }
 
-        }
-
-        private static bool IsRightHandedCoordinate(XbimMatrix3D matrix)
-        {
-            return matrix.Backward.Angle(matrix.Right.CrossProduct(matrix.Up)) < 1e-4;
         }
         #endregion
     }

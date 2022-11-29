@@ -191,29 +191,86 @@ namespace XbimXplorer.Deduct
             for (int i = 0; i < newWallOutline.Count; i++)
             {
                 var geom = oriWall.GeometryParam.Clone() as GeometryParam;
-                if (oriWall.GeometryParam is GeometryStretch)
+                if (geom is GeometryStretch geomS)
                 {
-                    foreach (var pt in newWallOutline[i].Shell.Coordinates)
-                    {
-                        ((GeometryStretch)geom).Outline = new ThTCHMPolygon();
-                }
+                    geomS.Outline = new ThTCHMPolygon() { Shell = newWallOutline[i].ToTCHPolyline() };
                 }
 
+                var id = Convert.ToInt32(oriWall.Id.ToString() + i.ToString());
+                var name = oriWall.Name;
+                var material = oriWall.Material;
+                var describe = oriWall.Describe;
+                var uid = System.Guid.NewGuid().ToString();
 
-                var bimWall = new THBimWall(Convert.ToInt32(oriWall.Id.ToString() + i.ToString()), oriWall.Name, oriWall.Material, geom, "", wall.BuildElement.Root.GlobalId);
+                var bimWall = new THBimWall(id, name, material, geom, describe, uid);
+                bimWall.ParentUid = oriWall.ParentUid;
+                bimWall.Matrix3D = oriWall.Matrix3D;
+                foreach (var pair in oriWall.Properties)
+                {
+                    bimWall.Properties.Add(pair.Key, pair.Value);
+                }
+
+                //add opening
+
+
+
+
+                newBimWall.Add(bimWall);
+
 
             }
 
-
-
-
-
-
-
-
-
-
             return newBimWall;
         }
+
+        public static void UpdateProject(THBimProject archiProject, Dictionary<string, Tuple<bool, List<THBimWall>>> wallCutResult)
+        {
+            foreach (var building in archiProject.ProjectSite.SiteBuildings)
+            {
+                foreach (var storey in building.Value.BuildingStoreys)
+                {
+                    foreach (var wallCut in wallCutResult)
+                    {
+                        if (wallCut.Value.Item2.Count > 0)
+                        {
+                            //删掉墙 这里不能和只删一起做，有才加有些楼层没有墙实体
+                            storey.Value.FloorEntitys.TryGetValue(wallCut.Key, out var oriWallBimModel);
+                            if (oriWallBimModel != null)
+                            {
+                                storey.Value.FloorEntitys.Remove(wallCut.Key);
+                                wallCut.Value.Item2.ForEach(x => storey.Value.FloorEntitys.Add(x.Uid, x));
+
+                            }
+                            //关系
+                            var relations = storey.Value.FloorEntityRelations.Values.Where(x => x.RelationElementUid == wallCut.Key).ToList();
+                            if (relations.Any())
+                            {
+                                relations.ForEach(x => storey.Value.FloorEntityRelations.Remove(x.Uid));
+                                foreach (var bimWall in wallCut.Value.Item2)
+                                {
+                                    var uid = System.Guid.NewGuid().ToString();
+                                    var relationsNew = new THBimElementRelation(bimWall.Id, bimWall.Name, bimWall, bimWall.Describe, bimWall.Uid);
+                                    storey.Value.FloorEntityRelations.Add(relationsNew.Uid, relationsNew);
+                                }
+                            }
+                        }
+                        else if (wallCut.Value.Item1 == true)
+                        {
+                            //删掉墙
+                            storey.Value.FloorEntitys.TryGetValue(wallCut.Key, out var oriWallBimModel);
+                            if (oriWallBimModel != null)
+                            {
+                                storey.Value.FloorEntitys.Remove(wallCut.Key);
+                            }
+                            //关系
+                            var relations = storey.Value.FloorEntityRelations.Values.Where(x => x.RelationElementUid == wallCut.Key).ToList();
+                            relations.ForEach(x => storey.Value.FloorEntityRelations.Remove(x.Uid));
+                        }
+                    }
+                }
+            }
+
+        }
+
     }
 }

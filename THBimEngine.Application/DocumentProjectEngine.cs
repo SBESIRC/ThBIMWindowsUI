@@ -138,7 +138,28 @@ namespace THBimEngine.Application
             HaveChange = true;
         }
 
-        
+        public void AddProject(THDocument currentDocument , THBimProject project, ProjectParameter projectParameter)
+        {
+            HaveChange = false;
+            convertFactory = new THProjectDataConvertFactory(Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3);
+            bool isAdd = currentDocument.IsAddProject(projectParameter.ProjectId);
+
+            if (isAdd)
+            {
+             
+            }
+            else
+            {
+                var convertResult = convertFactory.ProjectConvert(project, false);
+                convertResult.BimProject.Matrix3D = projectParameter.Matrix3D;
+                convertResult.BimProject.ApplcationName = projectParameter.Source;
+                convertResult.BimProject.ProjectIdentity = projectParameter.ProjectId;
+                convertResult.BimProject.Major = projectParameter.Major;
+                UpdateProject(currentDocument, convertResult);
+            }
+
+        }
+
         private void UpdateProject(THDocument currentDocument, ConvertResult projectResult)
         {
             var prjId = projectResult.BimProject.Uid;

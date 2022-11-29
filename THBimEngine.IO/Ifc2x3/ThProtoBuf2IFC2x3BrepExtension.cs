@@ -76,20 +76,20 @@ namespace ThBIMServer.Ifc2x3
             return faceBasedSurface;
         }
 
-        public static IfcFacetedBrep ToIfcFacetedBrep(this IfcStore model, ThSUCompDefinitionData def, bool isRightHandedCoordinate = true, double xZoom = 1.0, double yZoom = 1.0, double zZoom = 1.0)
+        public static IfcFacetedBrep ToIfcFacetedBrep(this IfcStore model, ThSUCompDefinitionData def, XbimMatrix3D matrix)
         {
             var NewBrep = model.Instances.New<IfcFacetedBrep>();
             var ifcClosedShell = model.Instances.New<IfcClosedShell>();
             foreach (var face in def.BrepFaces)
             {
                 var ifcface = model.Instances.New<IfcFace>();
-                ifcface.Bounds.Add(model.ToIfcFaceOuterBound(face.OuterLoop.Points.Select(o => new ThTCHPoint3d() { X = o.X * xZoom, Y = (isRightHandedCoordinate ? 1 : -1) * o.Y * yZoom, Z = o.Z * zZoom }).ToList()));
+                ifcface.Bounds.Add(model.ToIfcFaceOuterBound(face.OuterLoop.Points.Select(o => matrix.Transform(o.Point3D2XBimPoint())).ToList()));
                 var innerBounds = face.InnerLoops;
                 if (innerBounds != null && innerBounds.Count > 0)
                 {
                     foreach (var innerBound in innerBounds)
                     {
-                        ifcface.Bounds.Add(model.ToIfcFaceBound(innerBound.Points.Select(o => new ThTCHPoint3d() { X = o.X * xZoom, Y = (isRightHandedCoordinate ? 1 : -1) * o.Y * yZoom, Z = o.Z * zZoom }).ToList()));
+                        ifcface.Bounds.Add(model.ToIfcFaceBound(innerBound.Points.Select(o => matrix.Transform(o.Point3D2XBimPoint())).ToList()));
                     }
                 }
                 ifcClosedShell.CfsFaces.Add(ifcface);
@@ -98,9 +98,8 @@ namespace ThBIMServer.Ifc2x3
             return NewBrep;
         }
 
-        public static IfcRepresentationItem ToIfcExtrudedAreaSolid(this IfcStore model, IfcFacetedBrep ifcFacetedBrep, out XbimMatrix3D matrix)
+        public static IfcRepresentationItem BeamToIfcExtrudedAreaSolid(this IfcStore model, IfcFacetedBrep ifcFacetedBrep, out XbimMatrix3D matrix)
         {
-            matrix = XbimMatrix3D.Identity;
             Xbim.Ifc4.Interfaces.IXbimGeometryEngine geomEngine = new Xbim.Geometry.Engine.Interop.XbimGeometryEngine();
             var solid = geomEngine.CreateSolid(ifcFacetedBrep);
             if (solid.Faces.Count == 6 && solid.Vertices.Count == 8)
@@ -109,7 +108,7 @@ namespace ThBIMServer.Ifc2x3
                 var BeamCrossSections = solid.Faces.OrderBy(o => o.Area).Take(2);
                 var CrossSection1 = BeamCrossSections.First();
                 var CrossSection2 = BeamCrossSections.Last();
-                if (Math.Abs(CrossSection1.Area - CrossSection2.Area) < 10 && CrossSection1.Normal.IsParallel(CrossSection2.Normal, 1) && CrossSection1.OuterBound.Vertices.Count == 4)
+                if (Math.Abs(CrossSection1.Area - CrossSection2.Area) < 10 && CrossSection1.Normal.IsParallel(CrossSection2.Normal, THBimDomainCommon.AngleTolerance) && CrossSection1.OuterBound.Vertices.Count == 4)
                 {
                     var edge = solid.Edges.FirstOrDefault(e => !CrossSection1.OuterBound.Edges.Contains(e) && !CrossSection2.OuterBound.Edges.Contains(e));
                     var pt1 = edge.EdgeStart.VertexGeometry;
@@ -125,6 +124,7 @@ namespace ThBIMServer.Ifc2x3
                     }
                     else
                     {
+                        matrix = XbimMatrix3D.Identity;
                         return ifcFacetedBrep;
                     }
                     var pts = CrossSection1.OuterBound.Points.ToList();
@@ -134,7 +134,6 @@ namespace ThBIMServer.Ifc2x3
                     matrix.M44 = 1;
                     matrix.Invert();
                     var BottomFace = CrossSection1.Transform(matrix) as IXbimFace;
-                    var d = matrix.Transform(direction);
                     var profile = model.ToIfcArbitraryClosedProfileDef(BottomFace.OuterBound);
                     var ifcAreaSolid = model.ToIfcExtrudedAreaSolid(profile, new XbimVector3D(0, 0, 1), direction.Length);
                     matrix = XbimMatrix3D.CreateWorld(centerPt.Point3D2Vector(), direction.Normalized().Negated(), upDirection.Normalized());
@@ -142,12 +141,80 @@ namespace ThBIMServer.Ifc2x3
                     return ifcAreaSolid;
                 }
             }
+            matrix = XbimMatrix3D.Identity;
             return ifcFacetedBrep;
         }
 
-        private static IfcFaceOuterBound ToIfcFaceOuterBound(this IfcStore model, List<ThTCHPoint3d> vertices)
+        public static IfcRepresentationItem ConstructToIfcExtrudedAreaSolid(this IfcStore model, IfcFacetedBrep ifcFacetedBrep, out XbimMatrix3D matrix)
+        {
+            Xbim.Ifc4.Interfaces.IXbimGeometryEngine geomEngine = new Xbim.Geometry.Engine.Interop.XbimGeometryEngine();
+            var solid = geomEngine.CreateSolid(ifcFacetedBrep);
+            IXbimFace lowXbimFace = null, highXbimFace = null;
+            int verticalPlane = 0;
+            bool CanCreatSolid = true;
+            foreach (var face in solid.Faces)
+            {
+                if (face.Normal.IsParallel(THBimDomainCommon.ZAxis, THBimDomainCommon.AngleTolerance))
+                {
+                    if (lowXbimFace == null)
+                    {
+                        lowXbimFace = face;
+                    }
+                    else if (highXbimFace == null)
+                    {
+                        if (face.OuterBound.Vertices.First().VertexGeometry.Z > lowXbimFace.OuterBound.Vertices.First().VertexGeometry.Z)
+                        {
+                            highXbimFace = face;
+                        }
+                        else
+                        {
+                            highXbimFace = lowXbimFace;
+                            lowXbimFace = face;
+                        }
+                    }
+                    else
+                    {
+                        CanCreatSolid = false;
+                        break;
+                    }
+                }
+                else if (face.Normal.IsVertical(THBimDomainCommon.ZAxis, THBimDomainCommon.AngleTolerance))
+                    verticalPlane++;
+                else
+                {
+                    CanCreatSolid = false;
+                    break;
+                }
+            }
+            if (CanCreatSolid && lowXbimFace != null && highXbimFace != null && Math.Abs(lowXbimFace.Area - highXbimFace.Area) < 10 && verticalPlane >= 4)
+            {
+                var centerPt = lowXbimFace.OuterBound.Points.GetPlaneCenter();
+                var silidHeight = highXbimFace.OuterBound.Points.First().Z - lowXbimFace.OuterBound.Points.First().Z;
+                matrix = XbimMatrix3D.CreateWorld(centerPt.Point3D2Vector(), THBimDomainCommon.ZAxis.Negated(), THBimDomainCommon.YAxis);
+                matrix.M44 = 1;
+                matrix.Invert();
+                var BottomFace = lowXbimFace.Transform(matrix) as IXbimFace;
+                var profile = model.ToIfcArbitraryClosedProfileDef(BottomFace.OuterBound);
+                var ifcAreaSolid = model.ToIfcExtrudedAreaSolid(profile, new XbimVector3D(0, 0, 1), silidHeight);
+                matrix = XbimMatrix3D.CreateWorld(centerPt.Point3D2Vector(), THBimDomainCommon.ZAxis.Negated(), THBimDomainCommon.YAxis);
+                matrix.M44 = 1;
+                return ifcAreaSolid;
+            }
+            matrix = XbimMatrix3D.Identity;
+            return ifcFacetedBrep;
+        }
+
+        private static IfcFaceOuterBound ToIfcFaceOuterBound(this IfcStore model, List<XbimPoint3D> vertices)
         {
             return model.Instances.New<IfcFaceOuterBound>(b =>
+            {
+                b.Bound = model.ToIfcPolyLoop(vertices);
+            });
+        }
+
+        private static IfcFaceBound ToIfcFaceBound(this IfcStore model, List<XbimPoint3D> vertices)
+        {
+            return model.Instances.New<IfcFaceBound>(b =>
             {
                 b.Bound = model.ToIfcPolyLoop(vertices);
             });
@@ -161,10 +228,20 @@ namespace ThBIMServer.Ifc2x3
             });
         }
 
+        private static IfcPolyLoop ToIfcPolyLoop(this IfcStore model, List<XbimPoint3D> vertices)
+        {
+            var polyLoop = model.Instances.New<IfcPolyLoop>();
+            foreach (var v in vertices)
+            {
+                polyLoop.Polygon.Add(model.ToIfcCartesianPoint(v));
+            }
+            return polyLoop;
+        }
+
         private static IfcPolyLoop ToIfcPolyLoop(this IfcStore model, List<ThTCHPoint3d> vertices)
         {
             var polyLoop = model.Instances.New<IfcPolyLoop>();
-            foreach (ThTCHPoint3d v in vertices)
+            foreach (var v in vertices)
             {
                 polyLoop.Polygon.Add(model.ToIfcCartesianPoint(v));
             }

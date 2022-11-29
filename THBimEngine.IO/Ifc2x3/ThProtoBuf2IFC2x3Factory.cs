@@ -926,49 +926,21 @@ namespace ThBIMServer.Ifc2x3
                         }
                     }
                 }
-                var xBimMatrix3D = componentData.Transformations.ToXBimMatrix3D();
-                double xZoom = 1.0, yZoom = 1.0, zZoom = 1.0;
-                var XScale = xBimMatrix3D.XScale();
-                if (Math.Abs(XScale - 1) > 0.01)
-                {
-                    xZoom = XScale;
-                    xBimMatrix3D.M11 /= XScale;
-                    xBimMatrix3D.M12 /= XScale;
-                    xBimMatrix3D.M13 /= XScale;
-                }
-                var YScale = xBimMatrix3D.YScale();
-                if (Math.Abs(YScale - 1) > 0.01)
-                {
-                    yZoom = YScale;
-                    xBimMatrix3D.M21 /= YScale;
-                    xBimMatrix3D.M22 /= YScale;
-                    xBimMatrix3D.M23 /= YScale;
-                }
-                var ZScale = xBimMatrix3D.ZScale();
-                if (Math.Abs(ZScale - 1) > 0.01)
-                {
-                    zZoom = ZScale;
-                    xBimMatrix3D.M31 /= ZScale;
-                    xBimMatrix3D.M32 /= ZScale;
-                    xBimMatrix3D.M33 /= ZScale;
-                }
-                var isRightHandedCoordinate = !xBimMatrix3D.IsFlipped();
-                if(!isRightHandedCoordinate)
-                {
-                    xBimMatrix3D = ThProtoBufExtension.XZMatrix * xBimMatrix3D;
-                }
-                IfcRepresentationItem body = model.ToIfcFacetedBrep(def, isRightHandedCoordinate, xZoom, yZoom, zZoom);
+                IfcRepresentationItem body = model.ToIfcFacetedBrep(def, componentData.Transformations.ToXBimMatrix3D());
+                var objectPlacement = XbimMatrix3D.Identity;
                 if (componentData.IfcClassification.StartsWith("IfcBeam"))
                 {
-                    XbimMatrix3D m;
-                    body = model.ToIfcExtrudedAreaSolid(body as IfcFacetedBrep, out m);
-                    xBimMatrix3D = m * xBimMatrix3D;
+                    body = model.BeamToIfcExtrudedAreaSolid(body as IfcFacetedBrep, out objectPlacement);
+                }
+                else if (componentData.IfcClassification.StartsWith("IfcColumn") || componentData.IfcClassification.StartsWith("IfcWall"))
+                {
+                    body = model.ConstructToIfcExtrudedAreaSolid(body as IfcFacetedBrep, out objectPlacement);
                 }
                 var shape = ThIFC2x3Factory.CreateFaceBasedSurfaceBody(model, body);
                 ret.Representation = ThIFC2x3Factory.CreateProductDefinitionShape(model, shape);
 
                 //object placement
-                ret.ObjectPlacement = model.ToIfcLocalPlacement(xBimMatrix3D);
+                ret.ObjectPlacement = model.ToIfcLocalPlacement(objectPlacement);
 
                 txn.Commit();
                 return ret;

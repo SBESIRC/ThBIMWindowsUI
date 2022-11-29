@@ -42,7 +42,7 @@ namespace XbimXplorer.Deduct
 
             var wallCutResult = CutBimWall(deductWall);
 
-            UpdateProject(wallCutResult);
+            DeductService.UpdateProject(ArchiProject, wallCutResult);
 
 
             /////////////////////////////
@@ -160,6 +160,16 @@ namespace XbimXplorer.Deduct
 
         }
 
+
+
+        /// <summary>
+        /// key：原墙uid
+        /// value ：item1 是否只删除原墙， item2代替的新墙
+        /// 如果返回值count=0  => onlyDelete = true 只删除墙， onlyDelete = false 则保留原墙
+        /// 返回值count>0 -> 删除原墙，用新墙代替
+        /// </summary>
+        /// <param name="deductWall"></param>
+        /// <returns></returns>
         private static Dictionary<string, Tuple<bool, List<THBimWall>>> CutBimWall(Dictionary<string, Dictionary<THBimWall, List<Tuple<IfcProfileDef, IfcAxis2Placement>>>> deductWall)
         {
             ////////////////////////
@@ -184,34 +194,12 @@ namespace XbimXplorer.Deduct
                         newBimWall = DeductService.ToThBimWall(wallCutPair.Key, newWall);
                     }
 
-                    wallCutDict.Add(wallCutPair.Key.Uid, new Tuple<bool, List<Polygon>>(onlyDelete, newBimWall));
+                    wallCutDict.Add(wallCutPair.Key.Uid, new Tuple<bool, List<THBimWall>>(onlyDelete, newBimWall));
                 }
             }
 
             return wallCutDict;
         }
 
-        private void UpdateProject(Dictionary<string, Tuple<bool, List<THBimWall>>> wallCutResult)
-        {
-            foreach (var building in ArchiProject.ProjectSite.SiteBuildings)
-            {
-                foreach (var storey in building.Value.BuildingStoreys)
-                {
-                    foreach (var wall in storey.Value.FloorEntitys)
-                    {
-                        //wall.key == wallcutresult.key
-                    }
-                    foreach (var wall in storey.Value.FloorEntityRelations)
-                    {
-                        //wall.value.relationelementuid == wallcutresult.key
-
-                    }
-
-
-
-                }
-            }
-
-        }
     }
 }

@@ -32,6 +32,8 @@ namespace THBimEngine.Application
                 convertResult.BimProject.ApplcationName = projectParameter.Source;
                 convertResult.BimProject.ProjectIdentity = projectParameter.ProjectId;
                 convertResult.BimProject.Major = projectParameter.Major;
+                var findPrject = currentDocument.GetProject(projectParameter.ProjectId);
+                findPrject.SourceProject = project;
                 foreach (var item in currentDocument.UnShowEntityTypes) 
                 {
                     convertResult.BimProject.UnShowEntityTypes.Add(item);
@@ -66,6 +68,8 @@ namespace THBimEngine.Application
 
                 var convertResult = convertFactory.ProjectConvert(project, false);
                 convertResult.BimProject.Matrix3D = projectParameter.Matrix3D;
+                var findPrject = currentDocument.GetProject(projectParameter.ProjectId);
+                findPrject.SourceProject = project;
                 UpdateProject(currentDocument,convertResult);
             }
             else
@@ -116,6 +120,8 @@ namespace THBimEngine.Application
             if (!isAdd)
             {
                 //这里增量跟新没有做，先删除原来的数据，再增加现在的数据
+                var findPrject = currentDocument.GetProject(projectParameter.ProjectId);
+                findPrject.SourceProject = ifcStore;
                 currentDocument.DeleteProject(ifcStore.FileName);
             }
             var prjName = Path.GetFileNameWithoutExtension(ifcStore.FileName);

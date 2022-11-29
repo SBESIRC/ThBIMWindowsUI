@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using THBimEngine.Domain;
 using Xbim.Common.Geometry;
 using Xbim.Ifc;
@@ -76,6 +77,11 @@ namespace THBimEngine.Application
 				}
 			}
 			return isAdd;
+		}
+
+		public THBimProject GetProject(string prjIdentity)
+        {
+			return AllBimProjects.FirstOrDefault(o => o.ProjectIdentity.Equals(prjIdentity));
 		}
 		/// <summary>
 		/// 加入项目

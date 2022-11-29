@@ -1072,7 +1072,15 @@ namespace XbimXplorer
                         var dirName = Path.GetDirectoryName(ifcStore.FileName);
                         fileName = string.Format("{0}-100%.ifc", fileName);
                         var newName = Path.Combine(dirName, fileName);
-                        mergeIfc.SaveAs(newName);
+                        if (mergeIfc != null)
+                        {
+                            mergeIfc.SaveAs(newName);
+                            mergeIfc.Dispose();
+                        }
+                        else
+                        {
+                            ifcStore.SaveAs(newName);
+                        }
                         MessageBox.Show($"上传成功!", "上传成功", MessageBoxButton.OK);
                     }
                     catch

@@ -221,9 +221,6 @@
     <Compile Include="Extensions\IFCReverse.cs" />
     <Compile Include="Deduct\DeductService.cs" />
     <Compile Include="Deduct\DeductEngine23.cs" />
-    <Compile Include="NTS\ThBimNTSExtension.cs" />
-    <Compile Include="NTS\ThIFCNTSExtension4.cs" />
-    <Compile Include="NTS\ThIFCNTSSpatialIndex4.cs" />
     <Compile Include="Project\BoolToVisibilty.cs" />
     <Compile Include="Business\RenderEngineToHome.cs" />
     <Compile Include="Commands\Fix.cs" />

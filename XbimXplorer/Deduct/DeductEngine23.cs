@@ -40,7 +40,35 @@ namespace XbimXplorer.Deduct
             var storeyWallDict = GetSpIdxIfc23(struStoreys, out var wallTupleDict);
             var deductWall = DeductWall(struStoreys, storeyWallDict);
 
+            var debug = new Dictionary<THBimWall, List<string>>();
+
+            foreach (var s in deductWall)
+            {
+                foreach (var cutWall in s.Value)
+                {
+                    var swall = new List<string>();
+
+
+                    foreach (var ifc in cutWall.Value)
+                    {
+                        var suid = wallTupleDict.Where(x => x.Value == ifc).FirstOrDefault().Key;
+                        swall.Add(suid);
+                    }
+
+                    debug.Add(cutWall.Key, swall);
+                }
+            }
+
+            var focus = debug.Where(x => x.Value.Contains("3ay4D6Fz8HxR8p0AOO8G05"));
+
             var wallCutResult = CutBimWall(deductWall);
+
+
+            var wallnew = wallCutResult.ElementAt(0).Value.Item2;
+            var wallori = debug.ElementAt(0).Key;
+
+
+            DeductService.UpdateNewWallGeom(ref wallCutResult);
 
             DeductService.UpdateProject(ref ArchiProject, wallCutResult);
 
@@ -191,7 +219,7 @@ namespace XbimXplorer.Deduct
                     var newBimWall = new List<THBimWall>();
                     if (onlyDelete == false)
                     {
-                        newBimWall .AddRange ( DeductService.ToThBimWall(wallCutPair.Key, newWall));
+                        newBimWall.AddRange(DeductService.ToThBimWall(wallCutPair.Key, newWall));
                     }
 
                     wallCutDict.Add(wallCutPair.Key.Uid, new Tuple<bool, List<THBimWall>>(onlyDelete, newBimWall));

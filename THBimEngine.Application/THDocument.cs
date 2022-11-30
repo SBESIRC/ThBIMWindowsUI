@@ -105,6 +105,10 @@ namespace THBimEngine.Application
 			{
 				projectEngine.AddProject(this, thSUProject, projectParameter);
 			}
+            else if (project is THBimProject thBimProject)
+            {
+                projectEngine.AddProject(this, thBimProject, projectParameter);
+            }
 			else 
 			{
 				throw new NotSupportedException();

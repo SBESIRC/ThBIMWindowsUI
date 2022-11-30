@@ -106,7 +106,7 @@ namespace XbimXplorer.Deduct
             return notsmall;
         }
 
-        private static Polygon ToObb(this Geometry geom)
+        private static Polygon ToObb(this NetTopologySuite.Geometries.Geometry geom)
         {
             var rectangle = MinimumDiameter.GetMinimumRectangle(geom);
             if (rectangle is Polygon polygon)

@@ -230,6 +230,86 @@ namespace ThBIMServer.Ifc2x3
             }
         }
 
+        public static IfcBuildingStorey CreateStorey(IfcStore model, IfcBuilding building, ThBimStoreyManager storey)
+        {
+            using (var txn = model.BeginTransaction("Create Storey"))
+            {
+                var ret = model.Instances.New<IfcBuildingStorey>(s =>
+                {
+                    s.Name = storey.Name;
+                    s.ObjectPlacement = model.ToIfcLocalPlacement(building.ObjectPlacement);
+                    s.Elevation = storey.Elevation;
+                    s.GlobalId = IfcGloballyUniqueId.FromGuid(Guid.NewGuid());
+                });
+                model.Instances.New<IfcRelDefinesByProperties>(rel =>
+                {
+                    rel.Name = "THifc properties";
+                    rel.RelatedObjects.Add(ret);
+                    rel.RelatingPropertyDefinition = model.Instances.New<IfcPropertySet>(pset =>
+                    {
+                        pset.Name = "Custom";
+                        pset.HasProperties.Add(model.Instances.New<IfcPropertySingleValue>(p =>
+                        {
+                            p.Name = "FloorNo";
+                            p.NominalValue = new IfcText(storey.Name);
+                        }));
+                        pset.HasProperties.Add(model.Instances.New<IfcPropertySingleValue>(p =>
+                        {
+                            p.Name = "Height";
+                            p.NominalValue = new IfcLengthMeasure(storey.Height);
+                        }));
+                        //pset.HasProperties.Add(model.Instances.New<IfcPropertySingleValue>(p =>
+                        //{
+                        //    p.Name = "StdFlrNo";
+                        //    p.NominalValue = new IfcText(storey.Name.ToString());
+                        //}));
+                    });
+                });
+                txn.Commit();
+                return ret;
+            }
+        }
+
+        public static IfcBuildingStorey CreateStorey(IfcStore model, IfcBuilding building, IfcBuildingStorey storey)
+        {
+            using (var txn = model.BeginTransaction("Create Storey"))
+            {
+                var ret = model.Instances.New<IfcBuildingStorey>(s =>
+                {
+                    s.Name = storey.Name;
+                    s.ObjectPlacement = model.ToIfcLocalPlacement(building.ObjectPlacement);
+                    s.Elevation = storey.Elevation;
+                    s.GlobalId = IfcGloballyUniqueId.FromGuid(Guid.NewGuid());
+                });
+                model.Instances.New<IfcRelDefinesByProperties>(rel =>
+                {
+                    rel.Name = "THifc properties";
+                    rel.RelatedObjects.Add(ret);
+                    rel.RelatingPropertyDefinition = model.Instances.New<IfcPropertySet>(pset =>
+                    {
+                        pset.Name = "Custom";
+                        pset.HasProperties.Add(model.Instances.New<IfcPropertySingleValue>(p =>
+                        {
+                            p.Name = "FloorNo";
+                            p.NominalValue = new IfcText(storey.Name);
+                        }));
+                        //pset.HasProperties.Add(model.Instances.New<IfcPropertySingleValue>(p =>
+                        //{
+                        //    p.Name = "Height";
+                        //    p.NominalValue = new IfcLengthMeasure(storey.Height);
+                        //}));
+                        //pset.HasProperties.Add(model.Instances.New<IfcPropertySingleValue>(p =>
+                        //{
+                        //    p.Name = "StdFlrNo";
+                        //    p.NominalValue = new IfcText(storey.Name.ToString());
+                        //}));
+                    });
+                });
+                txn.Commit();
+                return ret;
+            }
+        }
+
         private static IfcProductDefinitionShape CreateProductDefinitionShape(IfcStore model, IfcExtrudedAreaSolid solid)
         {
             var shape = ThIFC2x3Factory.CreateSweptSolidBody(model, solid);

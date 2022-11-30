@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using THBimEngine.Application;
+using THBimEngine.Domain;
 using ThBIMServer.Ifc2x3;
 using Xbim.Common;
 using Xbim.Ifc;
@@ -310,6 +312,119 @@ namespace XbimXplorer.Extensions.ModelMerge
             ThProtoBuf2IFC2x3RelAggregatesFactory.Create(bigModel, bigBuildings, storeys);
             //返回
             return bigModel;
+        }
+
+        /// <summary>
+        /// 结构和建筑合模(合模IFC内部的多个Site)
+        /// </summary>
+        public IfcStore ModelMerge(THDocument currentDocument, IfcStore model)
+        {
+            var modelProject = model.Instances.FirstOrDefault<Xbim.Ifc2x3.Kernel.IfcProject>();
+            if(modelProject == null)
+            {
+                return null;
+            }
+            var NewModel = ThProtoBuf2IFC2x3Factory.CreateAndInitModel(modelProject.Name);
+            var site = ThProtoBuf2IFC2x3Factory.CreateSite(NewModel);
+            IfcBuilding building = ThProtoBuf2IFC2x3Factory.CreateBuilding(NewModel, site, "Default Building");
+            var allFloors = ProjectExtension.AllProjectStoreys(currentDocument.AllBimProjects);
+            var storeys = new List<IfcBuildingStorey>();
+            //foreach (var floor in allFloors)
+            //{
+            //    var storey = ThProtoBuf2IFC2x3Factory.CreateStorey(NewModel, building, floor);
+            //    storeys.Add(storey);
+            //}
+            foreach (IfcBuildingStorey floor in modelProject.Sites.First().Buildings.First().BuildingStoreys)
+            {
+                var storey = ThProtoBuf2IFC2x3Factory.CreateStorey(NewModel, building, floor);
+                storeys.Add(storey);
+            }
+            // IfcRelAggregates 关系
+            ThProtoBuf2IFC2x3RelAggregatesFactory.Create(NewModel, building, storeys);
+            #region Insert Copy Function
+            PropertyTranformDelegate semanticFilter = (property, parentObject) =>
+            {
+                return property.PropertyInfo.GetValue(parentObject, null);
+            };
+            //single map should be used for all insertions between two models
+            var map = new XbimInstanceHandleMap(model, NewModel);
+            #endregion
+
+            
+            var modelSites = modelProject.Sites;
+            var relVoidsElements = model.Instances.OfType<IfcRelVoidsElement>();//洞口
+            var relFillsElements = model.Instances.OfType<IfcRelFillsElement>();//洞口内包含的构建
+            foreach (var modelSite in modelSites)
+            {
+                var modelBuilding = modelSite.Buildings.FirstOrDefault() as IfcBuilding;
+                foreach (IfcBuildingStorey BuildingStorey in modelBuilding.BuildingStoreys)
+                {
+                    IfcBuildingStorey storey = (IfcBuildingStorey)building.BuildingStoreys.FirstOrDefault(o => Math.Abs(o.Elevation.Value - BuildingStorey.Elevation.Value) < 200);
+                    if (storey != null)
+                    {
+                        var CreatElements = new List<Xbim.Ifc2x3.Kernel.IfcProduct>();
+                        foreach (var spatialStructure in BuildingStorey.ContainsElements)
+                        {
+                            var elements = spatialStructure.RelatedElements;
+                            using (var txn = NewModel.BeginTransaction("Insert copy"))
+                            {
+                                foreach(var e in elements)
+                                {
+                                    if (e is Xbim.Ifc2x3.SharedBldgElements.IfcWall wall)
+                                    {
+                                        var newWall = NewModel.InsertCopy(wall, map, semanticFilter, false, false);
+                                        var wall_relVoidsElements = relVoidsElements.Where(o => o.RelatingBuildingElement == wall);
+                                        foreach (var voildElementHole in wall_relVoidsElements)
+                                        {
+                                            var hole = voildElementHole.RelatedOpeningElement as IfcOpeningElement;
+                                            var newHole = NewModel.InsertCopy(hole, map, semanticFilter, false, false);
+                                            //ThProtoBuf2IFC2x3Builder.SetupHole(NewModel, storey, newWall, newHole);
+                                            var relVoidsElement = NewModel.Instances.New<IfcRelVoidsElement>();
+                                            relVoidsElement.RelatedOpeningElement = newHole;
+                                            relVoidsElement.RelatingBuildingElement = newWall;
+
+                                            var relFillsElement = relFillsElements.FirstOrDefault(o => o.RelatingOpeningElement == hole);
+                                            if(relFillsElement != null)
+                                            {
+                                                var ifcBuildingElement = relFillsElement.RelatedBuildingElement;
+                                                var newBuildingElement = NewModel.InsertCopy(ifcBuildingElement, map, semanticFilter, false, false);
+                                                var FillsElement = NewModel.Instances.New<IfcRelFillsElement>();
+                                                FillsElement.RelatingOpeningElement = newHole;
+                                                FillsElement.RelatedBuildingElement = newBuildingElement;
+                                                CreatElements.Add(newBuildingElement);
+                                            }
+                                        }
+                                        CreatElements.Add(newWall);
+                                    }
+                                    else if (e is Xbim.Ifc2x3.SharedBldgElements.IfcDoor || e is Xbim.Ifc2x3.SharedBldgElements.IfcWindow)
+                                    {
+                                        //do not
+                                    }
+                                    else
+                                    {
+                                        var newElement = NewModel.InsertCopy(e, map, semanticFilter, false, false);
+                                        CreatElements.Add(newElement);
+                                    }
+                                }
+                                txn.Commit();
+                            }
+                        }
+                        using (var txn = NewModel.BeginTransaction("relContainEntitys2Storey"))
+                        {
+                            //for ifc2x3
+                            var relContainedIn = NewModel.Instances.New<IfcRelContainedInSpatialStructure>();
+                            storey.ContainsElements.Append<Xbim.Ifc2x3.Interfaces.IIfcRelContainedInSpatialStructure>(relContainedIn);
+
+                            relContainedIn.RelatingStructure = storey;
+                            relContainedIn.RelatedElements.AddRange(CreatElements);
+                            txn.Commit();
+                        }
+                    }
+                }
+            }
+
+
+            return NewModel;
         }
     }
 }

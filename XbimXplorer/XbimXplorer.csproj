@@ -53,7 +53,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>xBIM.ico</ApplicationIcon>
+    <ApplicationIcon>THBIM.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -465,7 +465,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Resource Include="xBIM.ico" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -518,7 +517,7 @@
       <Visible>False</Visible>
       <Description>xBIM files</Description>
       <Progid>xBIM.Xplorer</Progid>
-      <DefaultIcon>xBIM.ico</DefaultIcon>
+      <DefaultIcon>THBIM.ico</DefaultIcon>
     </FileAssociation>
   </ItemGroup>
   <ItemGroup>
@@ -570,6 +569,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Images\search.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="THBIM.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -29,7 +29,7 @@ namespace XbimXplorer.Dialogs
         {
             InitializeComponent();
             DataContext = this;
-            Logo.Source = new BitmapImage(new Uri(@"pack://application:,,/xBIM.ico", UriKind.RelativeOrAbsolute));
+            Logo.Source = new BitmapImage(new Uri(@"pack://application:,,/THBIM.ico", UriKind.RelativeOrAbsolute));
             _assembly = Assembly.GetEntryAssembly();
         }
 

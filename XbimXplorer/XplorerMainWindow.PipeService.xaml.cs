@@ -211,6 +211,7 @@ namespace XbimXplorer
                 pipeServer = null;
                 backgroundWorker.RunWorkerAsync();
                 var majer = message.Header.Major;//专业
+                
                 foreach (var project in message.CadProjects)
                 {
                     var ProjectId = project.ProjectId;//项目信息
@@ -229,7 +230,7 @@ namespace XbimXplorer
                     {
                         ProjectId = project.Root.GlobalId,
                         Source = EApplcationName.CAD,
-                        Major = EMajor.Architecture,
+                        Major = EMajor.Structure,
                     });
                 }
             }
@@ -440,7 +441,7 @@ namespace XbimXplorer
                     OpenFilePath = ifc_ProjectPath,
                     ProjectId = ifc_ProjectPath,
                     Source = EApplcationName.SU,
-                    Major = EMajor.Architecture,
+                    Major = EMajor.Structure,
                 });
             }
         }

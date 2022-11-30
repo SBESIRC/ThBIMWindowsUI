@@ -9,13 +9,13 @@
         xmlns:viewModels="clr-namespace:Xbim.Ifc.ViewModels;assembly=Xbim.Ifc"
         xmlns:thGControl="clr-namespace:THBimEngine.Presention;assembly=THBimEngine.Presention"
         AllowsTransparency="False"
-        Title="TianHua Bim Xplorer"
+        Title="天华结构三维平台"
         Height="600"
         Width="800" 
         x:Name="MainWindow"
         WindowState="Maximized"
         ContentRendered="RenderedEvents" 
-        Icon="xBIM.ico" 
+        Icon="xBIM.ico"
         Closing="XplorerMainWindow_Closing" >
     <Window.Resources>
         <ObjectDataProvider x:Key="ModelProvider"  IsInitialLoadEnabled="False" ></ObjectDataProvider>
@@ -203,6 +203,7 @@
                       VerticalContentAlignment="Center"
                       HorizontalContentAlignment="Center"></MenuItem>
                 <MenuItem Header="建筑数据导入SU平台" Click="MenuItem_Click_4" Width="130" HorizontalAlignment="Left"
+                          Visibility="Collapsed"
                       VerticalContentAlignment="Center"
                       HorizontalContentAlignment="Center"></MenuItem>
                 <MenuItem Header="构件数量统计" Click="MenuItem_Click" Width="90" HorizontalAlignment="Left" ToolTip="统计数量通过日志视图查看"

@@ -99,8 +99,8 @@ namespace XbimXplorer
             Dispatcher.BeginInvoke(new Action(delegate
             {
                 Title = string.IsNullOrEmpty(ifcFilename)
-                    ? "TianHua Bim Xplorer" :
-                    "TianHua Bim Xplorer - [" + ifcFilename + "]";
+                    ? "天华结构三维平台" :
+                    "天华结构三维平台 - [" + ifcFilename + "]";
             }));
         }
         public event PropertyChangedEventHandler PropertyChanged;
@@ -1096,6 +1096,7 @@ namespace XbimXplorer
         {
             if (CurrentDocument == null)
                 return;
+            /*
             var architectureIFC = CurrentDocument.AllBimProjects.FirstOrDefault(o => o.Major == EMajor.Architecture && o.ApplcationName == EApplcationName.CAD && o.SourceProject is IfcStore);
             if(architectureIFC == null)
             {
@@ -1147,7 +1148,7 @@ namespace XbimXplorer
             else
             {
                 MessageBox.Show("导入SU失败！", "导入失败", MessageBoxButton.OK);
-            }
+            }*/
         }
 
 

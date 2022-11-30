@@ -12,11 +12,12 @@ namespace THBimEngine.Domain
         {
             get
             {
+                /*
                 var arch = Storeys.Where(o => o.Key.Equals(EMajor.Architecture)).ToList();
                 if (arch.Count > 0)
                 {
                     return arch[0].Value.First().Name;
-                }
+                }*/
 
                 var stru = Storeys.Where(o => o.Key.Equals(EMajor.Structure)).ToList();
                 if (stru.Count > 0)
@@ -35,11 +36,12 @@ namespace THBimEngine.Domain
         {
             get
             {
+                /*
                 var arch = Storeys.Where(o => o.Key.Equals(EMajor.Architecture)).ToList();
                 if (arch.Count > 0)
                 {
                     return new ThBimElevationInfo(true, arch[0].Value.First().Elevation);
-                }
+                }*/
 
                 return new ThBimElevationInfo(false, 0.0);
             }

@@ -13,6 +13,7 @@ namespace THBimEngine.Domain
         /// </summary>
         [Description("结构")]
         Structure = 10,
+        /*
         /// <summary>
         /// 建筑
         /// </summary>
@@ -32,7 +33,7 @@ namespace THBimEngine.Domain
         /// 水
         /// </summary>
         [Description("水")]
-        Water = 50,
+        Water = 50,*/
     }
     /// <summary>
     /// 来源信息

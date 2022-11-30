@@ -14,8 +14,11 @@ namespace XbimXplorer
         string configPath = "";
         public UserConfig() 
         {
-            var currentDir = Environment.CurrentDirectory;
+            var currentDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);//Environment.CurrentDirectory;
+            currentDir = Path.Combine(currentDir, "thbim");
             configPath = Path.Combine(currentDir, "userConfig.xml");
+            if (!Directory.Exists(currentDir))
+                Directory.CreateDirectory(currentDir);
             InitConfigFile(configPath);
             Config = new ConfigHelper(configPath);
         }

@@ -141,7 +141,7 @@ namespace THBimEngine.Application
         public void AddProject(THDocument currentDocument , THBimProject project, ProjectParameter projectParameter)
         {
             HaveChange = false;
-            convertFactory = new THProjectDataConvertFactory(Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3);
+            convertFactory = new ThBimProjectDataConvertFactory(Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3);
             bool isAdd = currentDocument.IsAddProject(projectParameter.ProjectId);
 
             if (isAdd)

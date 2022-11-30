@@ -7,13 +7,22 @@ namespace THBimEngine.DBOperation
 {
     public class ProjectDBHelper
     {
-        ConnectionConfig dbSqlServerConfig = new ConnectionConfig()
+        ConnectionConfig dbSqlServerConfig;
+        public ProjectDBHelper(string location) 
         {
-            ConfigId = "DBSqlServer",
-            DbType = SqlSugar.DbType.SqlServer,
-            ConnectionString = "Data Source= 172.16.0.2;Initial Catalog=Product_Project;User ID=ghost123;Password=12345abc123!",
-            IsAutoCloseConnection = true,
-        };
+            string sqlIP = "172.16.0.2";
+            if (!string.IsNullOrEmpty(location) && location.Contains("武汉"))
+            {
+                sqlIP = @"172.28.8.1\SQL2008";
+            }
+            dbSqlServerConfig = new ConnectionConfig()
+            {
+                ConfigId = "DBSqlServer",
+                DbType = SqlSugar.DbType.SqlServer,
+                ConnectionString = string.Format("Data Source= {0};User ID=ghost123;Password=12345abc123!",sqlIP),
+                IsAutoCloseConnection = true,
+            };
+        }
         public List<DBProject> GetUserProjects(string userId)
         {
             var resPorject = new List<DBProject>();

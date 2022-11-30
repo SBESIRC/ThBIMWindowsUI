@@ -25,6 +25,8 @@ namespace THBimEngine.HttpService
         public string ChineseName { get; set; }
         [JsonProperty("pre_sso_id")]
         public string PreSSOId { get; set; }
+        [JsonIgnore]
+        public string LoginLocation { get; set; }
         public List<Department> Departments { get; set; }
     }
     public class Department

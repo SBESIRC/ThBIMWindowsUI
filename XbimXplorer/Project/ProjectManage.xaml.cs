@@ -18,7 +18,7 @@ namespace XbimXplorer
     /// </summary>
     public partial class ProjectManage : Window
     {
-        ProjectDBHelper projectDBHelper = new ProjectDBHelper();
+        ProjectDBHelper projectDBHelper;
         static ProjectVM projectVM =null;
         OperateType operateType;
         ProjectFileInfo selectProjectFile;
@@ -29,6 +29,7 @@ namespace XbimXplorer
             InitializeComponent();
             loginUser = user;
             operateType = OperateType.Close;
+            projectDBHelper = new ProjectDBHelper(user.LoginLocation);
             InitUserProjects();
         }
         public OperateType GetOperateType() 

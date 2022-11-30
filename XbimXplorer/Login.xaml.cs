@@ -17,6 +17,10 @@ namespace XbimXplorer
             bool isRememb = userConfig.Config.AppConfigBoolValue("RemembPsw");
             string uName = userConfig.Config.AppConfigStringValue("UserName");
             string uPsw = userConfig.Config.AppConfigStringValue("UserPsw");
+            cbxLocation.Items.Clear();
+            cbxLocation.Items.Add("上海");
+            cbxLocation.Items.Add("武汉");
+            cbxLocation.SelectedItem = "武汉";
             ckbRemberPsw.IsChecked = isRememb;
             txtUName.Text = uName;
             txtUPsw.Password = uPsw;
@@ -48,11 +52,13 @@ namespace XbimXplorer
                 userConfig.Config.UpdateOrAddAppConfig("RemembPsw", "True");
                 userConfig.Config.UpdateOrAddAppConfig("UserPsw", uPsw);
             }
-            else 
+            else
             {
                 userConfig.Config.UpdateOrAddAppConfig("RemembPsw", "False");
                 userConfig.Config.UpdateOrAddAppConfig("UserPsw", "");
             }
+            if (cbxLocation.SelectedIndex > -1)
+                userInfo.LoginLocation = cbxLocation.SelectedItem.ToString();
             XplorerMainWindow xplorer = new XplorerMainWindow(userInfo);
             this.Close();
             xplorer.Show();

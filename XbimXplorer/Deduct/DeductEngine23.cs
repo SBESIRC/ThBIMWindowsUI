@@ -72,33 +72,6 @@ namespace XbimXplorer.Deduct
 
             DeductService.UpdateProject(ref ArchiProject, wallCutResult);
 
-
-            /////////////////////////////
-            //var item = deductWall.ElementAt(2).Value.ElementAt(17).Value;
-
-            //var geom0 = ThIFCNTSExtension.ToNTSLineString(item[0].Item1, item[0].Item2);
-            //var geom1 = ThIFCNTSExtension.ToNTSLineString(item[1].Item1, item[1].Item2);
-
-            //var a2 = deductWall.ElementAt(0).Value.ElementAt(3);
-            //var a3 = new List<string>();
-            //foreach (var aa in a2.Value)
-            //{
-            //    var s = wallTupleDict.Where(x => x.Value == aa).First().Key;
-            //    a3.Add(s.ToString());
-            //}
-
-            //wallCutResult.TryGetValue(a2.Key.Uid , out var resultValue);
-
-
-            //var geomArchi = ((GeometryStretch)a2.Key.GeometryParam).ToNTSPolygon();
-            //var geomStructList = a2.Value.Select(x => x.Item1.ToNTSPolygon(x.Item2)).ToList();
-
-            //var newWall = DeductService.CutBimWallGeom(geomArchi, geomStructList, out var onlyDelete);
-
-
-            /////////////////////////////
-
-            var a = 1;
         }
 
         private static Dictionary<IfcBuildingStorey, ThIFCNTSSpatialIndex> GetSpIdxIfc23(List<IfcBuildingStorey> storeys, out Dictionary<string, Tuple<IfcProfileDef, IfcAxis2Placement>> wallTupleDict)

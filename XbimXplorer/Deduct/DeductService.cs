@@ -12,6 +12,7 @@ using NetTopologySuite.Operation.OverlayNG;
 using ThBIMServer.NTS;
 using THBimEngine.Domain;
 using NetTopologySuite.Algorithm;
+using THBimEngine.Geometry.ProjectFactory;
 
 namespace XbimXplorer.Deduct
 {
@@ -249,7 +250,7 @@ namespace XbimXplorer.Deduct
                                 foreach (var bimWall in wallCut.Value.Item2)
                                 {
                                     var uid = System.Guid.NewGuid().ToString();
-                                    var relationsNew = new THBimElementRelation(bimWall.Id, bimWall.Name, bimWall, bimWall.Describe, bimWall.Uid);
+                                    var relationsNew = new THBimElementRelation(bimWall.Id, bimWall.Name, bimWall, bimWall.Describe, uid);
                                     storey.Value.FloorEntityRelations.Add(relationsNew.Uid, relationsNew);
                                 }
                             }
@@ -272,5 +273,14 @@ namespace XbimXplorer.Deduct
 
         }
 
+        public static void UpdateNewWallGeom(ref Dictionary<string, Tuple<bool, List<THBimWall>>> wallCutResult)
+        {
+            var convertFactory = new ThBimProjectDataConvertFactory(Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3);
+            foreach (var pair in wallCutResult)
+            {
+                var items = pair.Value.Item2.OfType<THBimEntity>().ToList();
+                convertFactory.CreateSolidMesh(items);
+            }
+        }
     }
 }

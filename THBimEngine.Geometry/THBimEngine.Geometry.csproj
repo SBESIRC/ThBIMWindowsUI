@@ -97,6 +97,7 @@
     <Compile Include="XbimMatrixHelper.cs" />
     <Compile Include="ProjectFactory\ConvertFactoryBase.cs" />
     <Compile Include="ProjectFactory\THIfcStoreMeshConvertFactory.cs" />
+    <Compile Include="ProjectFactory\ThBimProjectDataConvertFactory.cs" />
     <Compile Include="ProjectFactory\THProjectDataConvertFactory.cs" />
     <Compile Include="GeometryFactory.cs" />
     <Compile Include="ProjectFactory\THSUProjectConvertFactory.cs" />

@@ -85,7 +85,7 @@ namespace XbimXplorer.Deduct
         /// <returns></returns>
         private static bool IsCutWallSimilarWithOri(List<Polygon> cutPolyObb, Polygon archiWallOri, double tol_OBBRatio)
         {
-            var isOriWall = cutPolyObb.Where(x => x.Area / archiWallOri.Area >= tol_OBBRatio ||
+            var isOriWall = cutPolyObb.Where(x => x.Area / archiWallOri.Area >= tol_OBBRatio &&
                                                   x.Area / archiWallOri.Area <= (1 + (1 - tol_OBBRatio))).Any(); //有可能obb比原大
             return isOriWall;
         }
@@ -223,7 +223,7 @@ namespace XbimXplorer.Deduct
             return newBimWall;
         }
 
-        public static void UpdateProject(THBimProject archiProject, Dictionary<string, Tuple<bool, List<THBimWall>>> wallCutResult)
+        public static void UpdateProject(ref THBimProject archiProject, Dictionary<string, Tuple<bool, List<THBimWall>>> wallCutResult)
         {
             foreach (var building in archiProject.ProjectSite.SiteBuildings)
             {

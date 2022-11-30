@@ -42,7 +42,7 @@ namespace XbimXplorer.Deduct
 
             var wallCutResult = CutBimWall(deductWall);
 
-            DeductService.UpdateProject(ArchiProject, wallCutResult);
+            DeductService.UpdateProject(ref ArchiProject, wallCutResult);
 
 
             /////////////////////////////
@@ -191,7 +191,7 @@ namespace XbimXplorer.Deduct
                     var newBimWall = new List<THBimWall>();
                     if (onlyDelete == false)
                     {
-                        newBimWall = DeductService.ToThBimWall(wallCutPair.Key, newWall);
+                        newBimWall .AddRange ( DeductService.ToThBimWall(wallCutPair.Key, newWall));
                     }
 
                     wallCutDict.Add(wallCutPair.Key.Uid, new Tuple<bool, List<THBimWall>>(onlyDelete, newBimWall));

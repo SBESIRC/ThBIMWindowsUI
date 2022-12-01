@@ -32,8 +32,7 @@ namespace THBimEngine.Application
                 convertResult.BimProject.ApplcationName = projectParameter.Source;
                 convertResult.BimProject.ProjectIdentity = projectParameter.ProjectId;
                 convertResult.BimProject.Major = projectParameter.Major;
-                var findPrject = currentDocument.GetProject(projectParameter.ProjectId);
-                findPrject.SourceProject = project;
+                convertResult.BimProject.SourceProject = project;
                 foreach (var item in currentDocument.UnShowEntityTypes) 
                 {
                     convertResult.BimProject.UnShowEntityTypes.Add(item);
@@ -52,6 +51,7 @@ namespace THBimEngine.Application
                 convertResult.BimProject.ApplcationName = projectParameter.Source;
                 convertResult.BimProject.ProjectIdentity = projectParameter.ProjectId;
                 convertResult.BimProject.Major = projectParameter.Major;
+                convertResult.BimProject.SourceProject = project;
                 UpdateProject(currentDocument, convertResult);
             }
 
@@ -63,13 +63,10 @@ namespace THBimEngine.Application
             bool isAdd = currentDocument.IsAddProject(projectParameter.ProjectId);
             if (!isAdd)
             {
-                //这里增量跟新没有做，先删除原来的数据，再增加现在的数据
                 //currentDocument.DeleteProjectData(project.Root.GlobalId);
-
                 var convertResult = convertFactory.ProjectConvert(project, false);
                 convertResult.BimProject.Matrix3D = projectParameter.Matrix3D;
-                var findPrject = currentDocument.GetProject(projectParameter.ProjectId);
-                findPrject.SourceProject = project;
+                convertResult.BimProject.SourceProject = project;
                 UpdateProject(currentDocument,convertResult);
             }
             else
@@ -153,6 +150,7 @@ namespace THBimEngine.Application
             {
                 if (project.ProjectIdentity != projectResult.BimProject.ProjectIdentity)
                     continue;
+                project.SourceProject = projectResult.BimProject.SourceProject;
                 var buildings = project.ProjectSite.SiteBuildings.Values;
                 var updateMeshIds = new List<string>();
                 foreach (var building in buildings)

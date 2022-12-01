@@ -141,7 +141,7 @@ namespace THBimEngine.Application
         public void AddProject(THDocument currentDocument , THBimProject project, ProjectParameter projectParameter)
         {
             HaveChange = false;
-            convertFactory = new ThBimProjectDataConvertFactory(Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3);
+            //convertFactory = new ThBimProjectDataConvertFactory(Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3);
             bool isAdd = currentDocument.IsAddProject(projectParameter.ProjectId);
 
             if (isAdd)
@@ -150,12 +150,15 @@ namespace THBimEngine.Application
             }
             else
             {
-                var convertResult = convertFactory.ProjectConvert(project, false);
-                convertResult.BimProject.Matrix3D = projectParameter.Matrix3D;
-                convertResult.BimProject.ApplcationName = projectParameter.Source;
-                convertResult.BimProject.ProjectIdentity = projectParameter.ProjectId;
-                convertResult.BimProject.Major = projectParameter.Major;
-                UpdateProject(currentDocument, convertResult);
+                //var convertResult = convertFactory.ProjectConvert(project, false);
+                //convertResult.BimProject.Matrix3D = projectParameter.Matrix3D;
+                //convertResult.BimProject.ApplcationName = projectParameter.Source;
+                //convertResult.BimProject.ProjectIdentity = projectParameter.ProjectId;
+                //convertResult.BimProject.Major = projectParameter.Major;
+
+                //这里要先在也业务里把entity几何体建成
+                HaveChange = true;
+                project.ProjectChanged();
             }
 
         }

@@ -34,6 +34,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "THBimEngine.Common", "THBim
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "THBimEngine.IO", "THBimEngine.IO\THBimEngine.IO.csproj", "{09BF25DD-C40E-459E-8349-8044075C608C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "THBimEngine.Internal", "THBimEngine.Internal\THBimEngine.Internal.csproj", "{0A86C53F-49E7-44FE-A9F0-5EBDAC632691}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -176,6 +178,18 @@ Global
 		{09BF25DD-C40E-459E-8349-8044075C608C}.Release|x64.Build.0 = Release|Any CPU
 		{09BF25DD-C40E-459E-8349-8044075C608C}.Release|x86.ActiveCfg = Release|Any CPU
 		{09BF25DD-C40E-459E-8349-8044075C608C}.Release|x86.Build.0 = Release|Any CPU
+		{0A86C53F-49E7-44FE-A9F0-5EBDAC632691}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A86C53F-49E7-44FE-A9F0-5EBDAC632691}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A86C53F-49E7-44FE-A9F0-5EBDAC632691}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0A86C53F-49E7-44FE-A9F0-5EBDAC632691}.Debug|x64.Build.0 = Debug|Any CPU
+		{0A86C53F-49E7-44FE-A9F0-5EBDAC632691}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0A86C53F-49E7-44FE-A9F0-5EBDAC632691}.Debug|x86.Build.0 = Debug|Any CPU
+		{0A86C53F-49E7-44FE-A9F0-5EBDAC632691}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A86C53F-49E7-44FE-A9F0-5EBDAC632691}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A86C53F-49E7-44FE-A9F0-5EBDAC632691}.Release|x64.ActiveCfg = Release|Any CPU
+		{0A86C53F-49E7-44FE-A9F0-5EBDAC632691}.Release|x64.Build.0 = Release|Any CPU
+		{0A86C53F-49E7-44FE-A9F0-5EBDAC632691}.Release|x86.ActiveCfg = Release|Any CPU
+		{0A86C53F-49E7-44FE-A9F0-5EBDAC632691}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

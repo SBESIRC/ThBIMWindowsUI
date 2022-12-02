@@ -1,7 +1,7 @@
 ﻿using System;
 using Xbim.Geometry.Engine.Interop;
 
-namespace ThBIMServer.Ifc2x3
+namespace THBimEngine.IO.Xbim
 {
     public sealed class ThXbimGeometryService
     {

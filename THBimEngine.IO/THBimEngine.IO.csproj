@@ -106,16 +106,19 @@
     <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3RelAggregatesFactory.cs" />
     <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3RelDefinesFactory.cs" />
     <Compile Include="Ifc2x3\ThProtoBuf2IFCSolid3dExtension.cs" />
-    <Compile Include="Ifc2x3\ThXbimGeometryService.cs" />
+    <Compile Include="ThBimXbimNTSMarshal.cs" />
+    <Compile Include="Xbim\ThXbimGeometryService.cs" />
     <Compile Include="Ifc2x3\ThXbimSlabEngine.cs" />
     <Compile Include="NTS\ThIFCNTSExtension.cs" />
     <Compile Include="NTS\ThIFCNTSFixedPrecision.cs" />
     <Compile Include="NTS\ThIFCNTSService.cs" />
     <Compile Include="NTS\ThIFCNTSSpatialIndex.cs" />
+    <Compile Include="NTS\ThNTSIfcProfileDefExtension.cs" />
     <Compile Include="NTS\ThNTSOperation.cs" />
     <Compile Include="NTS\ThTCHNTSExtension.cs" />
     <Compile Include="NTS\ThTCHNTSOperation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Xbim\ThXbimIfcProfileDefExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\THBimEngine.Domain\THBimEngine.Domain.csproj">

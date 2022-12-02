@@ -8,12 +8,12 @@ namespace THBimEngine.DBOperation
     public class ProjectDBHelper
     {
         ConnectionConfig dbSqlServerConfig;
-        public ProjectDBHelper(string location) 
+        public ProjectDBHelper(string sqlIp) 
         {
             string sqlIP = "172.16.0.2";
-            if (!string.IsNullOrEmpty(location) && location.Contains("武汉"))
+            if (!string.IsNullOrEmpty(sqlIp) )
             {
-                sqlIP = @"172.28.8.1\SQL2008";
+                sqlIP = sqlIp;
             }
             dbSqlServerConfig = new ConnectionConfig()
             {

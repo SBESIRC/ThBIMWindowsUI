@@ -29,7 +29,7 @@ namespace XbimXplorer
             InitializeComponent();
             loginUser = user;
             operateType = OperateType.Close;
-            projectDBHelper = new ProjectDBHelper(user.LoginLocation);
+            projectDBHelper = new ProjectDBHelper(user.LocationSQLIp);
             InitUserProjects();
         }
         public OperateType GetOperateType() 

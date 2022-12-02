@@ -27,6 +27,8 @@ namespace THBimEngine.HttpService
         public string PreSSOId { get; set; }
         [JsonIgnore]
         public string LoginLocation { get; set; }
+        [JsonIgnore]
+        public string LocationSQLIp { get; set; }
         public List<Department> Departments { get; set; }
     }
     public class Department

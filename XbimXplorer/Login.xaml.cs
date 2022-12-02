@@ -115,7 +115,6 @@ namespace XbimXplorer
         }
                 userInfo.Majors = new List<string>();
                 userInfo.Majors.Add(comMajor.SelectedItem.ToString());
-
                 //保存登录的用户信息
                 userConfig.Config.UpdateOrAddAppConfig("UserName", uName);
                 userConfig.Config.UpdateOrAddAppConfig("Major", string.Join(";", userInfo.Majors));
@@ -129,6 +128,8 @@ namespace XbimXplorer
                     userConfig.Config.UpdateOrAddAppConfig("RemembPsw", "False");
                     userConfig.Config.UpdateOrAddAppConfig("UserPsw", "");
                 }
+                if (cbxLocation.SelectedIndex > -1)
+                    userInfo.LoginLocation = cbxLocation.SelectedItem.ToString();
             }
             catch (Exception ex)
             {
@@ -138,7 +139,6 @@ namespace XbimXplorer
             }
             finally 
             {
-                mainWindow.IsEnabled = true;
                 if (null != userInfo) 
                 {
                     XplorerMainWindow xplorer = new XplorerMainWindow(userInfo);
@@ -148,7 +148,6 @@ namespace XbimXplorer
                 }
             }
         }
-
         private void ckbRemberPsw_Checked(object sender, RoutedEventArgs e)
         {
             if (ckbRemberPsw.IsChecked == true)

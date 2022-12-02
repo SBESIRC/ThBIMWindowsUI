@@ -214,7 +214,7 @@ namespace XbimXplorer
                 backgroundWorker.RunWorkerAsync();
                 var majer = message.Header.Major;//专业
                 var major = EnumUtil.GetEnumItemByDescription<EMajor>(majer);
-                ProjectDBHelper projectDB = new ProjectDBHelper();
+                ProjectDBHelper projectDB = new ProjectDBHelper("");
                 foreach (var project in message.CadProjects)
                 {
                     var ProjectId = project.ProjectId;//项目信息
@@ -239,7 +239,7 @@ namespace XbimXplorer
                     {
                         ProjectId = project.Root.GlobalId,
                         Source = EApplcationName.CAD,
-                        Major = EMajor.Architecture,
+                        //Major = EMajor.Architecture,
                     });
                 }
             }

@@ -109,6 +109,7 @@
     <Compile Include="NTS\ThBimNTSExtension.cs" />
     <Compile Include="NTS\ThIFCNTSExtension4.cs" />
     <Compile Include="NTS\ThIFCNTSSpatialIndex4.cs" />
+    <Compile Include="NTS\ThNTSIfcProductSpatialIndex.cs" />
     <Compile Include="ThBimXbimNTSMarshal.cs" />
     <Compile Include="Xbim\ThXbimGeometryService.cs" />
     <Compile Include="Ifc2x3\ThXbimSlabEngine.cs" />

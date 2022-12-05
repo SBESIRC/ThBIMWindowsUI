@@ -106,6 +106,9 @@
     <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3RelAggregatesFactory.cs" />
     <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3RelDefinesFactory.cs" />
     <Compile Include="Ifc2x3\ThProtoBuf2IFCSolid3dExtension.cs" />
+    <Compile Include="NTS\ThBimNTSExtension.cs" />
+    <Compile Include="NTS\ThIFCNTSExtension4.cs" />
+    <Compile Include="NTS\ThIFCNTSSpatialIndex4.cs" />
     <Compile Include="ThBimXbimNTSMarshal.cs" />
     <Compile Include="Xbim\ThXbimGeometryService.cs" />
     <Compile Include="Ifc2x3\ThXbimSlabEngine.cs" />

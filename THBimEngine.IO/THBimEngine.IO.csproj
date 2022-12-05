@@ -31,6 +31,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GfcClasses.net">
+      <HintPath>..\GFC2.0\GfcClasses.net.dll</HintPath>
+    </Reference>
+    <Reference Include="objectbuf.net">
+      <HintPath>..\GFC2.0\objectbuf.net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -96,6 +102,9 @@
     <Compile Include="Geometry\ThXbimProtoBufExtension.cs" />
     <Compile Include="Geometry\ThXbimRay3D.cs" />
     <Compile Include="Geometry\XbimMesher.cs" />
+    <Compile Include="GFC2\THGFCExtension.cs" />
+    <Compile Include="GFC2\ThBimGFC2.cs" />
+    <Compile Include="GFC2\ThGFCDocument.cs" />
     <Compile Include="Ifc2x3\ThIFC2x3Factory.cs" />
     <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3BrepExtension.cs" />
     <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3Builder.cs" />

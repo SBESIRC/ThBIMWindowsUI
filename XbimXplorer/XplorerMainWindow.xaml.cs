@@ -51,6 +51,8 @@ using XbimXplorer.LogViewer;
 using XbimXplorer.Project;
 using XbimXplorer.Properties;
 using XbimXplorer.ThBIMEngine;
+using XbimXplorer.Deduct;
+using THBimEngine.IO.GFC2;
 #endregion
 
 namespace XbimXplorer
@@ -1391,6 +1393,54 @@ namespace XbimXplorer
             }
             Log.Info(string.Format("Total Count : {0}", sumCount));
             MessageBox.Show("统计完成，请前往日志中查看结果","提醒");
+        }
+
+        private void MenuItem_Deduct_Click(object sender, RoutedEventArgs e)
+        {
+            if (CurrentDocument == null)
+                return;
+
+            var deductService = new DeductEngine(CurrentDocument);
+
+            //deductService.Do();
+
+            //var projectParameter = new ProjectParameter()
+            //{
+            //    ProjectId = aProject.ProjectIdentity,
+            //    Matrix3D = aProject.Matrix3D,
+            //    Major = aProject.Major,
+            //    Source = aProject.ApplcationName,
+            //};
+            //CurrentDocument.AddProject(deductService.ArchiProject, projectParameter);
+
+            var aProject = CurrentDocument.AllBimProjects.Where(x => x.Major == EMajor.Architecture && x.ApplcationName == EApplcationName.CAD).FirstOrDefault();
+            GFCConvertEngine.ToGFCEngine(aProject);
+
+        }
+
+        private void MenuItem_Deduct_Open_Click(object sender, RoutedEventArgs e)
+        {
+            if (CurrentDocument == null)
+                return;
+
+            var aPath = @"D:\project\14.ThBim\chart\建筑 -带轴网.thbim";
+            LoadFileToCurrentDocument(new ProjectParameter()
+            {
+                OpenFilePath = aPath,
+                ProjectId = aPath,
+                Major = EMajor.Architecture,
+                Source = EApplcationName.CAD,
+            });
+
+            //var sPath = @"D:\project\14.ThBim\chart\0929-结构32.ifc";
+            //LoadFileToCurrentDocument(new ProjectParameter()
+            //{
+            //    OpenFilePath = sPath,
+            //    ProjectId = sPath,
+            //    Major = EMajor.Structure,
+            //    Source = EApplcationName.IFC,
+            //});
+
         }
     }
     class DocumentCacheModel

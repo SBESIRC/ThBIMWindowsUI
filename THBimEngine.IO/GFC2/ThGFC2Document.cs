@@ -9,7 +9,7 @@ using glodon.objectbufnet;
 
 namespace THBimEngine.IO.GFC2
 {
-    public class ThGFCDocument
+    public class ThGFC2Document
     {
         private Writer gfcWriter;
         private int m_id;
@@ -18,7 +18,7 @@ namespace THBimEngine.IO.GFC2
         public Dictionary<Tuple<double, double>, int> vector2dIndex;
         public Dictionary<Tuple<double, double, double>, int> vector3dIndex;
 
-        public ThGFCDocument()
+        public ThGFC2Document()
         {
             gfcWriter = new Writer();
             m_id = 0;
@@ -27,9 +27,9 @@ namespace THBimEngine.IO.GFC2
             vector3dIndex = new Dictionary<Tuple<double, double, double>, int>();
         }
 
-        public static ThGFCDocument Create(string filePath)
+        public static ThGFC2Document Create(string filePath)
         {
-            var doc = new ThGFCDocument();
+            var doc = new ThGFC2Document();
             doc.Open(filePath, false, "");
             return doc;
         }

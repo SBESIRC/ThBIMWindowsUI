@@ -14,7 +14,7 @@ namespace XbimXplorer.Deduct
         public static void ToGFCEngine(THBimProject prj)
         {
             var docPath = @"D:\project\14.ThBim\chart\try.gfc";
-            var gfcDoc = ThGFCDocument.Create(docPath);
+            var gfcDoc = ThGFC2Document.Create(docPath);
 
             if (prj.ProjectSite == null)
             {
@@ -26,7 +26,7 @@ namespace XbimXplorer.Deduct
             gfcDoc.Close();
         }
 
-        private static void PrjToGFC(THBimProject prj, ThGFCDocument gfcDoc)
+        private static void PrjToGFC(THBimProject prj, ThGFC2Document gfcDoc)
         {
             prj.ToGfc(gfcDoc);
 

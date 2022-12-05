@@ -11,9 +11,9 @@ using THBimEngine.Domain;
 
 namespace THBimEngine.IO.GFC2
 {
-    public static class ThBimGFC2
+    public static class ThBimToGFC2
     {
-        public static int ToGfc(this THBimProject prj, ThGFCDocument gfcDoc)
+        public static int ToGfc(this THBimProject prj, ThGFC2Document gfcDoc)
         {
             var site = prj.ProjectSite;
 
@@ -38,7 +38,7 @@ namespace THBimEngine.IO.GFC2
             return prjSettingId;
         }
 
-        public static int ToGfc(this THBimBuilding building, ThGFCDocument gfcDoc)
+        public static int ToGfc(this THBimBuilding building, ThGFC2Document gfcDoc)
         {
             var b = new NGfc2Building();
             b.setID(0);
@@ -46,7 +46,7 @@ namespace THBimEngine.IO.GFC2
             return id;
         }
 
-        public static int ToGfc(this THBimStorey storey, ThGFCDocument gfcDoc)
+        public static int ToGfc(this THBimStorey storey, ThGFC2Document gfcDoc)
         {
             var stoeryG = new NGfc2Floor();
             stoeryG.setStructuralElevation(storey.Elevation);
@@ -65,7 +65,7 @@ namespace THBimEngine.IO.GFC2
         /// <param name="gfcDoc"></param>
         /// <param name="floorHightMatrix"></param>
         /// <returns></returns>
-        public static int ToGfc(this THBimWall wall, ThGFCDocument gfcDoc, XbimMatrix3D floorHightMatrix)
+        public static int ToGfc(this THBimWall wall, ThGFC2Document gfcDoc, XbimMatrix3D floorHightMatrix)
         {
             //转换wall geometry 到 GFC lineShape
             var geom = wall.GeometryParam as GeometryStretch;

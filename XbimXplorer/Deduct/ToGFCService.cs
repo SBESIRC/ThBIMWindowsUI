@@ -32,34 +32,44 @@ namespace XbimXplorer.Deduct
 
             var site = prj.ProjectSite;
 
-
+            var buildingStoreyGFCDict = new Dictionary<int, List<int>>();//building gfc id，floor gfc ID;
+            var floorEntityDict = new Dictionary<int, List<int>>();//floor gfc id，entity gfc ID;
 
             foreach (var buildingPair in site.SiteBuildings)
             {
-                buildingPair.Value.ToGfc(gfcDoc);
-                var storeyDict = new Dictionary<string, int>();//storey uid，gfc ID;
+                var buildingId = buildingPair.Value.ToGfc(gfcDoc);
+                buildingStoreyGFCDict.Add(buildingId, new List<int>());
 
                 foreach (var floorPair in buildingPair.Value.BuildingStoreys)
                 {
                     var floorId = floorPair.Value.ToGfc(gfcDoc);
-                    storeyDict.Add(floorPair.Value.Uid, floorId);
-                    var entityDict = new Dictionary<string, int>();
+                    buildingStoreyGFCDict[buildingId].Add(floorId);
+                    floorEntityDict.Add(floorId, new List<int>());
 
+                    var floorHightMatrix = floorPair.Value.Matrix3D;
                     foreach (var entityRelation in floorPair.Value.FloorEntityRelations)
                     {
                         var rUid = entityRelation.Value.RelationElementUid;
                         prj.PrjAllEntitys.TryGetValue(rUid, out var entity);
                         if (entity is THBimWall wallEntity)
                         {
-                            var wid = wallEntity.ToGfc(gfcDoc);
-                            entityDict.Add(entity.Uid, wid);
+                            var wid = wallEntity.ToGfc(gfcDoc, floorHightMatrix);
+                            floorEntityDict[floorId].Add(wid);
                         }
                     }
-
-
-
                 }
             }
+
+            foreach (var p in floorEntityDict)
+            {
+                gfcDoc.AddRelAggregate(p.Key, p.Value);
+            }
+
+            foreach (var p in buildingStoreyGFCDict)
+            {
+                gfcDoc.AddRelAggregate(p.Key, p.Value);
+            }
+
 
 
         }

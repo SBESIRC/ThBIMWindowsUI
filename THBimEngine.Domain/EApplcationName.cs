@@ -13,6 +13,11 @@ namespace THBimEngine.Domain
         /// </summary>
         [Description("结构")]
         Structure = 10,
+        /// <summary>
+        /// 建筑
+        /// </summary>
+        [Description("建筑")]
+        Architecture = 20,
         /*
         /// <summary>
         /// 建筑

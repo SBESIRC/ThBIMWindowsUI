@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-
 using Xbim.Ifc;
 using ifc4 = Xbim.Ifc4;
 using ifc23 = Xbim.Ifc2x3;
 
+using THBimEngine.Application;
 using ThBIMServer.NTS;
 using THBimEngine.Domain;
 
@@ -16,8 +16,21 @@ namespace XbimXplorer.Deduct
 {
     public class DeductEngine
     {
-        public THBimProject ArchiProject;
-        public THBimProject StructProject;
+
+        private THDocument currDoc;
+        private THBimProject ArchiProject;
+        private THBimProject StructProject;
+
+        public DeductEngine(THDocument currDoc)
+        {
+            this.currDoc = currDoc;
+            var sProject = currDoc.AllBimProjects.Where(x => x.Major == EMajor.Structure).FirstOrDefault();
+            var aProject = currDoc.AllBimProjects.Where(x => x.Major == EMajor.Architecture && x.ApplcationName == EApplcationName.CAD).FirstOrDefault();
+           
+            StructProject = sProject;
+            ArchiProject = aProject;
+        }
+
         public void Do()
         {
             if (!CheckProjetInvalid())
@@ -38,7 +51,7 @@ namespace XbimXplorer.Deduct
             ////    TryIfc23(ifcStore);
             ////}
             /////////////////////////////////////////
-           
+
 
             if (ifcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
             {
@@ -152,14 +165,6 @@ namespace XbimXplorer.Deduct
             }
 
         }
-
-
-
-
-
-
-
-
 
         private void DeductIFC4Engine(Xbim.Ifc.IfcStore ifcStore)
         {

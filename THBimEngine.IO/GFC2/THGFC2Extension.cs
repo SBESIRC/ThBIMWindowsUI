@@ -7,9 +7,9 @@ using Xbim.Common.Geometry;
 
 namespace THBimEngine.IO.GFC2
 {
-    public static class THGFCExtension
+    public static class THGFC2Extension
     {
-        public static int AddGfc2String(this ThGFCDocument doc, string strValue)
+        public static int AddGfc2String(this ThGFC2Document doc, string strValue)
         {
             int id = -1;
             if (doc.stringIndex.ContainsKey(strValue))
@@ -26,7 +26,7 @@ namespace THBimEngine.IO.GFC2
             return id;
         }
 
-        public static int AddGfc2Vector2d(this ThGFCDocument doc, double x, double y)
+        public static int AddGfc2Vector2d(this ThGFC2Document doc, double x, double y)
         {
             int id = -1;
             var tuple = new Tuple<double, double>(x, y);
@@ -45,7 +45,7 @@ namespace THBimEngine.IO.GFC2
             return id;
         }
 
-        public static int AddGfc2Vector3d(this ThGFCDocument doc, double x, double y, double z)
+        public static int AddGfc2Vector3d(this ThGFC2Document doc, double x, double y, double z)
         {
             int id = -1;
             var tuple = new Tuple<double, double, double>(x, y, z);
@@ -71,7 +71,7 @@ namespace THBimEngine.IO.GFC2
         /// <param name="doc"></param>
         /// <param name="matrixe3d"></param>
         /// <returns></returns>
-        public static int AddGfc2Coordinates3d(this ThGFCDocument doc, XbimMatrix3D matrixe3d)
+        public static int AddGfc2Coordinates3d(this ThGFC2Document doc, XbimMatrix3D matrixe3d)
         {
             var id = -1;
             var xid = doc.AddGfc2Vector3d(matrixe3d.M11, matrixe3d.M12, matrixe3d.M13);
@@ -90,7 +90,7 @@ namespace THBimEngine.IO.GFC2
 
         }
 
-        public static int AddGfc2Line2d(this ThGFCDocument doc, XbimPoint3D sp, XbimPoint3D ep)
+        public static int AddGfc2Line2d(this ThGFC2Document doc, XbimPoint3D sp, XbimPoint3D ep)
         {
             var id = -1;
             NGfc2Line2d ln = new NGfc2Line2d();
@@ -103,7 +103,7 @@ namespace THBimEngine.IO.GFC2
             return id;
         }
 
-        public static int AddGfc2RectangleSection(this ThGFCDocument doc, double width, double height)
+        public static int AddGfc2RectangleSection(this ThGFC2Document doc, double width, double height)
         {
             var id = -1;
             NGfc2RectangleSection rect = new NGfc2RectangleSection();
@@ -114,7 +114,7 @@ namespace THBimEngine.IO.GFC2
             return id;
         }
 
-        public static int AddRelAggregate(this ThGFCDocument doc, int parentID, List<int> childIds)
+        public static int AddRelAggregate(this ThGFC2Document doc, int parentID, List<int> childIds)
         {
             var id = -1;
             if (childIds != null && childIds.Count > 0)

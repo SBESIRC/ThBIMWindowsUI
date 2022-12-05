@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Collections.Generic;
 
-using Xbim.Ifc2x3.ProfileResource;
-using Xbim.Ifc2x3.GeometryResource;
+using Xbim.Ifc4.ProfileResource;
+using Xbim.Ifc4.GeometryResource;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Index.Strtree;
 using NetTopologySuite.Geometries.Prepared;
@@ -12,7 +12,7 @@ using THBimEngine.Domain;
 
 namespace ThBIMServer.NTS
 {
-    public class ThIFCNTSSpatialIndex : IDisposable
+    public class ThIFCNTSSpatialIndex4 : IDisposable
     {
         private STRtree<Geometry> Engine { get; set; }
         private Dictionary<Tuple<IfcProfileDef, IfcAxis2Placement>, Geometry> Geometries { get; set; }
@@ -20,12 +20,12 @@ namespace ThBIMServer.NTS
         public bool AllowDuplicate { get; set; }
         public bool PrecisionReduce { get; set; }
 
-        private ThIFCNTSSpatialIndex()
+        private ThIFCNTSSpatialIndex4()
         {
 
         }
 
-        public ThIFCNTSSpatialIndex(List<Tuple<IfcProfileDef, IfcAxis2Placement>> profiles, bool precisionReduce = false, bool allowDuplicate = false)
+        public ThIFCNTSSpatialIndex4(List<Tuple<IfcProfileDef, IfcAxis2Placement>> profiles, bool precisionReduce = false, bool allowDuplicate = false)
         {
             // 默认使用固定精度
             PrecisionReduce = precisionReduce;
@@ -98,7 +98,6 @@ namespace ThBIMServer.NTS
                 return obj.ToNTSPolygon(placement);
             }
         }
-
         private Polygon ToNTSPolygonalGeometry(GeometryStretch geomStretch)
         {
             using (var ov = new ThIFCNTSFixedPrecision(PrecisionReduce))
@@ -175,7 +174,6 @@ namespace ThBIMServer.NTS
                 Query(geometry.EnvelopeInternal),
                 ThIFCNTSService.Instance.PreparedGeometryFactory.Create(geometry));
         }
-
 
         /// <summary>
         /// Window selection

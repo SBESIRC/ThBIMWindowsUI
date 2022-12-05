@@ -5,12 +5,15 @@ using System.Linq;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Mathematics;
 
-using Xbim.Ifc2x3.GeometryResource;
-using Xbim.Ifc2x3.ProfileResource;
+using Xbim.Ifc4.GeometryResource;
+using Xbim.Ifc4.ProfileResource;
 
 namespace ThBIMServer.NTS
 {
-    public static class ThIFCNTSExtension
+    /// <summary>
+    /// 20221205update： ifc4很久没更新，有问题。如果需要用从ThIFCNTSExtension copy一份过来
+    /// </summary>
+    public static class ThIFCNTSExtension4
     {
         public static Geometry ToNTSGeometry(this IfcProfileDef profile, IfcAxis2Placement placement)
         {
@@ -39,7 +42,6 @@ namespace ThBIMServer.NTS
             {
                 var geometry = profile.ToNTSLineString(placement);
                 return geometry.CreatePolygon();
-
             }
             else
             {
@@ -67,6 +69,7 @@ namespace ThBIMServer.NTS
         //    return geometry.CreatePolygon();
         //}
 
+
         //public static LineString ToNTSLineString(this IfcCurve curve, IfcAxis2Placement placement)
         //{
         //    if (curve is IfcPolyline polyline)
@@ -83,7 +86,21 @@ namespace ThBIMServer.NTS
         //    }
         //}
 
-        //public static LineString ToNTSLineString(this IfcRectangleProfileDef rectangleProfile, IfcAxis2Placement areaLocation, IfcAxis2Placement placement)
+
+        //public static LineString ToNTSLineString(this IfcPolyline polyline, IfcAxis2Placement placement)
+        //{
+        //    var points = new List<Coordinate>();
+        //    var offset = (placement as IfcPlacement).Location.ToNTSCoordinate();
+        //    for (int i = 0; i < polyline.Points.Count; i++)
+        //    {
+        //        points.Add(polyline.Points[i].ToNTSCoordinate().Offset(offset));
+        //    }
+        //    points.Add(polyline.Points[0].ToNTSCoordinate().Offset(offset));
+
+        //    return points.CreateLineString();
+        //}
+
+        //public static LineString ToNTSLineString(this IfcRectangleProfileDef rectangleProfile, IfcAxis2Placement placement)
         //{
         //    var points = new List<Coordinate>();
         //    var location = new Coordinate(rectangleProfile.Position.Location.X.MakePrecise(), rectangleProfile.Position.Location.Y.MakePrecise());
@@ -126,19 +143,6 @@ namespace ThBIMServer.NTS
 
         //}
 
-        //public static LineString ToNTSLineString(this IfcPolyline polyline, IfcAxis2Placement placement)
-        //{
-        //    var points = new List<Coordinate>();
-        //    var offset = (placement as IfcPlacement).Location.ToNTSCoordinate();
-        //    for (int i = 0; i < polyline.Points.Count; i++)
-        //    {
-        //        points.Add(polyline.Points[i].ToNTSCoordinate().Offset(offset));
-        //    }
-        //    points.Add(polyline.Points[0].ToNTSCoordinate().Offset(offset));
-
-        //    return points.CreateLineString();
-        //}
-
         //public static LineString ToNTSLineString(this IfcCompositeCurve compositeCurve, IfcAxis2Placement placement)
         //{
         //    var points = new List<Coordinate>();
@@ -161,6 +165,7 @@ namespace ThBIMServer.NTS
         //    var xDim = ((double)rectangleProfile.XDim.Value).MakePrecise();
         //    var yDim = ((double)rectangleProfile.YDim.Value).MakePrecise();
         //    var offset = (placement as IfcPlacement).Location.ToNTSCoordinate();
+
         //    points.Add(ThNTSOperation.Addition(location, vector1, vector2, xDim, yDim).Offset(offset));
         //    points.Add(ThNTSOperation.Addition(location, -vector1, vector2, xDim, yDim).Offset(offset));
         //    points.Add(ThNTSOperation.Addition(location, -vector1, -vector2, xDim, yDim).Offset(offset));
@@ -172,20 +177,21 @@ namespace ThBIMServer.NTS
 
         public static LineString ToNTSLineString(this IfcProfileDef profile, IfcAxis2Placement placement)
         {
-            var points = new List<CoordinateZ>();
+            var points = new List<Coordinate>();
             if (profile is IfcArbitraryClosedProfileDef closedProfile)
             {
                 var curve = closedProfile.OuterCurve;
                 if (curve is IfcPolyline polyline)
                 {
-                    var profOutter = polyline.GetOutterNTS3D();
+                    var profOutter = polyline.GetOutterNTS();
                     points.AddRange(profOutter);
                 }
                 else if (curve is IfcCompositeCurve compositeCurve)
                 {
-                    var profOutter = compositeCurve.GetOutterNTS3D();
+                    var profOutter = compositeCurve.GetOutterNTS();
                     points.AddRange(profOutter);
                 }
+
             }
             else if (profile is IfcRectangleProfileDef rectangleProfile)
             {
@@ -197,89 +203,54 @@ namespace ThBIMServer.NTS
                 throw new NotImplementedException();
             }
 
-            placement.ToTransInfo(out var offset, out var offsetV);
-            var pointsGlobalTemp = points.Select(x => ThNTSOperation.TransP(x, offsetV, offset)).ToList();
-
-            var pointsGlobal = pointsGlobalTemp.Select(x => new Coordinate(x.X, x.Y)).ToList();
+            placement.ToTransInfo(out var offset, out var offsetV1, out var offsetV2);
+            var pointsGlobal = points.Select(x => ThNTSOperation.TransP(x, offsetV1, offsetV2, offset)).ToList();
             return pointsGlobal.CreateLineString();
         }
 
-        private static void ToTransInfo(this IfcAxis2Placement placement, out CoordinateZ offset, out List<Vector3D> offsetV)
+        private static void ToTransInfo(this IfcAxis2Placement placement, out Coordinate offset, out Vector2D offsetV1, out Vector2D offsetV2)
         {
-            offsetV = new List<Vector3D>();
-
-            offset = (placement as IfcPlacement).Location.ToNTSCoordinate3D();
-            for (int i = 0; i < placement.P.Count; i++)
-            {
-                var v = new Vector3D(placement.P[i].X.MakePrecise(), placement.P[i].Y.MakePrecise(), placement.P[i].Z.MakePrecise());
-                offsetV.Add(v);
-            }
-            if (placement.P.Count == 2)
-            {
-                offsetV.Add(new Vector3D(0, 0, 1));
-            }
+            offset = (placement as IfcPlacement).Location.ToNTSCoordinate();
+            offsetV1 = new Vector2D(placement.P[0].X.MakePrecise(), placement.P[0].Y.MakePrecise());
+            offsetV2 = new Vector2D(placement.P[1].X.MakePrecise(), placement.P[1].Y.MakePrecise());
         }
 
-        //private static List<Coordinate> GetOutterNTS(this IfcRectangleProfileDef rectangleProfile)
-        //{
-        //    var points = new List<Coordinate>();
-
-        //    var xDim = ((double)rectangleProfile.XDim.Value).MakePrecise();
-        //    var yDim = ((double)rectangleProfile.YDim.Value).MakePrecise();
-
-        //    var pointsTemp = new List<Coordinate>();
-        //    pointsTemp.Add(new Coordinate(-xDim / 2, -yDim / 2));
-        //    pointsTemp.Add(new Coordinate(-xDim / 2, yDim / 2));
-        //    pointsTemp.Add(new Coordinate(xDim / 2, yDim / 2));
-        //    pointsTemp.Add(new Coordinate(xDim / 2, -yDim / 2));
-        //    pointsTemp.Add(new Coordinate(-xDim / 2, -yDim / 2));
-
-        //    ToTransInfo(rectangleProfile.Position, out var offsetLocation, out var offsetV1, out var offsetV2);
-        //    points = pointsTemp.Select(x => ThNTSOperation.TransP(x, offsetV1, offsetV2, offsetLocation)).ToList();
-
-        //    return points;
-        //}
-
-        private static List<CoordinateZ> GetOutterNTS(this IfcRectangleProfileDef rectangleProfile)
+        private static List<Coordinate> GetOutterNTS(this IfcRectangleProfileDef rectangleProfile)
         {
-            var points = new List<CoordinateZ>();
+            var points = new List<Coordinate>();
 
             var xDim = ((double)rectangleProfile.XDim.Value).MakePrecise();
             var yDim = ((double)rectangleProfile.YDim.Value).MakePrecise();
 
-            var pointsTemp = new List<CoordinateZ>();
-            pointsTemp.Add(new CoordinateZ(-xDim / 2, -yDim / 2, 0));
-            pointsTemp.Add(new CoordinateZ(-xDim / 2, yDim / 2, 0));
-            pointsTemp.Add(new CoordinateZ(xDim / 2, yDim / 2, 0));
-            pointsTemp.Add(new CoordinateZ(xDim / 2, -yDim / 2, 0));
-            pointsTemp.Add(new CoordinateZ(-xDim / 2, -yDim / 2, 0));
+            var pointsTemp = new List<Coordinate>();
+            pointsTemp.Add(new Coordinate(-xDim / 2, -yDim / 2));
+            pointsTemp.Add(new Coordinate(-xDim / 2, yDim / 2));
+            pointsTemp.Add(new Coordinate(xDim / 2, yDim / 2));
+            pointsTemp.Add(new Coordinate(xDim / 2, -yDim / 2));
+            pointsTemp.Add(new Coordinate(-xDim / 2, -yDim / 2));
 
-            ToTransInfo(rectangleProfile.Position, out var offsetLocation, out var offsetV);
-            points = pointsTemp.Select(x => ThNTSOperation.TransP(x, offsetV, offsetLocation)).ToList();
+            ToTransInfo(rectangleProfile.Position, out var offsetLocation, out var offsetV1, out var offsetV2);
+            points = pointsTemp.Select(x => ThNTSOperation.TransP(x, offsetV1, offsetV2, offsetLocation)).ToList();
 
             return points;
         }
 
-        /// <summary>
-        /// 有bug，底边必须在xy平面，如果在其他平面的拉伸体，则需要coornidateM,暂不支持
-        /// </summary>
-        /// <param name="curve"></param>
-        /// <returns></returns>
         private static List<Coordinate> GetOutterNTS(this IfcPolyline polyline)
         {
             var points = new List<Coordinate>();
 
             for (int i = 0; i < polyline.Points.Count; i++)
             {
-                points.Add(polyline.Points[i].ToNTSCoordinate3D());
+                points.Add(polyline.Points[i].ToNTSCoordinate());
             }
-            points.Add(polyline.Points[0].ToNTSCoordinate3D());
+            points.Add(polyline.Points[0].ToNTSCoordinate());
+
 
             return points;
         }
 
         /// <summary>
-        /// 有bug，底边必须在xy平面，如果在其他平面的拉伸体，则需要coornidateM,暂不支持
+        /// 可能有bug
         /// </summary>
         /// <param name="curve"></param>
         /// <returns></returns>
@@ -289,68 +260,17 @@ namespace ThBIMServer.NTS
 
             for (int i = 0; i < compositeCurve.Segments.Count; i++)
             {
-                points.Add((compositeCurve.Segments[i].ParentCurve as IfcPolyline).Points[0].ToNTSCoordinate3D());
+                points.Add((compositeCurve.Segments[i].ParentCurve as IfcPolyline).Points[0].ToNTSCoordinate());
             }
-            points.Add((compositeCurve.Segments[0].ParentCurve as IfcPolyline).Points[0].ToNTSCoordinate3D());
+            points.Add((compositeCurve.Segments[0].ParentCurve as IfcPolyline).Points[0].ToNTSCoordinate());
 
             return points;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="point"></param>
-        /// <returns></returns>
-        public static CoordinateZ ToNTSCoordinate3D(this IfcCartesianPoint point)
-        {
-
-            if (!point.Z.Equals(double.NaN))
-            {
-                return new CoordinateZ(point.X.MakePrecise(), point.Y.MakePrecise(), point.Z.MakePrecise());
-            }
-            else
-            {
-                return new CoordinateZ(point.X.MakePrecise(), point.Y.MakePrecise(), 0);
-            }
-
         }
 
         public static Coordinate ToNTSCoordinate(this IfcCartesianPoint point)
         {
             return new Coordinate(point.X.MakePrecise(), point.Y.MakePrecise());
         }
-
-
-
-        //////////////////////3d////////////////
-        private static List<CoordinateZ> GetOutterNTS3D(this IfcPolyline polyline)
-        {
-            var points = new List<CoordinateZ>();
-
-            for (int i = 0; i < polyline.Points.Count; i++)
-            {
-                points.Add(polyline.Points[i].ToNTSCoordinate3D());
-            }
-            points.Add(polyline.Points[0].ToNTSCoordinate3D());
-
-
-            return points;
-        }
-
-        private static List<CoordinateZ> GetOutterNTS3D(this IfcCompositeCurve compositeCurve)
-        {
-            var points = new List<CoordinateZ>();
-
-            for (int i = 0; i < compositeCurve.Segments.Count; i++)
-            {
-                points.Add((compositeCurve.Segments[i].ParentCurve as IfcPolyline).Points[0].ToNTSCoordinate3D());
-            }
-            points.Add((compositeCurve.Segments[0].ParentCurve as IfcPolyline).Points[0].ToNTSCoordinate3D());
-
-            return points;
-        }
-
-
 
 
     }

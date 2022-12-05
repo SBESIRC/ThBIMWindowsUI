@@ -270,7 +270,6 @@ namespace XbimXplorer.Deduct
                     }
                 }
             }
-
         }
 
         public static void UpdateNewWallGeom(ref Dictionary<string, Tuple<bool, List<THBimWall>>> wallCutResult)

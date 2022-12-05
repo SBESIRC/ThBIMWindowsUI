@@ -9,21 +9,22 @@ using glodon.objectbufnet;
 
 namespace THBimEngine.IO.GFC2
 {
-
     public class ThGFCDocument
     {
         private Writer gfcWriter;
         private int m_id;
 
-        public Dictionary<string, int> CommonStr;
-        public Dictionary<Tuple<double, double>, int> CommonVector2d;
-        public Dictionary<Tuple<double, double, double>, int> CommonVector3d;
+        public Dictionary<string, int> stringIndex;
+        public Dictionary<Tuple<double, double>, int> vector2dIndex;
+        public Dictionary<Tuple<double, double, double>, int> vector3dIndex;
 
         public ThGFCDocument()
         {
             gfcWriter = new Writer();
             m_id = 0;
-            CommonStr = new Dictionary<string, int>();
+            stringIndex = new Dictionary<string, int>();
+            vector2dIndex = new Dictionary<Tuple<double, double>, int>();
+            vector3dIndex = new Dictionary<Tuple<double, double, double>, int>();
         }
 
         public static ThGFCDocument Create(string filePath)
@@ -41,11 +42,9 @@ namespace THBimEngine.IO.GFC2
             return flag;
         }
 
-        public int writeEntity(Entity entity)
+        public int AddEntity(Entity entity)
         {
-            int num;
             int id = -1;
-
             if (entity != null)
             {
                 if (!(entity is NGfc2Object))
@@ -57,13 +56,12 @@ namespace THBimEngine.IO.GFC2
                     this.m_id++;
                     id = this.gfcWriter.writeEntity(entity);
                 }
-                num = id;
             }
             else
             {
-                num = id;
+
             }
-            return num;
+            return id;
         }
 
         public void Close()

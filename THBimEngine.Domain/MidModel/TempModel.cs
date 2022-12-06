@@ -98,6 +98,11 @@ namespace THBimEngine.Domain.MidModel
                                 description ="折板";
                             }
                             var type = item.ToString().Split('.').Last();
+                            if (type.Contains("IfcOpeningElement"))
+                            {
+                                if (((Xbim.Ifc2x3.Kernel.IfcRoot)item).FriendlyName != "Wall_Hole")
+                                    continue;
+                            }
                             bool isVirtualElement = false;
                             if (type.Contains("IfcVirtualElement"))
                             {

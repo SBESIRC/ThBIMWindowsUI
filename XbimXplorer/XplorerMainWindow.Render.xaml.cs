@@ -162,7 +162,7 @@ namespace XbimXplorer
 
                 var ifcStore = ThBimCutData.GetIfcStore(prjName);
                 var readGeomtry = new IfcStoreReadGeomtry(new XbimMatrix3D());
-                var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out List<PointNormal> allGeoPointNormals);
+                var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out List<PointNormal> allGeoPointNormals,true);
                 ThBimCutData.Run(ifcStore, allGeoModels, allGeoPointNormals);
                 ViewerMutex.ReleaseMutex();
       

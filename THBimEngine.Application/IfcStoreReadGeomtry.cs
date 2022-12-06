@@ -32,7 +32,7 @@ namespace THBimEngine.Application
 		{
 			projectMatrix3D = prjMatrix3D;
 		}
-		public List<GeometryMeshModel> ReadGeomtry(IfcStore model, out List<PointNormal> allPointNormals)
+		public List<GeometryMeshModel> ReadGeomtry(IfcStore model, out List<PointNormal> allPointNormals, bool needOpening = false)
 		{
 			ifcModel = model;
 			allPointNormals = new List<PointNormal>();
@@ -58,7 +58,7 @@ namespace THBimEngine.Application
 					shapeInstances.AddRange(tempIns);
 				}
 			}
-			var task = MoreTaskReadAsync();
+			var task = MoreTaskReadAsync(needOpening);
 			bool isContinue = true;
 			while (isContinue)
 			{
@@ -114,7 +114,7 @@ namespace THBimEngine.Application
 			return newMeshModels;
 		}
 
-		private async Task MoreTaskReadAsync()
+		private async Task MoreTaskReadAsync(bool needOpening)
 		{
 			List<Task> tasks = new List<Task>();
 
@@ -144,14 +144,14 @@ namespace THBimEngine.Application
 						}
 					}
 					targetShapes.AddRange(shapeGeometries.GetRange(start, thisSize));
-					ReadGeometries(targetShapes, tempi, start, end);
+					ReadGeometries(targetShapes, tempi, start, end, needOpening);
 
 				});
 				tasks.Add(t);
 			}
 			await Task.WhenAll(tasks);
 		}
-		private void ReadGeometries(List<XbimShapeGeometry> targetShapes, int taskNum, int start, int end)
+		private void ReadGeometries(List<XbimShapeGeometry> targetShapes, int taskNum, int start, int end, bool needOpening)
 		{
 			int thisCount = end - start;
 			int pIndex = -1;
@@ -174,7 +174,7 @@ namespace THBimEngine.Application
 				var type = this.ifcModel.Metadata.ExpressType((short)insModel.IfcTypeId);
 				var typeStr = type.Name.ToLower().Replace("ifc", "");
 				var material = THBimMaterial.GetTHBimEntityMaterial(typeStr, true);
-				if (typeStr.Contains("open"))
+				if (typeStr.Contains("open")&&!needOpening)
 					continue;
 				var allPts = tr.Vertices.ToArray();
 				var allFace = tr.Faces;
@@ -313,7 +313,8 @@ namespace THBimEngine.Application
 		protected IEnumerable<XbimShapeInstance> GetShapeInstancesToRender(IGeometryStoreReader geomReader, HashSet<short> excludedTypes)
 		{
 			var shapeInstances = geomReader.ShapeInstances
-				.Where(s => s.RepresentationType == XbimGeometryRepresentationType.OpeningsAndAdditionsIncluded
+				.Where(s => (s.RepresentationType == XbimGeometryRepresentationType.OpeningsAndAdditionsIncluded
+				|| s.RepresentationType == XbimGeometryRepresentationType.OpeningsAndAdditionsOnly)
 							&&
 							!excludedTypes.Contains(s.IfcTypeId));
 			return shapeInstances;
@@ -341,6 +342,8 @@ namespace THBimEngine.Application
 					continue;
 				foreach (var exIfcType in ifcT.NonAbstractSubTypes)
 				{
+					if (exIfcType.Name.ToLower().Contains("open"))
+						continue;
 					excludedTypes.Add(exIfcType.TypeId);
 				}
 			}

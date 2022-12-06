@@ -126,7 +126,7 @@ namespace XbimXplorer
                         //var prjName = CurrentDocument.AllBimProjects.First().ProjectIdentity.Split('.').First() + "-100%.ifc";
                         var ifcStore = ThBimCutData.GetIfcStore(prjName);
                         var readGeomtry = new IfcStoreReadGeomtry(new XbimMatrix3D());
-                        var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out List<PointNormal> allGeoPointNormals);
+                        var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out List<PointNormal> allGeoPointNormals,true);
                         ThBimCutData.Run(ifcStore, allGeoModels, allGeoPointNormals);
                     }
                 }
@@ -138,9 +138,9 @@ namespace XbimXplorer
                         var pcPrjName = Path.Combine(System.IO.Path.GetDirectoryName(CurrentDocument.AllBimProjects.First().ProjectIdentity), "【PC】1114-同润二期1#楼tekla不带钢筋信息.ifc");
                         var ifcStorePC = ThBimCutData.GetIfcStore(pcPrjName);
                         var readGeomtry = new IfcStoreReadGeomtry(new XbimMatrix3D());
-                        var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out List<PointNormal> allGeoPointNormals);
+                        var allGeoModels = readGeomtry.ReadGeomtry(ifcStore, out List<PointNormal> allGeoPointNormals,true);
                         var readGeomtryPC = new IfcStoreReadGeomtry(new XbimMatrix3D());
-                        var allGeoModelsPC = readGeomtryPC.ReadGeomtry(ifcStorePC, out List<PointNormal> allGeoPointNormalsPC);
+                        var allGeoModelsPC = readGeomtryPC.ReadGeomtry(ifcStorePC, out List<PointNormal> allGeoPointNormalsPC,true);
                         ThBimCutData.Run(ifcStore, allGeoModels, allGeoPointNormals, ifcStorePC, allGeoModelsPC, allGeoPointNormalsPC);
                     }
                 }

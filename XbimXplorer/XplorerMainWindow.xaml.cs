@@ -1407,18 +1407,19 @@ namespace XbimXplorer
 
             var deductService = new DeductEngine(CurrentDocument);
 
-            //deductService.Do();
+            deductService.Do();
 
-            //var projectParameter = new ProjectParameter()
-            //{
-            //    ProjectId = aProject.ProjectIdentity,
-            //    Matrix3D = aProject.Matrix3D,
-            //    Major = aProject.Major,
-            //    Source = aProject.ApplcationName,
-            //};
-            //CurrentDocument.AddProject(deductService.ArchiProject, projectParameter);
+            var aProject = deductService.ArchiProject;
+            var projectParameter = new ProjectParameter()
+            {
+                ProjectId = aProject.ProjectIdentity,
+                Matrix3D = aProject.Matrix3D,
+                Major = aProject.Major,
+                Source = aProject.ApplcationName,
+            };
+            CurrentDocument.AddProject(aProject, projectParameter);
 
-            var aProject = CurrentDocument.AllBimProjects.Where(x => x.Major == EMajor.Architecture && x.ApplcationName == EApplcationName.CAD).FirstOrDefault();
+            //var aProject = CurrentDocument.AllBimProjects.Where(x => x.Major == EMajor.Architecture && x.ApplcationName == EApplcationName.CAD).FirstOrDefault();
             GFCConvertEngine.ToGFCEngine(aProject);
 
         }

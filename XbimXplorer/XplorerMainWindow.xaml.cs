@@ -1438,14 +1438,14 @@ namespace XbimXplorer
                 Source = EApplcationName.CAD,
             });
 
-            //var sPath = @"D:\project\14.ThBim\chart\0929-结构32.ifc";
-            //LoadFileToCurrentDocument(new ProjectParameter()
-            //{
-            //    OpenFilePath = sPath,
-            //    ProjectId = sPath,
-            //    Major = EMajor.Structure,
-            //    Source = EApplcationName.IFC,
-            //});
+            var sPath = @"D:\project\14.ThBim\chart\0929-结构32.ifc";
+            LoadFileToCurrentDocument(new ProjectParameter()
+            {
+                OpenFilePath = sPath,
+                ProjectId = sPath,
+                Major = EMajor.Structure,
+                Source = EApplcationName.IFC,
+            });
 
         }
     }

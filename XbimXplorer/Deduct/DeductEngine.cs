@@ -18,7 +18,7 @@ namespace XbimXplorer.Deduct
     {
 
         private THDocument currDoc;
-        private THBimProject ArchiProject;
+        public THBimProject ArchiProject;
         private THBimProject StructProject;
 
         public DeductEngine(THDocument currDoc)

@@ -124,9 +124,7 @@
     <Compile Include="Xbim\ThXbimBrepExtension.cs" />
     <Compile Include="Xbim\ThXbimGeometryService.cs" />
     <Compile Include="Ifc2x3\ThXbimSlabEngine.cs" />
-    <Compile Include="NTS\ThBimNTSExtension.cs" />
     <Compile Include="NTS\ThIFCNTSExtension.cs" />
-    <Compile Include="NTS\ThIFCNTSExtension4.cs" />
     <Compile Include="NTS\ThIFCNTSFixedPrecision.cs" />
     <Compile Include="NTS\ThIFCNTSService.cs" />
     <Compile Include="NTS\ThIFCNTSSpatialIndex.cs" />

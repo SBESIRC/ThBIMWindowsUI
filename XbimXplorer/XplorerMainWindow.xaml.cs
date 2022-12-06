@@ -1415,7 +1415,7 @@ namespace XbimXplorer
             CurrentDocument.AddProject(aProject, projectParameter);
 
             //var aProject = CurrentDocument.AllBimProjects.Where(x => x.Major == EMajor.Architecture && x.ApplcationName == EApplcationName.CAD).FirstOrDefault();
-            GFCConvertEngine.ToGFCEngine(aProject);
+            //GFCConvertEngine.ToGFCEngine(aProject);
 
         }
 

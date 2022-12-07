@@ -42,7 +42,7 @@ namespace THBimEngine.Domain
             }
             return projectBuilds;
         }
-        public List<ProjectFileInfo> GetProjectFiles() 
+        public List<ProjectFileInfo> GetProjectFiles(bool mainFileDataWithLinkFile = true) 
         {
             var projectBuilds = GetDirFileBuilding();
             var linkFileInfos = new List<ProjectFileInfo>();
@@ -102,7 +102,14 @@ namespace THBimEngine.Domain
                     continue;
                 var linkModel = linkFileInfos.Where(c => c.SubPrjId == item.SubPrjId && c.Major == item.Major && c.ShowFileName == item.ShowFileName).FirstOrDefault();
                 if (linkModel != null)
+                {
                     item.LinkFilePath = linkModel.LoaclPath;
+                    if (mainFileDataWithLinkFile) 
+                    {
+                        FileInfo fileInfo = new FileInfo(linkModel.LoaclPath);
+                        item.LastUpdataTime = fileInfo.LastWriteTime;
+                    }
+                }
                 var linkFile = linkModelFiles.Where(c => c.SubPrjId == item.SubPrjId && c.Major == item.Major && c.ShowFileName == item.ShowFileName).FirstOrDefault();
                 if (null != linkFile)
                     item.ExternalLinkPath = linkFile.LoaclPath;

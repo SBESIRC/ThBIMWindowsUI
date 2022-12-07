@@ -75,6 +75,9 @@ namespace THBimEngine.Domain.MidModel
             var ifcProject = ifcStore.Instances.FirstOrDefault<IIfcProject>();
             var site = ifcProject.Sites.First();
             var buildings = site.Buildings.ToList();
+
+            var holeDic = new Dictionary<int, List<double>>();
+
             foreach (var building in buildings)
             {
                 foreach (var ifcStorey in building.BuildingStoreys)
@@ -102,7 +105,7 @@ namespace THBimEngine.Domain.MidModel
                             {
                                 try
                                 {
-                                    if (((Xbim.Ifc2x3.Kernel.IfcRoot)item).FriendlyName != "Wall_Hole")
+                                    if (!((Xbim.Ifc2x3.Kernel.IfcRoot)item).FriendlyName.Contains("Wall_Hole"))
                                         continue;
                                 }
                                 catch
@@ -182,11 +185,38 @@ namespace THBimEngine.Domain.MidModel
                             }
 
                             UniComponents.Add(uniComponent);
+                            if(type.Contains("IfcOpeningElement"))
+                            {
+                                holeDic.Add(uniComponent.unique_id,new List<double>() 
+                                { uniComponent.x_l+uniComponent.x_r , uniComponent.y_l+uniComponent.y_r, uniComponent.z_l, uniComponent.z_r});
+                            }
                         }
                     }
                     buildingStorey.element_index_e.Add(uniComponentIndex - 1);
                     Buildingstoreys.Add(floorPara.Num, buildingStorey);
                 }
+                foreach(var i in holeDic.Keys)
+                {
+                    var storey = Buildingstoreys[UniComponents[i].floor_num];
+                    if (i == holeDic.Keys.Last())
+                    {
+                        UniComponents[i].properties.Add("holeDepth", (storey.top_elevation - UniComponents[i].z_r).ToString());
+                        continue;
+                    }
+                    foreach (var j in holeDic.Keys)
+                    {
+                        if (j <= i) continue;
+                        var xDiff = Math.Abs(holeDic[i][0] - holeDic[j][0]);
+                        var yDiff = Math.Abs(holeDic[i][1] - holeDic[j][1]);
+                        var holeDepth = holeDic[j][2] - holeDic[i][3];
+                        if (xDiff < 100 && yDiff < 100 && holeDepth > 0 && holeDepth < storey.top_elevation-storey.bottom_elevation)
+                        {
+                            UniComponents[i].properties.Add("holeDepth", (holeDic[j][2]- holeDic[i][3]).ToString());
+                            break;
+                        }
+                    }
+                }
+                
             }
         }
 

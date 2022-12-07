@@ -124,6 +124,7 @@
     <Compile Include="NTS\ThTCHNTSExtension.cs" />
     <Compile Include="NTS\ThTCHNTSOperation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Xbim\ThXbimIfcProfileDefExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\THBimEngine.Domain\THBimEngine.Domain.csproj">

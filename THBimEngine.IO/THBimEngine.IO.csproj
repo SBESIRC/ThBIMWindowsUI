@@ -90,6 +90,7 @@
     <Compile Include="Geometry\ThXbimCommon.cs" />
     <Compile Include="Geometry\ThXbimCoordinateSystem3D.cs" />
     <Compile Include="Geometry\ThXbimExtension.cs" />
+    <Compile Include="Geometry\ThXbimGeometryAnalyzer.cs" />
     <Compile Include="Geometry\ThXbimMeshBuilder.cs" />
     <Compile Include="Geometry\ThXbimPlane3D.cs" />
     <Compile Include="Geometry\ThXbimProtoBufExtension.cs" />
@@ -111,6 +112,7 @@
     <Compile Include="NTS\ThIFCNTSSpatialIndex4.cs" />
     <Compile Include="NTS\ThNTSIfcProductSpatialIndex.cs" />
     <Compile Include="ThBimXbimNTSMarshal.cs" />
+    <Compile Include="Xbim\ThXbimBrepExtension.cs" />
     <Compile Include="Xbim\ThXbimGeometryService.cs" />
     <Compile Include="Ifc2x3\ThXbimSlabEngine.cs" />
     <Compile Include="NTS\ThIFCNTSExtension.cs" />
@@ -122,7 +124,6 @@
     <Compile Include="NTS\ThTCHNTSExtension.cs" />
     <Compile Include="NTS\ThTCHNTSOperation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Xbim\ThXbimIfcProfileDefExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\THBimEngine.Domain\THBimEngine.Domain.csproj">

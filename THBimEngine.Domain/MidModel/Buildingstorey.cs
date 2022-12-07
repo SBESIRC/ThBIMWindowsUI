@@ -31,7 +31,7 @@ namespace THBimEngine.Domain.MidModel
 			description = storey.Describe;
 		}
 
-		public Buildingstorey(IIfcBuildingStorey storey, FloorPara floorPara)
+		public Buildingstorey(IIfcBuildingStorey storey, FloorPara floorPara, string fileName)
 		{
 			floor_name = storey.Name;
 			if(storey.Elevation == null)
@@ -49,7 +49,8 @@ namespace THBimEngine.Domain.MidModel
 			floorNo = floorPara.Num;///
 			if (!(storey.Description is null))
 				description = storey.Description;
-		}
+			properties.Add("fileName", fileName);
+        }
 
 		public void WriteToFile(BinaryWriter writer)
         {

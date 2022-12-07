@@ -81,7 +81,7 @@ namespace THBimEngine.Domain.MidModel
                 {
                     var floorPara = GetIfcStoreyPara(ifcStorey);
                     if (floorPara.Num == -100) continue;
-                    var buildingStorey = new Buildingstorey(ifcStorey, floorPara);
+                    var buildingStorey = new Buildingstorey(ifcStorey, floorPara, ifcStore.FileName);
                     buildingStorey.element_index_s.Add(uniComponentIndex);
                     foreach (var spatialStructure in ifcStorey.ContainsElements)
                     {
@@ -100,8 +100,16 @@ namespace THBimEngine.Domain.MidModel
                             var type = item.ToString().Split('.').Last();
                             if (type.Contains("IfcOpeningElement"))
                             {
-                                if (((Xbim.Ifc2x3.Kernel.IfcRoot)item).FriendlyName != "Wall_Hole")
+                                try
+                                {
+                                    if (((Xbim.Ifc2x3.Kernel.IfcRoot)item).FriendlyName != "Wall_Hole")
+                                        continue;
+                                }
+                                catch
+                                {
                                     continue;
+                                }
+                         
                             }
                             bool isVirtualElement = false;
                             if (type.Contains("IfcVirtualElement"))

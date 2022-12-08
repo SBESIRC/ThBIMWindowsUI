@@ -317,6 +317,9 @@
     <Compile Include="THPluginSystem\LeftPluginViewModel.cs" />
     <Compile Include="THPluginSystem\PluginService.cs" />
     <Compile Include="THPluginSystem\TopPluginViewModel.cs" />
+    <Compile Include="UploadDBFile.xaml.cs">
+      <DependentUpon>UploadDBFile.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserConfig.cs" />
     <Compile Include="XplorerMainWindow.IApplication.xaml.cs">
       <DependentUpon>XplorerMainWindow.xaml</DependentUpon>
@@ -411,6 +414,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="THPluginSystem\LeftPluginMainUControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UploadDBFile.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

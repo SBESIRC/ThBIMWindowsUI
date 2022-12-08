@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Google.Protobuf;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,10 @@ namespace THBimEngine.Domain
         public static XbimVector3D Point3D2Vector(this ThTCHPoint3d pt)
         {
             return new XbimVector3D(pt.X, pt.Y, pt.Z);
+        }
+        public static XbimPoint3D ToXbimPoint3D(this ThTCHPoint3d pt)
+        {
+            return new XbimPoint3D(pt.X, pt.Y, pt.Z);
         }
         public static XbimMatrix3D ToXBimMatrix3D(this ThTCHMatrix3d matrix)
         {
@@ -39,7 +44,10 @@ namespace THBimEngine.Domain
         {
             return new XbimPoint3D(point.X, point.Y, point.Z);
         }
-
+        public static XbimVector3D LineDirection(this ThTCHLine line)
+        {
+            return (line.EndPt.ToXbimPoint3D() - line.StartPt.ToXbimPoint3D()).Normalized();
+        }
         public static ThTCHPoint3d XBimPoint2Point3D(this XbimPoint3D point)
         {
             return new ThTCHPoint3d()
@@ -119,6 +127,14 @@ namespace THBimEngine.Domain
             return outLineGeoParam;
         }
 
+        public static double DistanceTo(this ThTCHPoint3d point, ThTCHPoint3d targetPoint)
+        {
+            var disX = (point.X - targetPoint.X);
+            var disY = (point.Y - targetPoint.Y);
+            var disZ = (point.Z - targetPoint.Z);
+            return Math.Sqrt(disX * disX + disY * disY + disZ * disZ);
+        }
+
         public static ThSULoopData XBimVertexSet2SULoopData(this IEnumerable<XbimPoint3D> vertices)
         {
             ThSULoopData loopData = new ThSULoopData();
@@ -153,6 +169,25 @@ namespace THBimEngine.Domain
                 Data43 = placement3D.Location.Z,
                 Data44 = 1,
             };
+        }
+
+        public static IBufferMessage ExtendCurve(this IBufferMessage curve, double distance)
+        {
+            if (curve is ThTCHLine line)
+            {
+                var dir = line.LineDirection().Normalized();
+                var newStartPt = line.StartPt.ToXbimPoint3D() - dir * distance;
+                var newEndPt = line.EndPt.ToXbimPoint3D() + dir * distance;
+                return new ThTCHLine() { StartPt = newStartPt.XBimPoint2Point3D(), EndPt = newEndPt.XBimPoint2Point3D() };
+            }
+            else if (curve is ThTCHArc arc)
+            {
+                throw new NotSupportedException();
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
         }
 
         public static bool VerifyPipeData(this byte[] data)

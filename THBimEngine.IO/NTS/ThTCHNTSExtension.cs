@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
+using System;
+using Google.Protobuf;
 
 namespace ThBIMServer.NTS
 {
@@ -19,6 +21,23 @@ namespace ThBIMServer.NTS
         private static ThTCHPoint3d ToTCHPoint(this Coordinate point)
         {
             return new ThTCHPoint3d { X = PM.MakePrecise(point.X), Y = PM.MakePrecise(point.Y), Z = 0 };
+        }
+
+        public static LineString ToNTSLineString(this ThTCHLine line)
+        {
+            var points = new List<Coordinate>();
+            points.Add(ToCoordinate(line.StartPt));
+            points.Add(ToCoordinate(line.EndPt));
+            return GF.CreateLineString(points.ToArray());
+        }
+
+        public static LineString ToNTSLineString(this ThTCHArc arc)
+        {
+            var points = new List<Coordinate>();
+            points.Add(ToCoordinate(arc.StartPt));
+            points.Add(ToCoordinate(arc.CenterPt));
+            points.Add(ToCoordinate(arc.EndPt));
+            return GF.CreateLineString(points.ToArray());
         }
 
         public static LineString ToNTSLineString(this ThTCHPolyline polyline)
@@ -104,6 +123,25 @@ namespace ThBIMServer.NTS
             }
         }
 
+        public static LineString ToNTSLineString(this IMessage entity)
+        {
+            if(entity is ThTCHLine line)
+            {
+                return line.ToNTSLineString();
+            }
+            else if(entity is ThTCHArc arc)
+            {
+                return arc.ToNTSLineString();
+            }
+            else if(entity is ThTCHPolyline polyline)
+            {
+                return polyline.ToNTSLineString();
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
+        }
         public static ThTCHPolyline ToTCHPolyline(this NetTopologySuite.Geometries.Geometry geometry)
         {
             if (geometry.IsEmpty)
@@ -161,6 +199,75 @@ namespace ThBIMServer.NTS
                 }
             }
             return tchPolyline;
+        }
+
+        public static Polygon ToNTSPolygon(this Google.Protobuf.IBufferMessage gpEntity)
+        {
+            if(gpEntity is ThTCHMPolygon gpMPolygon)
+            {
+                return gpMPolygon.ToNTSPolygon();
+            }
+            else if(gpEntity is ThTCHPolyline gpPolyline)
+            {
+                return gpPolyline.ToNTSPolygon();
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public static Polygon ToNTSPolygon(this ThTCHMPolygon polygon)
+        {
+            if (polygon == null)
+            {
+                throw new NotImplementedException();
+            }
+            else if (polygon.Holes.Count == 0)
+            {
+                var geometry = polygon.Shell.ToNTSLineString();
+                return geometry.CreatePolygon();
+            }
+            else
+            {
+                if (polygon.Shell.ToNTSLineString() is LinearRing shellRing)
+                {
+                    var holeRings = polygon.Holes.Select(h => h.ToNTSLineString()).OfType<LinearRing>().ToArray();
+                    return ThIFCNTSService.Instance.GeometryFactory.CreatePolygon(shellRing, holeRings);
+                }
+                else
+                {
+                    return ThIFCNTSService.Instance.GeometryFactory.CreatePolygon();
+                }
+            }
+        }
+
+        public static Polygon ToNTSPolygon(this ThTCHPolyline polyline)
+        {
+            if (polyline == null)
+            {
+                throw new NotImplementedException();
+            }
+            var geometry = polyline.ToNTSLineString();
+            return geometry.CreatePolygon();
+        }
+
+        public static ThTCHPoint3d Intersection(this IBufferMessage curve, IBufferMessage other)
+        {
+            var geometry = curve.ToNTSLineString().Intersection(other.ToNTSLineString());
+            if (geometry is Point point)
+            {
+                return new ThTCHPoint3d()
+                {
+                    X = point.X,
+                    Y = point.Y,
+                    Z = point.Z,
+                };
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

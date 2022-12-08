@@ -25,19 +25,19 @@ public static partial class ThTCHWallDataReflection {
           "ChNUaFRDSFdhbGxEYXRhLnByb3RvGhNUaFRDSEdlb21ldHJ5LnByb3RvGhNU",
           "aFRDSERvb3JEYXRhLnByb3RvGhVUaFRDSFdpbmRvd0RhdGEucHJvdG8aFlRo",
           "VENIT3BlbmluZ0RhdGEucHJvdG8aG1RoVENIQnVpbHRFbGVtZW50RGF0YS5w",
-          "cm90byK2AgoNVGhUQ0hXYWxsRGF0YRItCg1idWlsZF9lbGVtZW50GAEgASgL",
+          "cm90byLEAgoNVGhUQ0hXYWxsRGF0YRItCg1idWlsZF9lbGVtZW50GAEgASgL",
           "MhYuVGhUQ0hCdWlsdEVsZW1lbnREYXRhEhIKCmxlZnRfd2lkdGgYAiABKAES",
-          "EwoLcmlnaHRfd2lkdGgYAyABKAESIgoLc3RhcnRfcG9pbnQYBCABKAsyDS5U",
-          "aFRDSFBvaW50M2QSIAoJZW5kX3BvaW50GAUgASgLMg0uVGhUQ0hQb2ludDNk",
-          "Eh0KBWRvb3JzGAYgAygLMg4uVGhUQ0hEb29yRGF0YRIhCgd3aW5kb3dzGAcg",
-          "AygLMhAuVGhUQ0hXaW5kb3dEYXRhEiMKCG9wZW5pbmdzGAggAygLMhEuVGhU",
-          "Q0hPcGVuaW5nRGF0YRIgCgl3YWxsX3R5cGUYCSABKA4yDS5XYWxsVHlwZUVu",
-          "dW0qKwoMV2FsbFR5cGVFbnVtEhAKDFBBUlRJVElPTklORxAAEgkKBVNIRUFS",
-          "EAFiBnByb3RvMw=="));
+          "EwoLcmlnaHRfd2lkdGgYAyABKAESIQoLY2VudGVyX2xpbmUYBCABKAsyCi5U",
+          "aFRDSExpbmVIABIfCgpjZW50ZXJfYXJjGAUgASgLMgkuVGhUQ0hBcmNIABId",
+          "CgVkb29ycxgGIAMoCzIOLlRoVENIRG9vckRhdGESIQoHd2luZG93cxgHIAMo",
+          "CzIQLlRoVENIV2luZG93RGF0YRIjCghvcGVuaW5ncxgIIAMoCzIRLlRoVENI",
+          "T3BlbmluZ0RhdGESIAoJd2FsbF90eXBlGAkgASgOMg0uV2FsbFR5cGVFbnVt",
+          "Qg4KDGNlbnRlcl9jdXJ2ZSorCgxXYWxsVHlwZUVudW0SEAoMUEFSVElUSU9O",
+          "SU5HEAASCQoFU0hFQVIQAWIGcHJvdG8z"));
     descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
         new pbr::FileDescriptor[] { global::ThTCHGeometryReflection.Descriptor, global::ThTCHDoorDataReflection.Descriptor, global::ThTCHWindowDataReflection.Descriptor, global::ThTCHOpeningDataReflection.Descriptor, global::ThTCHBuiltElementDataReflection.Descriptor, },
         new pbr::GeneratedClrTypeInfo(new[] {typeof(global::WallTypeEnum), }, null, new pbr::GeneratedClrTypeInfo[] {
-          new pbr::GeneratedClrTypeInfo(typeof(global::ThTCHWallData), global::ThTCHWallData.Parser, new[]{ "BuildElement", "LeftWidth", "RightWidth", "StartPoint", "EndPoint", "Doors", "Windows", "Openings", "WallType" }, null, null, null, null)
+          new pbr::GeneratedClrTypeInfo(typeof(global::ThTCHWallData), global::ThTCHWallData.Parser, new[]{ "BuildElement", "LeftWidth", "RightWidth", "CenterLine", "CenterArc", "Doors", "Windows", "Openings", "WallType" }, new[]{ "CenterCurve" }, null, null, null)
         }));
   }
   #endregion
@@ -89,12 +89,19 @@ public sealed partial class ThTCHWallData : pb::IMessage<ThTCHWallData>
     buildElement_ = other.buildElement_ != null ? other.buildElement_.Clone() : null;
     leftWidth_ = other.leftWidth_;
     rightWidth_ = other.rightWidth_;
-    startPoint_ = other.startPoint_ != null ? other.startPoint_.Clone() : null;
-    endPoint_ = other.endPoint_ != null ? other.endPoint_.Clone() : null;
     doors_ = other.doors_.Clone();
     windows_ = other.windows_.Clone();
     openings_ = other.openings_.Clone();
     wallType_ = other.wallType_;
+    switch (other.CenterCurveCase) {
+      case CenterCurveOneofCase.CenterLine:
+        CenterLine = other.CenterLine.Clone();
+        break;
+      case CenterCurveOneofCase.CenterArc:
+        CenterArc = other.CenterArc.Clone();
+        break;
+    }
+
     _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
   }
 
@@ -140,27 +147,27 @@ public sealed partial class ThTCHWallData : pb::IMessage<ThTCHWallData>
     }
   }
 
-  /// <summary>Field number for the "start_point" field.</summary>
-  public const int StartPointFieldNumber = 4;
-  private global::ThTCHPoint3d startPoint_;
+  /// <summary>Field number for the "center_line" field.</summary>
+  public const int CenterLineFieldNumber = 4;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-  public global::ThTCHPoint3d StartPoint {
-    get { return startPoint_; }
+  public global::ThTCHLine CenterLine {
+    get { return centerCurveCase_ == CenterCurveOneofCase.CenterLine ? (global::ThTCHLine) centerCurve_ : null; }
     set {
-      startPoint_ = value;
+      centerCurve_ = value;
+      centerCurveCase_ = value == null ? CenterCurveOneofCase.None : CenterCurveOneofCase.CenterLine;
     }
   }
 
-  /// <summary>Field number for the "end_point" field.</summary>
-  public const int EndPointFieldNumber = 5;
-  private global::ThTCHPoint3d endPoint_;
+  /// <summary>Field number for the "center_arc" field.</summary>
+  public const int CenterArcFieldNumber = 5;
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-  public global::ThTCHPoint3d EndPoint {
-    get { return endPoint_; }
+  public global::ThTCHArc CenterArc {
+    get { return centerCurveCase_ == CenterCurveOneofCase.CenterArc ? (global::ThTCHArc) centerCurve_ : null; }
     set {
-      endPoint_ = value;
+      centerCurve_ = value;
+      centerCurveCase_ = value == null ? CenterCurveOneofCase.None : CenterCurveOneofCase.CenterArc;
     }
   }
 
@@ -209,6 +216,27 @@ public sealed partial class ThTCHWallData : pb::IMessage<ThTCHWallData>
     }
   }
 
+  private object centerCurve_;
+  /// <summary>Enum of possible cases for the "center_curve" oneof.</summary>
+  public enum CenterCurveOneofCase {
+    None = 0,
+    CenterLine = 4,
+    CenterArc = 5,
+  }
+  private CenterCurveOneofCase centerCurveCase_ = CenterCurveOneofCase.None;
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+  public CenterCurveOneofCase CenterCurveCase {
+    get { return centerCurveCase_; }
+  }
+
+  [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+  [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+  public void ClearCenterCurve() {
+    centerCurveCase_ = CenterCurveOneofCase.None;
+    centerCurve_ = null;
+  }
+
   [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
   [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
   public override bool Equals(object other) {
@@ -227,12 +255,13 @@ public sealed partial class ThTCHWallData : pb::IMessage<ThTCHWallData>
     if (!object.Equals(BuildElement, other.BuildElement)) return false;
     if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(LeftWidth, other.LeftWidth)) return false;
     if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(RightWidth, other.RightWidth)) return false;
-    if (!object.Equals(StartPoint, other.StartPoint)) return false;
-    if (!object.Equals(EndPoint, other.EndPoint)) return false;
+    if (!object.Equals(CenterLine, other.CenterLine)) return false;
+    if (!object.Equals(CenterArc, other.CenterArc)) return false;
     if(!doors_.Equals(other.doors_)) return false;
     if(!windows_.Equals(other.windows_)) return false;
     if(!openings_.Equals(other.openings_)) return false;
     if (WallType != other.WallType) return false;
+    if (CenterCurveCase != other.CenterCurveCase) return false;
     return Equals(_unknownFields, other._unknownFields);
   }
 
@@ -243,12 +272,13 @@ public sealed partial class ThTCHWallData : pb::IMessage<ThTCHWallData>
     if (buildElement_ != null) hash ^= BuildElement.GetHashCode();
     if (LeftWidth != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(LeftWidth);
     if (RightWidth != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(RightWidth);
-    if (startPoint_ != null) hash ^= StartPoint.GetHashCode();
-    if (endPoint_ != null) hash ^= EndPoint.GetHashCode();
+    if (centerCurveCase_ == CenterCurveOneofCase.CenterLine) hash ^= CenterLine.GetHashCode();
+    if (centerCurveCase_ == CenterCurveOneofCase.CenterArc) hash ^= CenterArc.GetHashCode();
     hash ^= doors_.GetHashCode();
     hash ^= windows_.GetHashCode();
     hash ^= openings_.GetHashCode();
     if (WallType != global::WallTypeEnum.Partitioning) hash ^= WallType.GetHashCode();
+    hash ^= (int) centerCurveCase_;
     if (_unknownFields != null) {
       hash ^= _unknownFields.GetHashCode();
     }
@@ -279,13 +309,13 @@ public sealed partial class ThTCHWallData : pb::IMessage<ThTCHWallData>
       output.WriteRawTag(25);
       output.WriteDouble(RightWidth);
     }
-    if (startPoint_ != null) {
+    if (centerCurveCase_ == CenterCurveOneofCase.CenterLine) {
       output.WriteRawTag(34);
-      output.WriteMessage(StartPoint);
+      output.WriteMessage(CenterLine);
     }
-    if (endPoint_ != null) {
+    if (centerCurveCase_ == CenterCurveOneofCase.CenterArc) {
       output.WriteRawTag(42);
-      output.WriteMessage(EndPoint);
+      output.WriteMessage(CenterArc);
     }
     doors_.WriteTo(output, _repeated_doors_codec);
     windows_.WriteTo(output, _repeated_windows_codec);
@@ -316,13 +346,13 @@ public sealed partial class ThTCHWallData : pb::IMessage<ThTCHWallData>
       output.WriteRawTag(25);
       output.WriteDouble(RightWidth);
     }
-    if (startPoint_ != null) {
+    if (centerCurveCase_ == CenterCurveOneofCase.CenterLine) {
       output.WriteRawTag(34);
-      output.WriteMessage(StartPoint);
+      output.WriteMessage(CenterLine);
     }
-    if (endPoint_ != null) {
+    if (centerCurveCase_ == CenterCurveOneofCase.CenterArc) {
       output.WriteRawTag(42);
-      output.WriteMessage(EndPoint);
+      output.WriteMessage(CenterArc);
     }
     doors_.WriteTo(ref output, _repeated_doors_codec);
     windows_.WriteTo(ref output, _repeated_windows_codec);
@@ -350,11 +380,11 @@ public sealed partial class ThTCHWallData : pb::IMessage<ThTCHWallData>
     if (RightWidth != 0D) {
       size += 1 + 8;
     }
-    if (startPoint_ != null) {
-      size += 1 + pb::CodedOutputStream.ComputeMessageSize(StartPoint);
+    if (centerCurveCase_ == CenterCurveOneofCase.CenterLine) {
+      size += 1 + pb::CodedOutputStream.ComputeMessageSize(CenterLine);
     }
-    if (endPoint_ != null) {
-      size += 1 + pb::CodedOutputStream.ComputeMessageSize(EndPoint);
+    if (centerCurveCase_ == CenterCurveOneofCase.CenterArc) {
+      size += 1 + pb::CodedOutputStream.ComputeMessageSize(CenterArc);
     }
     size += doors_.CalculateSize(_repeated_doors_codec);
     size += windows_.CalculateSize(_repeated_windows_codec);
@@ -386,24 +416,27 @@ public sealed partial class ThTCHWallData : pb::IMessage<ThTCHWallData>
     if (other.RightWidth != 0D) {
       RightWidth = other.RightWidth;
     }
-    if (other.startPoint_ != null) {
-      if (startPoint_ == null) {
-        StartPoint = new global::ThTCHPoint3d();
-      }
-      StartPoint.MergeFrom(other.StartPoint);
-    }
-    if (other.endPoint_ != null) {
-      if (endPoint_ == null) {
-        EndPoint = new global::ThTCHPoint3d();
-      }
-      EndPoint.MergeFrom(other.EndPoint);
-    }
     doors_.Add(other.doors_);
     windows_.Add(other.windows_);
     openings_.Add(other.openings_);
     if (other.WallType != global::WallTypeEnum.Partitioning) {
       WallType = other.WallType;
     }
+    switch (other.CenterCurveCase) {
+      case CenterCurveOneofCase.CenterLine:
+        if (CenterLine == null) {
+          CenterLine = new global::ThTCHLine();
+        }
+        CenterLine.MergeFrom(other.CenterLine);
+        break;
+      case CenterCurveOneofCase.CenterArc:
+        if (CenterArc == null) {
+          CenterArc = new global::ThTCHArc();
+        }
+        CenterArc.MergeFrom(other.CenterArc);
+        break;
+    }
+
     _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
   }
 
@@ -435,17 +468,21 @@ public sealed partial class ThTCHWallData : pb::IMessage<ThTCHWallData>
           break;
         }
         case 34: {
-          if (startPoint_ == null) {
-            StartPoint = new global::ThTCHPoint3d();
+          global::ThTCHLine subBuilder = new global::ThTCHLine();
+          if (centerCurveCase_ == CenterCurveOneofCase.CenterLine) {
+            subBuilder.MergeFrom(CenterLine);
           }
-          input.ReadMessage(StartPoint);
+          input.ReadMessage(subBuilder);
+          CenterLine = subBuilder;
           break;
         }
         case 42: {
-          if (endPoint_ == null) {
-            EndPoint = new global::ThTCHPoint3d();
+          global::ThTCHArc subBuilder = new global::ThTCHArc();
+          if (centerCurveCase_ == CenterCurveOneofCase.CenterArc) {
+            subBuilder.MergeFrom(CenterArc);
           }
-          input.ReadMessage(EndPoint);
+          input.ReadMessage(subBuilder);
+          CenterArc = subBuilder;
           break;
         }
         case 50: {
@@ -495,17 +532,21 @@ public sealed partial class ThTCHWallData : pb::IMessage<ThTCHWallData>
           break;
         }
         case 34: {
-          if (startPoint_ == null) {
-            StartPoint = new global::ThTCHPoint3d();
+          global::ThTCHLine subBuilder = new global::ThTCHLine();
+          if (centerCurveCase_ == CenterCurveOneofCase.CenterLine) {
+            subBuilder.MergeFrom(CenterLine);
           }
-          input.ReadMessage(StartPoint);
+          input.ReadMessage(subBuilder);
+          CenterLine = subBuilder;
           break;
         }
         case 42: {
-          if (endPoint_ == null) {
-            EndPoint = new global::ThTCHPoint3d();
+          global::ThTCHArc subBuilder = new global::ThTCHArc();
+          if (centerCurveCase_ == CenterCurveOneofCase.CenterArc) {
+            subBuilder.MergeFrom(CenterArc);
           }
-          input.ReadMessage(EndPoint);
+          input.ReadMessage(subBuilder);
+          CenterArc = subBuilder;
           break;
         }
         case 50: {

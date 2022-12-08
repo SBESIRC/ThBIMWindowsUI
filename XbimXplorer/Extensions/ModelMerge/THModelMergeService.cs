@@ -32,8 +32,12 @@ namespace XbimXplorer.Extensions.ModelMerge
         /// <param name="bigModel">95%ifc</param>
         /// <param name="smallModel">5%ifc</param>
         /// <returns></returns>
-        public IfcStore ModelMerge(IfcStore bigModel, IfcStore smallModel)
+        public IfcStore ModelMerge(IfcStore model, IfcStore smallModel)
         {
+            if (string.IsNullOrEmpty(model.FileName))
+                return null;
+            var bigModel = IfcStore.Open(model.FileName);
+
             //先做一个最简单的，两个Ifc2X3的IFC模型合并，后续再考虑版本问题
             var bigProject = bigModel.Instances.FirstOrDefault<Xbim.Ifc2x3.Kernel.IfcProject>();
             var smallProject = smallModel.Instances.FirstOrDefault<Xbim.Ifc2x3.Kernel.IfcProject>();
@@ -133,50 +137,17 @@ namespace XbimXplorer.Extensions.ModelMerge
                 {
                     storey = BuildingStorey.CloneAndCreateNew(bigModel, bigBuildings, storeyName, Storey_z,  storey_heigth, ++MaxStdFlrNo);
                 }
-                var CreatWalls = new List<Xbim.Ifc2x3.SharedBldgElements.IfcWall>();
-                var CreatSlabs = new List<Xbim.Ifc2x3.SharedBldgElements.IfcSlab>();
-                var CreatBeams = new List<Xbim.Ifc2x3.SharedBldgElements.IfcBeam>();
-                var CreatColumns = new List<Xbim.Ifc2x3.SharedBldgElements.IfcColumn>();
+                var CreatElements = new List<Xbim.Ifc2x3.Kernel.IfcProduct>();
                 foreach (var spatialStructure in BuildingStorey.ContainsElements)
                 {
-                    {
-                        //var elements = spatialStructure.RelatedElements;
-                        //var walls = elements.OfType<Xbim.Ifc2x3.SharedBldgElements.IfcWall>();
-                        //var wall = walls.FirstOrDefault();
-                        ////示例： 一个墙最终表达到Viewer的坐标。 是自己的坐标 + wall_Location + Storey_Location
-                        //var wall_z = ((wall.ObjectPlacement as Xbim.Ifc2x3.GeometricConstraintResource.IfcLocalPlacement).RelativePlacement as Xbim.Ifc2x3.GeometryResource.IfcPlacement).Location.Z;
-                    }
                     var elements = spatialStructure.RelatedElements;
-                    var walls = elements.OfType<Xbim.Ifc2x3.SharedBldgElements.IfcWall>();
-                    var slabs = elements.OfType<Xbim.Ifc2x3.SharedBldgElements.IfcSlab>();
-                    var beams = elements.OfType<Xbim.Ifc2x3.SharedBldgElements.IfcBeam>();
-                    var columns = elements.OfType<Xbim.Ifc2x3.SharedBldgElements.IfcColumn>();
-                    {
-                        //var wall = walls.FirstOrDefault();
-                        ////示例： 一个墙最终表达到Viewer的坐标。 是自己的坐标 + wall_Location + Storey_Location
-                        //var wall_z = ((wall.ObjectPlacement as Xbim.Ifc2x3.GeometricConstraintResource.IfcLocalPlacement).RelativePlacement as Xbim.Ifc2x3.GeometryResource.IfcPlacement).Location.Z;
-                    }
+                    
                     using (var txn = bigModel.BeginTransaction("Insert copy"))
                     {
-                        foreach (var wall in walls)
+                        foreach (var element in elements)
                         {
-                            var newWall = bigModel.InsertCopy(wall, map, semanticFilter, false, false);
-                            CreatWalls.Add(newWall);
-                        }
-                        foreach (var slab in slabs)
-                        {
-                            var newSlab = bigModel.InsertCopy(slab, map, semanticFilter, false, false);
-                            CreatSlabs.Add(newSlab);
-                        }
-                        foreach (var beam in beams)
-                        {
-                            var newBeam = bigModel.InsertCopy(beam, map, semanticFilter, false, false);
-                            CreatBeams.Add(newBeam);
-                        }
-                        foreach (var column in columns)
-                        {
-                            var newColumn = bigModel.InsertCopy(column, map, semanticFilter, false, false);
-                            CreatColumns.Add(newColumn);
+                            var newElement = bigModel.InsertCopy(element, map, semanticFilter, false, false);
+                            CreatElements.Add(newElement);
                         }
                         txn.Commit();
                     }
@@ -188,10 +159,7 @@ namespace XbimXplorer.Extensions.ModelMerge
                     storey.ContainsElements.Append<Xbim.Ifc2x3.Interfaces.IIfcRelContainedInSpatialStructure>(relContainedIn);
 
                     relContainedIn.RelatingStructure = storey;
-                    relContainedIn.RelatedElements.AddRange(CreatWalls);
-                    relContainedIn.RelatedElements.AddRange(CreatSlabs);
-                    relContainedIn.RelatedElements.AddRange(CreatBeams);
-                    relContainedIn.RelatedElements.AddRange(CreatColumns);
+                    relContainedIn.RelatedElements.AddRange(CreatElements);
                     txn.Commit();
                 }
             }

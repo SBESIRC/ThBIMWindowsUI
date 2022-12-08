@@ -1072,9 +1072,20 @@ namespace XbimXplorer
                             MessageBox.Show("主文件未在项目中找到，无法进行合模操作");
                             return;
                         }
-                        var projectData = structure5Project?.SourceProject as ThSUProjectData;
                         var mergeService = new Extensions.ModelMerge.THModelMergeService();
-                        var mergeIfc = mergeService.ModelMerge(ifcStore, projectData);
+                        IfcStore mergeIfc;
+                        if (structure5Project?.SourceProject is ThSUProjectData projectData)
+                        {
+                            mergeIfc = mergeService.ModelMerge(ifcStore, projectData);
+                        }
+                        else if (structure5Project?.SourceProject is IfcStore projectIfcStore)
+                        {
+                            mergeIfc = mergeService.ModelMerge(ifcStore, projectIfcStore);
+                        }
+                        else
+                        {
+                            mergeIfc = null;
+                        }
                         var fileName = Path.GetFileNameWithoutExtension(ifcStore.FileName);
                         var dirName = Path.GetDirectoryName(ifcStore.FileName);
                         fileName = string.Format("{0}-100%.ifc", fileName);

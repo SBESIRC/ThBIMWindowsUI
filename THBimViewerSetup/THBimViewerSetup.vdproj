@@ -591,18 +591,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_5025FF8C778C06BF05A40F357C652E10"
-        "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_5025FF8C778C06BF05A40F357C652E10"
-        "OwnerKey" = "8:_7D7BBC6E3999F8A67CA308B1419B8F72"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_51A51311C0464651A6FA1AB8754D0F27"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -875,18 +863,6 @@
         {
         "MsmKey" = "8:_7CEBC9970876583ECE271E24253541D9"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7D7BBC6E3999F8A67CA308B1419B8F72"
-        "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7D7BBC6E3999F8A67CA308B1419B8F72"
-        "OwnerKey" = "8:_ECA264919BA6435611CA7F229D193CCF"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1444,18 +1420,6 @@
         "Entry"
         {
         "MsmKey" = "8:_D7ED7D512CB0995C72E15B0B5FE20099"
-        "OwnerKey" = "8:_7D7BBC6E3999F8A67CA308B1419B8F72"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_D7ED7D512CB0995C72E15B0B5FE20099"
-        "OwnerKey" = "8:_5025FF8C778C06BF05A40F357C652E10"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_D7ED7D512CB0995C72E15B0B5FE20099"
         "OwnerKey" = "8:_11E22DC836A7833D145E48FDC0A79084"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1761,6 +1725,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_FE66DE98132C1F4D96D12AB1C5840107"
+        "OwnerKey" = "8:_EEC97A5F0F6F8941209AE265B10BA82D"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
         "MsmSig" = "8:_UNDEFINED"
@@ -1805,18 +1775,6 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_ECA264919BA6435611CA7F229D193CCF"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_7D7BBC6E3999F8A67CA308B1419B8F72"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_5025FF8C778C06BF05A40F357C652E10"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -2273,7 +2231,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\天华结构三维平台1.0.24.msi"
+        "OutputFilename" = "8:Release\\天华结构三维平台1.0.25.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -2516,7 +2474,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:THBimEngine.Application, Version=1.0.23.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:THBimEngine.Application, Version=1.0.24.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_0E417396EAD022E3C6BC22B0C5A3007E"
@@ -2711,7 +2669,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:THBimEngine.Common, Version=1.0.23.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:THBimEngine.Common, Version=1.0.24.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_11E22DC836A7833D145E48FDC0A79084"
@@ -2906,7 +2864,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:THBimEngine.DBOperation, Version=1.0.23.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:THBimEngine.DBOperation, Version=1.0.24.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_210447E4D88C3FAE9A6235444D385C98"
@@ -3523,37 +3481,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_5025FF8C778C06BF05A40F357C652E10"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:AcsClient.Connector, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_5025FF8C778C06BF05A40F357C652E10"
-                    {
-                    "Name" = "8:AcsClient.Connector.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:AcsClient.Connector.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_0651A10A253F4D13A5CC23E1EBF76FF8"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_51A51311C0464651A6FA1AB8754D0F27"
             {
             "SourcePath" = "8:..\\WorkDir\\ifc-render-engine.dll"
@@ -3660,7 +3587,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:GLFW.NET, Version=1.0.23.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:GLFW.NET, Version=1.0.24.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_5A348231EA96114A6C2FA4F414B9C3DE"
@@ -4066,37 +3993,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_7D7BBC6E3999F8A67CA308B1419B8F72"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:LBimFileCommit, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_7D7BBC6E3999F8A67CA308B1419B8F72"
-                    {
-                    "Name" = "8:LBimFileCommit.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:LBimFileCommit.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_0651A10A253F4D13A5CC23E1EBF76FF8"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_826DBEEA981D0185844B273B0EEC3170"
             {
             "AssemblyRegister" = "3:1"
@@ -4469,7 +4365,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:THBimEngine.Presention, Version=1.0.23.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:THBimEngine.Presention, Version=1.0.24.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_9EE529A42ABB0CD61D16DCD679452B10"
@@ -4613,7 +4509,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:THBimEngine.Geometry, Version=1.0.23.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:THBimEngine.Geometry, Version=1.0.24.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_A57063B4618B76806E8318B880096D0C"
@@ -4837,7 +4733,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:THBimEngine.Domain, Version=1.0.23.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:THBimEngine.Domain, Version=1.0.24.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_B1EC13D795B0545F52CE82B224731401"
@@ -5695,7 +5591,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:THBimEngine.HttpService, Version=1.0.23.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:THBimEngine.HttpService, Version=1.0.24.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_ECA264919BA6435611CA7F229D193CCF"
@@ -5726,7 +5622,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:THBimEngine.IO, Version=1.0.23.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:THBimEngine.IO, Version=1.0.24.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_EEC97A5F0F6F8941209AE265B10BA82D"
@@ -6185,15 +6081,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:天华结构三维平台"
-        "ProductCode" = "8:{489B30CF-1078-4F89-A5DB-6EBACECC1944}"
-        "PackageCode" = "8:{8CBB6A0D-DF56-4607-AA03-870DF6BF2952}"
+        "ProductCode" = "8:{0CBBAB6E-3551-4125-9484-D15A7700ABE8}"
+        "PackageCode" = "8:{67ABFB0C-0D03-45CD-B633-C2FE2D11B16F}"
         "UpgradeCode" = "8:{ED2A8D68-8A28-4313-AC3F-A8420ED52526}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.24"
+        "ProductVersion" = "8:1.0.25"
         "Manufacturer" = "8:TIANHUA Architectural Design Co., Ltd"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

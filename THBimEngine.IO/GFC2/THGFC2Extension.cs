@@ -127,5 +127,19 @@ namespace THBimEngine.IO.GFC2
             }
             return id;
         }
+
+        public static int AddRelDefinesByElement(this ThGFC2Document doc, int parentID, List<int> childIds)
+        {
+            var id = -1;
+            if (childIds != null && childIds.Count > 0)
+            {
+                var rel = new NGfc2RelDefinesByElement();
+                rel.setRelatingElement(parentID);
+                childIds.ForEach(x => rel.addRelatedObjects(x));
+
+                id = doc.AddEntity(rel);
+            }
+            return id;
+        }
     }
 }

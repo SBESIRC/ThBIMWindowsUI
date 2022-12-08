@@ -13,50 +13,86 @@ namespace XbimXplorer.Deduct
     {
         public static void ToGFCEngine(THBimProject prj)
         {
-            var docPath = @"D:\project\14.ThBim\chart\try.gfc";
+            var docPath = @"D:\project\14.ThBim\chart\try.gfc2";
             var gfcDoc = ThGFC2Document.Create(docPath);
-
-            if (prj.ProjectSite == null)
+            try
             {
-                return;
+                if (prj.ProjectSite == null)
+                {
+                    return;
+                }
+
+                PrjToGFC(prj, gfcDoc);
             }
+            catch
+            {
 
-            PrjToGFC(prj, gfcDoc);
-
-            gfcDoc.Close();
+            }
+            finally
+            {
+                gfcDoc.Close();
+            }
         }
 
         private static void PrjToGFC(THBimProject prj, ThGFC2Document gfcDoc)
         {
-            prj.ToGfc(gfcDoc);
+            var globelId = 0;
+            prj.ToGfc(gfcDoc, ref globelId);
 
             var site = prj.ProjectSite;
+            var buildingStoreyGFCDict = new Dictionary<int, List<int>>();//building gfc lineNo，floor gfc lineNo;
+            var floorEntityDict = new Dictionary<int, List<int>>();//floor gfc lineNo, entity gfc lineNo;
+            var entityModel = new Dictionary<int, Tuple<int, List<int>>>();//key：wall width ，item1: wallmodel lineNo, item2: wall entity gfc lineNo;
 
-            var buildingStoreyGFCDict = new Dictionary<int, List<int>>();//building gfc id，floor gfc ID;
-            var floorEntityDict = new Dictionary<int, List<int>>();//floor gfc id，entity gfc ID;
+            var wallCount = 0;
 
-            foreach (var buildingPair in site.SiteBuildings)
+            for (int i = 0; i < site.SiteBuildings.Count; i++)
             {
-                var buildingId = buildingPair.Value.ToGfc(gfcDoc);
+                //if (i > 0)
+                //{
+                //    continue;
+                //}
+
+                var buildingPair = site.SiteBuildings.ElementAt(i);
+                var buildingId = buildingPair.Value.ToGfc(gfcDoc, ref globelId);
                 buildingStoreyGFCDict.Add(buildingId, new List<int>());
 
-                foreach (var floorPair in buildingPair.Value.BuildingStoreys)
+                for (int j = 0; j < buildingPair.Value.BuildingStoreys.Count; j++)
                 {
-                    var floorId = floorPair.Value.ToGfc(gfcDoc);
+                    //if (j > 0)
+                    //{
+                    //    continue;
+                    //}
+
+                    var floorPair = buildingPair.Value.BuildingStoreys.ElementAt(j);
+                    var floorId = floorPair.Value.ToGfc(gfcDoc, ref globelId);
                     buildingStoreyGFCDict[buildingId].Add(floorId);
                     floorEntityDict.Add(floorId, new List<int>());
 
                     var floorHightMatrix = floorPair.Value.Matrix3D;
+
                     foreach (var entityRelation in floorPair.Value.FloorEntityRelations)
                     {
+                        //if (wallCount > 0)
+                        //{
+                        //    continue;
+                        //}
+
                         var rUid = entityRelation.Value.RelationElementUid;
                         prj.PrjAllEntitys.TryGetValue(rUid, out var entity);
+
                         if (entity is THBimWall wallEntity)
                         {
-                            var wid = wallEntity.ToGfc(gfcDoc, floorHightMatrix);
-                            floorEntityDict[floorId].Add(wid);
+                            var wid = wallEntity.ToGfc(gfcDoc, floorHightMatrix, ref globelId, ref entityModel);
+                            if (wid != -1)
+                            {
+                                floorEntityDict[floorId].Add(wid);
+                                wallCount++;
+                            }
                         }
                     }
+                    floorEntityDict[floorId].AddRange(entityModel.Select(x => x.Value.Item1));
+
                 }
             }
 
@@ -70,6 +106,10 @@ namespace XbimXplorer.Deduct
                 gfcDoc.AddRelAggregate(p.Key, p.Value);
             }
 
+            foreach (var p in entityModel)
+            {
+                gfcDoc.AddRelDefinesByElement(p.Value.Item1, p.Value.Item2);
+            }
 
 
         }

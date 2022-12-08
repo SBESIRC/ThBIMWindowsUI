@@ -46,21 +46,16 @@ namespace XbimXplorer.Deduct
             //    foreach (var cutWall in s.Value)
             //    {
             //        var swall = new List<string>();
-
-
             //        foreach (var ifc in cutWall.Value)
             //        {
             //            var suid = wallTupleDict.Where(x => x.Value == ifc).FirstOrDefault().Key;
             //            swall.Add(suid);
             //        }
-
             //        debug.Add(cutWall.Key, swall);
             //    }
             //}
            
-
             var wallCutResult = CutBimWall(deductWall);
-
 
             //var wallnew = wallCutResult.ElementAt(0).Value.Item2;
             //var wallori = debug.ElementAt(0).Key;

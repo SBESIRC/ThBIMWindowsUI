@@ -58,18 +58,25 @@ namespace XbimXplorer.Deduct
                     cutArchiWallPolyTemp.Add(cutArchiWallpl);
                 }
 
-
                 var cutArchiWallPoly = new List<LinearRing>();
                 cutArchiWallPoly.AddRange(cutArchiWallPolyTemp.Select(x => x.Shell));
 
-                //var cutArchiWallNotSmall = RemoveTooSmallCutWall(cutArchiWallPoly, tol_tooSmallCut);
-
-
                 var cutPolyObb = cutArchiWallPoly.Select(x => x.ToObb()).ToList();
-                var isOriWall = IsCutWallSimilarWithOri(cutPolyObb, archiWallOri, tol_OBBRatio);
-                if (isOriWall == false)
+
+                var cutArchiWallNotSmall = RemoveTooSmallCutWall(cutPolyObb, tol_tooSmallCut);
+
+                if (cutArchiWallNotSmall.Count == 0)
                 {
-                    cutPart.AddRange(cutPolyObb);
+                    onlyDelete = true;
+                }
+                else
+                {
+                    var isOriWall = IsCutWallSimilarWithOri(cutArchiWallNotSmall, archiWallOri, tol_OBBRatio);
+
+                    if (isOriWall == false)
+                    {
+                        cutPart.AddRange(cutArchiWallNotSmall);
+                    }
                 }
             }
 
@@ -97,15 +104,44 @@ namespace XbimXplorer.Deduct
         /// </summary>
         /// <param name="cutArchiWallPoly"></param>
         /// <returns></returns>
-        private static List<LinearRing> RemoveTooSmallCutWall(List<LinearRing> cutArchiWallPoly, double tol)
+        private static List<Polygon> RemoveTooSmallCutWall(List<Polygon> cutArchiWallPoly, double tol)
         {
-            var notsmall = new List<LinearRing>();
+            var notsmall = new List<Polygon>();
 
-            notsmall.AddRange(cutArchiWallPoly);
+            foreach (var wallPoly in cutArchiWallPoly)
+            {
 
+                if (wallPoly.Area <= 200 * tol || IsMaxSideShort(wallPoly, tol))
+                {
+
+                }
+                else
+                {
+                    notsmall.Add(wallPoly);
+                }
+            }
 
             return notsmall;
         }
+
+        private static bool IsMaxSideShort(Polygon pl, double tol)
+        {
+            var returnB = false;
+
+            for (int i = 0; i < pl.Coordinates.Count() - 1; i++)
+            {
+                if (pl.Coordinates[i].Distance(pl.Coordinates[i + 1]) < tol)
+                {
+                    returnB = true;
+                    break;
+                }
+            }
+
+
+            return returnB;
+        }
+
+
 
         private static Polygon ToObb(this NetTopologySuite.Geometries.Geometry geom)
         {

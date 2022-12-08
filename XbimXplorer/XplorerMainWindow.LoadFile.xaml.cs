@@ -45,7 +45,7 @@ namespace XbimXplorer
             {
                 LoadTHBimFile(filePath);
             }
-            else if (ext == ".ydb") 
+            else if (ext == ".ydb")
             {
                 LoadYJKYDBFile(filePath);
             }
@@ -92,7 +92,7 @@ namespace XbimXplorer
         List<ProjectParameter> openProjects;
         void LoadFilesToCurrentDocument(List<ProjectParameter> openFileParameters)
         {
-            if (null == openFileParameters || openFileParameters.Count<1 || mutilLoadBWorker != null)
+            if (null == openFileParameters || openFileParameters.Count < 1 || mutilLoadBWorker != null)
                 return;
             openProjects = new List<ProjectParameter>();
             openProjects.AddRange(openFileParameters);
@@ -336,40 +336,72 @@ namespace XbimXplorer
                  */
 
                 var DataHead = fileArray.Take(10).ToArray();
-                //84 = 'T' 72 = 'H' 
-                if (DataHead[0] == 84 && DataHead[1] == 72 && DataHead[2] == 3)
+
+
+                ////84 = 'T' 72 = 'H' 
+                //if (DataHead[0] == 84 && DataHead[1] == 72 && DataHead[2] == 3)
+                //{
+                //    switch (DataHead[3])
+                //    {
+                //        case 1:
+                //            {
+                //                //CAD THBim 文件
+                //                var DataBody = fileArray.Skip(10).ToArray();
+                //                var th_Project = new ThTCHProjectData();
+                //                Google.Protobuf.MessageExtensions.MergeFrom(th_Project, DataBody);
+                //                th_Project.Root.GlobalId = fileName;
+                //                CurrentDocument.AddProject(th_Project, openParameter);
+                //                break;
+                //            }
+                //        case 2:
+                //            {
+                //                //SU THBim 文件
+                //                var DataBody = fileArray.Skip(10).ToArray();
+                //                var su_Project = new ThSUProjectData();
+                //                Google.Protobuf.MessageExtensions.MergeFrom(su_Project, DataBody);
+                //                su_Project.Root.GlobalId = fileName;
+                //                CurrentDocument.AddProject(su_Project, openParameter);
+                //                break;
+                //            }
+                //        default:
+                //            {
+                //                //不支持的文件类型
+                //                Log.WarnFormat($"{fileName}导入失败，不支持的文件数据");
+                //                break;
+                //            }
+                //    }
+                //}
+
+                var thMessage = new ProtobufMessage();
+                Google.Protobuf.MessageExtensions.MergeFrom(thMessage, fileArray);
+
+                if (thMessage.CadProjects.Count > 0)
                 {
-                    switch (DataHead[3])
+                    foreach (var project in thMessage.CadProjects)
                     {
-                        case 1:
-                            {
-                                //CAD THBim 文件
-                                var DataBody = fileArray.Skip(10).ToArray();
-                                var th_Project = new ThTCHProjectData();
-                                Google.Protobuf.MessageExtensions.MergeFrom(th_Project, DataBody);
-                                th_Project.Root.GlobalId = fileName;
-                                CurrentDocument.AddProject(th_Project, openParameter);
-                                break;
-                            }
-                        case 2:
-                            {
-                                //SU THBim 文件
-                                var DataBody = fileArray.Skip(10).ToArray();
-                                var su_Project = new ThSUProjectData();
-                                Google.Protobuf.MessageExtensions.MergeFrom(su_Project, DataBody);
-                                su_Project.Root.GlobalId = fileName;
-                                CurrentDocument.AddProject(su_Project, openParameter);
-                                break;
-                            }
-                        default:
-                            {
-                                //不支持的文件类型
-                                Log.WarnFormat($"{fileName}导入失败，不支持的文件数据");
-                                break;
-                            }
+                        var ProjectId = project.ProjectId;//项目信息
+                        var ProjectChildId = project.ProjectSubId;//子项信息
+                        var BindingName = project.BindingName;//楼栋名称
+                        var ProjectPath = project.ProjectPath;//完整路径
+
+                        CurrentDocument.AddProject(project, new ProjectParameter
+                        {
+                            ProjectId = project.Root.GlobalId,
+                            Source = THBimEngine.Domain.EApplcationName.CAD,
+                            Major = THBimEngine.Domain.EMajor.Architecture,
+                        });
                     }
                 }
+                else if (thMessage.SuProjects.Count > 0)
+                {
 
+
+                }
+                else
+                {
+                    //不支持的文件类型
+                    Log.WarnFormat($"{fileName}导入失败，不支持的文件数据");
+                }
             }
             catch (Exception ex)
             {
@@ -380,7 +412,7 @@ namespace XbimXplorer
                 r.Dispose();
             }
         }
-        private void LoadYJKYDBFile(string fileName) 
+        private void LoadYJKYDBFile(string fileName)
         {
             if (string.IsNullOrEmpty(fileName) || !File.Exists(fileName))
                 return;

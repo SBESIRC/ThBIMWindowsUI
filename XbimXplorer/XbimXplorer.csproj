@@ -218,7 +218,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Extensions\GPEntityConvert.cs" />
     <Compile Include="Extensions\IFCReverse.cs" />
     <Compile Include="Project\BoolToVisibilty.cs" />
     <Compile Include="Business\RenderEngineToHome.cs" />

@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using THBimEngine.Domain;
 using THBimEngine.Geometry.ProjectFactory;
-using Xbim.Common.Geometry;
 using Xbim.Ifc;
 using Xbim.Ifc4.Interfaces;
 

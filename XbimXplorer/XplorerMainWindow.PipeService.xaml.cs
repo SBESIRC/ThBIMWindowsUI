@@ -16,6 +16,7 @@ using Xbim.Common.Geometry;
 using Xbim.Ifc;
 using XbimXplorer.Extensions.ModelMerge;
 using XbimXplorer.ThBIMEngine;
+using THBimEngine.IO.GoogleProtobuf;
 
 namespace XbimXplorer
 {
@@ -218,6 +219,21 @@ namespace XbimXplorer
                     var ProjectChildId = project.ProjectSubId;//子项信息
                     var BindingName = project.BindingName;//楼栋名称
                     var ProjectPath = project.ProjectPath;//完整路径
+                    //wall BUTT Buffer
+                    {
+                        GPEntityConvert projectConvert = new GPEntityConvert(BufferType.MITTER);
+                        foreach (var site in project.Sites)
+                        {
+                            foreach (var building in site.Buildings)
+                            {
+                                foreach (var storey in building.Storeys)
+                                {
+                                    projectConvert.WallDataDoorWindowRelation(storey.Walls.ToList());
+                                }
+                            }
+                        }
+
+                    }
                     //打印CAD管道数据
                     var Model = ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Factory.CreateAndInitModel("ThCAD2IFCProject", project.Root.GlobalId);
                     if (Model != null)

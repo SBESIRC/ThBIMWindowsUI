@@ -261,7 +261,7 @@ namespace ThBIMServer.NTS
                 {
                     X = point.X,
                     Y = point.Y,
-                    Z = point.Z,
+                    Z = 0,
                 };
             }
             else

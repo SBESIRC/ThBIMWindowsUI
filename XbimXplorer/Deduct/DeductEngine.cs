@@ -24,8 +24,8 @@ namespace XbimXplorer.Deduct
         public DeductEngine(THDocument currDoc)
         {
             this.currDoc = currDoc;
-            var sProject = currDoc.AllBimProjects.Where(x => x.Major == EMajor.Structure).FirstOrDefault();
-            var aProject = currDoc.AllBimProjects.Where(x => x.Major == EMajor.Architecture && x.ApplcationName == EApplcationName.CAD).FirstOrDefault();
+            var sProject = currDoc.AllBimProjects.Where(x => x.Major == EMajor.Structure && x.ApplcationName == EApplcationName.IFC).FirstOrDefault();
+            var aProject = currDoc.AllBimProjects.Where(x => x.Major == EMajor.Architecture && x.ApplcationName == EApplcationName.IFC).FirstOrDefault();
            
             StructProject = sProject;
             ArchiProject = aProject;
@@ -38,7 +38,8 @@ namespace XbimXplorer.Deduct
                 return;
             }
 
-            var ifcStore = StructProject.SourceProject as Xbim.Ifc.IfcStore;
+            var archIfcStore = ArchiProject.SourceProject as Xbim.Ifc.IfcStore;
+            var structIfcStore = StructProject.SourceProject as Xbim.Ifc.IfcStore;
 
             /////////////////////////////////////////
             ////if (ifcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc4)
@@ -53,16 +54,17 @@ namespace XbimXplorer.Deduct
             /////////////////////////////////////////
 
 
-            if (ifcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
+            if (archIfcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3 && structIfcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
             {
                 var engine = new DeductEngine23();
-                engine.IfcStore = ifcStore;
+                engine.StructIfcStore = structIfcStore;
                 engine.ArchiProject = ArchiProject;
                 engine.DeductIFC23Engine();
             }
-            else if (ifcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc4)
+            //Demo For zxr（这里是否有两个IFC4,两个2*3,一个2*3一个4...）
+            else if (structIfcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc4)
             {
-                DeductIFC4Engine(ifcStore);
+                DeductIFC4Engine(structIfcStore);
             }
         }
 
@@ -269,7 +271,7 @@ namespace XbimXplorer.Deduct
             {
                 return false;
             }
-            if (ArchiProject.ApplcationName != EApplcationName.CAD)
+            if (ArchiProject.ApplcationName != EApplcationName.IFC)
             {
                 return false;
             }

@@ -4,8 +4,12 @@ using System.Linq;
 
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Mathematics;
-
+using THBimEngine.IO.Geometry;
+using THBimEngine.IO.Xbim;
+using Xbim.Ifc2x3.GeometricConstraintResource;
+using Xbim.Ifc2x3.GeometricModelResource;
 using Xbim.Ifc2x3.GeometryResource;
+using Xbim.Ifc2x3.Kernel;
 using Xbim.Ifc2x3.ProfileResource;
 
 namespace ThBIMServer.NTS
@@ -45,6 +49,23 @@ namespace ThBIMServer.NTS
             {
                 throw new NotImplementedException();
             }
+        }
+        
+        public static Polygon ToNTSPolygon(this IfcProduct ifcElement)
+        {
+            var body = ifcElement.Representation.Representations[0].Items[0];
+            if (body is IfcExtrudedAreaSolid extrudedAreaSolid)
+            {
+                var dir = extrudedAreaSolid.ExtrudedDirection;
+                if(dir.X == 0 && dir.Y == 0 && dir.Z == 1)
+                {
+                    var profile = extrudedAreaSolid.SweptArea;
+                    var placement = ifcElement.ObjectPlacement as IfcLocalPlacement;
+                    var face = profile.ToXbimFace(placement);
+                    return face.ToPolygon();
+                }
+            }
+            return ThXbimGeometryAnalyzer.ElementBottomFace(ifcElement).ToPolygon();
         }
 
         //public static Polygon ToNTSPolygon(this IfcCurve curve, IfcAxis2Placement placement)

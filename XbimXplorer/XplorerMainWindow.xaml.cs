@@ -1099,77 +1099,98 @@ namespace XbimXplorer
                         {
                             ifcStore.SaveAs(newName);
                         }
-                        if (File.Exists(newName))
-                        {
-                            //上传文件到协同项目中
-                            var docCache = documentModelCache[prjKey];
-                            UploadFileToDB uploadFileToDB = new UploadFileToDB();
-                            var prjs = uploadFileToDB.GetDBProject();
-                            var prj = prjs.Where(c => c.PrjNo == docCache.ParentProject.PrjNum).FirstOrDefault();
-                            if (prj == null)
-                            {
-                                MessageBox.Show("上传失败，未在协同服务器上获取到相应的项目", "操作提醒", MessageBoxButton.OK);
-                                return;
-                            }
-                            var allSubPrjs = uploadFileToDB.GetSubProjects(prj.Id);
-                            var subPrj = allSubPrjs.Where(c => c.SubEntryName == docCache.MainModel.SubPrjName).First();
-                            if (null == subPrj)
-                            {
-                                MessageBox.Show("上传失败，未在协同服务器上获取到相应的项目", "操作提醒", MessageBoxButton.OK);
-                                return;
-                            }
-                            var getFiles = uploadFileToDB.GetSubProjectFiles(subPrj.Id);
-                            var sMajorFiles = getFiles.Where(c => c.Major == "S").ToList();
-                            if (getFiles.Count < 1)
-                            {
-                                MessageBox.Show("上传失败，未在协同服务器上获取到相应的项目", "操作提醒", MessageBoxButton.OK);
-                                return;
-                            }
-                            if (sMajorFiles.Count < 1)
-                            {
-                                MessageBox.Show("上传失败，项目中未找到结构的相关文件，目前上传只针对结构专业的文件绑定", "操作提醒", MessageBoxButton.OK);
-                                return;
-                            }
-                            var fileNameWithOutExt = Path.GetFileNameWithoutExtension(fileName);
-                            var oldFile = getFiles.Where(c => c.FileName == fileNameWithOutExt).FirstOrDefault();
-                            var uploadRes = "";
-                            //判断是否已经上传过，
-                            if (null != oldFile)
-                            {
-                                //上传过后续进行更新
-                                uploadRes = uploadFileToDB.FileUpdateToDB(prj, subPrj, oldFile, newName);
-                            }
-                            else 
-                            {
-                                //未上传过，需要选择绑定的文件
-                                UploadDBFile uploadDBFile = new UploadDBFile(sMajorFiles);
-                                uploadDBFile.Owner = this;
-                                var res = uploadDBFile.ShowDialog();
-                                if (res != true) 
-                                {
-                                    MessageBox.Show("上传失败,未选择绑定的数据！", "上传失败", MessageBoxButton.OK);
-                                    return;
-                                }
-                                //进行绑定
-                                oldFile = uploadDBFile.GetSelectFile();
-                                uploadRes = uploadFileToDB.FileUploadToDB(prj, subPrj, oldFile, newName);
-                            }
-                            if (!string.IsNullOrEmpty(uploadRes)) 
-                            {
-                                MessageBox.Show(string.Format("上传失败 {0}",uploadRes), "上传失败", MessageBoxButton.OK);
-                                return;
-                            }
-                        }
-                        MessageBox.Show($"上传成功!", "上传成功", MessageBoxButton.OK);
+                        var res = UploadFileToDBPlatform(prjKey, newName);
+                        if(string.IsNullOrEmpty(res))
+                            MessageBox.Show($"上传成功!", "操作提醒", MessageBoxButton.OK);
+                        else
+                            MessageBox.Show(res, "操作提醒", MessageBoxButton.OK);
                     }
                     catch(Exception ex)
                     {
-                        MessageBox.Show("上传失败,未能成功上传！", "上传失败", MessageBoxButton.OK);
+                        MessageBox.Show("上传失败,未能成功上传！", "操作提醒", MessageBoxButton.OK);
                     }
                 }
             }
         }
+        private string UploadFileToDBPlatform(string prjKey,string localIFCFilePath) 
+        {
+            if (string.IsNullOrEmpty(localIFCFilePath) || !File.Exists(localIFCFilePath))
+                return "IFC文件不存在，无法进行上传操作";
+            //检查系统Viewer并启动Viewer
+            bool haveViewer = HaveProcess("lbviewer");
+            if (!haveViewer) 
+            {
+                var lbViewerPath = @"D:\QDBIM\QDBIM\DXMX\LbViewer\LbViewer.exe";
+                if (!File.Exists(lbViewerPath)) 
+                {
+                    return "上传失败，本机中没有协同的三维平台";
+                }
+                Process MyProcess = new Process();
+                MyProcess.StartInfo.FileName = lbViewerPath;//外部程序路径
+                MyProcess.StartInfo.Verb = "Open";
+                MyProcess.Start();
+                //这里等5秒，防止程序没有启动起来后续调用会报错
+                Thread.Sleep(5000);
+            }
+            //上传文件到协同项目中
+            var docCache = documentModelCache[prjKey];
+            UploadFileToDB uploadFileToDB = new UploadFileToDB();
+            var prjs = uploadFileToDB.GetDBProject();
+            var prj = prjs.Where(c => c.PrjNo == docCache.ParentProject.PrjNum).FirstOrDefault();
+            if (prj == null)
+                return "上传失败，未在协同服务器上获取到相应的项目";
+            var allSubPrjs = uploadFileToDB.GetSubProjects(prj.Id);
+            var subPrj = allSubPrjs.Where(c => c.SubEntryName == docCache.MainModel.SubPrjName).First();
+            if (null == subPrj)
+                return "上传失败，未在协同服务器上获取到相应的项目";
+            var getFiles = uploadFileToDB.GetSubProjectFiles(subPrj.Id);
+            var sMajorFiles = getFiles.Where(c => c.Major == "S").ToList();
+            if (getFiles.Count < 1)
+                return "上传失败，未在协同服务器上获取到相应的项目";
+            if (sMajorFiles.Count < 1)
+                return "上传失败，项目中未找到结构的相关文件，目前上传只针对结构专业的文件绑定";
+            var fileNameWithOutExt = Path.GetFileNameWithoutExtension(localIFCFilePath);
+            var oldFile = getFiles.Where(c => c.FileName == fileNameWithOutExt).FirstOrDefault();
+            var uploadRes = "";
+            //判断是否已经上传过，
+            if (null != oldFile)
+            {
+                //上传过后续进行更新
+                uploadRes = uploadFileToDB.FileUpdateToDB(prj, subPrj, oldFile, localIFCFilePath);
+            }
+            else
+            {
+                //未上传过，需要选择绑定的文件
+                UploadDBFile uploadDBFile = new UploadDBFile(sMajorFiles);
+                uploadDBFile.Owner = this;
+                var res = uploadDBFile.ShowDialog();
+                if (res != true)
+                    return "上传失败,未选择绑定的数据！";
+                //进行绑定
+                oldFile = uploadDBFile.GetSelectFile();
+                uploadRes = uploadFileToDB.FileUploadToDB(prj, subPrj, oldFile, localIFCFilePath);
+            }
+            if (!string.IsNullOrEmpty(uploadRes))
+                return string.Format("上传失败 {0}", uploadRes);
+            return string.Empty;
+        }
 
+        private bool HaveProcess(string processName) 
+        {
+            Process[] ps = Process.GetProcesses();
+            foreach (Process p in ps)
+            {
+                try
+                {
+                    if (p.ProcessName.ToLower() == processName)
+                    {
+                        return true;
+                    }
+                }
+                catch { }
+            }
+            return false;
+        }
         private void MenuItem_Click_4(object sender, RoutedEventArgs e)
         {
             if (CurrentDocument == null)

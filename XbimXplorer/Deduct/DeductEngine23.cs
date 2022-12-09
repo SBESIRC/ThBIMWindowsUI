@@ -27,15 +27,34 @@ namespace XbimXplorer.Deduct
     internal class DeductEngine23
     {
         //input
-        public Xbim.Ifc.IfcStore IfcStore;
+        //Demo For zxr（我在这里加了一个ArchiIfcStore(建筑的IFC)，后面你把ArchiProject删掉然后用ArchiIfcStore就好了）
+        public Xbim.Ifc.IfcStore ArchiIfcStore;
+        public Xbim.Ifc.IfcStore StructIfcStore;
         public THBimProject ArchiProject;
 
         //output
         public void DeductIFC23Engine()
         {
-            var project = IfcStore.Instances.FirstOrDefault<IfcProject>();
+            var project = StructIfcStore.Instances.FirstOrDefault<IfcProject>();
             var buildlings = project.Sites.FirstOrDefault()?.Buildings.FirstOrDefault() as IfcBuilding;
             var struStoreys = buildlings.BuildingStoreys.OfType<IfcBuildingStorey>().ToList();
+
+            //Demo For zxr（二维场景ThNTSIfcProductSpatialIndex）
+            //var storeyWallElementDict = new Dictionary<IfcBuildingStorey, ThNTSIfcProductSpatialIndex>();
+            //foreach (var ifcStorey in struStoreys)
+            //{
+            //    var walls = new List<IfcProduct>();
+            //    foreach (var containElement in ifcStorey.ContainsElements)
+            //    {
+            //        //var elements = containElement.RelatedElements.OfType<IfcProduct>();
+            //        //var walls = elements.Where(o => o is IfcWall).ToList();
+            //        //var doors = elements.Where(o => o is IfcDoor).ToList();
+            //        //var windows = elements.Where(o => o is IfcWindow).ToList();
+            //        walls.AddRange(containElement.RelatedElements.OfType<IfcWall>());
+            //    }
+            //    ThNTSIfcProductSpatialIndex spatialIndex = new ThNTSIfcProductSpatialIndex(walls);
+            //    storeyWallElementDict.Add(ifcStorey, spatialIndex);
+            //}
 
             var storeyWallDict = GetSpIdxIfc23(struStoreys, out var wallTupleDict);
             var deductWall = DeductWall(struStoreys, storeyWallDict);
@@ -90,7 +109,6 @@ namespace XbimXplorer.Deduct
                         {
                             var area = item.Representation.Representations[0].Items[0];
                         }
-
                     }
                 }
                 var spIdx = new ThIFCNTSSpatialIndex(struProfileInfos);

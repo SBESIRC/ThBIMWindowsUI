@@ -1429,24 +1429,25 @@ namespace XbimXplorer
             if (CurrentDocument == null)
                 return;
 
-            var aPath = @"D:\project\14.ThBim\chart\建筑 -带轴网.thbim";
-            LoadFileToCurrentDocument(new ProjectParameter()
+            //Demo For zxr（文件路径你需要改一下）
+            var aPath = @"D:\建筑1012.ifc";
+            var sPath = @"D:\0929-结构32.ifc";
+            var loadPrjs = new List<ProjectParameter>();
+            loadPrjs.Add(new ProjectParameter()
             {
                 OpenFilePath = aPath,
                 ProjectId = aPath,
                 Major = EMajor.Architecture,
-                Source = EApplcationName.CAD,
+                Source = EApplcationName.IFC,
             });
-
-            var sPath = @"D:\project\14.ThBim\chart\0929-结构32.ifc";
-            LoadFileToCurrentDocument(new ProjectParameter()
+            loadPrjs.Add(new ProjectParameter()
             {
                 OpenFilePath = sPath,
                 ProjectId = sPath,
                 Major = EMajor.Structure,
                 Source = EApplcationName.IFC,
             });
-
+            LoadFilesToCurrentDocument(loadPrjs);
         }
     }
     class DocumentCacheModel

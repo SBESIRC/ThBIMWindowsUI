@@ -58,7 +58,7 @@ namespace XbimXplorer.ThBIMEngine
                 // 重定向标准错误输出
                 proc.StartInfo.RedirectStandardError = true;
 
-                proc.StartInfo.Arguments = ydbFile + " " + outIfcName;
+                proc.StartInfo.Arguments = "\"" +ydbFile+ "\"" + " " + "\"" + outIfcName + "\"";
 
                 proc.Start();
                 proc.WaitForExit();

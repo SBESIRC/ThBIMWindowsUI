@@ -1144,7 +1144,7 @@ namespace XbimXplorer
             if (null == subPrj)
                 return "上传失败，未在协同服务器上获取到相应的项目";
             var getFiles = uploadFileToDB.GetSubProjectFiles(subPrj.Id);
-            var sMajorFiles = getFiles.Where(c => c.Major == "S").ToList();
+            var sMajorFiles = getFiles.Where(c => c.Major == "A").ToList();
             if (getFiles.Count < 1)
                 return "上传失败，未在协同服务器上获取到相应的项目";
             if (sMajorFiles.Count < 1)

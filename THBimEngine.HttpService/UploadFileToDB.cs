@@ -81,7 +81,7 @@ namespace THBimEngine.HttpService
                 FileId = fileInfo.Id,
                 VerNo = fileInfo.VersionNo,
                 ModelSubName = "默认",
-                Major = MajorCodeToEMajor(fileInfo.Major),
+                Major = MajorEnum.结构,
                 IfcFilePath = filePath,
                 IsUpdate = false
             };

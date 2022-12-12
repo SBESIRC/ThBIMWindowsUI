@@ -101,7 +101,6 @@ namespace XbimXplorer.ThBIMEngine
 
 		public void WriteMidDataMultithreading(List<GeometryMeshModel> meshModels, List<PointNormal> meshPoints)
 		{
-			ExampleScene.ifcre_set_sleep_time(2000);
 			ExampleScene.ifcre_clear_model_data();
 			if (null == meshModels || null == meshPoints)
 				return;
@@ -183,7 +182,6 @@ namespace XbimXplorer.ThBIMEngine
 				}
 			}));
 			Task.WaitAll(tasks.ToArray());
-			ExampleScene.ifcre_set_sleep_time(10);
 		}
 
 		public void PushGridDataToEngine(List<GridLine> gridLines, List<GridCircle> gridCircles, List<GridText> gridTexts)

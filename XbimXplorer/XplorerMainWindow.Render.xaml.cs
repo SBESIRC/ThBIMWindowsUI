@@ -14,16 +14,18 @@ using Xbim.Common.Geometry;
 using XbimXplorer.ThBIMEngine;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Windows.Forms;
 
 namespace XbimXplorer
 {
     public partial class XplorerMainWindow
     {
-        bool isFirstRender = true;
+        System.Timers.Timer renderTimer = null;
         public void ShowEntityByIds(List<int> showEntityIds)
         {
-            if (showEntityIds == null)
+            if (showEntityIds == null || renderTimer == null)
                 return;
+            renderTimer.Stop();
             ExampleScene.ifcre_set_config("to_show_states", "0");
             ExampleScene.ifcre_set_comp_ids(-1);
             ExampleScene.ifcre_set_sleep_time(100);
@@ -31,13 +33,13 @@ namespace XbimXplorer
             {
                 ExampleScene.ifcre_set_comp_ids(id);
             }
-            ExampleScene.ifcre_set_sleep_time(10);
+            renderTimer.Start();
         }
         public void ShowGridByIds(List<string> gridEntityIds)
         {
-            if (gridEntityIds == null)
+            if (gridEntityIds == null || renderTimer == null)
                 return;
-            ExampleScene.ifcre_set_sleep_time(100);
+            renderTimer.Stop();
             var dataToEngine = new DataToEngine();
             List<GridLine> showGridLines = new List<GridLine>();
             List<GridCircle> showGridCircles = new List<GridCircle>();
@@ -61,12 +63,21 @@ namespace XbimXplorer
                 }
             }
             dataToEngine.PushGridDataToEngine(showGridLines, showGridCircles, showGridTexts);
-            ExampleScene.ifcre_set_sleep_time(10);
+            renderTimer.Start();
         }
         public void RenderScene()
         {
             if (CurrentApplicationIsDisposed())
                 return;
+            if (null == renderTimer)
+            {
+                renderTimer = new System.Timers.Timer(15);
+                renderTimer.Elapsed += RenderTimer_Elapsed;
+            }
+            else 
+            {
+                renderTimer.Stop();
+            }
             CurrentDocumentToScene();
             projectMatrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero);
             DateTime startTime = DateTime.Now;
@@ -83,10 +94,18 @@ namespace XbimXplorer
             Log.Info(string.Format("渲染前准备工作完成，耗时：{0}s", totalTime));
             _dispatcherTimer.Start();
             ProgressChanged(this, new ProgressChangedEventArgs(0, ""));
-            //Thread thread = new Thread(new ThreadStart(Func));
-            //thread.Start();
-            ExampleScene.Render();
-            
+            //ExampleScene.Render();
+            renderTimer.Start();
+
+
+        }
+
+        private void RenderTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            this.Dispatcher.BeginInvoke((MethodInvoker)(() =>
+            {
+                ExampleScene.Render();
+            }));
         }
 
         static Mutex CadMutex = null;
@@ -241,7 +260,7 @@ namespace XbimXplorer
         }
         private bool CurrentApplicationIsDisposed() 
         {
-            return Application.Current == null;
+            return System.Windows.Application.Current == null;
         }
     }
 }

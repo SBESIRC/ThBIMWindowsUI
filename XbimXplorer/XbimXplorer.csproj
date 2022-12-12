@@ -218,6 +218,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Deduct\DeductEngineIfcVsIfc2.cs" />
     <Compile Include="Deduct\ToGFCService.cs" />
     <Compile Include="Extensions\IFCReverse.cs" />
     <Compile Include="Deduct\DeductService.cs" />

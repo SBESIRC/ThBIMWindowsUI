@@ -65,7 +65,7 @@ namespace XbimXplorer
         private BackgroundWorker _loadFileBackgroundWorker;
         private BackgroundWorker _loadStreamBackgroundWorker;
         private DispatcherTimer _dispatcherTimer;
-        private int _selectIndex=-1;
+        private int _selectIndex = -1;
         private Dictionary<int, int> _geoIndexIfcIndexMap;
         /// <summary>
         /// Used for the creation of a new federation file
@@ -145,7 +145,7 @@ namespace XbimXplorer
             Closing += XplorerMainWindow_Closing;
         }
         private void DispatcherTimer_Tick(object sender, EventArgs e)
-		{
+        {
             var selectId = ExampleScene.GetCurrentCompID();
             if (selectId < 0)
                 return;
@@ -153,14 +153,14 @@ namespace XbimXplorer
 
 
         }
-        public Visibility DeveloperVisible => Settings.Default.DeveloperMode 
-            ? Visibility.Visible 
+        public Visibility DeveloperVisible => Settings.Default.DeveloperMode
+            ? Visibility.Visible
             : Visibility.Collapsed;
 
         private void InitFromSettings()
         {
             FileAccessMode = Settings.Default.FileAccessMode;
-            OnPropertyChanged("DeveloperVisible");           
+            OnPropertyChanged("DeveloperVisible");
         }
 
         private ObservableMruList<string> _mruFiles = new ObservableMruList<string>();
@@ -184,12 +184,12 @@ namespace XbimXplorer
             Settings.Default.Save();
         }
 
-        
+
         #region "Model File Operations"
 
         void XplorerMainWindow_Closing(object sender, CancelEventArgs e)
         {
-            if (null != winFormHost.Child) 
+            if (null != winFormHost.Child)
             {
                 if (winFormHost.Child is GLControl glControl)
                     Win32.CloseRender(glControl.Handle);
@@ -212,13 +212,13 @@ namespace XbimXplorer
             // this enables a basic configuration for the logger.
             //
             BasicConfigurator.Configure();
-            var model = IfcStore.Create(null,IfcSchemaVersion.Ifc2X3, XbimStoreType.InMemoryModel);
+            var model = IfcStore.Create(null, IfcSchemaVersion.Ifc2X3, XbimStoreType.InMemoryModel);
             ModelProvider.ObjectInstance = model;
             ModelProvider.Refresh();
 
             // logging information warnings
             //
-            _appender = new EventAppender {Tag = "MainWindow"};
+            _appender = new EventAppender { Tag = "MainWindow" };
             _appender.Logged += appender_Logged;
 
             var hier = LogManager.GetRepository() as Hierarchy;
@@ -235,10 +235,10 @@ namespace XbimXplorer
         {
             CloseAndDeleteTemporaryFiles();
         }
-        
+
         public XbimDBAccess FileAccessMode { get; set; } = XbimDBAccess.Read;
-        
-        
+
+
 
         private void SetDeflection(IModel model)
         {
@@ -264,7 +264,7 @@ namespace XbimXplorer
             //}
         }
 
-        public void RemoveProjectFormCurrentDocument(string projectId) 
+        public void RemoveProjectFormCurrentDocument(string projectId)
         {
             if (CurrentDocument == null)
                 return;
@@ -287,13 +287,13 @@ namespace XbimXplorer
                 LoadingComplete(s, args);
             }
         }
-        private void IfcStoreToMidFile(IfcStore ifcStore) 
+        private void IfcStoreToMidFile(IfcStore ifcStore)
         {
             //var engineFile = new IfcStoreToEngineFile();
             //engineFile.ProgressChanged += OnProgressChanged;
             //_geoIndexIfcIndexMap = engineFile.LoadGeometry(ifcStore);
         }
-        private void ShowIfcStore(IfcStore ifcStore) 
+        private void ShowIfcStore(IfcStore ifcStore)
         {
             //this Triggers the event to load the model into the views 
             ModelProvider.ObjectInstance = ifcStore;
@@ -313,7 +313,7 @@ namespace XbimXplorer
                 new Action(() =>
                 {
                     ProgressBar.Value = args.ProgressPercentage;
-                    StatusMsg.Text = (string) args.UserState;
+                    StatusMsg.Text = (string)args.UserState;
                 }));
 
         }
@@ -321,7 +321,7 @@ namespace XbimXplorer
         private void dlg_FileSaveAs(object sender, CancelEventArgs e)
         {
             var dlg = sender as SaveFileDialog;
-            if (dlg == null) 
+            if (dlg == null)
                 return;
             var fInfo = new FileInfo(dlg.FileName);
             try
@@ -336,10 +336,10 @@ namespace XbimXplorer
                     Model.SaveAs(dlg.FileName);
                     SetOpenedModelFileName(dlg.FileName);
                     var s = Path.GetExtension(dlg.FileName);
-                    if (string.IsNullOrWhiteSpace(s)) 
+                    if (string.IsNullOrWhiteSpace(s))
                         return;
                     var extension = s.ToLowerInvariant();
-                    if (extension != "xbim" || string.IsNullOrWhiteSpace(_temporaryXbimFileName)) 
+                    if (extension != "xbim" || string.IsNullOrWhiteSpace(_temporaryXbimFileName))
                         return;
                     File.Delete(_temporaryXbimFileName);
                     _temporaryXbimFileName = null;
@@ -361,7 +361,7 @@ namespace XbimXplorer
             //    return;
             //LoadFileToCurrentDocument(_openedModelFileName,null);
         }
-        
+
         private void CommandBinding_SaveAs(object sender, ExecutedRoutedEventArgs e)
         {
             var dlg = new SaveFileDialog();
@@ -403,7 +403,7 @@ namespace XbimXplorer
         {
             CloseAndDeleteTemporaryFiles();
         }
-        
+
         private void CommandBinding_Open(object sender, ExecutedRoutedEventArgs e)
         {
             var corefilters = new[] {
@@ -432,7 +432,7 @@ namespace XbimXplorer
             {
                 if (_loadFileBackgroundWorker != null && _loadFileBackgroundWorker.IsBusy)
                     _loadFileBackgroundWorker.CancelAsync(); //tell it to stop
-                
+
                 //SetOpenedModelFileName(null);
                 if (Model != null)
                 {
@@ -475,7 +475,7 @@ namespace XbimXplorer
                     e.CanExecute = (Model != null);
                 }
                 else if (e.Command == OpenExportWindowCmd)
-                {   
+                {
                     e.CanExecute = (Model != null) && (!string.IsNullOrEmpty(GetOpenedModelFileName()));
                 }
                 else
@@ -489,7 +489,7 @@ namespace XbimXplorer
         # region "Federation Model operations"
         private void EditFederationCmdExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            var fdlg = new FederatedModelDialog {DataContext = Model};
+            var fdlg = new FederatedModelDialog { DataContext = Model };
             var done = fdlg.ShowDialog();
             if (done.HasValue && done.Value)
             {
@@ -501,7 +501,7 @@ namespace XbimXplorer
         {
             e.CanExecute = Model != null && Model.IsFederation;
         }
-       
+
         private void CreateFederationCmdExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             var dlg = new OpenFileDialog
@@ -549,7 +549,7 @@ namespace XbimXplorer
                 case ".ifczip":
                 case ".ifcxml":
                     // create temp file as a placeholder for the temporory xbim file                   
-                    fedModel = IfcStore.Create(null,IfcSchemaVersion.Ifc2X3, XbimStoreType.InMemoryModel);                    
+                    fedModel = IfcStore.Create(null, IfcSchemaVersion.Ifc2X3, XbimStoreType.InMemoryModel);
                     using (var txn = fedModel.BeginTransaction())
                     {
                         var project = fedModel.Instances.New<Xbim.Ifc2x3.Kernel.IfcProject>();
@@ -602,7 +602,7 @@ namespace XbimXplorer
             IfcStoreToMidFile(fedModel);
             ShowIfcStore(fedModel);
         }
-        
+
         #endregion
 
         /// <summary>
@@ -667,10 +667,10 @@ namespace XbimXplorer
         /// </summary>
         private bool _meshModel = true;
 
-        
+
         private double _deflectionOverride = double.NaN;
         private double _angularDeflectionOverride = double.NaN;
-        
+
         /// <summary>
         /// determines if the geometry engine will run on parallel threads.
         /// </summary>
@@ -701,7 +701,7 @@ namespace XbimXplorer
         {
             //DrawingControl.ViewHome();
         }
-        
+
         private void OpenExportWindow(object sender, ExecutedRoutedEventArgs executedRoutedEventArgs)
         {
             var wndw = new ExportWindow(this);
@@ -718,7 +718,7 @@ namespace XbimXplorer
             };
             w.Show();
         }
-        
+
         private void DisplaySettingsPage(object sender, RoutedEventArgs e)
         {
             var sett = new SettingsWindow();
@@ -730,15 +730,15 @@ namespace XbimXplorer
                 sett.AngularDeflection.Text = _angularDeflectionOverride.ToString();
             if (!double.IsNaN(_deflectionOverride))
                 sett.Deflection.Text = _deflectionOverride.ToString();
-            
+
             // visuals
             //sett.SimplifiedRendering.IsChecked = DrawingControl.HighSpeed;
             //sett.ShowFps.IsChecked = DrawingControl.ShowFps;
 
             // show dialog
             sett.ShowDialog();
-            
-            
+
+
             // dialog closed
             if (!sett.SettingsChanged)
                 return;
@@ -759,7 +759,7 @@ namespace XbimXplorer
             _angularDeflectionOverride = double.NaN;
             if (!string.IsNullOrWhiteSpace(sett.AngularDeflection.Text))
                 double.TryParse(sett.AngularDeflection.Text, out _angularDeflectionOverride);
-            
+
             if (!string.IsNullOrWhiteSpace(sett.Deflection.Text))
                 double.TryParse(sett.Deflection.Text, out _deflectionOverride);
 
@@ -814,7 +814,7 @@ namespace XbimXplorer
 
         private void ShowErrors(object sender, MouseButtonEventArgs e)
         {
-            OpenOrFocusPluginWindow(typeof (LogViewer.LogViewer));
+            OpenOrFocusPluginWindow(typeof(LogViewer.LogViewer));
         }
 
         private void Exit(object sender, RoutedEventArgs e)
@@ -844,7 +844,7 @@ namespace XbimXplorer
             ConnectStylerFeedBack();
             _appender.EventsLimit = 100;
         }
-        
+
         private void EntityLabel_KeyDown()
         {
             //var input = EntityLabel.Text;
@@ -935,7 +935,7 @@ namespace XbimXplorer
         {
             var mi = sender as MenuItem;
             if (mi == null)
-            {  
+            {
                 return;
             }
             WholeMesh.IsChecked = false;
@@ -976,7 +976,7 @@ namespace XbimXplorer
             var module4 = (typeof(Xbim.Ifc4.Kernel.IfcProduct)).Module;
             var meta4 = ExpressMetaData.GetMetadata(module4);
             var product4 = meta4.ExpressType("IFCPRODUCT");
-            
+
 
 
             var tpcoll = product2X3.NonAbstractSubTypes.Select(x => x.Type).ToList();
@@ -1260,12 +1260,12 @@ namespace XbimXplorer
                 return;
             ThBimCutData.Run(CurrentDocument.AllBimProjects);
         }
-        
+
         private void ExportCut_Click_structure(object sender, RoutedEventArgs e)
         {
             if (CurrentDocument == null || CurrentDocument.AllBimProjects.Count < 1)
                 return;
-            var prjName = CurrentDocument.AllBimProjects.First().ProjectIdentity.Split('.').First()+"-100%.ifc";
+            var prjName = CurrentDocument.AllBimProjects.First().ProjectIdentity.Split('.').First() + "-100%.ifc";
 
             CurrentDocument.DocumentChanged -= RunCutData_DocumentChanged;
             CurrentDocument.ClearAllData();
@@ -1308,11 +1308,11 @@ namespace XbimXplorer
             var selectProjectFile = projectManage.GetOpenModel();
             if (selectProjectFile == null)
                 return;
-            SetOpenedModelFileName(string.Format("{0}_{1}_{2}", pPrj.ShowName,subPrj.ShowName, selectProjectFile.ShowFileName));
+            SetOpenedModelFileName(string.Format("{0}_{1}_{2}", pPrj.ShowName, subPrj.ShowName, selectProjectFile.ShowFileName));
             var id = string.Format("{0}_{1}_{2}", pPrj.PrjId, subPrj.PrjId, selectProjectFile.LoaclPath);
             //检查Document删除和增加的数据
             List<THDocument> rmDocs = new List<THDocument>();
-            foreach (var item in DocumentManager.AllDocuments) 
+            foreach (var item in DocumentManager.AllDocuments)
             {
                 if (item.DocumentId == id)
                     rmDocs.Add(item);
@@ -1330,13 +1330,13 @@ namespace XbimXplorer
                 ProjectId = selectProjectFile.LinkFilePath,
                 Major = selectProjectFile.Major,
                 Source = selectProjectFile.ApplcationName,
-            }) ;
+            });
             DocumentCacheModel docCache;
             if (documentModelCache.ContainsKey(id))
             {
                 docCache = documentModelCache[id];
             }
-            else 
+            else
             {
                 docCache = new DocumentCacheModel(id, selectProjectFile, prjLocalPath);
                 docCache.ParentProject = pPrj;
@@ -1364,12 +1364,12 @@ namespace XbimXplorer
             if (null == CurrentDocument || CurrentDocument.AllBimProjects.Count < 1)
                 return;
             Dictionary<Type, int> typeCount = new Dictionary<Type, int>();
-            foreach (var project in CurrentDocument.AllBimProjects) 
+            foreach (var project in CurrentDocument.AllBimProjects)
             {
                 var res = project.ProjrctEntityTypeCounts();
                 if (null == res || res.Count < 1)
                     continue;
-                foreach (var keyValue in res) 
+                foreach (var keyValue in res)
                 {
                     var key = keyValue.Key;
                     var keyCount = keyValue.Value.Count;
@@ -1377,7 +1377,7 @@ namespace XbimXplorer
                     {
                         typeCount[key] += keyCount;
                     }
-                    else 
+                    else
                     {
                         typeCount.Add(key, keyCount);
                     }
@@ -1392,7 +1392,7 @@ namespace XbimXplorer
                 Log.Info(string.Format("Type : {0} Count : {1}", showTypeName, showCount));
             }
             Log.Info(string.Format("Total Count : {0}", sumCount));
-            MessageBox.Show("统计完成，请前往日志中查看结果","提醒");
+            MessageBox.Show("统计完成，请前往日志中查看结果", "提醒");
         }
 
         private void MenuItem_Deduct_Click(object sender, RoutedEventArgs e)
@@ -1402,20 +1402,20 @@ namespace XbimXplorer
 
             var deductService = new DeductEngine(CurrentDocument);
 
-            deductService.Do();
+            deductService.DoIfcVsIfc();
 
-            var aProject = deductService.ArchiProject;
+            //var aProject = deductService.ArchiProject;
 
-            var projectParameter = new ProjectParameter()
-            {
-                ProjectId = aProject.ProjectIdentity,
-                Matrix3D = aProject.Matrix3D,
-                Major = aProject.Major,
-                Source = aProject.ApplcationName,
-            };
-            CurrentDocument.AddProject(aProject, projectParameter);
+            //var projectParameter = new ProjectParameter()
+            //{
+            //    ProjectId = aProject.ProjectIdentity,
+            //    Matrix3D = aProject.Matrix3D,
+            //    Major = aProject.Major,
+            //    Source = aProject.ApplcationName,
+            //};
+            //CurrentDocument.AddProject(aProject, projectParameter);
 
-            GFCConvertEngine.ToGFCEngine(aProject);
+            //GFCConvertEngine.ToGFCEngine(aProject);
 
         }
 
@@ -1453,8 +1453,8 @@ namespace XbimXplorer
         public ShowProject SubProject { get; set; }
         public ProjectFileInfo MainModel { get; }
         public List<ProjectFileInfo> ProjectAllFileCache { get; protected set; }
-        public FileExternalLink DocExternalLink { get;}
-        public DocumentCacheModel(string docId, ProjectFileInfo mainModel,string rootPath) 
+        public FileExternalLink DocExternalLink { get; }
+        public DocumentCacheModel(string docId, ProjectFileInfo mainModel, string rootPath)
         {
             DocumentId = docId;
             MainModel = mainModel;
@@ -1463,14 +1463,14 @@ namespace XbimXplorer
             DocExternalLink = new FileExternalLink(mainModel.LoaclPath, mainModel.ExternalLinkPath);
             UpdateCacheFile();
         }
-        public void UpdateCacheFile() 
+        public void UpdateCacheFile()
         {
             FileProject fileProject = new FileProject(RootPath);
             ProjectAllFileCache = fileProject.GetProjectFiles();
         }
-        public ProjectFileInfo GetProjectFileInfo(string filePath) 
+        public ProjectFileInfo GetProjectFileInfo(string filePath)
         {
-            foreach(var item in ProjectAllFileCache) 
+            foreach (var item in ProjectAllFileCache)
             {
                 if (item.LoaclPath == filePath)
                     return item;

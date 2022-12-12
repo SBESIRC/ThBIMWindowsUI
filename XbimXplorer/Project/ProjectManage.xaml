@@ -194,7 +194,7 @@
                         <DataGridTextColumn Header="模型名称" Width="2*" Binding="{Binding ShowFileName}" IsReadOnly="True"></DataGridTextColumn>
                         <DataGridTextColumn Header="上传人" Width="1*" Binding="{Binding OwnerName}" IsReadOnly="True"></DataGridTextColumn>
                         <DataGridTextColumn Header="专业" Binding="{Binding MajorName}" IsReadOnly="True"  CanUserSort="False" CanUserResize="False"></DataGridTextColumn>
-                        <DataGridTextColumn Header="更新时间" Width="1*" Binding="{Binding LastUpdataTime}" IsReadOnly="True"></DataGridTextColumn>
+                        <DataGridTextColumn Header="更新时间" Width="1*" Binding="{Binding LastUpdataTime,StringFormat='yyyy/MM/dd HH:mm:ss'}" IsReadOnly="True"></DataGridTextColumn>
                     </DataGrid.Columns>
                     <DataGrid.Resources>
                         <Style TargetType="DataGridRow">
@@ -226,7 +226,7 @@
                         <DataGridTextColumn Header="上传人" Width="1*" Binding="{Binding OwnerName}" IsReadOnly="True"></DataGridTextColumn>
                         <DataGridTextColumn Header="占用人" Width="1*" Binding="{Binding OccupyName}" IsReadOnly="True"></DataGridTextColumn>
                         <DataGridTextColumn Header="专业" Binding="{Binding MajorName}" IsReadOnly="True"  CanUserSort="False" CanUserResize="False"></DataGridTextColumn>
-                        <DataGridTextColumn Header="更新时间" Width="1*" Binding="{Binding LastUpdataTime}" IsReadOnly="True"></DataGridTextColumn>
+                        <DataGridTextColumn Header="更新时间" Width="1*" Binding="{Binding LastUpdataTime,StringFormat='yyyy/MM/dd HH:mm:ss'}" IsReadOnly="True"></DataGridTextColumn>
                     </DataGrid.Columns>
                     <DataGrid.Resources>
                         <Style TargetType="DataGridRow">
@@ -255,7 +255,7 @@
                         <DataGridTextColumn Header="模型名称" Width="2*" Binding="{Binding ShowFileName}" IsReadOnly="True"></DataGridTextColumn>
                         <DataGridTextColumn Header="上传人" Width="1*" Binding="{Binding OwnerName}" IsReadOnly="True"></DataGridTextColumn>
                         <DataGridTextColumn Header="专业" Binding="{Binding MajorName}" IsReadOnly="True"  CanUserSort="False" CanUserResize="False"></DataGridTextColumn>
-                        <DataGridTextColumn Header="更新时间" Width="1*" Binding="{Binding LastUpdataTime}" IsReadOnly="True"></DataGridTextColumn>
+                        <DataGridTextColumn Header="更新时间" Width="1*" Binding="{Binding LastUpdataTime,StringFormat='yyyy/MM/dd HH:mm:ss'}" IsReadOnly="True"></DataGridTextColumn>
                     </DataGrid.Columns>
                     <DataGrid.Resources>
                         <Style TargetType="DataGridRow">

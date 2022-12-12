@@ -65,7 +65,7 @@ namespace XbimXplorer
             if (null == projectVM) 
             {
                 var userPojects = projectDBHelper.GetUserProjects(loginUser.PreSSOId);
-                projectVM = new ProjectVM(userPojects);
+                projectVM = new ProjectVM(userPojects,loginUser.LoginLocation);
             }
             this.DataContext = projectVM;
         }
@@ -318,11 +318,12 @@ namespace XbimXplorer
                 this.RaisePropertyChanged();
             }
         }
-
-        public ProjectVM(List<DBProject> projects)
+        private string location;
+        public ProjectVM(List<DBProject> projects,string loginLocation)
         {
             AllProjects = new List<ShowProject>();
             Projects = new ObservableCollection<ShowProject>();
+            location = loginLocation;
             var allName = EnumUtil.GetEnumDescriptions<EMajor>();
             MajorNames.AddRange(allName);
             allName = EnumUtil.GetEnumDescriptions<EApplcationName>();
@@ -501,7 +502,7 @@ namespace XbimXplorer
             var pProject = project;
             if (project.IsChild)
                 pProject = GetParentPrject(project);
-            var path = string.Format("D:\\THBimTempFilePath\\{0}_{1}", pProject.PrjId, pProject.ShowName);
+            var path = string.Format("D:\\THBimTempFilePath\\{0}\\{1}_{2}", location, pProject.PrjId, pProject.ShowName);
             CheckAndAddDir(path);
             return path;
         }

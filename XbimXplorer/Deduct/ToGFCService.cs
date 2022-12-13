@@ -13,7 +13,7 @@ namespace XbimXplorer.Deduct
     {
         public static void ToGFCEngine(THBimProject prj)
         {
-            var docPath = @"D:\project\14.ThBim\chart\try.gfc2";
+            var docPath = @"D:\try.gfc2";
             var gfcDoc = ThGFC2Document.Create(docPath);
             try
             {

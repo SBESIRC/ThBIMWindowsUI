@@ -119,6 +119,7 @@
     <Compile Include="NTS\ThBimNTSExtension.cs" />
     <Compile Include="NTS\ThIFCNTSExtension4.cs" />
     <Compile Include="NTS\ThIFCNTSSpatialIndex4.cs" />
+    <Compile Include="NTS\ThNTSSpatialIndex.cs" />
     <Compile Include="NTS\ThNTSIfcProductSpatialIndex.cs" />
     <Compile Include="ThBimXbimNTSMarshal.cs" />
     <Compile Include="Xbim\ThXbimBrepExtension.cs" />
@@ -128,7 +129,6 @@
     <Compile Include="NTS\ThIFCNTSFixedPrecision.cs" />
     <Compile Include="NTS\ThIFCNTSService.cs" />
     <Compile Include="NTS\ThIFCNTSSpatialIndex.cs" />
-    <Compile Include="NTS\ThNTSIfcProfileDefExtension.cs" />
     <Compile Include="NTS\ThNTSOperation.cs" />
     <Compile Include="NTS\ThTCHNTSExtension.cs" />
     <Compile Include="NTS\ThTCHNTSOperation.cs" />

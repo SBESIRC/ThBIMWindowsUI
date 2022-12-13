@@ -39,7 +39,7 @@ namespace XbimXplorer.Deduct
             var buildlings = project.Sites.FirstOrDefault()?.Buildings.FirstOrDefault() as IfcBuilding;
             var struStoreys = buildlings.BuildingStoreys.OfType<IfcBuildingStorey>().ToList();
 
-            //Demo For zxr（二维场景ThNTSIfcProductSpatialIndex）
+            ////Demo For zxr（二维场景ThNTSIfcProductSpatialIndex）
             //var storeyWallElementDict = new Dictionary<IfcBuildingStorey, ThNTSIfcProductSpatialIndex>();
             //foreach (var ifcStorey in struStoreys)
             //{

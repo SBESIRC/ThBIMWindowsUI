@@ -11,7 +11,6 @@ using ifc23 = Xbim.Ifc2x3;
 using THBimEngine.Application;
 using ThBIMServer.NTS;
 using THBimEngine.Domain;
-using THBimEngine.IO.NTS;
 
 namespace XbimXplorer.Deduct
 {
@@ -74,31 +73,20 @@ namespace XbimXplorer.Deduct
             //    return;
             //}
 
-            var ifcStoreS = StructProject.SourceProject as Xbim.Ifc.IfcStore;
-
-
-            TryIfc23(ifcStoreS);
-
-
-            return;
-
             var archIfcStore = ArchiProject.SourceProject as Xbim.Ifc.IfcStore;
             var structIfcStore = StructProject.SourceProject as Xbim.Ifc.IfcStore;
-
-
-            var ifcStoreA = ArchiProject.SourceProject as Xbim.Ifc.IfcStore;
 
             if (archIfcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3 && structIfcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
             {
                 var engine = new DeductEngineIfcVsIfc2();
-                engine.IfcStruct = ifcStoreS;
-                engine.IfcArchi = ifcStoreA;
+                engine.IfcStruct = structIfcStore;
+                engine.IfcArchi = archIfcStore;
                 engine.DeductEngine();
             }
             //Demo For zxr（这里是否有两个IFC4,两个2*3,一个2*3一个4...）
             else if (structIfcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc4)
             {
-                DeductIFC4Engine(structIfcStore);
+                //DeductIFC4Engine(structIfcStore);
             }
         }
 
@@ -167,11 +155,11 @@ namespace XbimXplorer.Deduct
                 var aaageom = ThIFCNTSExtension.ToNTSLineString(testProf, testPlacement);
 
 
-                var testPlacement2 = (Xbim.Ifc2x3.GeometricConstraintResource.IfcLocalPlacement)w111.ObjectPlacement;
-                var testProfDef = (Xbim.Ifc2x3.GeometricModelResource.IfcSweptAreaSolid)w111.Representation.Representations[0].Items[0];
-                var geom2 = ThNTSIfcProfileDefExtension.ToPolygon(testProf, testPlacement2);
+                //var testPlacement2 = (Xbim.Ifc2x3.GeometricConstraintResource.IfcLocalPlacement)w111.ObjectPlacement;
+                //var testProfDef = (Xbim.Ifc2x3.GeometricModelResource.IfcSweptAreaSolid)w111.Representation.Representations[0].Items[0];
+                //var geom2 = ThNTSIfcProfileDefExtension.ToPolygon(testProf, testPlacement2);
 
-
+                var geom2 = w111.ToNTSPolygon();
             }
         }
 

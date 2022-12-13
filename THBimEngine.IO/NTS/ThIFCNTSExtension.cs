@@ -50,14 +50,14 @@ namespace ThBIMServer.NTS
                 throw new NotImplementedException();
             }
         }
-        
+
         public static Polygon ToNTSPolygon(this IfcProduct ifcElement)
         {
             var body = ifcElement.Representation.Representations[0].Items[0];
             if (body is IfcExtrudedAreaSolid extrudedAreaSolid)
             {
                 var dir = extrudedAreaSolid.ExtrudedDirection;
-                if(dir.X == 0 && dir.Y == 0 && dir.Z == 1)
+                if (dir.X == 0 && dir.Y == 0 && dir.Z == 1)
                 {
                     var profile = extrudedAreaSolid.SweptArea;
                     var placement = ifcElement.ObjectPlacement as IfcLocalPlacement;
@@ -238,6 +238,46 @@ namespace ThBIMServer.NTS
             if (placement.P.Count == 2)
             {
                 offsetV.Add(new Vector3D(0, 0, 1));
+            }
+        }
+
+        /// <summary>
+        /// 目前只支持拉伸体且z 0，0，1情况
+        /// </summary>
+        /// <param name="ifcElement"></param>
+        /// <param name="ZValue"></param>
+        /// <param name="ZDir"></param>
+        public static void GetExtrudedDepth(this IfcProduct ifcElement, out double ZValue, out Vector3D ZDir)
+        {
+            ZDir = new Vector3D(0, 0, 1);
+            ZValue = 0;
+            var body = ifcElement.Representation.Representations[0].Items[0];
+            if (body is IfcExtrudedAreaSolid extrudedAreaSolid)
+            {
+                var dir = extrudedAreaSolid.ExtrudedDirection;
+                if (dir.X == 0 && dir.Y == 0 && dir.Z == 1)
+                {
+                    ZDir = new Vector3D(dir.X, dir.Y, dir.Z);
+                    ZValue = extrudedAreaSolid.Depth;
+                }
+            }
+        }
+
+        public static void GetGlobleZ(this IfcProduct ifcElement, out double ZHight)
+        {
+            ZHight = 0;
+            var body = ifcElement.Representation.Representations[0].Items[0];
+            if (body is IfcExtrudedAreaSolid extrudedAreaSolid)
+            {
+                var dir = extrudedAreaSolid.ExtrudedDirection;
+                if (dir.X == 0 && dir.Y == 0 && dir.Z == 1)
+                {
+                    var placement = ifcElement.ObjectPlacement as IfcLocalPlacement;
+                    ToTransInfo(placement.RelativePlacement, out var offset, out var offsetV);
+                    var point = new CoordinateZ(0, 0, 0);
+                    var transPt = ThNTSOperation.TransP(point, offsetV, offset);
+                    ZHight = transPt.Z;
+                }
             }
         }
 

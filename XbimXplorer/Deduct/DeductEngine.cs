@@ -31,42 +31,66 @@ namespace XbimXplorer.Deduct
             ArchiProject = aProject;
         }
 
-        public void Do()
+        //public void DoIfcVsBimModel()
+        //{
+        //    if (!CheckProjetInvalid())
+        //    {
+        //        return;
+        //    }
+
+        //    var ifcStore = StructProject.SourceProject as Xbim.Ifc.IfcStore;
+
+        //    /////////////////////////////////////////
+        //    ////if (ifcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc4)
+        //    ////{
+        //    ////    // GetSpIdxIfc4(ifcStore);
+        //    ////    TryIfc4(ifcStore);
+        //    ////}
+        //    ////else if (ifcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
+        //    ////{
+        //    ////    TryIfc23(ifcStore);
+        //    ////}
+        //    /////////////////////////////////////////
+
+
+        //    if (ifcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
+        //    {
+        //        var engine = new DeductEngine23();
+        //        engine.IfcStore = ifcStore;
+        //        engine.ArchiProject = ArchiProject;
+        //        engine.DeductIFC23Engine();
+        //    }
+        //    else if (ifcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc4)
+        //    {
+        //        DeductIFC4Engine(ifcStore);
+        //    }
+        //}
+
+        public void DoIfcVsIfc()
         {
-            if (!CheckProjetInvalid())
-            {
-                return;
-            }
+            //if (!CheckProjetInvalid())
+            //{
+            //    return;
+            //}
 
             var archIfcStore = ArchiProject.SourceProject as Xbim.Ifc.IfcStore;
             var structIfcStore = StructProject.SourceProject as Xbim.Ifc.IfcStore;
 
-            /////////////////////////////////////////
-            ////if (ifcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc4)
-            ////{
-            ////    // GetSpIdxIfc4(ifcStore);
-            ////    TryIfc4(ifcStore);
-            ////}
-            ////else if (ifcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
-            ////{
-            ////    TryIfc23(ifcStore);
-            ////}
-            /////////////////////////////////////////
-
-
             if (archIfcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3 && structIfcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
             {
-                var engine = new DeductEngine23();
-                engine.StructIfcStore = structIfcStore;
-                engine.ArchiProject = ArchiProject;
-                engine.DeductIFC23Engine();
+                var engine = new DeductEngineIfcVsIfc2();
+                engine.IfcStruct = structIfcStore;
+                engine.IfcArchi = archIfcStore;
+                engine.DeductEngine();
             }
             //Demo For zxr（这里是否有两个IFC4,两个2*3,一个2*3一个4...）
             else if (structIfcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc4)
             {
-                DeductIFC4Engine(structIfcStore);
+                //DeductIFC4Engine(structIfcStore);
             }
         }
+
+
 
         private static void TryIfc4(Xbim.Ifc.IfcStore ifcStore)
         {
@@ -127,8 +151,15 @@ namespace XbimXplorer.Deduct
                 var testProf = ((Xbim.Ifc2x3.GeometricModelResource.IfcSweptAreaSolid)w111.Representation.Representations[0].Items[0]).SweptArea;
                 var testPosition = ((Xbim.Ifc2x3.GeometricModelResource.IfcSweptAreaSolid)w111.Representation.Representations[0].Items[0]).Position;
                 var testPlacement = ((Xbim.Ifc2x3.GeometricConstraintResource.IfcLocalPlacement)w111.ObjectPlacement).RelativePlacement;
-
+               
                 var aaageom = ThIFCNTSExtension.ToNTSLineString(testProf, testPlacement);
+
+
+                //var testPlacement2 = (Xbim.Ifc2x3.GeometricConstraintResource.IfcLocalPlacement)w111.ObjectPlacement;
+                //var testProfDef = (Xbim.Ifc2x3.GeometricModelResource.IfcSweptAreaSolid)w111.Representation.Representations[0].Items[0];
+                //var geom2 = ThNTSIfcProfileDefExtension.ToPolygon(testProf, testPlacement2);
+
+                var geom2 = w111.ToNTSPolygon();
             }
         }
 
@@ -271,7 +302,12 @@ namespace XbimXplorer.Deduct
             {
                 return false;
             }
-            if (ArchiProject.ApplcationName != EApplcationName.IFC)
+            //if (ArchiProject.ApplcationName != EApplcationName.CAD)
+            //{
+            //    return false;
+            //}
+
+            if (ArchiProject.ApplcationName != EApplcationName.IFC )
             {
                 return false;
             }

@@ -218,10 +218,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Deduct\DeductEngineIfcVsIfc2.cs" />
+    <Compile Include="Deduct\Model\DeductGFCModel.cs" />
     <Compile Include="Deduct\ToGFCService.cs" />
     <Compile Include="Extensions\IFCReverse.cs" />
     <Compile Include="Deduct\DeductService.cs" />
-    <Compile Include="Deduct\DeductEngine23.cs" />
     <Compile Include="Project\BoolToVisibilty.cs" />
     <Compile Include="Business\RenderEngineToHome.cs" />
     <Compile Include="Commands\Fix.cs" />
@@ -584,6 +585,7 @@
   <ItemGroup>
     <Resource Include="THBIM.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <Year>$([System.DateTime]::Now.ToString("yy"))</Year>

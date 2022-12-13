@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -123,12 +124,19 @@ namespace XbimXplorer
                 var path =projectVM.GetPrjectSubDir(projectVM.SelectProject, major, "SU");
                 if (string.IsNullOrEmpty(path))
                     return;
-                var currentDir = System.Environment.CurrentDirectory;
-                var templatePath = Path.Combine(currentDir, "Template\\THSKPTemplate_S_2020.skp");
-                path = Path.Combine(path, fileName + ".skp");
-                File.Copy(templatePath, path, true);
-                //OpenFile(path);
-                projectVM.ChangeSelectSubProject();
+                try
+                {
+                    var currentDir = System.Environment.CurrentDirectory;
+                    var templatePath = Path.Combine(currentDir, "Template\\THSKPTemplate_S_2020.skp");
+                    path = Path.Combine(path, fileName + ".skp");
+                    File.Copy(templatePath, path, true);
+                    //OpenFile(path);
+                    projectVM.ChangeSelectSubProject();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(string.Format("更新失败，{0}", ex.Message), "操作提醒", MessageBoxButton.OK);
+                }
             }
             btn.IsEnabled = true;
         }
@@ -208,19 +216,28 @@ namespace XbimXplorer
             var res = MessageBox.Show(strMsg, "操作提醒", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (res != MessageBoxResult.Yes)
                 return;
-            if (!string.IsNullOrEmpty(selectItem.LoaclPath) && File.Exists(selectItem.LoaclPath))
+            try
             {
-                File.Delete(selectItem.LoaclPath);
+                if (!string.IsNullOrEmpty(selectItem.LoaclPath) && File.Exists(selectItem.LoaclPath))
+                {
+                    File.Delete(selectItem.LoaclPath);
+                }
+                if (!string.IsNullOrEmpty(selectItem.LinkFilePath) && File.Exists(selectItem.LinkFilePath))
+                {
+                    File.Delete(selectItem.LinkFilePath);
+                }
+                if (!string.IsNullOrEmpty(selectItem.ExternalLinkPath) && File.Exists(selectItem.ExternalLinkPath))
+                {
+                    File.Delete(selectItem.ExternalLinkPath);
+                }
+                projectVM.ChangeSelectSubProject();
             }
-            if (!string.IsNullOrEmpty(selectItem.LinkFilePath) && File.Exists(selectItem.LinkFilePath))
+            catch (Exception ex) 
             {
-                File.Delete(selectItem.LinkFilePath);
+                MessageBox.Show(string.Format("作废失败，{0}", ex.Message), "操作提醒", MessageBoxButton.OK);
             }
-            if (!string.IsNullOrEmpty(selectItem.ExternalLinkPath) && File.Exists(selectItem.ExternalLinkPath))
-            {
-                File.Delete(selectItem.ExternalLinkPath);
-            }
-            projectVM.ChangeSelectSubProject();
+            
+            
         }
         private void UpdateFile_Click(object sender, RoutedEventArgs e)
         {
@@ -237,13 +254,20 @@ namespace XbimXplorer
                 var filePath = selectPath.GetSelectResult(out string major);
                 if (string.IsNullOrEmpty(filePath))
                     return;
-                File.Copy(filePath, path, true);
-                if (type == "YDB")
+                try
                 {
-                    ThYDBToIfcConvertService ydbToIfc = new ThYDBToIfcConvertService();
-                    ydbToIfc.Convert(path);
+                    File.Copy(filePath, path, true);
+                    if (type == "YDB")
+                    {
+                        ThYDBToIfcConvertService ydbToIfc = new ThYDBToIfcConvertService();
+                        ydbToIfc.Convert(path);
+                    }
+                    projectVM.ChangeSelectSubProject();
                 }
-                projectVM.ChangeSelectSubProject();
+                catch (Exception ex)
+                {
+                    MessageBox.Show(string.Format("更新失败，{0}", ex.Message), "操作提醒", MessageBoxButton.OK);
+                }
             }
         }
     }

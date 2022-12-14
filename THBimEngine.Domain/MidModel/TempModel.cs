@@ -206,7 +206,10 @@ namespace THBimEngine.Domain.MidModel
                 foreach(var i in holeDic.Keys)
                 {
                     var storey = Buildingstoreys[UniComponents[i].floor_num];
-                    UniComponents[i].properties.Add("Depth", holeDepthDic[holeIdDic[i]].ToString());
+                    UniComponents[i].properties.Add("Length", UniComponents[i].x_len.ToString());
+                    UniComponents[i].properties.Add("Width", holeDepthDic[holeIdDic[i]].ToString());
+                    UniComponents[i].properties.Add("Height", UniComponents[i].y_len.ToString());
+                    
                     UniComponents[i].properties.Add("Elevation", (UniComponents[i].z_l - storey.bottom_elevation).ToString());
                     if (i == holeDic.Keys.Last())
                     {

@@ -71,15 +71,19 @@ namespace XbimXplorer.Deduct.Model
         public DeductGFCModel(IfcProduct ifc, bool isArchi)
         {
             IFC = ifc;
-            Outline = ifc.ToNTSPolygon();
+            //Outline = ifc.ToNTSPolygon();
             UID = ifc.GlobalId;
-            ifc.GetExtrudedDepth(out var z, out var dir);
-            ZValue = z;
-            ZDir = dir;
+            //ifc.GetExtrudedDepth(out var z, out var dir);
+            //ZValue = z;
+            //ZDir = dir;
             ItemType = GetDeductType(ifc, isArchi);
-            ifc.GetGlobleZ(out var Zhight);
-            GlobalZ = Zhight;
-
+            //ifc.GetGlobleZ(out var Zhight);
+            //GlobalZ = Zhight;
+            var ifcInfo = ifc.AnalyzeIfcProduct();
+            Outline = ifcInfo.Item1;
+            ZValue = ifcInfo.Item2;
+            GlobalZ = ifcInfo.Item3;
+            ZDir = new Vector3D(0, 0, 1);
             _width = -1;
         }
 

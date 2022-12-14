@@ -281,6 +281,36 @@ namespace ThBIMServer.NTS
             }
         }
 
+        public static Tuple<Polygon, double, double> AnalyzeIfcProduct(this IfcProduct ifcElement)
+        {
+            Polygon outLine;
+            double height, globalZ;
+            var body = ifcElement.Representation.Representations[0].Items[0];
+            if (body is IfcExtrudedAreaSolid extrudedAreaSolid)
+            {
+                var dir = extrudedAreaSolid.ExtrudedDirection;
+                if (dir.X == 0 && dir.Y == 0 && dir.Z == 1)
+                {
+                    var profile = extrudedAreaSolid.SweptArea;
+                    var placement = ifcElement.ObjectPlacement as IfcLocalPlacement;
+                    var face = profile.ToXbimFace(placement);
+                    outLine =  face.ToPolygon();
+                    height = extrudedAreaSolid.Depth;
+                    globalZ = face.OuterBound.Points.First().Z;
+                    return (outLine, height, globalZ).ToTuple();
+                }
+            }
+            var xbimSolid = ThXbimGeometryAnalyzer.CreatXbimSolid(body, ifcElement.ObjectPlacement);
+            var bottomFace = ThXbimGeometryAnalyzer.ElementBottomFace(xbimSolid);
+            outLine =  bottomFace.ToPolygon();
+            var pts = xbimSolid.Vertices.Select(o => o.VertexGeometry);
+            var min_Z = pts.Min(o => o.Z);
+            var max_Z = pts.Max(o => o.Z);
+            height = max_Z - min_Z;
+            globalZ = min_Z;
+            return (outLine, height, globalZ).ToTuple();
+        }
+
         //private static List<Coordinate> GetOutterNTS(this IfcRectangleProfileDef rectangleProfile)
         //{
         //    var points = new List<Coordinate>();

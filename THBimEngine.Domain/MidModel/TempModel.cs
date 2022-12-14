@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Xbim.Common;
 using Xbim.Ifc;
 using Xbim.Ifc4.Interfaces;
-using Xbim.IO.Xml.BsConf;
 
 namespace THBimEngine.Domain.MidModel
 {
@@ -95,10 +95,8 @@ namespace THBimEngine.Domain.MidModel
 
                         foreach (var item in elements)
                         {
-                            if(item.Name.ToString().Contains("CantiSlab"))
-                            {
-                                continue;
-                            }
+                            if(item.Name.ToString().Contains("CantiSlab")) continue;
+                            
                             var description = GetDescription(item);
                             if (description == "S_BEAM_梯梁" || description == "S_COLU_梯柱")
                                 continue;
@@ -144,7 +142,7 @@ namespace THBimEngine.Domain.MidModel
                             catch { }
 
                             var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, buildingStorey, Components[type], materialType, description);
-
+                            uniComponent.description = item.Description;
                             GetProfileName(item, uniComponent);
                             if (item is Xbim.Ifc2x3.SharedBldgElements.IfcWall ifcwall)
                             {
@@ -213,12 +211,10 @@ namespace THBimEngine.Domain.MidModel
                     UniComponents[i].properties.Add("Length", UniComponents[i].x_len.ToString());
                     UniComponents[i].properties.Add("Width", holeDepthDic[holeIdDic[i]].ToString());
                     UniComponents[i].properties.Add("Height", UniComponents[i].y_len.ToString());
-                    
                     UniComponents[i].properties.Add("Elevation", (UniComponents[i].z_l - storey.bottom_elevation).ToString());
                     if (i == holeDic.Keys.Last())
                     {
                         UniComponents[i].properties.Add("LLHeight", (storey.top_elevation - UniComponents[i].z_r).ToString());
-                        
                         continue;
                     }
                     foreach (var j in holeDic.Keys)
@@ -234,7 +230,6 @@ namespace THBimEngine.Domain.MidModel
                         }
                     }
                 }
-                
             }
         }
 
@@ -364,6 +359,7 @@ namespace THBimEngine.Domain.MidModel
             }
             return description;
         }
+
         public void GetFromBimData(THBimProject bimProject)
         {
             var typeName2IFCTypeName = new Dictionary<string, string>();
@@ -481,7 +477,6 @@ namespace THBimEngine.Domain.MidModel
                 }
             }
         }
-
 
         public void AddIfcFileByItem(IfcStore ifcStore, THBimProject bimProject)
         {
@@ -766,9 +761,11 @@ namespace THBimEngine.Domain.MidModel
             try
             {
                 var profileName = "";
-                if (ifcEntity.Name.Value.ToString().Contains("SU") && ifcEntity.GetType().Name.Contains("Beam"))
+                bool isBeam = ifcEntity.GetType().Name.Contains("Beam");
+                if (!isBeam) return;
+                if (ifcEntity.Name.Value.ToString().Contains("SU"))
                 {
-                    var x = (ifcEntity as Xbim.Ifc2x3.Kernel.IfcObject).IsDefinedByProperties;// as Xbim.Ifc2x3.Kernel.IfcRelDefinesByProperties);
+                    var x = (ifcEntity as Xbim.Ifc2x3.Kernel.IfcObject).IsDefinedByProperties;
                     var y = ((Xbim.Ifc2x3.Kernel.IfcPropertySet)x.First().RelatingPropertyDefinition).HasProperties.First();
                     var z = (string)(y as Xbim.Ifc2x3.PropertyResource.IfcPropertySingleValue).NominalValue.Value;
                     var val1 = z.Split(',')[1];
@@ -779,53 +776,30 @@ namespace THBimEngine.Domain.MidModel
                 {
                     var ifcProduct = ifcEntity as Xbim.Ifc2x3.Kernel.IfcProduct;
                     var item = ifcProduct.Representation.Representations.First().Items[0];
-                    if (item.GetType().Name == "IfcMappedItem")
+                    var type = item.GetType().Name;
+                    if (type == "IfcMappedItem")
                     {
-                        var source = (item as Xbim.Ifc2x3.GeometryResource.IfcMappedItem)
-                            .MappingSource.MappedRepresentation.Items[0];
-                        profileName = ((Xbim.Ifc2x3.GeometricModelResource.IfcSweptAreaSolid)source).SweptArea.ProfileName.ToString();
+                        var mappedItem = (item as Xbim.Ifc2x3.GeometryResource.IfcMappedItem).MappingSource.MappedRepresentation.Items.FirstOrDefault();
+                        profileName = GetProfileName(mappedItem, mappedItem.GetType().Name);
                     }
                     else
                     {
-                        var solid = item as Xbim.Ifc2x3.GeometricModelResource.IfcExtrudedAreaSolid;
-                        if (solid is null)
-                        {
-                            var rst = item as Xbim.Ifc2x3.GeometricModelResource.IfcBooleanResult;
-                            if (rst is null)
-                            {
-                                return;
-                            }
-                            var solid2 = rst.FirstOperand;
-                            profileName = ((Xbim.Ifc2x3.GeometricModelResource.IfcSweptAreaSolid)solid2).SweptArea.ProfileName.ToString();
-                        }
-                        else
-                        {
-                            profileName = solid.SweptArea.ProfileName.ToString();
-                        }
+                        profileName = GetProfileName(item, type);
                     }
                 }
                 else
                 {
                     var ifcProduct = ifcEntity as Xbim.Ifc4.Kernel.IfcProduct;
-                    if (!ifcProduct.Name.ToString().Contains("Beam"))
-                    {
-                        return;
-                    }
                     var item = ifcProduct.Representation.Representations.First().Items[0];
-                    var solid = item as Xbim.Ifc4.GeometricModelResource.IfcExtrudedAreaSolid;
-                    if (solid is null)
+                    var type = item.GetType().Name;
+                    if(type== "IfcMappedItem")
                     {
-                        var rst = item as Xbim.Ifc4.GeometricModelResource.IfcBooleanResult;
-                        if (rst is null)
-                        {
-                            return;
-                        }
-                        var solid2 = rst.FirstOperand as Xbim.Ifc4.GeometricModelResource.IfcSweptAreaSolid;
-                        profileName = solid2.SweptArea.ProfileName.ToString();
+                        var mappedItem = (item as Xbim.Ifc4.GeometryResource.IfcMappedItem).MappingSource.MappedRepresentation.Items.FirstOrDefault();
+                        profileName = GetProfileName(mappedItem, mappedItem.GetType().Name);
                     }
                     else
                     {
-                        profileName = solid.SweptArea.ProfileName.ToString();
+                        profileName = GetProfileName(item, type);
                     }
                 }
 
@@ -837,13 +811,51 @@ namespace THBimEngine.Domain.MidModel
                 }
                 else if (profileName.StartsWith("21"))
                 {
-                    uniComponent.description = profileName;
+                    uniComponent.properties.Add("ProfileName", profileName);
                 }
             }
             catch (Exception ex)
             {
 
             }
+        }
+
+        private string GetProfileName(PersistEntity item, string type)
+        {
+            if (item.Model.SchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
+            {
+                if (type == "IfcRevolvedAreaSolid")
+                {
+                    return (item as Xbim.Ifc2x3.GeometricModelResource.IfcRevolvedAreaSolid).SweptArea.ProfileName;
+                }
+                else if (type == "IfcExtrudedAreaSolid")
+                {
+                    return (item as Xbim.Ifc2x3.GeometricModelResource.IfcExtrudedAreaSolid).SweptArea.ProfileName;
+
+                }
+                else if (type == "IfcBooleanResult")
+                {
+                    return ((item as Xbim.Ifc2x3.GeometricModelResource.IfcBooleanResult).FirstOperand as Xbim.Ifc2x3.GeometricModelResource.IfcSweptAreaSolid).SweptArea.ProfileName.ToString();
+                }
+            }
+            else
+            {
+                if (type == "IfcRevolvedAreaSolid")
+                {
+                    return (item as Xbim.Ifc4.GeometricModelResource.IfcRevolvedAreaSolid).SweptArea.ProfileName;
+                }
+                else if (type == "IfcExtrudedAreaSolid")
+                {
+                    return (item as Xbim.Ifc4.GeometricModelResource.IfcExtrudedAreaSolid).SweptArea.ProfileName;
+
+                }
+                else if (type == "IfcBooleanResult")
+                {
+                    return ((item as Xbim.Ifc4.GeometricModelResource.IfcBooleanResult).FirstOperand as Xbim.Ifc4.GeometricModelResource.IfcSweptAreaSolid).SweptArea.ProfileName.ToString();
+                }
+            }
+            
+            return "";
         }
 
         public List<Edge> GetEdgesByDir(OutingPolygon outingPolygon, List<PointNormal> allPoints, ref int edgeIndex, int parentId)

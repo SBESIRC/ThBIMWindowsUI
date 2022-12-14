@@ -95,6 +95,10 @@ namespace THBimEngine.Domain.MidModel
 
                         foreach (var item in elements)
                         {
+                            if(item.Name.ToString().Contains("CantiSlab"))
+                            {
+                                continue;
+                            }
                             var description = GetDescription(item);
                             if (description == "S_BEAM_梯梁" || description == "S_COLU_梯柱")
                                 continue;

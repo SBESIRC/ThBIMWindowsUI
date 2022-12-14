@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 
-namespace THBimEngine.Domain.MidModel
+namespace THBimEngine.Domain.GeneratorModel
 {
     public class Edge// 存储边信息 通常只有两个点
     {

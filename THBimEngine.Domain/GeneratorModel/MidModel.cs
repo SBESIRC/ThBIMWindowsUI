@@ -7,9 +7,9 @@ using Xbim.Common;
 using Xbim.Ifc;
 using Xbim.Ifc4.Interfaces;
 
-namespace THBimEngine.Domain.MidModel
+namespace THBimEngine.Domain.GeneratorModel
 {
-    public class TempModel
+    public class MidModel
     {
         public List<Vec3> Points;
         public Dictionary<int, Buildingstorey> Buildingstoreys;
@@ -20,7 +20,7 @@ namespace THBimEngine.Domain.MidModel
 
         public List<PointNormal> allPoints = new List<PointNormal>();
 
-        public TempModel()
+        public MidModel()
         {
             Points = new List<Vec3>();
             Buildingstoreys = new Dictionary<int, Buildingstorey>();

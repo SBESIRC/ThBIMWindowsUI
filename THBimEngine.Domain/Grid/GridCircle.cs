@@ -1,4 +1,4 @@
-﻿using THBimEngine.Domain.MidModel;
+﻿using THBimEngine.Domain.GeneratorModel;
 
 namespace THBimEngine.Domain.Grid
 {

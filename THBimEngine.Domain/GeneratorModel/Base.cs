@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using Xbim.Common.Geometry;
 
-namespace THBimEngine.Domain.MidModel
+namespace THBimEngine.Domain.GeneratorModel
 {
     public struct Color// 颜色信息rgba
     { 

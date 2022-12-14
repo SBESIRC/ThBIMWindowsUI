@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Web.UI.WebControls;
 using THBimEngine.Domain;
 using THBimEngine.Domain.Grid;
-using THBimEngine.Domain.MidModel;
+using THBimEngine.Domain.GeneratorModel;
 using Xbim.Common.Geometry;
 using Xbim.Common.Step21;
 

@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Xbim.Ifc4.Interfaces;
 
-namespace THBimEngine.Domain.MidModel
+namespace THBimEngine.Domain.GeneratorModel
 {
     public class Buildingstorey
 	{

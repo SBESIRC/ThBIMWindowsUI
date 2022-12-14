@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 
-namespace THBimEngine.Domain.MidModel
+namespace THBimEngine.Domain.GeneratorModel
 {
     public class Component// 包含类型名、类型id、颜色、是否水平信息
 	{

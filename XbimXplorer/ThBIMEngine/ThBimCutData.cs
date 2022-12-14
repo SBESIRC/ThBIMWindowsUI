@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Controls;
 using THBimEngine.Domain;
-using THBimEngine.Domain.MidModel;
+using THBimEngine.Domain.GeneratorModel;
 using Xbim.Ifc;
 using Xbim.IO.Esent;
 using Xbim.ModelGeometry.Scene;
@@ -17,7 +17,7 @@ namespace XbimXplorer.ThBIMEngine
         public static void Run(List<THBimProject> bimProjects)
         {
             bool firstPr = true;
-            var tempData = new TempModel();
+            var tempData = new MidModel();
             foreach (var project in bimProjects)
             {
                 if (firstPr)
@@ -35,7 +35,7 @@ namespace XbimXplorer.ThBIMEngine
 
         public static void Run(IfcStore ifcStore, List<GeometryMeshModel> allGeoModels, List<PointNormal> allGeoPointNormals)
         {
-            var tempData = new TempModel();
+            var tempData = new MidModel();
             var resList = new Dictionary<string, GeometryMeshModel>();
             foreach (var item in allGeoModels)
             {
@@ -47,7 +47,7 @@ namespace XbimXplorer.ThBIMEngine
         public static void Run(IfcStore ifcStore, List<GeometryMeshModel> allGeoModels, List<PointNormal> allGeoPointNormals,
             IfcStore ifcStorePC, List<GeometryMeshModel> allGeoModelsPC, List<PointNormal> allGeoPointNormalsPC)
         {
-            var tempData = new TempModel();
+            var tempData = new MidModel();
             var resList = new Dictionary<string, GeometryMeshModel>();
             foreach (var item in allGeoModels)
             {

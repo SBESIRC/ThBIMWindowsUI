@@ -362,7 +362,7 @@ namespace XbimXplorer.Extensions.ModelMerge
             return Newpt;
         }
 
-        private static IfcRelDefinesByProperties CloneAndCreateNew(this IfcRelDefinesByProperties property, IfcStore model)
+        public static IfcRelDefinesByProperties CloneAndCreateNew(this IfcRelDefinesByProperties property, IfcStore model)
         {
             var result = model.Instances.New<IfcRelDefinesByProperties>(rel =>
             {

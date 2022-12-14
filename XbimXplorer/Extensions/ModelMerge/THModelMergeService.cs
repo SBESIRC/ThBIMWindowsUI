@@ -141,12 +141,18 @@ namespace XbimXplorer.Extensions.ModelMerge
                 foreach (var spatialStructure in BuildingStorey.ContainsElements)
                 {
                     var elements = spatialStructure.RelatedElements;
-                    
                     using (var txn = bigModel.BeginTransaction("Insert copy"))
                     {
                         foreach (var element in elements)
                         {
                             var newElement = bigModel.InsertCopy(element, map, semanticFilter, false, false);
+                            // add properties
+                            var property = smallModel.Instances.OfType<Xbim.Ifc2x3.Kernel.IfcRelDefinesByProperties>().FirstOrDefault(o => o.RelatedObjects.Contains(element));
+                            if (property != null)
+                            {
+                                var ifcRelDefinesByProperties = property.CloneAndCreateNew(bigModel);
+                                ifcRelDefinesByProperties.RelatedObjects.Add(newElement);
+                            }
                             CreatElements.Add(newElement);
                         }
                         txn.Commit();

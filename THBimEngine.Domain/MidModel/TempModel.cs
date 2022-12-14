@@ -77,6 +77,8 @@ namespace THBimEngine.Domain.MidModel
             var buildings = site.Buildings.ToList();
 
             var holeDic = new Dictionary<int, List<double>>();
+            var holeDepthDic = new Dictionary<string, double>();
+            var holeIdDic = new Dictionary<int, string>();
 
             foreach (var building in buildings)
             {
@@ -107,12 +109,12 @@ namespace THBimEngine.Domain.MidModel
                                 {
                                     if (!((Xbim.Ifc2x3.Kernel.IfcRoot)item).FriendlyName.Contains("Wall_Hole"))
                                         continue;
+                                    holeIdDic.Add(uniComponentIndex,item.GlobalId);
                                 }
                                 catch
                                 {
                                     continue;
                                 }
-                         
                             }
                             bool isVirtualElement = false;
                             if (type.Contains("IfcVirtualElement"))
@@ -140,6 +142,13 @@ namespace THBimEngine.Domain.MidModel
                             var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, buildingStorey, Components[type], materialType, description);
 
                             GetProfileName(item, uniComponent);
+                            if (item is Xbim.Ifc2x3.SharedBldgElements.IfcWall ifcwall)
+                            {
+                                if (ifcwall.HasOpenings.Count() > 0)
+                                {
+                                    holeDepthDic.Add(ifcwall.Openings.FirstOrDefault().GlobalId, uniComponent.y_len);
+                                }
+                            }
 
                             uniComponent.edge_ind_s = edgeIndex;
                             uniComponent.tri_ind_s = triangleIndex;
@@ -177,7 +186,6 @@ namespace THBimEngine.Domain.MidModel
                                         }
                                     }
                                 }
-        
                             }
                             else
                             {
@@ -198,9 +206,12 @@ namespace THBimEngine.Domain.MidModel
                 foreach(var i in holeDic.Keys)
                 {
                     var storey = Buildingstoreys[UniComponents[i].floor_num];
+                    UniComponents[i].properties.Add("Depth", holeDepthDic[holeIdDic[i]].ToString());
+                    UniComponents[i].properties.Add("Elevation", (UniComponents[i].z_l - storey.bottom_elevation).ToString());
                     if (i == holeDic.Keys.Last())
                     {
-                        UniComponents[i].properties.Add("holeDepth", (storey.top_elevation - UniComponents[i].z_r).ToString());
+                        UniComponents[i].properties.Add("LLHeight", (storey.top_elevation - UniComponents[i].z_r).ToString());
+                        
                         continue;
                     }
                     foreach (var j in holeDic.Keys)
@@ -211,7 +222,7 @@ namespace THBimEngine.Domain.MidModel
                         var holeDepth = holeDic[j][2] - holeDic[i][3];
                         if (xDiff < 100 && yDiff < 100 && holeDepth > 0 && holeDepth < storey.top_elevation-storey.bottom_elevation)
                         {
-                            UniComponents[i].properties.Add("holeDepth", (holeDic[j][2]- holeDic[i][3]).ToString());
+                            UniComponents[i].properties.Add("LLHeight", (holeDic[j][2]- holeDic[i][3]).ToString());
                             break;
                         }
                     }

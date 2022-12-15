@@ -391,7 +391,8 @@ namespace XbimXplorer
                 MessageBox.Show("打开YDB失败!", "打开文件说明", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            //LoadFileToCurrentDocument(ifcPath,null);
+            var openFileParameter = new ProjectParameter(ifcPath, THBimEngine.Domain.EMajor.Structure, THBimEngine.Domain.EApplcationName.IFC);
+            LoadFileToCurrentDocument(openFileParameter);
         }
         private void FileLoadCompleted(object s, RunWorkerCompletedEventArgs args)
         {

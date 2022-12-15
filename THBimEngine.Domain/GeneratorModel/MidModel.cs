@@ -95,7 +95,7 @@ namespace THBimEngine.Domain.GeneratorModel
 
                         foreach (var item in elements)
                         {
-                            if(item.Name.ToString().Contains("CantiSlab")) continue;
+                            if (item.Name.ToString().Contains("CantiSlab")) continue;
                             
                             var description = GetDescription(item);
                             if (description == "S_BEAM_梯梁" || description == "S_COLU_梯柱")
@@ -211,7 +211,7 @@ namespace THBimEngine.Domain.GeneratorModel
                     UniComponents[i].properties.Add("Length", UniComponents[i].x_len.ToString());
                     UniComponents[i].properties.Add("Width", holeDepthDic[holeIdDic[i]].ToString());
                     UniComponents[i].properties.Add("Height", UniComponents[i].y_len.ToString());
-                    UniComponents[i].properties.Add("Elevation", (UniComponents[i].z_l - storey.bottom_elevation).ToString());
+                    UniComponents[i].properties.Add("LLElevation", (UniComponents[i].z_l - storey.bottom_elevation).ToString());
                     if (i == holeDic.Keys.Last())
                     {
                         UniComponents[i].properties.Add("LLHeight", (storey.top_elevation - UniComponents[i].z_r).ToString());
@@ -228,6 +228,10 @@ namespace THBimEngine.Domain.GeneratorModel
                             UniComponents[i].properties.Add("LLHeight", (holeDic[j][2]- holeDic[i][3]).ToString());
                             break;
                         }
+                    }
+                    if(!UniComponents[i].properties.ContainsKey("LLHeight"))
+                    {
+                        UniComponents[i].properties.Add("LLHeight", (storey.top_elevation - UniComponents[i].z_r).ToString());
                     }
                 }
             }
@@ -761,9 +765,7 @@ namespace THBimEngine.Domain.GeneratorModel
             try
             {
                 var profileName = "";
-                bool isBeam = ifcEntity.GetType().Name.Contains("Beam");
-                if (!isBeam) return;
-                if (ifcEntity.Name.Value.ToString().Contains("SU"))
+                if (ifcEntity.Name.Value.ToString().Contains("SU")&& ifcEntity.GetType().Name.Contains("Beam"))
                 {
                     var x = (ifcEntity as Xbim.Ifc2x3.Kernel.IfcObject).IsDefinedByProperties;
                     var y = ((Xbim.Ifc2x3.Kernel.IfcPropertySet)x.First().RelatingPropertyDefinition).HasProperties.First();
@@ -802,7 +804,7 @@ namespace THBimEngine.Domain.GeneratorModel
                         profileName = GetProfileName(item, type);
                     }
                 }
-
+                if (string.IsNullOrEmpty(profileName)) return;
                 if (profileName.Contains("_") && profileName.Contains("*"))
                 {
                     string[] xyLen = profileName.Split('_')[1].Split('*');

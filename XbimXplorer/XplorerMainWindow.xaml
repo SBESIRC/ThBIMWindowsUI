@@ -201,7 +201,10 @@
                 <MenuItem Header="扣减demo" Click="MenuItem_Deduct_Click" Width="80" HorizontalAlignment="Left"
                       VerticalContentAlignment="Center"
                       HorizontalContentAlignment="Center"></MenuItem>
-                <MenuItem Header="扣减Open" Click="MenuItem_Deduct_Open_Click" Width="80" HorizontalAlignment="Left"
+                <MenuItem Header="扣减Open" Click="MenuItem_Deduct_Open_Click" Width="80" HorizontalAlignment="Center"
+                      VerticalContentAlignment="Center"
+                      HorizontalContentAlignment="Center" Height="24"/>
+                <MenuItem Header="装修Demo" Click="MenuItem_Furnish_Open_Click" Width="80" HorizontalAlignment="Left"
                       VerticalContentAlignment="Center"
                       HorizontalContentAlignment="Center"></MenuItem>
             </Menu>

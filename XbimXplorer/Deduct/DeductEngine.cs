@@ -90,7 +90,21 @@ namespace XbimXplorer.Deduct
             }
         }
 
+        public void DoFurnish()
+        {
+            var archIfcStore = ArchiProject.SourceProject as Xbim.Ifc.IfcStore;
 
+            if (archIfcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
+            {
+                var engine = new FurnishEngine();
+                engine.IfcArchi = archIfcStore;
+                engine.CalculateFurnish();
+            }
+            else
+            {
+                // do not
+            }
+        }
 
         private static void TryIfc4(Xbim.Ifc.IfcStore ifcStore)
         {

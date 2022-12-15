@@ -1430,24 +1430,41 @@ namespace XbimXplorer
                 return;
 
             //Demo For zxr（文件路径你需要改一下）
-            var aPath = @"D:\建筑1012.ifc";
-            var sPath = @"D:\0929-结构32.ifc";
-            var loadPrjs = new List<ProjectParameter>();
-            loadPrjs.Add(new ProjectParameter()
+            //var aPath = @"D:\建筑1012.ifc";
+            //var sPath = @"D:\0929-结构32.ifc";
+            //var loadPrjs = new List<ProjectParameter>();
+            //loadPrjs.Add(new ProjectParameter()
+            //{
+            //    OpenFilePath = aPath,
+            //    ProjectId = aPath,
+            //    Major = EMajor.Architecture,
+            //    Source = EApplcationName.IFC,
+            //});
+            //loadPrjs.Add(new ProjectParameter()
+            //{
+            //    OpenFilePath = sPath,
+            //    ProjectId = sPath,
+            //    Major = EMajor.Structure,
+            //    Source = EApplcationName.IFC,
+            //});
+            //LoadFilesToCurrentDocument(loadPrjs);
+
+            var aPath = @"D:\My\GFC\FurnishTest.ifc";
+            LoadFileToCurrentDocument(new ProjectParameter()
             {
                 OpenFilePath = aPath,
                 ProjectId = aPath,
                 Major = EMajor.Architecture,
                 Source = EApplcationName.IFC,
             });
-            loadPrjs.Add(new ProjectParameter()
-            {
-                OpenFilePath = sPath,
-                ProjectId = sPath,
-                Major = EMajor.Structure,
-                Source = EApplcationName.IFC,
-            });
-            LoadFilesToCurrentDocument(loadPrjs);
+        }
+
+        private void MenuItem_Furnish_Open_Click(object sender, RoutedEventArgs e)
+        {
+            if (CurrentDocument == null)
+                return;
+            var deductService = new DeductEngine(CurrentDocument);
+            deductService.DoFurnish();
         }
     }
     class DocumentCacheModel

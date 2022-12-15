@@ -36,6 +36,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "THBimEngine.IO", "THBimEngi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "THBimEngine.Internal", "THBimEngine.Internal\THBimEngine.Internal.csproj", "{0A86C53F-49E7-44FE-A9F0-5EBDAC632691}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugin Items", "Plugin Items", "{E7B870EB-5A4D-4AB1-9051-F1CDE79444D9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -193,6 +195,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0A86C53F-49E7-44FE-A9F0-5EBDAC632691} = {E7B870EB-5A4D-4AB1-9051-F1CDE79444D9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A75501D3-AC6F-4B92-A02D-C9347E05FAC2}

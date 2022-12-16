@@ -15,7 +15,7 @@ namespace THBimEngine.DBOperation
             {
                 sqlIP = sqlIp;
             }
-            if (location.Contains("广州"))
+            if (!string.IsNullOrEmpty(location) && location.Contains("广州"))
             {
                 dbSqlServerConfig = new ConnectionConfig()
                 {

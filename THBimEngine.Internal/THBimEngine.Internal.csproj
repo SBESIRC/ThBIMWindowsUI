@@ -35,23 +35,35 @@
       <HintPath>..\packages\log4net.2.0.15\lib\net45\log4net.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EncryptionFun.cs" />
     <Compile Include="OpenFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\EncryptionUI.xaml.cs">
+      <DependentUpon>EncryptionUI.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\THBimEngine.Application\THBimEngine.Application.csproj">
       <Project>{F238CF71-3AAD-463A-8304-39D2E5C64403}</Project>
       <Name>THBimEngine.Application</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\THBimEngine.Common\THBimEngine.Common.csproj">
+      <Project>{69892AD6-C1B7-4794-942B-F4E6AA1B066A}</Project>
+      <Name>THBimEngine.Common</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\THBimEngine.Domain\THBimEngine.Domain.csproj">
@@ -62,6 +74,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="UI\EncryptionUI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1348,6 +1348,9 @@ namespace XbimXplorer
             }
             foreach (var linkModel in docCache.DocExternalLink.LinkModels)
             {
+                if (null == linkModel || string.IsNullOrEmpty(linkModel.Project.LoaclPath) || !File.Exists(linkModel.Project.LoaclPath)
+                    || string.IsNullOrEmpty(linkModel.Project.LinkFilePath) || !File.Exists(linkModel.Project.LinkFilePath))
+                    continue;
                 var openParameter = new ProjectParameter()
                 {
                     OpenFilePath = linkModel.Project.LinkFilePath,

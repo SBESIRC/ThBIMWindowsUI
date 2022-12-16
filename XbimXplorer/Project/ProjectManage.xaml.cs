@@ -63,10 +63,14 @@ namespace XbimXplorer
         }
         private void InitUserProjects()
         {
-            if (null == projectVM) 
+            if (null == projectVM)
             {
                 var userPojects = projectDBHelper.GetUserProjects(loginUser.PreSSOId);
-                projectVM = new ProjectVM(userPojects,loginUser.LoginLocation);
+                projectVM = new ProjectVM(userPojects, loginUser.LoginLocation);
+            }
+            else 
+            {
+                projectVM.ChangeSelectSubProject();
             }
             this.DataContext = projectVM;
         }

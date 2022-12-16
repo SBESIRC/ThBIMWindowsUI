@@ -23,8 +23,11 @@ namespace XbimXplorer
     public partial class XplorerMainWindow
     {
         ProjectParameter openParameter;
+        bool loadEndZoom = false;
+        bool isMultipleLoad = false;
         public void LoadFileToCurrentDocument(ProjectParameter openFileParameter)
         {
+            
             openParameter = openFileParameter;
             string filePath = openFileParameter.OpenFilePath;
             var fInfo = new FileInfo(filePath);
@@ -75,6 +78,7 @@ namespace XbimXplorer
 
         public void LoadStreamToCurrentDocument(StreamParameter streamParameter)
         {
+            CheckLoadZoom(false);
             CloseAndDeleteTemporaryFiles();
             ProgressStatusBar.Visibility = Visibility.Visible;
             _loadStreamBackgroundWorker = new BackgroundWorker
@@ -87,13 +91,18 @@ namespace XbimXplorer
             _loadStreamBackgroundWorker.RunWorkerCompleted += FileLoadCompleted;
             _loadStreamBackgroundWorker.RunWorkerAsync(streamParameter);
         }
-
+        private void CheckLoadZoom(bool isMulti) 
+        {
+            isMultipleLoad = isMulti;
+            loadEndZoom = CurrentDocument == null || CurrentDocument.AllBimProjects.Count < 1;
+        }
         BackgroundWorker mutilLoadBWorker;
         List<ProjectParameter> openProjects;
         void LoadFilesToCurrentDocument(List<ProjectParameter> openFileParameters)
         {
             if (null == openFileParameters || openFileParameters.Count<1 || mutilLoadBWorker != null)
                 return;
+            CheckLoadZoom(true);
             openProjects = new List<ProjectParameter>();
             openProjects.AddRange(openFileParameters);
             mutilLoadBWorker = new BackgroundWorker();
@@ -106,6 +115,12 @@ namespace XbimXplorer
         {
             if (null == openProjects || openProjects.Count < 1)
             {
+                if (loadEndZoom) 
+                {
+                    ZoomEntitys(null);
+                    loadEndZoom = false;
+                    isMultipleLoad = false;
+                }
                 mutilLoadBWorker = null;
                 return;
             }
@@ -405,6 +420,10 @@ namespace XbimXplorer
                 Log.Info(string.Format("数据解析完成，耗时：{0}s", totalTime));
                 ProgressBar.Value = 0;
                 StatusMsg.Text = "";
+                if (!isMultipleLoad && loadEndZoom) 
+                {
+                    ZoomEntitys(null);
+                }
             }
             else //we have a problem
             {

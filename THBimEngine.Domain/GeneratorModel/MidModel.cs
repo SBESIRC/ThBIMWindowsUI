@@ -211,12 +211,12 @@ namespace THBimEngine.Domain.GeneratorModel
                     UniComponents[i].properties.Add("Length", UniComponents[i].x_len.ToString());
                     UniComponents[i].properties.Add("Width", holeDepthDic[holeIdDic[i]].ToString());
                     UniComponents[i].properties.Add("Height", UniComponents[i].y_len.ToString());
-                    UniComponents[i].properties.Add("LLElevation", (UniComponents[i].z_l - storey.bottom_elevation).ToString());
-                    if (i == holeDic.Keys.Last())
-                    {
-                        UniComponents[i].properties.Add("LLHeight", (storey.top_elevation - UniComponents[i].z_r).ToString());
-                        continue;
-                    }
+                    //if (i == holeDic.Keys.Last())
+                    //{
+                    //    UniComponents[i].properties.Add("LLHeight", (storey.top_elevation - UniComponents[i].z_r).ToString());
+                    //    UniComponents[i].properties.Add("LLElevation", "");
+                    //    continue;
+                    //}
                     foreach (var j in holeDic.Keys)
                     {
                         if (j <= i) continue;
@@ -225,13 +225,16 @@ namespace THBimEngine.Domain.GeneratorModel
                         var holeDepth = holeDic[j][2] - holeDic[i][3];
                         if (xDiff < 100 && yDiff < 100 && holeDepth > 0 && holeDepth < storey.top_elevation-storey.bottom_elevation)
                         {
+                            var storeyj = Buildingstoreys[UniComponents[j].floor_num];
                             UniComponents[i].properties.Add("LLHeight", (holeDic[j][2]- holeDic[i][3]).ToString());
+                            UniComponents[i].properties.Add("LLElevation", (UniComponents[j].z_l - storeyj.bottom_elevation).ToString());
                             break;
                         }
                     }
                     if(!UniComponents[i].properties.ContainsKey("LLHeight"))
                     {
                         UniComponents[i].properties.Add("LLHeight", (storey.top_elevation - UniComponents[i].z_r).ToString());
+                        UniComponents[i].properties.Add("LLElevation", "");
                     }
                 }
             }

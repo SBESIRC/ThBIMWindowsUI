@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Web.Profile;
 using Xbim.Common;
 using Xbim.Ifc;
+using Xbim.Ifc2x3.MeasureResource;
 using Xbim.Ifc4.Interfaces;
 
 namespace THBimEngine.Domain.GeneratorModel
@@ -856,11 +858,25 @@ namespace THBimEngine.Domain.GeneratorModel
                 }
                 else if (type == "IfcBooleanResult")
                 {
-                    return ((item as Xbim.Ifc4.GeometricModelResource.IfcBooleanResult).FirstOperand as Xbim.Ifc4.GeometricModelResource.IfcSweptAreaSolid).SweptArea.ProfileName.ToString();
+                    string profileName = "";
+                     GetProfileName(item as Xbim.Ifc4.GeometricModelResource.IfcBooleanResult,ref profileName);
+                    return profileName;
                 }
             }
-            
             return "";
+        }
+
+        private void GetProfileName(Xbim.Ifc4.GeometricModelResource.IfcBooleanResult item, ref string profileName)
+        {
+            var firstOperand = item.FirstOperand;
+            if (firstOperand.GetType().Name == "IfcBooleanResult")
+            {
+                GetProfileName(firstOperand as Xbim.Ifc4.GeometricModelResource.IfcBooleanResult,ref profileName);
+            }
+            else
+            {
+               profileName = (firstOperand as Xbim.Ifc4.GeometricModelResource.IfcSweptAreaSolid).SweptArea.ProfileName.ToString();
+            }
         }
 
         public List<Edge> GetEdgesByDir(OutingPolygon outingPolygon, List<PointNormal> allPoints, ref int edgeIndex, int parentId)

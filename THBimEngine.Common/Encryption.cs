@@ -1,12 +1,60 @@
 ﻿using System;
 using System.IO;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace THBimEngine.Common
 {
     public class Encryption
     {
-        private static readonly string defaultKey= "kmyoGf4DfFdOkb72PSa0";
+        private static readonly string defaultKey= "kmyoGf4DfFdOkb72";
+        /// <summary>
+        ///  AES 加密
+        /// </summary>
+        /// <param name="str">明文（待加密）</param>
+        /// <param name="key">密文(长度16的倍数)</param>
+        /// <returns></returns>
+        public static string AesEncrypt(string str, string key)
+        {
+            if (string.IsNullOrEmpty(str)) return null;
+            var tempKey = string.IsNullOrEmpty(key) ? defaultKey : key;
+            Byte[] toEncryptArray = Encoding.UTF8.GetBytes(str);
+
+            RijndaelManaged rm = new RijndaelManaged
+            {
+                Key = Encoding.UTF8.GetBytes(tempKey),
+                Mode = CipherMode.ECB,
+                Padding = PaddingMode.PKCS7
+            };
+
+            ICryptoTransform cTransform = rm.CreateEncryptor();
+            Byte[] resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
+            return Convert.ToBase64String(resultArray);
+        }
+
+        /// <summary>
+        ///  AES 解密
+        /// </summary>
+        /// <param name="str">明文（待解密）</param>
+        /// <param name="key">密文</param>
+        /// <returns></returns>
+        public static string AesDecrypt(string str, string key)
+        {
+            if (string.IsNullOrEmpty(str)) return null;
+            Byte[] toEncryptArray = Convert.FromBase64String(str);
+            var tempKey = string.IsNullOrEmpty(key) ? defaultKey : key;
+            RijndaelManaged rm = new RijndaelManaged
+            {
+                Key = Encoding.UTF8.GetBytes(tempKey),
+                Mode = CipherMode.ECB,
+                Padding = PaddingMode.PKCS7
+            };
+
+            ICryptoTransform cTransform = rm.CreateDecryptor();
+            Byte[] resultArray = cTransform.TransformFinalBlock(toEncryptArray, 0, toEncryptArray.Length);
+
+            return Encoding.UTF8.GetString(resultArray);
+        }
         /// <summary>
         /// DES加密
         /// </summary>

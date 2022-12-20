@@ -31,9 +31,9 @@ namespace THBimEngine.Internal.UI
             try
             {
                 if(isDec)
-                    txtRes.Text = Encryption.RSADecrypt(inputStr, key);
+                    txtRes.Text = Encryption.AesDecrypt(inputStr, key);
                 else
-                    txtRes.Text = Encryption.RSAEncryption(inputStr, key);
+                    txtRes.Text = Encryption.AesEncrypt(inputStr, key);
             }
             catch (Exception ex)
             {

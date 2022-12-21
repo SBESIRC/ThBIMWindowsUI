@@ -914,7 +914,7 @@ namespace THBimEngine.Domain.GeneratorModel
 
         public double GetLength(PointVector pt1, PointVector pt2)
         {
-            return Math.Sqrt(Math.Pow(pt1.X-pt2.X,2)+ Math.Pow(pt1.Y - pt2.Y, 2) + Math.Pow(pt1.Z - pt2.Z, 2));//Math.Abs(pt1.X - pt2.X) + Math.Abs(pt1.Y - pt2.Y) + Math.Abs(pt1.Z - pt2.Z);
+            return Math.Abs(pt1.X - pt2.X) + Math.Abs(pt1.Y - pt2.Y);
         }
 
         public void GetTrianglesAndEdges(List<FaceTriangle> triangles, List<PointNormal> allPoints, int offsetIndex, ref int triangleIndex, ref int edgeIndex,
@@ -945,7 +945,7 @@ namespace THBimEngine.Domain.GeneratorModel
                     lengths=lengths.OrderByDescending(l=>l).ToList();
                     foreach (var edge in allEdges)
                     {
-                        if (Math.Abs(lengths[2] -edge.Len)<1.0)
+                        if (Math.Abs(lengths[7] -edge.Len)<1.0)
                         {
                             edge.Id = edgeIndex++;
                             Edges.Add(edge);

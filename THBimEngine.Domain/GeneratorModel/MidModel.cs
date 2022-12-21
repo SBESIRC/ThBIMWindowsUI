@@ -842,7 +842,9 @@ namespace THBimEngine.Domain.GeneratorModel
                 }
                 else if (type == "IfcBooleanResult")
                 {
-                    return ((item as Xbim.Ifc2x3.GeometricModelResource.IfcBooleanResult).FirstOperand as Xbim.Ifc2x3.GeometricModelResource.IfcSweptAreaSolid).SweptArea.ProfileName.ToString();
+                    string profileName = "";
+                    GetProfileName(item as Xbim.Ifc2x3.GeometricModelResource.IfcBooleanResult, ref profileName);
+                    return profileName;
                 }
             }
             else
@@ -878,6 +880,18 @@ namespace THBimEngine.Domain.GeneratorModel
                profileName = (firstOperand as Xbim.Ifc4.GeometricModelResource.IfcSweptAreaSolid).SweptArea.ProfileName.ToString();
             }
         }
+        private void GetProfileName(Xbim.Ifc2x3.GeometricModelResource.IfcBooleanResult item, ref string profileName)
+        {
+            var firstOperand = item.FirstOperand;
+            if (firstOperand.GetType().Name == "IfcBooleanResult")
+            {
+                GetProfileName(firstOperand as Xbim.Ifc2x3.GeometricModelResource.IfcBooleanResult, ref profileName);
+            }
+            else
+            {
+                profileName = (firstOperand as Xbim.Ifc2x3.GeometricModelResource.IfcSweptAreaSolid).SweptArea.ProfileName.ToString();
+            }
+        }
 
         public List<Edge> GetEdgesByDir(OutingPolygon outingPolygon, List<PointNormal> allPoints, ref int edgeIndex, int parentId)
         {
@@ -900,7 +914,7 @@ namespace THBimEngine.Domain.GeneratorModel
 
         public double GetLength(PointVector pt1, PointVector pt2)
         {
-            return Math.Abs(pt1.X - pt2.X) + Math.Abs(pt1.Y - pt2.Y) + Math.Abs(pt1.Z - pt2.Z);
+            return Math.Sqrt(Math.Pow(pt1.X-pt2.X,2)+ Math.Pow(pt1.Y - pt2.Y, 2) + Math.Pow(pt1.Z - pt2.Z, 2));//Math.Abs(pt1.X - pt2.X) + Math.Abs(pt1.Y - pt2.Y) + Math.Abs(pt1.Z - pt2.Z);
         }
 
         public void GetTrianglesAndEdges(List<FaceTriangle> triangles, List<PointNormal> allPoints, int offsetIndex, ref int triangleIndex, ref int edgeIndex,
@@ -918,6 +932,27 @@ namespace THBimEngine.Domain.GeneratorModel
             }
             if (uniComponent.name.Contains("Beam"))
             {
+                if(uniComponent.properties.ContainsKey("ProfileName"))
+                {
+                    double length = 0;
+                    var lengths = new List<int>();
+                    foreach (var edge in allEdges) 
+                    {
+                        int len = Convert.ToInt32(edge.Len);
+                        if (!lengths.Contains(len))
+                            lengths.Add(len);
+                    }
+                    lengths=lengths.OrderByDescending(l=>l).ToList();
+                    foreach (var edge in allEdges)
+                    {
+                        if (Math.Abs(lengths[2] -edge.Len)<1.0)
+                        {
+                            edge.Id = edgeIndex++;
+                            Edges.Add(edge);
+                        }
+                    }
+                    return;
+                }
                 var edgeLenDic = new Dictionary<Vec3, double>();
                 var edgeDic = new Dictionary<Vec3, List<Edge>>();
                 int maxCnt = 0;

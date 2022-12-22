@@ -2279,7 +2279,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\天华结构三维平台1.0.31.msi"
+        "OutputFilename" = "8:Release\\天华结构三维平台1.0.33.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -3635,7 +3635,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:THBimEngine.DBOperation, Version=1.0.25.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:THBimEngine.DBOperation, Version=1.0.26.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_58A165618AA99E8703EC97BA4196BE97"
@@ -4076,7 +4076,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:THBimEngine.Common, Version=1.0.25.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:THBimEngine.Common, Version=1.0.26.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_8022C186D45F6CB6B8FE1076AB7C6EEE"
@@ -4138,7 +4138,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:THBimEngine.Domain, Version=1.0.27.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:THBimEngine.Domain, Version=1.0.28.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_85A7C591A464C971DF081742E3885BBB"
@@ -6191,15 +6191,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:天华结构三维平台"
-        "ProductCode" = "8:{DDF291C8-A57B-407D-9769-FCA0437A4799}"
-        "PackageCode" = "8:{3C3467DA-3B46-4994-B8F0-FA62F53261DB}"
+        "ProductCode" = "8:{CAA20F6A-9A81-4491-AFB3-D0B1E9CCA3D8}"
+        "PackageCode" = "8:{09B035BF-A834-42B1-98B1-583A67179A85}"
         "UpgradeCode" = "8:{ED2A8D68-8A28-4313-AC3F-A8420ED52526}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.31"
+        "ProductVersion" = "8:1.0.33"
         "Manufacturer" = "8:TIANHUA Architectural Design Co., Ltd"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

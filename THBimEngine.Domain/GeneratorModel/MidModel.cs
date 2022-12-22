@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net.Util.TypeConverters;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -901,6 +902,7 @@ namespace THBimEngine.Domain.GeneratorModel
             {
                 for (int j = i + 1; j < cnt; j++)
                 {
+                    //var pt = allPoints[triangle.ptIndex[i] + offsetIndex].Point;
                     var ptn1 = allPoints[outingPolygon.ptsIndex[i]];
                     var ptn2 = allPoints[outingPolygon.ptsIndex[j]];
                     var edgeLen = GetLength(ptn1.Point, ptn2.Point);
@@ -914,7 +916,7 @@ namespace THBimEngine.Domain.GeneratorModel
 
         public double GetLength(PointVector pt1, PointVector pt2)
         {
-            return Math.Abs(pt1.X - pt2.X) + Math.Abs(pt1.Y - pt2.Y);
+            return Math.Sqrt(Math.Pow(pt1.X - pt2.X,2) + Math.Pow(pt1.Y - pt2.Y,2));
         }
 
         public void GetTrianglesAndEdges(List<FaceTriangle> triangles, List<PointNormal> allPoints, int offsetIndex, ref int triangleIndex, ref int edgeIndex,
@@ -934,18 +936,19 @@ namespace THBimEngine.Domain.GeneratorModel
             {
                 if(uniComponent.properties.ContainsKey("ProfileName"))
                 {
-                    double length = 0;
                     var lengths = new List<int>();
+                    //var xylen = Math.Max(uniComponent.x_r-uniComponent.x_l,uniComponent.y_r-uniComponent.y_l);
+                    Dictionary<int, int> dic = new Dictionary<int, int>();
                     foreach (var edge in allEdges) 
                     {
-                        int len = Convert.ToInt32(edge.Len);
-                        if (!lengths.Contains(len))
-                            lengths.Add(len);
+                        if (!lengths.Contains(Convert.ToInt32(edge.Len)))
+                            lengths.Add(Convert.ToInt32(edge.Len));
                     }
                     lengths=lengths.OrderByDescending(l=>l).ToList();
+
                     foreach (var edge in allEdges)
                     {
-                        if (Math.Abs(lengths[7] -edge.Len)<1.0)
+                        if (Math.Abs(edge.Len - lengths[1]) <= 1)
                         {
                             edge.Id = edgeIndex++;
                             Edges.Add(edge);

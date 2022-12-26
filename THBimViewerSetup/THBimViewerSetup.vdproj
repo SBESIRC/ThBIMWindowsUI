@@ -15,12 +15,6 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_006DDC552FF2407891D63D726B8029E3"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_00AD0F5C387B99C95547BAC9DC15F09B"
         "OwnerKey" = "8:_8C4DED3DEFC3751F5ED6F77FE4322C46"
         "MsmSig" = "8:_UNDEFINED"
@@ -63,12 +57,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_04FF148F22B8469289BDABB12E13C5A8"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_06D96E8F7007497CAE3516EFE9C23B5E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -95,12 +83,6 @@
         {
         "MsmKey" = "8:_0E417396EAD022E3C6BC22B0C5A3007E"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_0E7B5AAC74EC44388897088A3A6B57E1"
-        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -171,12 +153,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_10D383D4E8304389834878D75996FEF0"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_11BF6CA54D076F15253C2414259BC573"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
         "MsmSig" = "8:_UNDEFINED"
@@ -213,12 +189,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_16881417513645F2955A304B11584CD1"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_16C729491BF01604E35AF1A170FC89BE"
         "OwnerKey" = "8:_FAC08A98039847839E86D2E1DDD4FFFF"
         "MsmSig" = "8:_UNDEFINED"
@@ -239,12 +209,6 @@
         {
         "MsmKey" = "8:_16C729491BF01604E35AF1A170FC89BE"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_1A8CD311A4924B59A743FAADE2FD4B88"
-        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -339,12 +303,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_2AA9D58AB7D8403889C8BDE819634C87"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_2B6BC2C8D3E44F2D845D6B40A7F96AEF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -357,12 +315,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_2C5B340387BB464A80E45C80C8E4D573"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_2D9A26D124A46E2E4B42C15CE63086AC"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
         "MsmSig" = "8:_UNDEFINED"
@@ -371,18 +323,6 @@
         {
         "MsmKey" = "8:_2D9A26D124A46E2E4B42C15CE63086AC"
         "OwnerKey" = "8:_ECA264919BA6435611CA7F229D193CCF"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_31A2672B848A4458B793F080E9CA8D88"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_361E820307C04020AC28E208DE890413"
-        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -447,12 +387,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_3CB4E237FF9848FFAFA8DBF0FC0E06BC"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_3E3F8882F4720F91A1E8EA8725ED2486"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
         "MsmSig" = "8:_UNDEFINED"
@@ -491,12 +425,6 @@
         {
         "MsmKey" = "8:_3FDFAE28411FD13F3AB20C07DD181CC3"
         "OwnerKey" = "8:_FE66DE98132C1F4D96D12AB1C5840107"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_42BE724A440A4F529D3D2B3CC780162B"
-        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -561,18 +489,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_48807166272A49C7AC680735A8EB0A57"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_4A665C5F98CA4D97B3778A5738BB89D9"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_4B10B23D112B3309A1A1992EB412AE67"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
         "MsmSig" = "8:_UNDEFINED"
@@ -580,12 +496,6 @@
         "Entry"
         {
         "MsmKey" = "8:_4F9977B9BBD743168C9B0EB4A889B9A4"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_501B21EF44644DB8BE1DDD1E849A6EE7"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -683,18 +593,6 @@
         {
         "MsmKey" = "8:_697F1BFD1A092FEEC099FEC5A3DA6DF7"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_69AE674908F940C0A09A1AAEE22A5907"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_69CA6B1494064C688EFF657B0B652438"
-        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -867,12 +765,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_79D611322CFE40D99BBA1CA2B28F17A5"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_7CEBC9970876583ECE271E24253541D9"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
         "MsmSig" = "8:_UNDEFINED"
@@ -897,20 +789,8 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_867C1D0780894A14B3D0971ED7B6AF80"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_88EFED042F2724F3107E1C95317D9C4A"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_8BCCCC8C18434416A49E40949D146378"
-        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -963,12 +843,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_8C668D332D5C46D1A16EB24208A76CA0"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_9191F35FFA42467BA100708EE240CA95"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1011,12 +885,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_9D0330147C104641803B4CD603211B57"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_9E557980CA4C4F679A9BBA11366AB060"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1031,12 +899,6 @@
         {
         "MsmKey" = "8:_9EE529A42ABB0CD61D16DCD679452B10"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_9F873EAF8E9A497FBA2030A662BE3D6C"
-        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1197,18 +1059,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_A788908144F24C9495568649F2F4E99D"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_A97BEB57F2B049CEB2913CE3F91F8674"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_AA40FCC52D7F89FB15395E9F4EF5D893"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
         "MsmSig" = "8:_UNDEFINED"
@@ -1227,12 +1077,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_ABB04616266044CEA3BF4C7341374786"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_ABD1B872F0704C509D10D3B13C7F5765"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -1241,12 +1085,6 @@
         {
         "MsmKey" = "8:_AD24F4EE5A65EB11DC3663384D291B40"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_AEC095FB4F964D77AD577C999AA339F8"
-        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1289,12 +1127,6 @@
         {
         "MsmKey" = "8:_B8179B3561A0B3F9C72EED24FB667107"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_BB08BF807440410EB96A0C61C7A7F6AC"
-        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1359,12 +1191,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_C82EAB420AEB4746A5086C1500C4C34A"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_C96D8F0424F5CCC194266C8B5DBFA190"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
         "MsmSig" = "8:_UNDEFINED"
@@ -1372,12 +1198,6 @@
         "Entry"
         {
         "MsmKey" = "8:_CC1DFC14A35E42CCAF4B0BEFEE3E0904"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_CD686D9935EF47A4832F6524F2539058"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1413,20 +1233,8 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_D2D6941BCC84469897D93F04038E9BF4"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_D59AFAC8E92361CB5B802CBF88B27172"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_D64F7D60429E4D909864F55860C4C597"
-        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1467,12 +1275,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_D9479A7020E941CAA8352A723BEBA508"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_DEF7E99047F4C5705074E788D88A244D"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
         "MsmSig" = "8:_UNDEFINED"
@@ -1497,12 +1299,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_DFB3FB67588046CAA03EADC5BE6DED87"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_DFF136BB4DF91CC05F94A5FADC7645DF"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
         "MsmSig" = "8:_UNDEFINED"
@@ -1511,12 +1307,6 @@
         {
         "MsmKey" = "8:_DFF136BB4DF91CC05F94A5FADC7645DF"
         "OwnerKey" = "8:_0D057CFC659ABBAC037BF8AAC6C6C66E"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_E3B81ABC370A463696FA94FAD56B7103"
-        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1637,12 +1427,6 @@
         {
         "MsmKey" = "8:_EF35C8E03C84C301B60AF25210F239D9"
         "OwnerKey" = "8:_1B9F645DF811481DA3E973AE22817DB6"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_EFBEB0C913A54C9CBC8CA1867D3A04CE"
-        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -2279,7 +2063,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\天华结构三维平台1.0.34.msi"
+        "OutputFilename" = "8:Release\\天华结构三维平台1.0.35.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -2334,26 +2118,6 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_006DDC552FF2407891D63D726B8029E3"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\comp_id_write.vert"
-            "TargetName" = "8:comp_id_write.vert"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_00AD0F5C387B99C95547BAC9DC15F09B"
             {
             "AssemblyRegister" = "3:1"
@@ -2414,26 +2178,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_04FF148F22B8469289BDABB12E13C5A8"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\gizmo_ui.frag"
-            "TargetName" = "8:gizmo_ui.frag"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_06D96E8F7007497CAE3516EFE9C23B5E"
@@ -2549,26 +2293,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0E7B5AAC74EC44388897088A3A6B57E1"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\collision.frag"
-            "TargetName" = "8:collision.frag"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_0EE2C3430E31C32F866A69392D5FE0BF"
             {
             "AssemblyRegister" = "3:1"
@@ -2660,26 +2384,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_10D383D4E8304389834878D75996FEF0"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\clp_plane.vert"
-            "TargetName" = "8:clp_plane.vert"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_11BF6CA54D076F15253C2414259BC573"
@@ -2775,26 +2479,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_16881417513645F2955A304B11584CD1"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\clp_ui_plane.vert"
-            "TargetName" = "8:clp_ui_plane.vert"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_16C729491BF01604E35AF1A170FC89BE"
             {
             "AssemblyRegister" = "3:1"
@@ -2824,26 +2508,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1A8CD311A4924B59A743FAADE2FD4B88"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\axis.frag"
-            "TargetName" = "8:axis.frag"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_1C4CCD93AAF262354708689F10606B97"
@@ -2912,7 +2576,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:THBimEngine.DBOperation, Version=1.0.27.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:THBimEngine.DBOperation, Version=1.0.28.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_210447E4D88C3FAE9A6235444D385C98"
@@ -2990,26 +2654,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2AA9D58AB7D8403889C8BDE819634C87"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\normal_depth_write.vert"
-            "TargetName" = "8:normal_depth_write.vert"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2B6BC2C8D3E44F2D845D6B40A7F96AEF"
             {
             "SourcePath" = "8:..\\WorkDir\\resources\\textures\\skybox\\left.jpg"
@@ -3061,26 +2705,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2C5B340387BB464A80E45C80C8E4D573"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\grid.vert"
-            "TargetName" = "8:grid.vert"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_2D9A26D124A46E2E4B42C15CE63086AC"
             {
             "AssemblyRegister" = "3:1"
@@ -3110,46 +2734,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_31A2672B848A4458B793F080E9CA8D88"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\axis.vert"
-            "TargetName" = "8:axis.vert"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_361E820307C04020AC28E208DE890413"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\axis_vk.vert"
-            "TargetName" = "8:axis_vk.vert"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_36EA1F70D55A674A4AA1ED7E59956D5C"
@@ -3265,26 +2849,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3CB4E237FF9848FFAFA8DBF0FC0E06BC"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\gizmo_ui.vert"
-            "TargetName" = "8:gizmo_ui.vert"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_3E3F8882F4720F91A1E8EA8725ED2486"
             {
             "AssemblyRegister" = "3:1"
@@ -3347,26 +2911,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_42BE724A440A4F529D3D2B3CC780162B"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\clp_plane.frag"
-            "TargetName" = "8:clp_plane.frag"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4540F2E88E5A41FEB9BAE1787921C246"
             {
             "SourcePath" = "8:..\\WorkDir\\Template\\THSKPTemplate_S_2020.skp"
@@ -3418,46 +2962,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_48807166272A49C7AC680735A8EB0A57"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\image_effect.vert"
-            "TargetName" = "8:image_effect.vert"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4A665C5F98CA4D97B3778A5738BB89D9"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\skybox.vert"
-            "TargetName" = "8:skybox.vert"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_4B10B23D112B3309A1A1992EB412AE67"
             {
             "AssemblyRegister" = "3:1"
@@ -3495,26 +2999,6 @@
             "TargetName" = "8:top.jpg"
             "Tag" = "8:"
             "Folder" = "8:_D9A73047D150484BB7DBEE748DDF9C32"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_501B21EF44644DB8BE1DDD1E849A6EE7"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\edge.frag"
-            "TargetName" = "8:edge.frag"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -3857,46 +3341,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_69AE674908F940C0A09A1AAEE22A5907"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\image_effect.frag"
-            "TargetName" = "8:image_effect.frag"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_69CA6B1494064C688EFF657B0B652438"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\clp_ui_plane.frag"
-            "TargetName" = "8:clp_ui_plane.frag"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_6AE7C1C08431B9370D0A732B20FFE90C"
             {
             "AssemblyRegister" = "3:1"
@@ -4021,26 +3465,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_79D611322CFE40D99BBA1CA2B28F17A5"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\text.frag"
-            "TargetName" = "8:text.frag"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_7CEBC9970876583ECE271E24253541D9"
             {
             "AssemblyRegister" = "3:1"
@@ -4134,26 +3558,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_867C1D0780894A14B3D0971ED7B6AF80"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\collision.vert"
-            "TargetName" = "8:collision.vert"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_88EFED042F2724F3107E1C95317D9C4A"
             {
             "AssemblyRegister" = "3:1"
@@ -4185,26 +3589,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8BCCCC8C18434416A49E40949D146378"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\bbx.frag"
-            "TargetName" = "8:bbx.frag"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_8C4DED3DEFC3751F5ED6F77FE4322C46"
             {
             "AssemblyRegister" = "3:1"
@@ -4234,26 +3618,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8C668D332D5C46D1A16EB24208A76CA0"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\text.vert"
-            "TargetName" = "8:text.vert"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9191F35FFA42467BA100708EE240CA95"
@@ -4400,26 +3764,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9D0330147C104641803B4CD603211B57"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\comp_id_write.frag"
-            "TargetName" = "8:comp_id_write.frag"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_9E557980CA4C4F679A9BBA11366AB060"
             {
             "AssemblyRegister" = "3:1"
@@ -4500,26 +3844,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9F873EAF8E9A497FBA2030A662BE3D6C"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\skybox.frag"
-            "TargetName" = "8:skybox.frag"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_A43971704431D5C3612E03A47BCE083E"
@@ -4646,46 +3970,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A788908144F24C9495568649F2F4E99D"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\bbx.vert"
-            "TargetName" = "8:bbx.vert"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A97BEB57F2B049CEB2913CE3F91F8674"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\text3d.vert"
-            "TargetName" = "8:text3d.vert"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_AA40FCC52D7F89FB15395E9F4EF5D893"
             {
             "AssemblyRegister" = "3:1"
@@ -4748,26 +4032,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_ABB04616266044CEA3BF4C7341374786"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\normal_depth_write.frag"
-            "TargetName" = "8:normal_depth_write.frag"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_ABD1B872F0704C509D10D3B13C7F5765"
             {
             "SourcePath" = "8:..\\WorkDir\\resources\\textures\\skybox\\back.jpg"
@@ -4819,31 +4083,11 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_AEC095FB4F964D77AD577C999AA339F8"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\test.frag"
-            "TargetName" = "8:test.frag"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_B1EC13D795B0545F52CE82B224731401"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:THBimEngine.Domain, Version=1.0.29.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:THBimEngine.Domain, Version=1.0.30.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_B1EC13D795B0545F52CE82B224731401"
@@ -4939,26 +4183,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_BB08BF807440410EB96A0C61C7A7F6AC"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\drawing_match.vert"
-            "TargetName" = "8:drawing_match.vert"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_BB56931EB034E561C0C4C4CBAF849138"
@@ -5105,26 +4329,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C82EAB420AEB4746A5086C1500C4C34A"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\drawing_match.frag"
-            "TargetName" = "8:drawing_match.frag"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_C96D8F0424F5CCC194266C8B5DBFA190"
             {
             "AssemblyRegister" = "3:1"
@@ -5162,26 +4366,6 @@
             "TargetName" = "8:Stfangso.ttf"
             "Tag" = "8:"
             "Folder" = "8:_C77677CA88F1410DB5B01A229F5C9ED2"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CD686D9935EF47A4832F6524F2539058"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\gizmo.frag"
-            "TargetName" = "8:gizmo.frag"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -5278,26 +4462,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D2D6941BCC84469897D93F04038E9BF4"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\test.vert"
-            "TargetName" = "8:test.vert"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_D59AFAC8E92361CB5B802CBF88B27172"
             {
             "AssemblyRegister" = "3:1"
@@ -5327,26 +4491,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D64F7D60429E4D909864F55860C4C597"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\chosen_test.vert"
-            "TargetName" = "8:chosen_test.vert"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_D7ED7D512CB0995C72E15B0B5FE20099"
@@ -5380,26 +4524,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D9479A7020E941CAA8352A723BEBA508"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\gizmo.vert"
-            "TargetName" = "8:gizmo.vert"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_DEF7E99047F4C5705074E788D88A244D"
             {
             "AssemblyRegister" = "3:1"
@@ -5431,26 +4555,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DFB3FB67588046CAA03EADC5BE6DED87"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\grid.frag"
-            "TargetName" = "8:grid.frag"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_DFF136BB4DF91CC05F94A5FADC7645DF"
             {
             "AssemblyRegister" = "3:1"
@@ -5480,26 +4584,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E3B81ABC370A463696FA94FAD56B7103"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\edge.vert"
-            "TargetName" = "8:edge.vert"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E3E283B6506A4C09A08A148F39F78FF6"
@@ -5701,7 +4785,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:THBimEngine.HttpService, Version=1.0.27.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:THBimEngine.HttpService, Version=1.0.28.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_ECA264919BA6435611CA7F229D193CCF"
@@ -5788,26 +4872,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EFBEB0C913A54C9CBC8CA1867D3A04CE"
-            {
-            "SourcePath" = "8:..\\WorkDir\\shaders\\chosen_test.frag"
-            "TargetName" = "8:chosen_test.frag"
-            "Tag" = "8:"
-            "Folder" = "8:_92A8312BBC764FD59BC75C96B2DF393C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_F3061E366626C64E20F151025DF6A3AB"
@@ -6129,17 +5193,6 @@
                             }
                         }
                     }
-                    "{9EF0B969-E518-4E46-987F-47570745A589}:_92A8312BBC764FD59BC75C96B2DF393C"
-                    {
-                    "Name" = "8:shaders"
-                    "AlwaysCreate" = "11:FALSE"
-                    "Condition" = "8:"
-                    "Transitive" = "11:FALSE"
-                    "Property" = "8:_247F8712544740FAA4422ADCD5AE2353"
-                        "Folders"
-                        {
-                        }
-                    }
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_9EF90964543B45499DAE26042FC1D6AA"
                     {
                     "Name" = "8:x64"
@@ -6191,15 +5244,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:天华结构三维平台"
-        "ProductCode" = "8:{443B8AA2-645D-4B50-ACE9-CC8D6E881AD7}"
-        "PackageCode" = "8:{F41FE75B-982F-4B3D-B2A7-DF9A7139F520}"
+        "ProductCode" = "8:{5D2CA308-D663-496C-8204-D63A722A3732}"
+        "PackageCode" = "8:{C3CAD0F9-18C9-41F6-A7CC-0A987FF8F58C}"
         "UpgradeCode" = "8:{ED2A8D68-8A28-4313-AC3F-A8420ED52526}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.34"
+        "ProductVersion" = "8:1.0.35"
         "Manufacturer" = "8:TIANHUA Architectural Design Co., Ltd"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

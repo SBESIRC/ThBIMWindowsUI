@@ -240,7 +240,6 @@ namespace THBimEngine.Domain
         public string PrjId { get; set; }
         public string SubPrjId { get; set; }
         public string SubPrjName { get; set; }
-        public string FileId { get; set; }
         public string LoaclPath { get; set; }
         public string ExternalLinkPath { get; set; }
         public string ShowFileName { get; set; }
@@ -265,6 +264,4 @@ namespace THBimEngine.Domain
         }
         public string LinkFilePath { get; set; }
     }
-
-    
 }

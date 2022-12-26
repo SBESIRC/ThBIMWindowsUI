@@ -7,23 +7,22 @@
              mc:Ignorable="d">
     <Grid x:Name="mainGrid" Background="White" Width="200" Margin="2,0,0,1">
         <Border BorderThickness="1,1,1,0" BorderBrush="Gray"></Border>
-        <Button x:Name="btnSelectDir" Content="选择项目文件夹" Height="25"  VerticalAlignment="Top"  Margin="10,2,40,0" Click="btnSelectDir_Click" Visibility="Collapsed"></Button>
         <Grid Margin="2,5,2,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
-            <StackPanel Orientation="Horizontal" >
+            <StackPanel Orientation="Horizontal">
                 <Button x:Name="btnAddLink" Content="新增" Height="25" Width="50"  Margin="5,0,0,0" Click="btnAddLink_Click"></Button>
                 <Button x:Name="changeLink" Content="修改" Height="25" Width="50" Margin="5,0,0,0" Click="changeLink_Click"></Button>
                 <Button x:Name="btnDelLink" Content="删除" Height="25" Width="50"  Margin="5,0,0,0" Click="btnDelLink_Click"></Button>
             </StackPanel>
             <DataGrid Grid.Row="1" Margin="5" AutoGenerateColumns="False" SelectionMode="Single" CanUserAddRows="False" RowHeaderWidth="0" 
-                      x:Name="dataGridLink" ColumnHeaderHeight="30" CanUserDeleteRows="False" ItemsSource="{Binding AllLinkModel}">
+                      x:Name="dataGridLink" ColumnHeaderHeight="30" CanUserDeleteRows="False" ItemsSource="{Binding AllLinkModel}" MouseRightButtonDown="dataGridLink_MouseRightButtonDown">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Width="4*" Header="链接名称" Binding="{Binding Project.ShowFileName}" IsReadOnly="True"></DataGridTextColumn>
-                    <DataGridTextColumn Width="2*" Header="专业" Binding="{Binding Project.MajorName}"  IsReadOnly="True"></DataGridTextColumn>
-                    <DataGridTextColumn Width="2*" Header="类型" Binding="{Binding Project.ShowSourceName}"  IsReadOnly="True"></DataGridTextColumn>
+                    <DataGridTextColumn Width="4*" Header="链接名称" Binding="{Binding LinkProject.ShowFileName}" IsReadOnly="True"></DataGridTextColumn>
+                    <DataGridTextColumn Width="2*" Header="专业" Binding="{Binding LinkProject.MajorName}"  IsReadOnly="True"></DataGridTextColumn>
+                    <DataGridTextColumn Width="2*" Header="类型" Binding="{Binding LinkProject.ShowSourceName}"  IsReadOnly="True"></DataGridTextColumn>
                     <DataGridTextColumn Width="3*" Header="状态" Binding="{Binding LinkState}"  IsReadOnly="True"></DataGridTextColumn>
                 </DataGrid.Columns>
             </DataGrid>

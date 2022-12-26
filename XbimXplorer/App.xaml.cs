@@ -75,6 +75,7 @@ namespace XbimXplorer
             debugUser.ChineseName = "测试用户";
             debugUser.PreSSOId = "TU1909XQ";
             debugUser.UserLogin = new UserLoginRes();
+            debugUser.LoginLocation = "上海";
             debugUser.UserLogin.Username = "thbimtestuser";
             var mainView = new XplorerMainWindow(debugUser, blockPlugin);
             mainView.Show();

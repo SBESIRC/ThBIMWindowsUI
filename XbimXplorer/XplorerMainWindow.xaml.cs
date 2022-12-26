@@ -107,10 +107,14 @@ namespace XbimXplorer
         public event EventHandler ApplicationClosing;
         public event ProgressChangedEventHandler ProgressChanged;
         private UserInfo loginUser;
+        private ProjectFileManager projectFileManager;
         public XplorerMainWindow(UserInfo user, bool preventPluginLoad = false)
         {
             InitializeComponent();
             loginUser = user;
+            projectFileManager = new ProjectFileManager(user);
+            CheckLocalFileServices.Instance.BindingUserInfo(user);
+            CheckLocalFileServices.Instance.StartCheck();
             ProgressChanged = OnProgressChanged;
             _geoIndexIfcIndexMap = new Dictionary<int, int>();
             _dispatcherTimer = new DispatcherTimer();
@@ -1070,13 +1074,6 @@ namespace XbimXplorer
                 {
                     try
                     {
-                        var prj95Id = structure95Project.ProjectIdentity;
-                        var prjKey = documentModelCache.Where(c => c.Value.MainModel.LinkFilePath == prj95Id).FirstOrDefault().Key;
-                        if (string.IsNullOrEmpty(prjKey)) 
-                        {
-                            MessageBox.Show("主文件未在项目中找到，无法进行合模操作");
-                            return;
-                        }
                         var mergeService = new Extensions.ModelMerge.THModelMergeService();
                         IfcStore mergeIfc;
                         if (structure5Project?.SourceProject is ThSUProjectData projectData)
@@ -1104,8 +1101,15 @@ namespace XbimXplorer
                         {
                             ifcStore.SaveAs(newName);
                         }
-                        var res = UploadFileToDBPlatform(prjKey, newName);
-                        if(string.IsNullOrEmpty(res))
+                        var prjFileInfo = CurrentDocument.ProjectFile;
+                        var res = projectFileManager.AddFileToProjectFile(CurrentDocument.ProjectDBInfo, prjFileInfo.MainFileId, newName,  prjFileInfo.MajorName, prjFileInfo.ApplcationName.ToString(), true, false);
+                        if (!string.IsNullOrEmpty(res)) 
+                        {
+                            MessageBox.Show(res, "操作提醒", MessageBoxButton.OK);
+                            return;
+                        }
+                        res = UploadFileToDBPlatform(CurrentDocument.ProjectDBInfo, newName);
+                        if (string.IsNullOrEmpty(res))
                             MessageBox.Show($"上传成功!", "操作提醒", MessageBoxButton.OK);
                         else
                             MessageBox.Show(res, "操作提醒", MessageBoxButton.OK);
@@ -1117,7 +1121,7 @@ namespace XbimXplorer
                 }
             }
         }
-        private string UploadFileToDBPlatform(string prjKey,string localIFCFilePath) 
+        private string UploadFileToDBPlatform(ProjectInfo mainPrjFileInfo,string localIFCFilePath) 
         {
             if (string.IsNullOrEmpty(localIFCFilePath) || !File.Exists(localIFCFilePath))
                 return "IFC文件不存在，无法进行上传操作";
@@ -1138,14 +1142,13 @@ namespace XbimXplorer
                 Thread.Sleep(5000);
             }
             //上传文件到协同项目中
-            var docCache = documentModelCache[prjKey];
             UploadFileToDB uploadFileToDB = new UploadFileToDB();
             var prjs = uploadFileToDB.GetDBProject();
-            var prj = prjs.Where(c => c.PrjNo == docCache.ParentProject.PrjNum).FirstOrDefault();
+            var prj = prjs.Where(c => c.PrjNo == mainPrjFileInfo.PrjNo).FirstOrDefault();
             if (prj == null)
                 return "上传失败，未在协同服务器上获取到相应的项目";
             var allSubPrjs = uploadFileToDB.GetSubProjects(prj.Id);
-            var subPrj = allSubPrjs.Where(c => c.SubEntryName == docCache.MainModel.SubPrjName).First();
+            var subPrj = allSubPrjs.Where(c => c.SubEntryName == mainPrjFileInfo.SubEntryName).First();
             if (null == subPrj)
                 return "上传失败，未在协同服务器上获取到相应的项目";
             var getFiles = uploadFileToDB.GetSubProjectFiles(subPrj.Id);
@@ -1179,7 +1182,6 @@ namespace XbimXplorer
                 return string.Format("上传失败 {0}", uploadRes);
             return string.Empty;
         }
-
         private bool HaveProcess(string processName) 
         {
             Process[] ps = Process.GetProcesses();
@@ -1290,14 +1292,11 @@ namespace XbimXplorer
                 return;
             ThBimCutData.Run(CurrentDocument.AllBimProjects);
         }
-        Dictionary<string, DocumentCacheModel> documentModelCache;
         private void mItemProject_Click(object sender, RoutedEventArgs e)
         {
             if (null == loginUser)
                 return;
-            if (null == documentModelCache)
-                documentModelCache = new Dictionary<string, DocumentCacheModel>();
-            var projectManage = new ProjectManage(loginUser);
+            var projectManage = new ProjectManager(loginUser);
             projectManage.Owner = this;
             var res = projectManage.ShowDialog();
             if (res.Value != true)
@@ -1312,55 +1311,46 @@ namespace XbimXplorer
             if (selectProjectFile == null)
                 return;
             SetOpenedModelFileName(string.Format("{0}_{1}_{2}", pPrj.ShowName,subPrj.ShowName, selectProjectFile.ShowFileName));
-            var id = string.Format("{0}_{1}_{2}", pPrj.PrjId, subPrj.PrjId, selectProjectFile.LoaclPath);
-            //检查Document删除和增加的数据
-            List<THDocument> rmDocs = new List<THDocument>();
-            foreach (var item in DocumentManager.AllDocuments) 
-            {
-                if (item.DocumentId == id)
-                    rmDocs.Add(item);
-            }
-            foreach (var item in rmDocs)
-                DocumentManager.RemoveDoucment(item);
+            var id = selectProjectFile.ProjectFileId;
+            //清除所有的Documnet,目前不考虑多文档缓存
+            DocumentManager.AllDocuments.Clear();
             THDocument addDoc = new THDocument(id, subPrj.ShowName, ProgressChanged, Log);
-            addDoc.ProjectLoaclPath = prjLocalPath;
+            addDoc.ProjectFile = ProjectCommon.ShortProjectFileToShortData(selectProjectFile);
+            addDoc.ProjectDBInfo = new ProjectInfo
+            {
+                Id = pPrj.PrjId,
+                PrjNo = pPrj.PrjNum,
+                PrjName = pPrj.ShowName,
+                SubentryId = subPrj.PrjId,
+                SubEntryName = subPrj.ShowName,
+            };
             DocumentManager.AddNewDoucment(addDoc);
             DocumentManager.CurrentDocument = addDoc;
             var loadPrjs = new List<ProjectParameter>();
             loadPrjs.Add(new ProjectParameter()
             {
-                OpenFilePath = selectProjectFile.LinkFilePath,
-                ProjectId = selectProjectFile.LinkFilePath,
+                OpenFilePath = selectProjectFile.OpenFile.FileLocalPath,
+                ProjectId = selectProjectFile.ProjectFileId,
                 Major = selectProjectFile.Major,
                 Source = selectProjectFile.ApplcationName,
             }) ;
-            DocumentCacheModel docCache;
-            if (documentModelCache.ContainsKey(id))
+            if (null != selectProjectFile.FileLinks) 
             {
-                docCache = documentModelCache[id];
-            }
-            else 
-            {
-                docCache = new DocumentCacheModel(id, selectProjectFile, prjLocalPath);
-                docCache.ParentProject = pPrj;
-                docCache.SubProject = subPrj;
-                documentModelCache.Add(id, docCache);
-            }
-            foreach (var linkModel in docCache.DocExternalLink.LinkModels)
-            {
-                if (null == linkModel || string.IsNullOrEmpty(linkModel.Project.LoaclPath) || !File.Exists(linkModel.Project.LoaclPath)
-                    || string.IsNullOrEmpty(linkModel.Project.LinkFilePath) || !File.Exists(linkModel.Project.LinkFilePath))
-                    continue;
-                var openParameter = new ProjectParameter()
+                foreach (var linkModel in selectProjectFile.FileLinks)
                 {
-                    OpenFilePath = linkModel.Project.LinkFilePath,
-                    ProjectId = linkModel.Project.LinkFilePath,
-                    Matrix3D = linkModel.MoveMatrix3D,
-                    Major = linkModel.Project.Major,
-                    Source = linkModel.Project.ApplcationName,
-                    SourceShowName = linkModel.Project.ShowSourceName,
-                };
-                loadPrjs.Add(openParameter);
+                    if (linkModel.State >= 1)
+                        continue;
+                    var openParameter = new ProjectParameter()
+                    {
+                        OpenFilePath = linkModel.LinkProject.OpenFile.FileLocalPath,
+                        ProjectId = linkModel.LinkId,
+                        Matrix3D = linkModel.GetLinkMatrix3D,
+                        Major = linkModel.LinkProject.Major,
+                        Source = linkModel.LinkProject.ApplcationName,
+                        SourceShowName = linkModel.LinkProject.ShowSourceName,
+                    };
+                    loadPrjs.Add(openParameter);
+                }
             }
             LoadFilesToCurrentDocument(loadPrjs);
         }
@@ -1399,39 +1389,6 @@ namespace XbimXplorer
             }
             Log.Info(string.Format("Total Count : {0}", sumCount));
             MessageBox.Show("统计完成，请前往日志中查看结果","提醒");
-        }
-    }
-    class DocumentCacheModel
-    {
-        public string DocumentId { get; }
-        public string RootPath { get; }
-        public ShowProject ParentProject { get; set; }
-        public ShowProject SubProject { get; set; }
-        public ProjectFileInfo MainModel { get; }
-        public List<ProjectFileInfo> ProjectAllFileCache { get; protected set; }
-        public FileExternalLink DocExternalLink { get;}
-        public DocumentCacheModel(string docId, ProjectFileInfo mainModel,string rootPath) 
-        {
-            DocumentId = docId;
-            MainModel = mainModel;
-            RootPath = rootPath;
-            ProjectAllFileCache = new List<ProjectFileInfo>();
-            DocExternalLink = new FileExternalLink(mainModel.LoaclPath, mainModel.ExternalLinkPath);
-            UpdateCacheFile();
-        }
-        public void UpdateCacheFile() 
-        {
-            FileProject fileProject = new FileProject(RootPath);
-            ProjectAllFileCache = fileProject.GetProjectFiles();
-        }
-        public ProjectFileInfo GetProjectFileInfo(string filePath) 
-        {
-            foreach(var item in ProjectAllFileCache) 
-            {
-                if (item.LoaclPath == filePath)
-                    return item;
-            }
-            return null;
         }
     }
 }

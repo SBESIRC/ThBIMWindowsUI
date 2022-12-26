@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Security.AccessControl;
-using System.Security.Principal;
 using THBimEngine.Application;
 using THBimEngine.Domain;
 
@@ -12,10 +8,10 @@ namespace XbimXplorer.LeftTabItme
 {
     class ProjectFileViewModel : NotifyPropertyChangedBase
     {
-        private List<ProjectFileInfo> allProjectAllFileModels;
-        ObservableCollection<ProjectFileInfo> _projectAllFileModels { get; set; }
+        private List<ShowProjectFile> allProjectAllFileModels;
+        ObservableCollection<ShowProjectFile> _projectAllFileModels { get; set; }
         
-        public ObservableCollection<ProjectFileInfo> ProjectAllFileModels
+        public ObservableCollection<ShowProjectFile> ProjectAllFileModels
         {
             get { return _projectAllFileModels; }
             set
@@ -54,17 +50,16 @@ namespace XbimXplorer.LeftTabItme
                 this.RaisePropertyChanged();
             }
         }
-        public ProjectFileViewModel(FileProject fileProject)
+        public ProjectFileViewModel(List<ShowProjectFile> showProjectFiles)
         {
-            ProjectAllFileModels = new ObservableCollection<ProjectFileInfo>();
+            ProjectAllFileModels = new ObservableCollection<ShowProjectFile>();
             BuildingNames = new ObservableCollection<string>();
             CatagoryNames = new ObservableCollection<string>();
             SystemNames = new ObservableCollection<string>();
-            allProjectAllFileModels = fileProject.GetProjectFiles().Where(c=>c.CanLink).ToList();
-            
-            var allBuildingNames = allProjectAllFileModels.Select(c => c.SubPrjName).Distinct().ToList();
-            var allTypes = allProjectAllFileModels.Select(c => c.ShowSourceName).Distinct().ToList();
-            var allCatagory = allProjectAllFileModels.Select(c => c.MajorName).Distinct().ToList();
+            allProjectAllFileModels = showProjectFiles;
+            var allBuildingNames = showProjectFiles.Select(c => c.SubPrjName).Distinct().ToList();
+            var allTypes = showProjectFiles.Select(c => c.ShowSourceName).Distinct().ToList();
+            var allCatagory = showProjectFiles.Select(c => c.MajorName).Distinct().ToList();
             BuildingNames.Add("全部");
             foreach (var item in allBuildingNames)
             {

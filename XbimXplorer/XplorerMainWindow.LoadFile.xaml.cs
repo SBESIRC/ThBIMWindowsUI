@@ -329,7 +329,6 @@ namespace XbimXplorer
                 WorkerReportsProgress = true,
                 WorkerSupportsCancellation = true
             };
-            ExampleScene.ifcre_set_sleep_time(1000);
             _loadFileBackgroundWorker.ProgressChanged += OnProgressChanged;
             _loadFileBackgroundWorker.DoWork += OpenAcceptableExtension;
             _loadFileBackgroundWorker.RunWorkerCompleted += FileLoadCompleted;

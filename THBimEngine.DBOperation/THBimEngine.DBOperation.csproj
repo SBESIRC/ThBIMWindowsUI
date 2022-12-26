@@ -52,8 +52,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DBModels\DBFile.cs" />
+    <Compile Include="DBModels\DBLink.cs" />
     <Compile Include="DBModels\DBProject.cs" />
     <Compile Include="DBModels\DBProjectFileUpload.cs" />
+    <Compile Include="DBModels\DBVProjectFile.cs" />
+    <Compile Include="DBModels\DBVProjectMainFile.cs" />
     <Compile Include="DBModels\DBSubProject.cs" />
     <Compile Include="DBProjectFile.cs" />
     <Compile Include="ProjectDBHelper.cs" />

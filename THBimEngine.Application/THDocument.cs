@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using THBimEngine.Domain;
-using Xbim.Common.Geometry;
 using Xbim.Ifc;
 
 namespace THBimEngine.Application
@@ -23,6 +22,14 @@ namespace THBimEngine.Application
 		/// 项目的当前地址
 		/// </summary>
 		public string ProjectLoaclPath { get; set; }
+		/// <summary>
+		/// 当前文件对应的协同平台的项目子项信息
+		/// </summary>
+		public ProjectInfo ProjectDBInfo { get; set; }
+		/// <summary>
+		/// 当前项目的主文件对应的项目信息
+		/// </summary>
+		public ShortProjectFile ProjectFile { get; set; }
 		#region
 		private DocumentProjectEngine projectEngine;
 		private ILog appLog;

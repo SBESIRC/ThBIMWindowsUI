@@ -29,11 +29,11 @@
                   ItemsSource="{Binding ProjectAllFileModels}">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="模型名称" Width="6*" Binding="{Binding ShowFileName}" IsReadOnly="True"></DataGridTextColumn>
-                <DataGridTextColumn Header="楼栋" Width="1*" Binding="{Binding SubPrjName}" IsReadOnly="True"></DataGridTextColumn>
+                <DataGridTextColumn Header="子项" Width="1*" Binding="{Binding SubPrjName}" IsReadOnly="True"></DataGridTextColumn>
                 <DataGridTextColumn Header="类型" Width="1*" Binding="{Binding ShowSourceName}" IsReadOnly="True"></DataGridTextColumn>
                 <DataGridTextColumn Header="专业" Width="1*" Binding="{Binding MajorName}" IsReadOnly="True"></DataGridTextColumn>
                 <DataGridTextColumn Header="上传人" Width="3*" Binding="{Binding OwnerName}" IsReadOnly="True"></DataGridTextColumn>
-                <DataGridTextColumn Header="更新时间" Width="3*" Binding="{Binding LastUpdataTime}" IsReadOnly="True"></DataGridTextColumn>
+                <DataGridTextColumn Header="更新时间" Width="3*" Binding="{Binding LastUpdateTime,StringFormat='yyyy/MM/dd HH:mm:ss'}" IsReadOnly="True"></DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
         <StackPanel Orientation="Horizontal" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Right">

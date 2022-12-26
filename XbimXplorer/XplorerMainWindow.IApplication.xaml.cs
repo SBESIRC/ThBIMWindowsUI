@@ -24,7 +24,12 @@ namespace XbimXplorer
             DocumentManager.CurrentDocument = DocumentManager.AllDocuments.FirstOrDefault();
             
         }
-
+        public string GetCurrentUserIdName(out string userName, out string loginLocation) 
+        {
+            userName = loginUser.ChineseName;
+            loginLocation = loginUser.LoginLocation;
+            return loginUser.UserLogin.Username;
+        }
         private void DocumentManage_SelectDocumentChanged(object sender, EventArgs e)
         {
             CurrentDocument = DocumentManager.CurrentDocument;

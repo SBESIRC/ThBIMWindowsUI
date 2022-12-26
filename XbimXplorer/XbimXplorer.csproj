@@ -218,6 +218,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CheckLocalFileServices.cs" />
     <Compile Include="Extensions\IFCReverse.cs" />
     <Compile Include="Project\BoolToVisibilty.cs" />
     <Compile Include="Business\RenderEngineToHome.cs" />
@@ -298,9 +299,12 @@
       <DependentUpon>wdwCommands.xaml</DependentUpon>
     </Compile>
     <Compile Include="Project\FileExternalLink.cs" />
-    <Compile Include="Project\ProjectManage.xaml.cs">
-      <DependentUpon>ProjectManage.xaml</DependentUpon>
+    <Compile Include="Project\ProjectCommon.cs" />
+    <Compile Include="Project\ProjectFileManager.cs" />
+    <Compile Include="Project\ProjectManager.xaml.cs">
+      <DependentUpon>ProjectManager.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Project\ProjectVM.cs" />
     <Compile Include="Project\SelectUploadFile.xaml.cs">
       <DependentUpon>SelectUploadFile.xaml</DependentUpon>
     </Compile>
@@ -308,6 +312,9 @@
     <Compile Include="IfcValidation\ValidationWindow.xaml.cs">
       <DependentUpon>ValidationWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ServiceIPConfig.cs" />
+    <Compile Include="Project\ShowFileLink.cs" />
+    <Compile Include="Project\ShowProjectFile.cs" />
     <Compile Include="ThBIMEngine\DataToEngine.cs" />
     <Compile Include="ThBIMEngine\ThBimCutData.cs" />
     <Compile Include="ThBIMEngine\ThYDBToIfcConvertService.cs" />
@@ -397,7 +404,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Project\ProjectManage.xaml">
+    <Page Include="Project\ProjectManager.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

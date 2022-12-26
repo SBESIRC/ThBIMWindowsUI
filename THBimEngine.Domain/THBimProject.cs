@@ -19,6 +19,10 @@ namespace THBimEngine.Domain
 		/// 项目Id，唯一Id
 		/// </summary>
         public string ProjectIdentity { get; set; }
+		/// <summary>
+		/// 项目打开的本地文件完整路径（可能为空,push数据时。可能为空)
+		/// </summary>
+		public string LocalFilePath { get; set; }
 		public THBimSite ProjectSite { get; set; }
 		/// <summary>
 		/// 原项目

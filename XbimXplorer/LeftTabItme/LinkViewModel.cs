@@ -7,8 +7,8 @@ namespace XbimXplorer.LeftTabItme
 {
     class LinkViewModel : NotifyPropertyChangedBase
     {
-        LinkModel _selectModel { get; set; }
-        public LinkModel SelectModel
+        ShowFileLink _selectModel { get; set; }
+        public ShowFileLink SelectModel
         {
             get { return _selectModel; }
             set
@@ -17,8 +17,8 @@ namespace XbimXplorer.LeftTabItme
                 this.RaisePropertyChanged();
             }
         }
-        ObservableCollection<LinkModel> _allLinkModel { get; set; }
-        public ObservableCollection<LinkModel> AllLinkModel
+        ObservableCollection<ShowFileLink> _allLinkModel { get; set; }
+        public ObservableCollection<ShowFileLink> AllLinkModel
         {
             get { return _allLinkModel; }
             set
@@ -29,7 +29,12 @@ namespace XbimXplorer.LeftTabItme
         }
         public LinkViewModel()
         {
-            AllLinkModel = new ObservableCollection<LinkModel>();
+            AllLinkModel = new ObservableCollection<ShowFileLink>();
+        }
+        public void ClearData() 
+        {
+            AllLinkModel.Clear();
+            SelectModel = null;
         }
     }
     

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using THBimEngine.Domain;
-using Xbim.Common.Geometry;
 
 namespace THBimEngine.Application
 {
@@ -32,6 +31,12 @@ namespace THBimEngine.Application
         /// </summary>
         /// <param name="projId"></param>
         void RemoveProjectFormCurrentDocument(string projId);
+        /// <summary>
+        /// 获取当前登录的用户Id和用户中文名称
+        /// </summary>
+        /// <param name="userName">out 用户中文名称</param>
+        /// <returns></returns>
+        string GetCurrentUserIdName(out string userName,out string loginLocation);
         
         #region 引擎相关
         /// <summary>

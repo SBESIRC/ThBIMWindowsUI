@@ -7,20 +7,22 @@ namespace XbimXplorer.LeftTabItme.LeftTabControls
     /// </summary>
     public partial class AddLinkSetUI : Window
     {
-        public AddLinkSetUI(double rotation,double moveX,double moveY,double moveZ)
+        public AddLinkSetUI(double rotation,double moveX,double moveY,double moveZ,bool isAdd)
         {
             InitializeComponent();
+            chbxNeedReturn.Visibility = isAdd ? Visibility.Visible : Visibility.Collapsed;
             txtRotation.Text = rotation.ToString();
             txtLocationX.Text = moveX.ToString();
             txtLocationY.Text = moveY.ToString();
             txtLocationZ.Text = moveZ.ToString();
         }
-        public double GetInputData(out double moveX, out double moveY, out double moveZ) 
+        public double GetInputData(out double moveX, out double moveY, out double moveZ,out bool needReturn) 
         {
             double rotation = TxtStringToDouble(txtRotation.Text.ToString());
             moveX = TxtStringToDouble(txtLocationX.Text.ToString());
             moveY = TxtStringToDouble(txtLocationY.Text.ToString());
             moveZ = TxtStringToDouble(txtLocationZ.Text.ToString());
+            needReturn = chbxNeedReturn.IsChecked == true;
             return rotation;
         }
         private double TxtStringToDouble(string strTxt)

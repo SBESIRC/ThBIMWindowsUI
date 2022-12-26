@@ -104,7 +104,10 @@ namespace XbimXplorer
                 }
                 FlagMutex.ReleaseMutex();
 
-                var prjName = CurrentDocument.AllBimProjects.First().ProjectIdentity.Split('.').First() + "-100%.ifc";
+                var mainFilePath = CurrentDocument.AllBimProjects.First().LocalFilePath;
+                var fileDir = Path.GetDirectoryName(mainFilePath);
+                var fileNameUnExt = Path.GetFileNameWithoutExtension(mainFilePath);
+                var prjName = Path.Combine(fileDir,string.Format("{0}-100%.ifc",fileNameUnExt));
 
                 var fileName = Path.Combine(System.IO.Path.GetDirectoryName(prjName), "BimEngineData.get");
                 using (MemoryMappedFile mmf = MemoryMappedFile.CreateOrOpen("getFileName", 1024 * 1024, MemoryMappedFileAccess.ReadWrite))
@@ -263,19 +266,15 @@ namespace XbimXplorer
                 suMessage = null;
                 SU_pipeServer = null;
                 SU_backgroundWorker.RunWorkerAsync();
-                if (documentModelCache == null || !documentModelCache.ContainsKey(CurrentDocument.DocumentId)) 
+                if (CurrentDocument == null || CurrentDocument.ProjectFile == null) 
                 {
                     Log.Info("SU端数据和当前打开的项目不是同一项目的同一楼栋，数据已丢弃");
                     return;
                 }
-                var cacheModel = documentModelCache[CurrentDocument.DocumentId];
-                cacheModel.UpdateCacheFile();
-                var mainDir = "";
-                if (cacheModel.MainModel != null) 
-                {
-                    mainDir = Path.GetDirectoryName(cacheModel.MainModel.LoaclPath);
-                    mainDir = Path.GetDirectoryName(mainDir);
-                }
+                var currentPrjId = CurrentDocument.ProjectDBInfo.Id;
+                var currentSubPrjId = CurrentDocument.ProjectDBInfo.SubentryId;
+                var currentMainId = CurrentDocument.ProjectFile.MainFileId;
+                var allLinks = projectFileManager.GetMainFileLinkInfo(new List<string> { currentMainId });
                 var majer = message.Header.Major;//专业
                 foreach (var project in message.SuProjects)
                 {
@@ -286,61 +285,60 @@ namespace XbimXplorer
                         Log.Info("SU端数据和当前打开的项目不是同一项目的同一楼栋，数据已丢弃");
                         continue;
                     }
-                    var dir = Path.GetDirectoryName(ProjectPath);
-                    dir = Path.GetDirectoryName(dir);
-                    if (!Directory.Equals(mainDir, dir)) 
+                    //根据完整路径获取当前所在的项目子项信息
+                    var prjFile = projectFileManager.GetProjectFileByPath(currentPrjId, currentSubPrjId, ProjectPath);
+                    if (null == prjFile) 
                     {
-                        Log.Info("SU端数据和当前打开的项目不是同一项目的同一楼栋，数据已丢弃");
+                        Log.Info("SU端数据和当前打开的项目不是同一项目,数据已丢弃");
                         continue;
                     }
-                    var fileInfo = cacheModel.GetProjectFileInfo(ProjectPath);
-                    if (null == fileInfo)
-                        continue;
+                    var dir = Path.GetDirectoryName(ProjectPath);
+                    var fileNameNoExt = Path.GetFileNameWithoutExtension(ProjectPath);
+                    var ifcPath = Path.Combine(dir, fileNameNoExt + ".ifc");
                     //判断是否有外链记录，如果没有这加入
-                    bool haveLink = false;
-                    foreach(var item in cacheModel.DocExternalLink.LinkModels) 
+                    List<ShowFileLink> fileLinks = new List<ShowFileLink>();
+                    foreach (var item in allLinks)
                     {
-                        if (item.Project.LoaclPath == ProjectPath) 
+                        if (item.LinkProjectFileId == prjFile.MainFile.ProjectFileId) 
                         {
-                            haveLink = true;
-                            break;
+                            fileLinks.Add(item);
                         }
                     }
-                    var ifcPath = Path.GetDirectoryName(fileInfo.LoaclPath);
-                    var fileName = Path.GetFileNameWithoutExtension(fileInfo.LoaclPath);
-                    ifcPath = Path.Combine(ifcPath, string.Format("{0}.ifc", fileName));
-                    if (!haveLink)
-                    {
-                        fileInfo.LinkFilePath = ifcPath;
-                        cacheModel.DocExternalLink.LinkModels.Add(new LinkModel()
-                        {
-                            LinkId = Guid.NewGuid().ToString(),
-                            LinkState = "已链接",
-                            Project = fileInfo,
-                            MoveMatrix3D = XbimMatrix3D.CreateTranslation(XbimVector3D.Zero),
-                            RotainAngle = 0,
-                        });
-                        cacheModel.DocExternalLink.SaveToFile();
-                    }
-                    else 
+                    if (fileLinks.Count > 0)
                     {
                         //判断是否要将已经载入的IFC移除，再次载入SU Push Data
-                        THBimProject rmPrj = null;
-                        foreach (var prj in CurrentDocument.AllBimProjects) 
+                        List<string> rmPrjIds = new List<string>();
+                        foreach (var prj in CurrentDocument.AllBimProjects)
                         {
-                            if (prj.ApplcationName != EApplcationName.SU && prj.Major == fileInfo.Major)
+                            if (prj.ApplcationName != EApplcationName.SU && prj.Major == prjFile.Major)
                                 continue;
-                            var isIfc = prj.SourceProject is IfcStore;
-                            if (!isIfc)
-                                continue;
-                            if (prj.ProjectIdentity == fileInfo.LinkFilePath)
-                                rmPrj = prj;
+                            if (fileLinks.Any(c=>c.LinkId == prj.ProjectIdentity))
+                                rmPrjIds.Add(prj.ProjectIdentity);
                         }
-                        if(null != rmPrj)
-                            CurrentDocument.DeleteProject(rmPrj.ProjectIdentity);
+                        foreach (var item in rmPrjIds) 
+                        {
+                            CurrentDocument.DeleteProject(item);
+                        }
+                    }
+                    else
+                    {
+                        //需要主文件增加和SU文件的外链记录
+                        var fileLink = new ShowFileLink()
+                        {
+                            LinkId = Guid.NewGuid().ToString(),
+                            FromLinkId = "",
+                            ProjectFileId = currentMainId,
+                            LinkProjectFileId = prjFile.MainFile.ProjectFileId,
+                            State = 0,
+                            MoveX = 0.0,
+                            MoveY = 0.0,
+                            MoveZ = 0.0,
+                            RotainAngle = 0.0,
+                        };
+                        projectFileManager.AddFileLink(fileLink, false);
+                        fileLinks.Add(fileLink);
                     }
                     //打印SU过来的管道数据
-                    
                     var Model = ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Factory.CreateAndInitModel("ThSU2IFCProject", project.Root.GlobalId);
                     if (Model != null)
                     {
@@ -348,12 +346,16 @@ namespace XbimXplorer
                         ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.SaveIfcModel(Model, ifcPath);
                         Model.Dispose();
                     }
-                    CurrentDocument.AddProject(project, new ProjectParameter
+                    foreach (var link in fileLinks) 
                     {
-                        ProjectId = project.Root.GlobalId,
-                        Source = EApplcationName.SU,
-                        Major = fileInfo.Major,
-                    });
+                        CurrentDocument.AddProject(project, new ProjectParameter
+                        {
+                            ProjectId = link.LinkId,
+                            Source = EApplcationName.SU,
+                            Major = EMajor.Structure,
+                            Matrix3D = link.GetLinkMatrix3D,
+                        });
+                    }
                 }
             }
         }

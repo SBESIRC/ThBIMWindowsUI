@@ -16,7 +16,7 @@ namespace XbimXplorer
         string configUserName = "UserName";
         string configUPsw = "UserPsw";
         string configSelectLocation = "Local";
-        Dictionary<string, string> locationSQLIps = new Dictionary<string, string>();
+        List<string> locations = new List<string>();
         public Login()
         {
             InitializeComponent();
@@ -24,27 +24,20 @@ namespace XbimXplorer
             InitLoacationInfo();
             
             cbxLocation.Items.Clear();
-            foreach (var item in locationSQLIps) 
+            foreach (var item in locations) 
             {
-                cbxLocation.Items.Add(item.Key);
+                cbxLocation.Items.Add(item);
             }
             InitDefaultValue();
         }
         private void InitLoacationInfo() 
         {
-            locationSQLIps = new Dictionary<string, string>();
+            locations = new List<string>();
             var appConfig = ConfigurationManager.AppSettings;
-            var allKeys = appConfig.AllKeys;
-            foreach (var item in allKeys) 
+            var allIpConfigs = IpConfigService.GetAllIpConfigs();
+            foreach (ServiceIPConfig item in allIpConfigs) 
             {
-                var upperKey = item.ToUpper();
-                if (upperKey.StartsWith("LOCAL_")) 
-                {
-                    var showName = item.Substring(item.IndexOf("_") + 1);
-                    if (locationSQLIps.ContainsKey(showName))
-                        continue;
-                    locationSQLIps.Add(showName, appConfig[item].ToString());
-                }
+                locations.Add(item.ServiceName);
             }
         }
 
@@ -86,10 +79,6 @@ namespace XbimXplorer
                 userInfo.LoginLocation = cbxLocation.SelectedItem.ToString();
             userConfig.Config.UpdateOrAddAppConfig(configUserName, uName);
             userConfig.Config.UpdateOrAddAppConfig(configSelectLocation, userInfo.LoginLocation);
-            if (!string.IsNullOrEmpty(userInfo.LoginLocation)) 
-            {
-                userInfo.LocationSQLIp = locationSQLIps[userInfo.LoginLocation];
-            }
             if (ckbRemberPsw.IsChecked == true)
             {
                 userConfig.Config.UpdateOrAddAppConfig(configRemembPswKey, "True");

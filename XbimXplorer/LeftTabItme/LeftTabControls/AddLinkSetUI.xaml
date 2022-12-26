@@ -10,7 +10,7 @@
         SizeToContent="WidthAndHeight"
         Title="外链设置" >
     <StackPanel Orientation="Vertical" Margin="0,0,0,5">
-        <Grid Height="30" VerticalAlignment="Center">
+        <Grid Height="30" VerticalAlignment="Center" Visibility="Collapsed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
@@ -23,20 +23,20 @@
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Height="30">
                     <Label Content="定位点:" VerticalContentAlignment="Center" VerticalAlignment="Center"></Label>
                     <Label Content="X:"  VerticalContentAlignment="Center" VerticalAlignment="Center"></Label>
-                    <TextBox Height="22" Width="50"  VerticalContentAlignment="Center" Text="0" x:Name="txtLocationX"></TextBox>
+                    <TextBox Height="22" Width="60"  VerticalContentAlignment="Center" Text="0" x:Name="txtLocationX"></TextBox>
                     <Label Content="Y:"  VerticalContentAlignment="Center" VerticalAlignment="Center"></Label>
-                    <TextBox Height="22" Width="50"  VerticalContentAlignment="Center" Text="0" x:Name="txtLocationY"></TextBox>
+                    <TextBox Height="22" Width="60"  VerticalContentAlignment="Center" Text="0" x:Name="txtLocationY"></TextBox>
                     <Label Content="Z:"  VerticalContentAlignment="Center" VerticalAlignment="Center"></Label>
-                    <TextBox Height="22" Width="50"  VerticalContentAlignment="Center" Text="0" x:Name="txtLocationZ"></TextBox>
+                    <TextBox Height="22" Width="60"  VerticalContentAlignment="Center" Text="0" x:Name="txtLocationZ"></TextBox>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Height="30">
                     <Label Content="旋转角度:"  VerticalContentAlignment="Center" VerticalAlignment="Center" ></Label>
-                    <TextBox Height="22" Width="50" VerticalContentAlignment="Center" Text="0" x:Name="txtRotation"></TextBox>
+                    <TextBox Height="22" Width="60" VerticalContentAlignment="Center" Text="0" x:Name="txtRotation"></TextBox>
                 </StackPanel>
             </StackPanel>
         </GroupBox>
 
-        <CheckBox Content="是否需要回链" Margin="5,5,0,5" VerticalContentAlignment="Center"></CheckBox>
+        <CheckBox x:Name="chbxNeedReturn" Content="是否需要回链" Margin="5,5,0,5" VerticalContentAlignment="Center" Visibility="Visible"></CheckBox>
         <StackPanel Orientation="Horizontal" Height="30" VerticalAlignment="Center" HorizontalAlignment="Right">
             <Button x:Name="btnOK" Content="确定" Width="50" Margin="5,0,5,0" Height="22" Click="btnOK_Click"></Button>
             <Button x:Name="btnUndo" Content="取消" Width="50" Margin="5,0,5,0"  Height="22" Click="btnUndo_Click"></Button>

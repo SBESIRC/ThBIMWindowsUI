@@ -77,6 +77,7 @@
     <Compile Include="ElementFilter.cs" />
     <Compile Include="EnumUtil.cs" />
     <Compile Include="EApplcationName.cs" />
+    <Compile Include="FileDetail.cs" />
     <Compile Include="FileProject.cs" />
     <Compile Include="GeometryModel\FaceTriangle.cs" />
     <Compile Include="GeometryModel\GeometryFaceModel.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="GeometryModel\PointNormal.cs" />
     <Compile Include="GeometryModel\PointVector.cs" />
     <Compile Include="ProjectExtension.cs" />
+    <Compile Include="ProjectInfo.cs" />
     <Compile Include="ProtoData\MessageHeader.cs" />
     <Compile Include="ProtoData\ProtobufMessage.cs" />
     <Compile Include="ProtoData\ThCircleLableGroupData.cs" />
@@ -132,6 +134,7 @@
     <Compile Include="ProtoData\ThTCHSlabData.cs" />
     <Compile Include="ProtoData\ThTCHWallData.cs" />
     <Compile Include="ProtoData\ThTCHWindowData.cs" />
+    <Compile Include="ShortProjectFile.cs" />
     <Compile Include="THBimBeam.cs" />
     <Compile Include="THBimBuilding.cs" />
     <Compile Include="THBimColumn.cs" />

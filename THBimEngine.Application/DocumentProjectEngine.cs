@@ -29,6 +29,7 @@ namespace THBimEngine.Application
             {
                 var convertResult = convertFactory.ProjectConvert(project, true);
                 convertResult.BimProject.Matrix3D = projectParameter.Matrix3D;
+                convertResult.BimProject.LocalFilePath = projectParameter.OpenFilePath;
                 convertResult.BimProject.ApplcationName = projectParameter.Source;
                 convertResult.BimProject.ProjectIdentity = projectParameter.ProjectId;
                 convertResult.BimProject.Major = projectParameter.Major;
@@ -48,6 +49,7 @@ namespace THBimEngine.Application
             {
                 var convertResult = convertFactory.ProjectConvert(project, false);
                 convertResult.BimProject.Matrix3D = projectParameter.Matrix3D;
+                convertResult.BimProject.LocalFilePath = projectParameter.OpenFilePath;
                 convertResult.BimProject.ApplcationName = projectParameter.Source;
                 convertResult.BimProject.ProjectIdentity = projectParameter.ProjectId;
                 convertResult.BimProject.Major = projectParameter.Major;
@@ -77,6 +79,7 @@ namespace THBimEngine.Application
                     var bimProject = convertResult.BimProject;
                     bimProject.ApplcationName = projectParameter.Source;
                     bimProject.ProjectIdentity = projectParameter.ProjectId;
+                    bimProject.LocalFilePath = projectParameter.OpenFilePath;
                     bimProject.Major = projectParameter.Major;
                     bimProject.SourceProject = project;
                     bimProject.NeedReadEntityMesh = false;
@@ -95,7 +98,7 @@ namespace THBimEngine.Application
                     bimProject.ApplcationName = projectParameter.Source;
                     bimProject.ProjectIdentity = projectParameter.ProjectId;
                     bimProject.Major = projectParameter.Major;
-                    bimProject.ProjectIdentity = project.Root.GlobalId;
+                    bimProject.LocalFilePath = projectParameter.OpenFilePath;
                     bimProject.SourceProject = project;
                     bimProject.ProjectChanged();
                     HaveChange = true;
@@ -117,15 +120,14 @@ namespace THBimEngine.Application
             if (!isAdd)
             {
                 //这里增量跟新没有做，先删除原来的数据，再增加现在的数据
-                var findPrject = currentDocument.GetProject(projectParameter.ProjectId);
-                findPrject.SourceProject = ifcStore;
-                currentDocument.DeleteProject(ifcStore.FileName);
+                currentDocument.DeleteProject(projectParameter.ProjectId);
             }
             var prjName = Path.GetFileNameWithoutExtension(ifcStore.FileName);
             var ifcProject = ifcStore.Instances.FirstOrDefault<IIfcProject>();
             var bimProject = new THBimProject(0, prjName, "", ifcProject.GlobalId);
             bimProject.ApplcationName = projectParameter.Source;
             bimProject.ProjectIdentity = projectParameter.ProjectId;
+            bimProject.LocalFilePath = projectParameter.OpenFilePath;
             bimProject.Major = projectParameter.Major;
             bimProject.SourceProject = ifcStore;
             bimProject.NeedReadEntityMesh = false;

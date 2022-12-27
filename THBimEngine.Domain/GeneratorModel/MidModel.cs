@@ -894,7 +894,7 @@ namespace THBimEngine.Domain.GeneratorModel
             }
         }
 
-        public List<Edge> GetEdgesByDir(OutingPolygon outingPolygon, List<PointNormal> allPoints, ref int edgeIndex, int parentId)
+        public List<Edge> GetEdgesByDir(OutingPolygon outingPolygon, List<Vec3> allPoints, ref int edgeIndex, int parentId)
         {
             var edges = new List<Edge>();
             var cnt = outingPolygon.ptsIndex.Count;
@@ -905,7 +905,7 @@ namespace THBimEngine.Domain.GeneratorModel
                     //var pt = allPoints[triangle.ptIndex[i] + offsetIndex].Point;
                     var ptn1 = allPoints[outingPolygon.ptsIndex[i]];
                     var ptn2 = allPoints[outingPolygon.ptsIndex[j]];
-                    var edgeLen = GetLength(ptn1.Point, ptn2.Point);
+                    var edgeLen = GetLength(ptn1, ptn2);
                     var edge = new Edge(ref edgeIndex, parentId, outingPolygon.ptsIndex[i], outingPolygon.ptsIndex[j], edgeLen);
 
                     edges.Add(edge);
@@ -914,9 +914,9 @@ namespace THBimEngine.Domain.GeneratorModel
             return edges;
         }
 
-        public double GetLength(PointVector pt1, PointVector pt2)
+        public double GetLength(Vec3 pt1, Vec3 pt2)
         {
-            return Math.Sqrt(Math.Pow(pt1.X - pt2.X,2) + Math.Pow(pt1.Y - pt2.Y,2));
+            return Math.Sqrt(Math.Pow(pt1.x - pt2.x,2) + Math.Pow(pt1.y - pt2.y,2));
         }
 
         public void GetTrianglesAndEdges(List<FaceTriangle> triangles, List<PointNormal> allPoints, int offsetIndex, ref int triangleIndex, ref int edgeIndex,
@@ -924,10 +924,12 @@ namespace THBimEngine.Domain.GeneratorModel
         {
             bool firstTriangles = true;
             var allEdges = new List<Edge>();
+            var pts = new List<PointVector>();
             foreach (var triangle in triangles)
             {
-                var outingPolygon = new OutingPolygon(triangle, allPoints, offsetIndex, ref triangleIndex, uniComponent, ref ptIndex, Points, firstTriangles, reverse);
-                var edges = GetEdgesByDir(outingPolygon, allPoints, ref edgeIndex, uniComponent.unique_id);
+                var outingPolygon = new OutingPolygon(triangle, allPoints, offsetIndex, ref triangleIndex, uniComponent, 
+                    ref ptIndex, Points, firstTriangles, reverse);
+                var edges = GetEdgesByDir(outingPolygon, Points, ref edgeIndex, uniComponent.unique_id);
                 OutingPolygons.Add(outingPolygon);
                 allEdges.AddRange(edges);
                 if (firstTriangles) firstTriangles = false;

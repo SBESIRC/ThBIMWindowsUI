@@ -38,21 +38,21 @@ namespace THBimEngine.Domain.GeneratorModel
             //}
             //else
             //{
-                for (int i = 0; i < cnt; i++)
+            for (int i = 0; i < cnt; i++)
+            {
+                var pt = allPoints[triangle.ptIndex[i] + offsetIndex].Point;
+                if (firstTriangles && i == 0)//第一个三角面片的第一个点
                 {
-                    var pt = allPoints[triangle.ptIndex[i] + offsetIndex].Point;
-                    if (firstTriangles && i == 0)//第一个三角面片的第一个点
-                    {
-                        GetBbx(pt, uniComponent);
-                    }
-                    else
-                    {
-                        UpdateBbx(pt, uniComponent);
-                    }
-                    Points.Add(new Vec3(pt));
-                    ptsIndex.Add(ptIndex);
-                    ptIndex++;
+                    GetBbx(pt, uniComponent);
                 }
+                else
+                {
+                    UpdateBbx(pt, uniComponent);
+                }
+                Points.Add(new Vec3(pt));
+                ptsIndex.Add(ptIndex);
+                ptIndex++;
+            }
             //}
             
         }

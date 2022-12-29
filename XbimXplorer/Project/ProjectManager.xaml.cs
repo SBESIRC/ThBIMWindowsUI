@@ -102,9 +102,19 @@ namespace XbimXplorer
                 return;
             try
             {
+                var fileName = Path.GetFileNameWithoutExtension(filePath);
+                var hisPrj = projectFileManager.ProjectFileDBHelper.GetHisProjectFile(pProject.PrjId, subProject.PrjId, major, type, fileName, "", 1);
+                if (hisPrj != null)
+                {
+                    var msg = string.Format("项目文件名称【{0}】,已经存在，且作废了，无法添加同名称的，请到历史记录中激活后使用更新功能继续操作", fileName);
+                    MessageBox.Show(msg, "操作提醒", MessageBoxButton.OK);
+                    return;
+                }
                 lableRemind.Content = "正在进行相应的操作（包含上传文件）,请耐心等待...";
                 gridRemind.Visibility = Visibility.Visible;
                 Refresh();
+                //第一步检查数据，上传文件是否是同名，如果是同名，则走更新流程
+                //再检查是否是已经作废的数据，如果是已经作废的数据，则不允许
                 var res = projectFileManager.AddFileToProject(pProject, subProject, filePath, major, type, true);
                 if (res != true)
                     return;
@@ -140,12 +150,20 @@ namespace XbimXplorer
                 return;
             try
             {
+                var hisPrj = projectFileManager.ProjectFileDBHelper.GetHisProjectFile(pProject.PrjId, subProject.PrjId, major, "SU", fileName, "", 1);
+                if (hisPrj != null)
+                {
+                    var msg = string.Format("项目文件名称【{0}】,已经存在，且作废了，无法添加同名称的，请到历史记录中激活后使用更新功能继续操作", fileName);
+                    MessageBox.Show(msg, "操作提醒", MessageBoxButton.OK);
+                    return;
+                }
                 lableRemind.Content = "正在进行相应的操作（包含上传文件）,请耐心等待...";
                 gridRemind.Visibility = Visibility.Visible;
                 Refresh();
                 var currentDir = System.Environment.CurrentDirectory;
                 var templatePath = Path.Combine(currentDir, "Template\\THSKPTemplate_S_2020.skp");
                 path = Path.Combine(path, fileName + ".skp");
+                
                 File.Copy(templatePath, path, true);
                 var res = projectFileManager.AddFileToProject(pProject, subProject, path, major, "SU", false);
                 if (res != true)
@@ -394,18 +412,35 @@ namespace XbimXplorer
             var res = MessageBox.Show(msg, "操作提醒", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (res != MessageBoxResult.Yes)
                 return;
+            bool isTrue = true;
+            
+            var downloadErrorFiles = new Dictionary<string, string>();
+            var delErrorFiles = new Dictionary<string, string>();
             try
             {
-                InitUserSelectProject();
                 lableRemind.Content = "正在检查本机的文件并下载数据,请耐心等待...";
                 gridRemind.Visibility = Visibility.Visible;
                 Refresh();
+                InitUserSelectProject();
+                //移除文件变化监听
+                foreach (var fileModel in projectVM.subProjectAllFileModels)
+                {
+                    foreach (var item in fileModel.FileInfos)
+                    {
+                        if (string.IsNullOrEmpty(item.FileDownloadPath))
+                            continue;
+                        if (fileModel.ApplcationName == EApplcationName.SU)
+                        {
+                            CheckLocalFileServices.Instance.RemoveCheckFile(fileModel.ProjectFileId);
+                        }
+                    }
+                }
+                //先刷新当前子项
+                projectVM.ChangeSelectSubProject();
                 //获取想选中子项,文件夹下的所有文件，为了减少下载量，不会直接将文件删除，先判断是否需要删除
                 //1、用不到的文件，或已经删除的文件 2、和服务器不一致版本的文件都删除
                 var childDir = ProjectCommon.GetSubProjectPath(pProject, subProject, loginUser.LoginLocation, true);
                 var delFiles = FileHelper.GetDirectoryFiles(childDir, true,true);
-                var downloadErrorFiles = new Dictionary<string, string>();
-                var delErrorFiles = new Dictionary<string, string>();
                 foreach (var fileModel in projectVM.subProjectAllFileModels) 
                 {
                     foreach (var item in fileModel.FileInfos) 
@@ -451,6 +486,7 @@ namespace XbimXplorer
             }
             catch (Exception ex)
             {
+                isTrue = false;
                 MessageBox.Show(string.Format("同步失败，{0}", ex.Message), "操作提醒", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally 
@@ -458,6 +494,17 @@ namespace XbimXplorer
                 lableRemind.Content = "";
                 gridRemind.Visibility = Visibility.Collapsed;
                 Refresh();
+                if (isTrue)
+                {
+                    if (downloadErrorFiles.Count > 0 || delErrorFiles.Count > 0)
+                    {
+                        MessageBox.Show(string.Format("同步结束，有文件操作是吧，删除失败{0},下载失败{1}", delErrorFiles.Count,downloadErrorFiles.Count), "操作提醒", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else 
+                    {
+                        MessageBox.Show("同步完成", "操作提醒", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
             }
 
         }
@@ -489,6 +536,51 @@ namespace XbimXplorer
             syncMenu.Click += SyncProjectFile_Click;
             aMenu.Items.Add(syncMenu);
             prjDGrid.ContextMenu = aMenu;
+        }
+
+        private void HistoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (projectVM.SelectProject == null || !projectVM.SelectProject.IsChild)
+                return;
+            InitUserSelectProject();
+            var btn = sender as Button;
+            var appName = btn.CommandParameter.ToString();
+            if (string.IsNullOrEmpty(appName))
+                return;
+            var eAppName = EnumUtil.GetEnumItemByDescription<EApplcationName>(appName);
+            string major = EnumUtil.GetEnumDescription(EMajor.Structure);
+            var showName = string.Format("[{0}][{1}][{2}]", subProject.ShowName, appName, major);
+            var showHis = projectFileManager.GetProjectFileHistory(pProject.PrjId, subProject.PrjId, appName, major);
+            var fileHistory = new ProjectFileHistory(showHis,showName);
+            fileHistory.Owner = this;
+            var res = fileHistory.ShowDialog();
+            if (res != true)
+                return;
+            var haveChange = fileHistory.GetChangedFileInfos(out List<FileHistory> changeFileInfos);
+            if (!haveChange)
+                return;
+            //有修改历史版本,修改数据库，删除本地对应的文件，并更新显示数据
+            var changeDB = projectFileManager.ChangeNewFileInfoToDB(changeFileInfos, eAppName);
+            if (!changeDB)
+                return;
+            var changedIds = changeFileInfos.Select(c => c.MainFileId).ToList();
+            foreach (var item in projectVM.subProjectAllFileModels) 
+            {
+                if (!changedIds.Contains(item.MainFileId))
+                    continue;
+                CheckLocalFileServices.Instance.RemoveCheckFile(item.MainFileId);
+                foreach (var file in item.FileInfos) 
+                {
+                    //删除文件
+                    try
+                    {
+                        if (File.Exists(file.FileLocalPath))
+                            File.Delete(file.FileLocalPath);
+                    }
+                    catch { }
+                }
+            }
+            projectVM.ChangeSelectSubProject();
         }
     }
     public enum OperateType

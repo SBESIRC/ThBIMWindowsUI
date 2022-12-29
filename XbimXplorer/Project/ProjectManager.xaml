@@ -185,7 +185,14 @@
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Label Content="主体模型文件管理区"></Label>
-                <Label Grid.Row="1" Content="YJK模型文件管理区"></Label>
+                <Grid Grid.Row="1" Margin="0,0,5,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Label  Content="YJK模型文件管理区" Grid.Row="0" Grid.Column="0"></Label>
+                    <Button Content="历史记录" Grid.Column="1" Height="22" Width="70" VerticalContentAlignment="Center" CommandParameter="YDB" Click="HistoryButton_Click" Visibility="Collapsed"></Button>
+                </Grid>
                 <DataGrid Grid.Row="2" Margin="5" CanUserAddRows="False"
                           SelectionMode="Single"
                           CanUserDeleteRows="False" AutoGenerateColumns="False" 
@@ -196,7 +203,7 @@
                         <DataGridTextColumn Header="模型名称" Width="2*" Binding="{Binding ShowFileName}" IsReadOnly="True"></DataGridTextColumn>
                         <DataGridTextColumn Header="上传人" Width="1*" Binding="{Binding OwnerName}" IsReadOnly="True"></DataGridTextColumn>
                         <DataGridTextColumn Header="专业" Binding="{Binding MajorName}" IsReadOnly="True"  CanUserSort="False" CanUserResize="False"></DataGridTextColumn>
-                        <DataGridTextColumn Header="更新时间" Width="1*" Binding="{Binding LastUpdateTime,StringFormat='yyyy/MM/dd HH:mm:ss'}" IsReadOnly="True"></DataGridTextColumn>
+                        <DataGridTextColumn Header="更新时间" Width="130" Binding="{Binding LastUpdateTime,StringFormat='yyyy/MM/dd HH:mm:ss'}" IsReadOnly="True"></DataGridTextColumn>
                     </DataGrid.Columns>
                     <DataGrid.Resources>
                         <Style TargetType="DataGridRow">
@@ -218,7 +225,14 @@
                     <RowDefinition Height="*"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
-                <Label Content="SU模型文件管理区"></Label>
+                <Grid Grid.Row="0" Margin="0,0,5,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Label  Content="SU模型文件管理区" Grid.Row="0" Grid.Column="0"></Label>
+                    <Button Content="历史记录" Grid.Column="1" Height="22" Width="70" VerticalContentAlignment="Center" Click="HistoryButton_Click" CommandParameter="SU"></Button>
+                </Grid>
                 <DataGrid Grid.Row="1" Margin="5" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" 
                           RowHeaderWidth="0" SelectionMode="Single"
                           ItemsSource="{Binding SuModels}"
@@ -228,7 +242,7 @@
                         <DataGridTextColumn Header="上传人" Width="1*" Binding="{Binding OwnerName}" IsReadOnly="True"></DataGridTextColumn>
                         <DataGridTextColumn Header="占用人" Width="1*" Binding="{Binding OccupyName}" IsReadOnly="True"></DataGridTextColumn>
                         <DataGridTextColumn Header="专业" Binding="{Binding MajorName}" IsReadOnly="True"  CanUserSort="False" CanUserResize="False"></DataGridTextColumn>
-                        <DataGridTextColumn Header="更新时间" Width="1*" Binding="{Binding LastUpdateTime,StringFormat='yyyy/MM/dd HH:mm:ss'}" IsReadOnly="True"></DataGridTextColumn>
+                        <DataGridTextColumn Header="更新时间" Width="130" Binding="{Binding LastUpdateTime,StringFormat='yyyy/MM/dd HH:mm:ss'}" IsReadOnly="True"></DataGridTextColumn>
                     </DataGrid.Columns>
                     <DataGrid.Resources>
                         <Style TargetType="DataGridRow">
@@ -251,7 +265,14 @@
                     <RowDefinition Height="*"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
-                <Label Content="IFC模型文件管理区"></Label>
+                <Grid Grid.Row="0" Margin="0,0,5,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Label  Content="IFC模型文件管理区" Grid.Row="0" Grid.Column="0"></Label>
+                    <Button Content="历史记录" Grid.Column="1" Height="22" Width="70" VerticalContentAlignment="Center" CommandParameter="IFC" Click="HistoryButton_Click" Visibility="Collapsed"></Button>
+                </Grid>
                 <DataGrid Grid.Row="1" Margin="5" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" RowHeaderWidth="0" SelectionMode="Single"
                           ItemsSource="{Binding IfcModels}"
                           SelectedItem="{Binding IFCSelectProjectFile,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged,NotifyOnSourceUpdated=True}">
@@ -259,7 +280,7 @@
                         <DataGridTextColumn Header="模型名称" Width="2*" Binding="{Binding ShowFileName}" IsReadOnly="True"></DataGridTextColumn>
                         <DataGridTextColumn Header="上传人" Width="1*" Binding="{Binding OwnerName}" IsReadOnly="True"></DataGridTextColumn>
                         <DataGridTextColumn Header="专业" Binding="{Binding MajorName}" IsReadOnly="True"  CanUserSort="False" CanUserResize="False"></DataGridTextColumn>
-                        <DataGridTextColumn Header="更新时间" Width="1*" Binding="{Binding LastUpdateTime,StringFormat='yyyy/MM/dd HH:mm:ss'}" IsReadOnly="True"></DataGridTextColumn>
+                        <DataGridTextColumn Header="更新时间" Width="130" Binding="{Binding LastUpdateTime,StringFormat='yyyy/MM/dd HH:mm:ss'}" IsReadOnly="True"></DataGridTextColumn>
                     </DataGrid.Columns>
                     <DataGrid.Resources>
                         <Style TargetType="DataGridRow">

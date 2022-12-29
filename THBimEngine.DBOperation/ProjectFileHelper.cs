@@ -34,6 +34,26 @@ namespace THBimEngine.DBOperation
             var prjFileLinks = sqlDB.Queryable<DBLink>().Where(expressionable.ToExpression()).ToList();
             return prjFileLinks;
         }
+        public List<DBProjectFile> GetDBProjectFiles(string prjId, string subPrjId, string appName, string major) 
+        {
+            var sqlDB = GetDBConnect();
+            var expressionable = new Expressionable<DBProjectFile>();
+            expressionable.And(c => c.PrjId == prjId);
+            expressionable.And(c => c.SubPrjId == subPrjId);
+            expressionable.And(c => c.ApplicationName == appName);
+            expressionable.And(c => c.MajorName == major);
+            var prjFiles = sqlDB.Queryable<DBProjectFile>().Where(expressionable.ToExpression()).ToList();
+            return prjFiles;
+        }
+        public List<DBVAllProjectFile> GetDBProjectMainFiles(List<string> prjFileIds) 
+        {
+            var sqlDB = GetDBConnect();
+            var expressionable = new Expressionable<DBVAllProjectFile>();
+            expressionable.And(c => c.IsMainFile == 1);
+            expressionable.And(c => prjFileIds.Contains(c.ProjectFileId));
+            var prjFiles = sqlDB.Queryable<DBVAllProjectFile>().Where(expressionable.ToExpression()).ToList();
+            return prjFiles;
+        }
         public List<DBVProjectMainFile> GetProjectFiles(string prjId,string subPrjId) 
         {
             var sqlDB = GetDBConnect();
@@ -96,7 +116,7 @@ namespace THBimEngine.DBOperation
             var prjAllFiles = sqlDB.Queryable<DBVProjectFile>().Where(expressionable.ToExpression()).ToList();
             return prjAllFiles;
         }
-        public DBProjectFile GetHisProjectFile(string prjId, string subPrjId, string majorName, string sourceName, string fileName,string buidingName) 
+        public DBProjectFile GetHisProjectFile(string prjId, string subPrjId, string majorName, string sourceName, string fileName,string buidingName,int isDel =0) 
         {
             var sqlDB = GetDBConnect();
             var expressionable = new Expressionable<DBProjectFile>();
@@ -105,7 +125,7 @@ namespace THBimEngine.DBOperation
             expressionable.And(c => c.SubPrjId == subPrjId);
             expressionable.And(c => c.MajorName == majorName);
             expressionable.And(c => c.ApplicationName == sourceName);
-            expressionable.And(c => c.IsDel == 0);
+            expressionable.And(c => c.IsDel == isDel);
             var res = sqlDB.Queryable<DBProjectFile>().Where(expressionable.ToExpression()).ToList();
             if (res.Count < 1)
                 return null;
@@ -128,6 +148,20 @@ namespace THBimEngine.DBOperation
                 })
                 .Where(it => it.ProjectFileId == prjFileId
                 && it.IsDel == 0).ExecuteCommand();
+        }
+        public void UnDelHProjectFile(SqlSugarProvider sqlDB, string uId, string uName, string prjFileId)
+        {
+            //删除旧数据
+            sqlDB.Updateable<DBProjectFile>().SetColumns(it =>
+                new DBProjectFile()
+                {
+                    IsDel = 0,
+                    UpdateTime = DateTime.Now,
+                    UpdatedBy = uId,
+                    UpdatedUserName = uName,
+                })
+                .Where(it => it.ProjectFileId == prjFileId
+                && it.IsDel == 1).ExecuteCommand();
         }
         public void DelHisProjectUploadFile(string prjFileId)
         {
@@ -167,6 +201,17 @@ namespace THBimEngine.DBOperation
                 })
                 .Where(it => it.ProjectFileUploadId == prjFileUploadId
                 && it.IsDel == 0).ExecuteCommand();
+        }
+        public void UnDelProjectUploadFile(SqlSugarProvider sqlDB, string prjFileUploadId)
+        {
+            //删除旧数据
+            sqlDB.Updateable<DBProjectFileUpload>().SetColumns(it =>
+                new DBProjectFileUpload()
+                {
+                    IsDel = 0,
+                })
+                .Where(it => it.ProjectFileUploadId == prjFileUploadId
+                && it.IsDel == 1).ExecuteCommand();
         }
         public void DelHisProjectLink(SqlSugarProvider sqlDB, string linkId)
         {

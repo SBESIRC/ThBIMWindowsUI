@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using THBimEngine.DBOperation;
 using THBimEngine.DBOperation.DBModels;
 using THBimEngine.Domain;
 
@@ -169,6 +171,25 @@ namespace XbimXplorer.Project
             shortData.PrjId = showProjectFile.PrjId;
             shortData.Major = showProjectFile.Major;
             return shortData;
+        }
+        public static FileHistory DBProjectFileToFileHistory(DBProjectFile projectFile)
+        {
+            var fileHistory = new FileHistory();
+            fileHistory.MainFileId = projectFile.ProjectFileId;
+            fileHistory.MainFileName = projectFile.FileName;
+            fileHistory.State = projectFile.IsDel == 0 ? "" : "已作废";
+            fileHistory.FileHistoryDetails = new List<FileHistoryDetail>();
+            return fileHistory;
+        }
+        public static FileHistoryDetail DBVFileInfoToFileDetail(DBVAllProjectFile projectFile) 
+        {
+            var fileHistoryDetail = new FileHistoryDetail();
+            fileHistoryDetail.ProjectFileId = projectFile.ProjectFileId;
+            fileHistoryDetail.ShowFileName = projectFile.FileRealName;
+            fileHistoryDetail.UploaderName = projectFile.UploaderName;
+            fileHistoryDetail.ProjectFileUplaodId = projectFile.ProjectUploadId;
+            fileHistoryDetail.FileUploadTime = projectFile.UploadTime;
+            return fileHistoryDetail;
         }
     }
 }

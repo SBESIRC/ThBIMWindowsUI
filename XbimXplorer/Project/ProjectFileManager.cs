@@ -879,27 +879,6 @@ namespace XbimXplorer.Project
             }
             return isSuccess;
         }
-        public bool DeleteFileLink(ShowFileLink fileLink)
-        {
-            bool isSuccess = false;
-            var sqlDB = ProjectFileDBHelper.GetDBConnect();
-            try
-            {
-                sqlDB.Ado.BeginTran();
-                ProjectFileDBHelper.DelHisProjectLink(sqlDB, fileLink.LinkId);
-                sqlDB.Ado.CommitTran();
-                isSuccess = true;
-            }
-            catch (Exception ex)
-            {
-                sqlDB.Ado.RollbackTran();
-                isSuccess = false;
-                MessageBox.Show(string.Format("删除外链失败,{0}", ex.Message), "操作提醒", MessageBoxButton.OK);
-
-            }
-            return isSuccess;
-        }
-
         public bool ChangeLinkState(ShowFileLink fileLink, bool isLoad,bool isDel) 
         {
             bool isSuccess = false;
@@ -942,6 +921,81 @@ namespace XbimXplorer.Project
         }
         #endregion
 
+        #region 历史记录相关
+        public List<FileHistory> GetProjectFileHistory(string prjId,string subPrjId,string appName,string majorName) 
+        {
+            var res = new List<FileHistory>();
+            //获取文件文件和其对应的所有主记录
+            var allRecords = ProjectFileDBHelper.GetDBProjectFiles(prjId, subPrjId, appName, majorName);
+            if (allRecords == null || allRecords.Count < 1)
+                return res;
+            var allHisMainFileUplaods = ProjectFileDBHelper.GetDBProjectMainFiles(allRecords.Select(c => c.ProjectFileId).ToList());
+            //构造数据
+            foreach (var mainItem in allRecords) 
+            {
+                var mainHis = ProjectCommon.DBProjectFileToFileHistory(mainItem);
+                mainHis.NewState = mainHis.State;
+                //获取对应的历史，并按时间排序
+                var hisFiles = allHisMainFileUplaods.Where(c => c.ProjectFileId == mainItem.ProjectFileId).OrderBy(c => c.UploadTime).ToList();
+                foreach (var fileItem in hisFiles) 
+                {
+                    var his = ProjectCommon.DBVFileInfoToFileDetail(fileItem);
+                    his.ShowFileName = mainHis.MainFileName;
+                    his.State = mainHis.State;
+                    his.NewState = mainHis.State;
+                    his.IsCurrentVersion = fileItem.IsDel == "0";
+                    mainHis.FileHistoryDetails.Add(his);
+                    if (his.IsCurrentVersion)
+                    {
+                        mainHis.OldMainFileUplaodId = his.ProjectFileUplaodId;
+                        mainHis.NewMainFileUplaodId = his.ProjectFileUplaodId;
+                    }
+                }
+                res.Add(mainHis);
+            }
+            return res;
+        }
+        public bool ChangeNewFileInfoToDB(List<FileHistory> changeFileInfos,EApplcationName applcationName)
+        {
+            bool isSuccess = false;
+            var sqlDB = ProjectFileDBHelper.GetDBConnect();
+            try
+            {
+                sqlDB.Ado.BeginTran();
+                foreach (var item in changeFileInfos) 
+                {
+                    if (item.State != item.NewState) 
+                    {
+                        //取消作废
+                        ProjectFileDBHelper.UnDelHProjectFile(sqlDB, userId, userName, item.MainFileId);
+                    }
+                    if (item.OldMainFileUplaodId != item.NewMainFileUplaodId) 
+                    {
+                        //更改了版本
+                        if (applcationName == EApplcationName.YDB)
+                        {
+                            //YDB对应的有多个文件，需要改多个数据(暂时没有实现)
+                        }
+                        else
+                        {
+                            ProjectFileDBHelper.DelHisProjectUploadFile(sqlDB, item.OldMainFileUplaodId);
+                            ProjectFileDBHelper.UnDelProjectUploadFile(sqlDB, item.NewMainFileUplaodId);
+                        }
+                    }
+                }
+                sqlDB.Ado.CommitTran();
+                isSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                sqlDB.Ado.RollbackTran();
+                isSuccess = false;
+                MessageBox.Show(string.Format("新增外链失败,{0}", ex.Message), "操作提醒", MessageBoxButton.OK);
+
+            }
+            return isSuccess;
+        }
+        #endregion
     }
     class TempFileInfo 
     {

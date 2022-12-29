@@ -299,7 +299,12 @@
       <DependentUpon>wdwCommands.xaml</DependentUpon>
     </Compile>
     <Compile Include="Project\FileExternalLink.cs" />
+    <Compile Include="Project\FileHistoryVM.cs" />
     <Compile Include="Project\ProjectCommon.cs" />
+    <Compile Include="Project\FileHistory.cs" />
+    <Compile Include="Project\ProjectFileHistory.xaml.cs">
+      <DependentUpon>ProjectFileHistory.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Project\ProjectFileManager.cs" />
     <Compile Include="Project\ProjectManager.xaml.cs">
       <DependentUpon>ProjectManager.xaml</DependentUpon>
@@ -403,6 +408,10 @@
     <Page Include="Commands\wdwCommands.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Project\ProjectFileHistory.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Project\ProjectManager.xaml">
       <SubType>Designer</SubType>

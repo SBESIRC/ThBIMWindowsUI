@@ -13,8 +13,8 @@ namespace THBimEngine.DBOperation
         {
             dbMySqlConfig = new ConnectionConfig()
             {
-                ConfigId = "DBMySql",
-                DbType = SqlSugar.DbType.MySql,
+                ConfigId = "THBimDB",
+                DbType = SqlSugar.DbType.SqlServer,
                 ConnectionString = connectStr,
                 IsAutoCloseConnection = true,
             };

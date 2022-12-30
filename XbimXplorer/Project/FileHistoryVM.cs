@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Media;
 using THBimEngine.Application;
 
@@ -79,13 +80,14 @@ namespace XbimXplorer.Project
         public void FilterByFileName(string filterName) 
         {
             ShowFiles.Clear();
+            var temp = new List<FileHistoryDetailVM>();
             if (string.IsNullOrEmpty(filterName))
             {
                 //显示全部
                 foreach (var item in allFileHis) 
                 {
                     foreach (var file in item.FileHistoryDetails)
-                        ShowFiles.Add(new FileHistoryDetailVM(file));
+                        temp.Add(new FileHistoryDetailVM(file));
                 }
             }
             else 
@@ -96,9 +98,12 @@ namespace XbimXplorer.Project
                     if (item.MainFileName != filterName)
                         continue;
                     foreach (var file in item.FileHistoryDetails)
-                        ShowFiles.Add(new FileHistoryDetailVM(file));
+                        temp.Add(new FileHistoryDetailVM(file));
                 }
             }
+            temp = temp.OrderByDescending(c => c.FileUploadTime).ToList();
+            foreach (var item in temp)
+                ShowFiles.Add(item);
         }
     }
 

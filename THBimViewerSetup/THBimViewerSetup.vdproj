@@ -2213,7 +2213,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\天华结构三维平台1.0.36.msi"
+        "OutputFilename" = "8:Release\\天华结构三维平台1.0.37.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -3269,7 +3269,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:THBimEngine.DBOperation, Version=1.0.29.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:THBimEngine.DBOperation, Version=1.0.30.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_58A165618AA99E8703EC97BA4196BE97"
@@ -3712,7 +3712,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:THBimEngine.Domain, Version=1.0.31.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:THBimEngine.Domain, Version=1.0.32.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_85A7C591A464C971DF081742E3885BBB"
@@ -5394,15 +5394,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:天华结构三维平台"
-        "ProductCode" = "8:{18A2D318-92AE-4409-906A-B38E69E0F2E0}"
-        "PackageCode" = "8:{733D282A-5376-4D35-8AFC-B966A0B9A4B4}"
+        "ProductCode" = "8:{647F4A43-7907-404E-A596-47C53CC44CBA}"
+        "PackageCode" = "8:{574C8D89-16C5-4D2A-B992-90588D00DC73}"
         "UpgradeCode" = "8:{ED2A8D68-8A28-4313-AC3F-A8420ED52526}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.36"
+        "ProductVersion" = "8:1.0.37"
         "Manufacturer" = "8:TIANHUA Architectural Design Co., Ltd"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

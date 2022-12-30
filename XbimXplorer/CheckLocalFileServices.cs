@@ -137,7 +137,7 @@ namespace XbimXplorer
                 {
                     if (item.ProjectFileId != prjFile.ProjectFileId)
                         continue;
-                    rmList.Add(prjFile);
+                    rmList.Add(item);
                     var newPrjFile = fileManager.GetProjectFile(prjFile.ProjectFileId);
                     if (null != newPrjFile)
                     {

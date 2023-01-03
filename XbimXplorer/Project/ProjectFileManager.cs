@@ -975,6 +975,10 @@ namespace XbimXplorer.Project
                         if (applcationName == EApplcationName.YDB)
                         {
                             //YDB对应的有多个文件，需要改多个数据(暂时没有实现)
+                            var oldFile = item.FileHistoryDetails.Where(c => c.ProjectFileUplaodId == item.OldMainFileUplaodId).FirstOrDefault();
+                            var newFile = item.FileHistoryDetails.Where(c => c.ProjectFileUplaodId == item.NewMainFileUplaodId).FirstOrDefault();
+                            ProjectFileDBHelper.DelHisProjectByVersionUploadFile(sqlDB, item.MainFileId,oldFile.ProjectFileUploadVersionId);
+                            ProjectFileDBHelper.UnDelHisProjectByVersionUploadFile(sqlDB, item.MainFileId, newFile.ProjectFileUploadVersionId);
                         }
                         else
                         {

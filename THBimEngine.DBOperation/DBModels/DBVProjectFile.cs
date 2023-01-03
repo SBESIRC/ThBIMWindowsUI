@@ -35,6 +35,7 @@ namespace THBimEngine.DBOperation.DBModels
         public int IsMainFile { get; set; }
         public int CanOpen { get; set; }
         public int NeedDownload { get; set; }
+        public string VersionId { get; set; }
         public DateTime UploadTime { get; set; }
         public string IsDel { get; set; }
     }

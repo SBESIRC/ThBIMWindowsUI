@@ -189,6 +189,7 @@ namespace XbimXplorer.Project
             fileHistoryDetail.UploaderName = projectFile.UploaderName;
             fileHistoryDetail.ProjectFileUplaodId = projectFile.ProjectUploadId;
             fileHistoryDetail.FileUploadTime = projectFile.UploadTime;
+            fileHistoryDetail.ProjectFileUploadVersionId = projectFile.VersionId;
             return fileHistoryDetail;
         }
     }

@@ -202,6 +202,30 @@ namespace THBimEngine.DBOperation
                 .Where(it => it.ProjectFileUploadId == prjFileUploadId
                 && it.IsDel == 0).ExecuteCommand();
         }
+        public void DelHisProjectByVersionUploadFile(SqlSugarProvider sqlDB, string prjFIleId,string versionId)
+        {
+            //删除旧数据
+            sqlDB.Updateable<DBProjectFileUpload>().SetColumns(it =>
+                new DBProjectFileUpload()
+                {
+                    IsDel = 1,
+                })
+                .Where(it => it.ProjectFileId == prjFIleId
+                && it.VersionId == versionId
+                && it.IsDel == 0).ExecuteCommand();
+        }
+        public void UnDelHisProjectByVersionUploadFile(SqlSugarProvider sqlDB, string prjFIleId, string versionId)
+        {
+            //删除旧数据
+            sqlDB.Updateable<DBProjectFileUpload>().SetColumns(it =>
+                new DBProjectFileUpload()
+                {
+                    IsDel = 0,
+                })
+                .Where(it => it.ProjectFileId == prjFIleId
+                && it.VersionId == versionId
+                && it.IsDel == 1).ExecuteCommand();
+        }
         public void UnDelProjectUploadFile(SqlSugarProvider sqlDB, string prjFileUploadId)
         {
             //删除旧数据

@@ -271,7 +271,7 @@
                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <Label  Content="IFC模型文件管理区" Grid.Row="0" Grid.Column="0"></Label>
-                    <Button Content="历史记录" Grid.Column="1" Height="22" Width="70" VerticalContentAlignment="Center" CommandParameter="IFC" Click="HistoryButton_Click" Visibility="Collapsed"></Button>
+                    <Button Content="历史记录" Grid.Column="1" Height="22" Width="70" VerticalContentAlignment="Center" CommandParameter="IFC" Click="HistoryButton_Click"></Button>
                 </Grid>
                 <DataGrid Grid.Row="1" Margin="5" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" RowHeaderWidth="0" SelectionMode="Single"
                           ItemsSource="{Binding IfcModels}"

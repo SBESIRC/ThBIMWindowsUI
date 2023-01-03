@@ -539,12 +539,15 @@ namespace XbimXplorer.Project
                     CreaterName = userName,
                 };
                 sqlDB.Ado.BeginTran();
+                //如果已经有历史了，不删除原来的主记录，也不插入新记录
                 if (haveHis)
                 {
-                    ProjectFileDBHelper.DelHisProjectFile(sqlDB, userId, userName, prjFileId);
                     ProjectFileDBHelper.DelHisProjectAllUploadFile(sqlDB, prjFileId);
                 }
-                sqlDB.Insertable(addDBProjetFile).ExecuteCommand();
+                else 
+                {
+                    sqlDB.Insertable(addDBProjetFile).ExecuteCommand();
+                }
                 foreach (var item in addDBFiles)
                 {
                     sqlDB.Insertable(item).ExecuteCommand();

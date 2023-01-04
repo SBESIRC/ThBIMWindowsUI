@@ -112,9 +112,19 @@ namespace THBimEngine.Domain.GeneratorModel
                             {
                                 try
                                 {
-                                    if (!((Xbim.Ifc2x3.Kernel.IfcRoot)item).FriendlyName.Contains("Wall_Hole"))
-                                        continue;
-                                    holeIdDic.Add(uniComponentIndex,item.GlobalId);
+                                    if(item.Model.SchemaVersion.ToString()== "Ifc4")
+                                    {
+                                        if (!item.Name.ToString().Contains("Wall_Hole"))
+                                            continue;
+                                        holeIdDic.Add(uniComponentIndex, item.GlobalId);
+                                    }
+                                    else
+                                    {
+                                        if (!((Xbim.Ifc2x3.Kernel.IfcRoot)item).FriendlyName.Contains("Wall_Hole"))
+                                            continue;
+                                        holeIdDic.Add(uniComponentIndex, item.GlobalId);
+                                    }
+                           
                                 }
                                 catch
                                 {
@@ -152,6 +162,13 @@ namespace THBimEngine.Domain.GeneratorModel
                                 if (ifcwall.HasOpenings.Count() > 0)
                                 {
                                     holeDepthDic.Add(ifcwall.Openings.FirstOrDefault().GlobalId, uniComponent.y_len);
+                                }
+                            }
+                            if(item is Xbim.Ifc4.SharedBldgElements.IfcWall ifcwall2)
+                            {
+                                if (ifcwall2.HasOpenings.Count() > 0)
+                                {
+                                    holeDepthDic.Add(ifcwall2.Openings.FirstOrDefault().GlobalId, uniComponent.y_len);
                                 }
                             }
 
@@ -210,35 +227,38 @@ namespace THBimEngine.Domain.GeneratorModel
                 }
                 foreach(var i in holeDic.Keys)
                 {
-                    var storey = Buildingstoreys[UniComponents[i].floor_num];
-                    UniComponents[i].properties.Add("Length", UniComponents[i].x_len.ToString());
-                    UniComponents[i].properties.Add("Width", holeDepthDic[holeIdDic[i]].ToString());
-                    UniComponents[i].properties.Add("Height", UniComponents[i].y_len.ToString());
-                    //if (i == holeDic.Keys.Last())
-                    //{
-                    //    UniComponents[i].properties.Add("LLHeight", (storey.top_elevation - UniComponents[i].z_r).ToString());
-                    //    UniComponents[i].properties.Add("LLElevation", "");
-                    //    continue;
-                    //}
-                    foreach (var j in holeDic.Keys)
+                    try
                     {
-                        if (j <= i) continue;
-                        var xDiff = Math.Abs(holeDic[i][0] - holeDic[j][0]);
-                        var yDiff = Math.Abs(holeDic[i][1] - holeDic[j][1]);
-                        var holeDepth = holeDic[j][2] - holeDic[i][3];
-                        if (xDiff < 100 && yDiff < 100 && holeDepth > 0 && holeDepth < storey.top_elevation-storey.bottom_elevation)
+                        var storey = Buildingstoreys[UniComponents[i].floor_num];
+                        UniComponents[i].properties.Add("Length", UniComponents[i].x_len.ToString());
+                        UniComponents[i].properties.Add("Width", holeDepthDic[holeIdDic[i]].ToString());
+                        UniComponents[i].properties.Add("Height", UniComponents[i].y_len.ToString());
+
+                        foreach (var j in holeDic.Keys)
                         {
-                            var storeyj = Buildingstoreys[UniComponents[j].floor_num];
-                            UniComponents[i].properties.Add("LLHeight", (holeDic[j][2]- holeDic[i][3]).ToString());
-                            UniComponents[i].properties.Add("LLElevation", (UniComponents[j].z_l - storeyj.bottom_elevation).ToString());
-                            break;
+                            if (j <= i) continue;
+                            var xDiff = Math.Abs(holeDic[i][0] - holeDic[j][0]);
+                            var yDiff = Math.Abs(holeDic[i][1] - holeDic[j][1]);
+                            var holeDepth = holeDic[j][2] - holeDic[i][3];
+                            if (xDiff < 100 && yDiff < 100 && holeDepth > 0 && holeDepth < storey.top_elevation - storey.bottom_elevation)
+                            {
+                                var storeyj = Buildingstoreys[UniComponents[j].floor_num];
+                                UniComponents[i].properties.Add("LLHeight", (holeDic[j][2] - holeDic[i][3]).ToString());
+                                UniComponents[i].properties.Add("LLElevation", (UniComponents[j].z_l - storeyj.bottom_elevation).ToString());
+                                break;
+                            }
+                        }
+                        if (!UniComponents[i].properties.ContainsKey("LLHeight"))
+                        {
+                            UniComponents[i].properties.Add("LLHeight", (storey.top_elevation - UniComponents[i].z_r).ToString());
+                            UniComponents[i].properties.Add("LLElevation", "");
                         }
                     }
-                    if(!UniComponents[i].properties.ContainsKey("LLHeight"))
+                    catch(Exception ex)
                     {
-                        UniComponents[i].properties.Add("LLHeight", (storey.top_elevation - UniComponents[i].z_r).ToString());
-                        UniComponents[i].properties.Add("LLElevation", "");
+                        ;
                     }
+                    
                 }
             }
         }

@@ -82,6 +82,7 @@ namespace THBimEngine.Domain.GeneratorModel
             var holeDic = new Dictionary<int, List<double>>();
             var holeDepthDic = new Dictionary<string, double>();
             var holeIdDic = new Dictionary<int, string>();
+            var holeFloorDic = new Dictionary<int, int>();
 
             foreach (var building in buildings)
             {
@@ -117,14 +118,15 @@ namespace THBimEngine.Domain.GeneratorModel
                                         if (!item.Name.ToString().Contains("Wall_Hole"))
                                             continue;
                                         holeIdDic.Add(uniComponentIndex, item.GlobalId);
+                                        holeFloorDic.Add(uniComponentIndex, floorPara.Num);
                                     }
                                     else
                                     {
                                         if (!((Xbim.Ifc2x3.Kernel.IfcRoot)item).FriendlyName.Contains("Wall_Hole"))
                                             continue;
                                         holeIdDic.Add(uniComponentIndex, item.GlobalId);
+                                        holeFloorDic.Add(uniComponentIndex, floorPara.Num);
                                     }
-                           
                                 }
                                 catch
                                 {
@@ -240,7 +242,7 @@ namespace THBimEngine.Domain.GeneratorModel
                             var xDiff = Math.Abs(holeDic[i][0] - holeDic[j][0]);
                             var yDiff = Math.Abs(holeDic[i][1] - holeDic[j][1]);
                             var holeDepth = holeDic[j][2] - holeDic[i][3];
-                            if (xDiff < 100 && yDiff < 100 && holeDepth > 0 && holeDepth < storey.top_elevation - storey.bottom_elevation)
+                            if (xDiff < 100 && yDiff < 100 && holeDepth > 0 && holeDepth < storey.top_elevation - storey.bottom_elevation && holeFloorDic[j] - holeFloorDic[i]==1)
                             {
                                 var storeyj = Buildingstoreys[UniComponents[j].floor_num];
                                 UniComponents[i].properties.Add("LLHeight", (holeDic[j][2] - holeDic[i][3]).ToString());
@@ -250,7 +252,8 @@ namespace THBimEngine.Domain.GeneratorModel
                         }
                         if (!UniComponents[i].properties.ContainsKey("LLHeight"))
                         {
-                            UniComponents[i].properties.Add("LLHeight", (storey.top_elevation - UniComponents[i].z_r).ToString());
+                            //UniComponents[i].properties.Add("LLHeight", (storey.top_elevation - UniComponents[i].z_r).ToString());
+                            UniComponents[i].properties.Add("LLHeight", "");
                             UniComponents[i].properties.Add("LLElevation", "");
                         }
                     }

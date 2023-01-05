@@ -164,6 +164,13 @@ namespace XbimXplorer
                     MessageBox.Show(msg, "操作提醒", MessageBoxButton.OK);
                     return;
                 }
+                hisPrj = projectFileManager.ProjectFileDBHelper.GetHisProjectFile(pProject.PrjId, subProject.PrjId, major, "SU", fileName, "", 0);
+                if (hisPrj != null)
+                {
+                    var msg = string.Format("项目文件名称【{0}】,已经存在，请选中文件右键更新", fileName);
+                    MessageBox.Show(msg, "操作提醒", MessageBoxButton.OK);
+                    return;
+                }
                 lableRemind.Content = "正在进行相应的操作（包含上传文件）,请耐心等待...";
                 gridRemind.Visibility = Visibility.Visible;
                 Refresh();

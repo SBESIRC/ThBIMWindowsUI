@@ -252,8 +252,7 @@ namespace THBimEngine.Domain.GeneratorModel
                         }
                         if (!UniComponents[i].properties.ContainsKey("LLHeight"))
                         {
-                            //UniComponents[i].properties.Add("LLHeight", (storey.top_elevation - UniComponents[i].z_r).ToString());
-                            UniComponents[i].properties.Add("LLHeight", "");
+                            UniComponents[i].properties.Add("LLHeight", (storey.top_elevation - UniComponents[i].z_r).ToString());
                             UniComponents[i].properties.Add("LLElevation", "");
                         }
                     }

@@ -13,12 +13,17 @@ namespace THBimEngine.IO
 
         public static Coordinate ToCoordinate(this XbimPoint3D xbimPoint)
         {
-            return new Coordinate(PM.MakePrecise(xbimPoint.X), PM.MakePrecise(xbimPoint.Z));
+            return new Coordinate(PM.MakePrecise(xbimPoint.X), PM.MakePrecise(xbimPoint.Y));
         }
 
         public static LineString ToLineString(this IEnumerable<XbimPoint3D> ds)
         {
             return GF.CreateLineString(ds.Select(o => o.ToCoordinate()).ToArray());
+        }
+
+        public static LinearRing ToLinearRing(this IEnumerable<XbimPoint3D> ds)
+        {
+            return GF.CreateLinearRing(ds.Select(o => o.ToCoordinate()).ToArray());
         }
     }
 }

@@ -147,7 +147,15 @@
     <PackageReference Include="NuGet.Core" Version="2.14.0" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="GfcClasses.net, Version=0.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\GFC2.0\GfcClasses.net.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="objectbuf.net, Version=0.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\GFC2.0\objectbuf.net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Concurrent" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -219,7 +227,23 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="CheckLocalFileServices.cs" />
+    <Compile Include="Deduct\Build2DModelService.cs" />
+    <Compile Include="Deduct\Engine\DeductEngineIfcVsIfc2.cs" />
+    <Compile Include="Deduct\Model\DeductGFCModel.cs" />
+    <Compile Include="Deduct\Model\GFCCeilingModel.cs" />
+    <Compile Include="Deduct\Model\GFCDoorModel.cs" />
+    <Compile Include="Deduct\Model\GFCElementModel.cs" />
+    <Compile Include="Deduct\Model\GFCFaceFloorFinishModel.cs" />
+    <Compile Include="Deduct\Model\GFCRoomModel.cs" />
+    <Compile Include="Deduct\Model\GFCSlabModel.cs" />
+    <Compile Include="Deduct\Model\GFCWallFaceFinishModel.cs" />
+    <Compile Include="Deduct\Model\GFCWallModel.cs" />
+    <Compile Include="Deduct\Model\GFCWindowModel.cs" />
+    <Compile Include="Deduct\ThModelToGFC2.cs" />
+    <Compile Include="Deduct\Engine\GFCConvertEngine.cs" />
+    <Compile Include="Deduct\Engine\GFCConvertEngine2.cs" />
     <Compile Include="Extensions\IFCReverse.cs" />
+    <Compile Include="Deduct\DeductService.cs" />
     <Compile Include="Project\BoolToVisibilty.cs" />
     <Compile Include="Business\RenderEngineToHome.cs" />
     <Compile Include="Commands\Fix.cs" />
@@ -320,6 +344,7 @@
     <Compile Include="ServiceIPConfig.cs" />
     <Compile Include="Project\ShowFileLink.cs" />
     <Compile Include="Project\ShowProjectFile.cs" />
+    <Compile Include="Deduct\Engine\DeductEngine.cs" />
     <Compile Include="ThBIMEngine\DataToEngine.cs" />
     <Compile Include="ThBIMEngine\ThBimCutData.cs" />
     <Compile Include="ThBIMEngine\ThYDBToIfcConvertService.cs" />
@@ -596,6 +621,7 @@
   <ItemGroup>
     <Resource Include="THBIM.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <Year>$([System.DateTime]::Now.ToString("yy"))</Year>

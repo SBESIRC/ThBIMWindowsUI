@@ -198,6 +198,12 @@
                 <MenuItem Header="构件数量统计" Click="MenuItem_Click" Width="90" HorizontalAlignment="Left" ToolTip="统计数量通过日志视图查看"
                       VerticalContentAlignment="Center"
                       HorizontalContentAlignment="Center"></MenuItem>
+                <!--<MenuItem Header="扣减demo" Click="MenuItem_Deduct_Click" Width="80" HorizontalAlignment="Left"
+                      VerticalContentAlignment="Center"
+                      HorizontalContentAlignment="Center"></MenuItem>
+                <MenuItem Header="扣减Open" Click="MenuItem_Deduct_Open_Click" Width="80" HorizontalAlignment="Left"
+                      VerticalContentAlignment="Center"
+                      HorizontalContentAlignment="Center"></MenuItem>-->
             </Menu>
             <Grid Grid.Column="1" x:Name="topPluginGrid" VerticalAlignment="Stretch">
                 <ItemsControl VerticalAlignment="Stretch" ItemsSource="{Binding TopPluginButtons,Mode=OneWay,NotifyOnSourceUpdated=True,UpdateSourceTrigger=PropertyChanged}">
@@ -220,7 +226,7 @@
                 </ItemsControl>
             </Grid>
         </Grid>
-        
+
         <Grid Grid.Row="1" x:Name="mainGrid">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"></ColumnDefinition>
@@ -295,7 +301,7 @@
                 </avalonDock:LayoutRoot>
             </avalonDock:DockingManager>
         </Grid>
-        
+
 
         <Grid Grid.Row="2" Margin="0,5" x:Name="CommandBox" Visibility="Collapsed" >
             <Grid.ColumnDefinitions>

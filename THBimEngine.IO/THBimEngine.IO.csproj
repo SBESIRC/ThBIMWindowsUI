@@ -31,6 +31,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GfcClasses.net">
+      <HintPath>..\GFC2.0\GfcClasses.net.dll</HintPath>
+    </Reference>
+    <Reference Include="objectbuf.net">
+      <HintPath>..\GFC2.0\objectbuf.net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -96,6 +102,9 @@
     <Compile Include="Geometry\ThXbimProtoBufExtension.cs" />
     <Compile Include="Geometry\ThXbimRay3D.cs" />
     <Compile Include="Geometry\XbimMesher.cs" />
+    <Compile Include="GFC2\THGFC2Extension.cs" />
+    <Compile Include="GFC2\ThBimToGFC2.cs" />
+    <Compile Include="GFC2\ThGFC2Document.cs" />
     <Compile Include="Ifc2x3\ThIFC2x3Factory.cs" />
     <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3BrepExtension.cs" />
     <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3Builder.cs" />
@@ -119,9 +128,13 @@
     <Compile Include="Ifc4\ThProtoBuf2IFC4Factory.cs" />
     <Compile Include="Ifc4\ThProtoBuf2IFCSolid3dExtension.cs" />
     <Compile Include="NTS\ThBimNTSExtension.cs" />
+    <Compile Include="NTS\ThCADCoreNTSSimplify.cs" />
+    <Compile Include="NTS\ThCoreNTSGeometryClipper.cs" />
     <Compile Include="NTS\ThIFCNTSExtension4.cs" />
     <Compile Include="NTS\ThIFCNTSSpatialIndex4.cs" />
+    <Compile Include="NTS\ThNTSSpatialIndex.cs" />
     <Compile Include="NTS\ThNTSIfcProductSpatialIndex.cs" />
+    <Compile Include="NTS\ThXbimNTSExtension.cs" />
     <Compile Include="ThBimXbimNTSMarshal.cs" />
     <Compile Include="Xbim\ThXbimBrepExtension.cs" />
     <Compile Include="Xbim\ThXbimGeometryService.cs" />
@@ -130,7 +143,6 @@
     <Compile Include="NTS\ThIFCNTSFixedPrecision.cs" />
     <Compile Include="NTS\ThIFCNTSService.cs" />
     <Compile Include="NTS\ThIFCNTSSpatialIndex.cs" />
-    <Compile Include="NTS\ThNTSIfcProfileDefExtension.cs" />
     <Compile Include="NTS\ThNTSOperation.cs" />
     <Compile Include="NTS\ThTCHNTSExtension.cs" />
     <Compile Include="NTS\ThTCHNTSOperation.cs" />

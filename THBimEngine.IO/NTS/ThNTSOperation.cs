@@ -1,7 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
-
+using NetTopologySuite.Algorithm;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Mathematics;
 
@@ -132,6 +132,24 @@ namespace ThBIMServer.NTS
             {
                 // 首尾端点不一致的情况
                 return ThIFCNTSService.Instance.GeometryFactory.CreateLineString(points.ToArray());
+            }
+        }
+
+        public static Coordinate GetCenter(this Coordinate point1, Coordinate point2)
+        {
+            return new Coordinate((point1.X + point2.X) / 2, (point1.Y + point2.Y) / 2);
+        }
+
+        public static Polygon ToObb(this Geometry geom)
+        {
+            var rectangle = MinimumDiameter.GetMinimumRectangle(geom);
+            if (rectangle is Polygon polygon)
+            {
+                return polygon;
+            }
+            else
+            {
+                throw new NotSupportedException();
             }
         }
 

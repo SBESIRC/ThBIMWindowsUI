@@ -140,7 +140,7 @@ namespace THBimEngine.Application
             HaveChange = true;
         }
 
-        
+
         private void UpdateProject(THDocument currentDocument, ConvertResult projectResult)
         {
             var prjId = projectResult.BimProject.Uid;

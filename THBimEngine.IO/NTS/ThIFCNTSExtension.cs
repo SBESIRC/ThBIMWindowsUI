@@ -4,8 +4,15 @@ using System.Linq;
 
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Mathematics;
-
+using NetTopologySuite.Operation.Buffer;
+using THBimEngine.Domain;
+using THBimEngine.IO.Geometry;
+using THBimEngine.IO.NTS;
+using THBimEngine.IO.Xbim;
+using Xbim.Ifc2x3.GeometricConstraintResource;
+using Xbim.Ifc2x3.GeometricModelResource;
 using Xbim.Ifc2x3.GeometryResource;
+using Xbim.Ifc2x3.Kernel;
 using Xbim.Ifc2x3.ProfileResource;
 
 namespace ThBIMServer.NTS
@@ -45,6 +52,23 @@ namespace ThBIMServer.NTS
             {
                 throw new NotImplementedException();
             }
+        }
+
+        public static Polygon ToNTSPolygon(this IfcProduct ifcElement)
+        {
+            var body = ifcElement.Representation.Representations[0].Items[0];
+            if (body is IfcExtrudedAreaSolid extrudedAreaSolid)
+            {
+                var dir = extrudedAreaSolid.ExtrudedDirection;
+                if (dir.X == 0 && dir.Y == 0 && dir.Z == 1)
+                {
+                    var profile = extrudedAreaSolid.SweptArea;
+                    var placement = ifcElement.ObjectPlacement as IfcLocalPlacement;
+                    var face = profile.ToXbimFace(placement);
+                    return face.ToPolygon();
+                }
+            }
+            return ThXbimGeometryAnalyzer.ElementBottomFace(ifcElement).ToPolygon();
         }
 
         //public static Polygon ToNTSPolygon(this IfcCurve curve, IfcAxis2Placement placement)
@@ -220,6 +244,101 @@ namespace ThBIMServer.NTS
             }
         }
 
+        /// <summary>
+        /// 目前只支持拉伸体且z 0，0，1情况
+        /// </summary>
+        /// <param name="ifcElement"></param>
+        /// <param name="ZValue"></param>
+        /// <param name="ZDir"></param>
+        public static void GetExtrudedDepth(this IfcProduct ifcElement, out double ZValue, out Vector3D ZDir)
+        {
+            ZDir = new Vector3D(0, 0, 1);
+            ZValue = 0;
+            var body = ifcElement.Representation.Representations[0].Items[0];
+            if (body is IfcExtrudedAreaSolid extrudedAreaSolid)
+            {
+                var dir = extrudedAreaSolid.ExtrudedDirection;
+                if (dir.X == 0 && dir.Y == 0 && dir.Z == 1)
+                {
+                    ZDir = new Vector3D(dir.X, dir.Y, dir.Z);
+                    ZValue = extrudedAreaSolid.Depth;
+                }
+            }
+        }
+
+        public static Tuple<Polygon, double, double> AnalyzeIfcProduct(this IfcProduct ifcElement)
+        {
+            Polygon outLine;
+            double height, globalZ;
+            var body = ifcElement.Representation.Representations[0].Items[0];
+            if (body is IfcExtrudedAreaSolid extrudedAreaSolid)
+            {
+                var dir = extrudedAreaSolid.ExtrudedDirection;
+                if (dir.X == 0 && dir.Y == 0 && dir.Z == 1)
+                {
+                    var profile = extrudedAreaSolid.SweptArea;
+                    var placement = ifcElement.ObjectPlacement as IfcLocalPlacement;
+                    var face = profile.ToXbimFace(placement);
+                    outLine =  face.ToPolygon();
+                    height = extrudedAreaSolid.Depth;
+                    globalZ = face.OuterBound.Points.First().Z;
+                    return (outLine, height, globalZ).ToTuple();
+                }
+            }
+            var xbimSolid = ThXbimGeometryAnalyzer.CreatXbimSolid(body, ifcElement.ObjectPlacement);
+            var bottomFace = ThXbimGeometryAnalyzer.ElementBottomFace(xbimSolid);
+            outLine =  bottomFace.ToPolygon();
+            var pts = xbimSolid.Vertices.Select(o => o.VertexGeometry);
+            var min_Z = pts.Min(o => o.Z);
+            var max_Z = pts.Max(o => o.Z);
+            height = max_Z - min_Z;
+            globalZ = min_Z;
+            return (outLine, height, globalZ).ToTuple();
+        }
+
+        public static List<Geometry> ToGeometryCollection(this Geometry geometry, bool keepHoles = false)
+        {
+            return geometry.ToDbObjects();
+        }
+
+        public static List<LineString> ToLines(this LineString polyline)
+        {
+            var simplyPL = polyline;//.DPSimplify(10);
+            List<LineString> result = new List<LineString>();
+            var pts = simplyPL.Coordinates;
+            for (int i = 0; i < simplyPL.Count - 1; i++)
+            {
+                result.Add(pts.Skip(i).Take(2).ToList().CreateLineString());
+            }
+            return result;
+        }
+
+        public static Polygon NTSBuffer(this Polygon polygon, double length)
+        {
+            return polygon.Buffer(length, new BufferParameters()
+            {
+                JoinStyle = JoinStyle.Mitre,
+            }) as Polygon;
+        }
+
+        public static void GetGlobleZ(this IfcProduct ifcElement, out double ZHight)
+        {
+            ZHight = 0;
+            var body = ifcElement.Representation.Representations[0].Items[0];
+            if (body is IfcExtrudedAreaSolid extrudedAreaSolid)
+            {
+                var dir = extrudedAreaSolid.ExtrudedDirection;
+                if (dir.X == 0 && dir.Y == 0 && dir.Z == 1)
+                {
+                    var placement = ifcElement.ObjectPlacement as IfcLocalPlacement;
+                    ToTransInfo(placement.RelativePlacement, out var offset, out var offsetV);
+                    var point = new CoordinateZ(0, 0, 0);
+                    var transPt = ThNTSOperation.TransP(point, offsetV, offset);
+                    ZHight = transPt.Z;
+                }
+            }
+        }
+
         //private static List<Coordinate> GetOutterNTS(this IfcRectangleProfileDef rectangleProfile)
         //{
         //    var points = new List<Coordinate>();
@@ -350,8 +469,42 @@ namespace ThBIMServer.NTS
             return points;
         }
 
-
-
-
+        public static List<Geometry> ToDbObjects(this Geometry geometry)
+        {
+            var objs = new List<Geometry>();
+            if (geometry is LineString lineString)
+            {
+                objs.Add(lineString);
+            }
+            else if (geometry is LinearRing linearRing)
+            {
+                objs.Add(linearRing);
+            }
+            else if (geometry is Polygon polygon)
+            {
+                objs.Add(polygon);
+            }
+            else if (geometry is Point point)
+            {
+                objs.Add(point);
+            }
+            else if (geometry is MultiLineString lineStrings)
+            {
+                lineStrings.Geometries.ForEach(g => objs.AddRange(g.ToDbObjects()));
+            }
+            else if (geometry is MultiPolygon polygons)
+            {
+                polygons.Geometries.ForEach(g => objs.AddRange(g.ToDbObjects()));
+            }
+            else if (geometry is GeometryCollection geometries)
+            {
+                geometries.Geometries.ForEach(g => objs.AddRange(g.ToDbObjects()));
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
+            return objs;
+        }
     }
 }

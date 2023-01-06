@@ -52,5 +52,13 @@ namespace THBimEngine.Domain
             var min_Y = points.Min(o => o.Y);
             return new XbimPoint3D((max_X + min_X) / 2, (max_Y + min_Y) / 2, points.First().Z);
         }
+
+        public static bool IsLeftPt(this XbimPoint3D pt,XbimPoint3D pt1, XbimPoint3D pt2)
+        {
+            XbimVector3D vector = pt2 - pt1;
+            var leftvector = ZAxis.CrossProduct(vector);
+            var ptVector = pt - pt1;
+            return ptVector.Angle(leftvector) < Math.PI / 2;
+        }
     }
 }

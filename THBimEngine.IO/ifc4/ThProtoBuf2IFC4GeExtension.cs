@@ -1,0 +1,139 @@
+﻿using Xbim.Ifc;
+using Xbim.Common.Geometry;
+using Xbim.Ifc4.ProfileResource;
+using Xbim.Ifc4.GeometryResource;
+using Xbim.Ifc4.GeometricModelResource;
+using Xbim.Ifc4.GeometricConstraintResource;
+
+using ThBIMServer.Geometries;
+
+namespace ThBIMServer.Ifc4
+{
+    public static class ThProtoBuf2IFC4GeExtension
+    {
+        public static IfcCartesianPoint ToIfcCartesianPoint(this IfcStore model, ThTCHPoint3d point)
+        {
+            return model.Instances.New<IfcCartesianPoint>(c =>
+            {
+                c.SetXYZ(point.X, point.Y, point.Z);
+            });
+        }
+
+        public static IfcCartesianPoint ToIfcCartesianPoint(this IfcStore model, XbimPoint3D point)
+        {
+            return model.Instances.New<IfcCartesianPoint>(c =>
+            {
+                c.SetXYZ(point.X, point.Y, point.Z);
+            });
+        }
+
+        public static IfcLocalPlacement ToIfcLocalPlacement(this IfcStore model,
+            IfcObjectPlacement relative_to = null)
+        {
+            var cs = ThXbimCoordinateSystem3D.Identity;
+            return model.Instances.New<IfcLocalPlacement>(l =>
+            {
+                l.PlacementRelTo = relative_to;
+                l.RelativePlacement = model.ToIfcAxis2Placement3D(cs);
+            });
+        }
+
+        public static IfcLocalPlacement ToIfcLocalPlacement(this IfcStore model,
+            ThTCHMatrix3d matrix, IfcObjectPlacement relative_to = null)
+        {
+            return model.Instances.New<IfcLocalPlacement>(l =>
+            {
+                l.PlacementRelTo = relative_to;
+                l.RelativePlacement = model.ToIfcAxis2Placement3D(matrix);
+            });
+        }
+
+        public static IfcLocalPlacement ToIfcLocalPlacement(this IfcStore model,
+           XbimMatrix3D matrix, IfcObjectPlacement relative_to = null)
+        {
+            return model.Instances.New<IfcLocalPlacement>(l =>
+            {
+                l.PlacementRelTo = relative_to;
+                l.RelativePlacement = model.ToIfcAxis2Placement3D(matrix);
+            });
+        }
+
+        public static IfcLocalPlacement ToIfcLocalPlacement(this IfcStore model,
+            ThTCHPoint3d origin, IfcObjectPlacement relative_to = null)
+        {
+            return model.Instances.New<IfcLocalPlacement>(l =>
+            {
+                l.PlacementRelTo = relative_to;
+                l.RelativePlacement = model.ToIfcAxis2Placement3D(origin.ToXbimPoint3D());
+            });
+        }
+
+        public static IfcDirection ToIfcDirection(this IfcStore model, XbimVector3D vector)
+        {
+            return model.Instances.New<IfcDirection>(d =>
+            {
+                d.SetXYZ(vector.X, vector.Y, vector.Z);
+            });
+        }
+
+        public static IfcExtrudedAreaSolid ToIfcExtrudedAreaSolid(this IfcStore model,
+            IfcProfileDef profile, XbimVector3D direction, double depth)
+        {
+            return model.Instances.New<IfcExtrudedAreaSolid>(s =>
+            {
+                s.Depth = depth;
+                s.SweptArea = profile;
+                s.ExtrudedDirection = model.ToIfcDirection(direction);
+                s.Position = model.ToIfcAxis2Placement3D(XbimPoint3D.Zero);
+            });
+        }
+
+        public static IfcAxis2Placement3D ToIfcAxis2Placement3D(this IfcStore model,
+            XbimPoint3D point)
+        {
+            return model.Instances.New<IfcAxis2Placement3D>(p =>
+            {
+                p.Location = model.ToIfcCartesianPoint(point);
+            });
+        }
+
+        public static IfcAxis2Placement2D ToIfcAxis2Placement2D(this IfcStore model,
+            XbimPoint3D point)
+        {
+            return model.Instances.New<IfcAxis2Placement2D>(p =>
+            {
+                p.Location = model.ToIfcCartesianPoint(point);
+            });
+        }
+
+        public static IfcAxis2Placement2D ToIfcAxis2Placement2D(this IfcStore model,
+            XbimPoint3D point, XbimVector3D direction)
+        {
+            return model.Instances.New<IfcAxis2Placement2D>(p =>
+            {
+                p.Location = model.ToIfcCartesianPoint(point);
+                p.RefDirection = model.ToIfcDirection(direction);
+            });
+        }
+
+        private static IfcAxis2Placement3D ToIfcAxis2Placement3D(this IfcStore model, ThTCHMatrix3d m)
+        {
+            return model.ToIfcAxis2Placement3D(new ThXbimCoordinateSystem3D(m));
+        }
+
+        private static IfcAxis2Placement3D ToIfcAxis2Placement3D(this IfcStore model, XbimMatrix3D m)
+        {
+            return model.ToIfcAxis2Placement3D(new ThXbimCoordinateSystem3D(m));
+        }
+
+        private static IfcAxis2Placement3D ToIfcAxis2Placement3D(this IfcStore model, ThXbimCoordinateSystem3D cs)
+        {
+            return model.Instances.New<IfcAxis2Placement3D>(p =>
+            {
+                p.Axis = model.ToIfcDirection(cs.CS.ZAxis.ToXbimVector3D());
+                p.RefDirection = model.ToIfcDirection(cs.CS.XAxis.ToXbimVector3D());
+                p.Location = model.ToIfcCartesianPoint(cs.CS.Origin.ToXbimPoint3D());
+            });
+        }
+    }
+}

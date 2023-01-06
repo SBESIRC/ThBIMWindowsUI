@@ -23,7 +23,7 @@ using THBimEngine.Domain;
 using THBimEngine.Geometry;
 using ThBIMServer.Ifc4;
 
-namespace THBimEngine.IO.ifc4
+namespace ThBIMServer.Ifc4
 {
     public static class ThProtoBuf2IFC4Factory
     {

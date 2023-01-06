@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using THBimEngine.Application;
 using THBimEngine.Domain;
-using THBimEngine.IO.ifc4;
 using ThBIMServer.Ifc2x3;
 using ThBIMServer.Ifc4;
 using Xbim.Common;

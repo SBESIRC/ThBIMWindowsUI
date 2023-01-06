@@ -7,7 +7,6 @@ using Xbim.Ifc;
 using Xbim.Ifc4.ProductExtension;
 using Xbim.Ifc4.SharedBldgElements;
 using System.Linq;
-using THBimEngine.IO.ifc4;
 
 namespace ThBIMServer.Ifc4
 {

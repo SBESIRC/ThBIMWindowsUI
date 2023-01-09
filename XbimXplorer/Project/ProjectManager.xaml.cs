@@ -634,6 +634,8 @@ namespace XbimXplorer
                     //别人占用的,没有任何修改的权限
                 }
             }
+            if (contextMenu.Items.Count < 1)
+                return;
             dGrid.ContextMenu = contextMenu;
         }
 

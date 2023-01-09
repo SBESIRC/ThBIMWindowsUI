@@ -244,6 +244,14 @@
     <Compile Include="Deduct\Engine\GFCConvertEngine2.cs" />
     <Compile Include="Extensions\IFCReverse.cs" />
     <Compile Include="Deduct\DeductService.cs" />
+    <Compile Include="Extensions\ModelConvert\IIfcModelConverter.cs" />
+    <Compile Include="Extensions\ModelConvert\ThIfc2X3ModelConverter.cs" />
+    <Compile Include="Extensions\ModelConvert\ThIfc4ModelConverter.cs" />
+    <Compile Include="Extensions\ModelConvert\ThModelConvertService.cs" />
+    <Compile Include="Extensions\ModelMerge\IIfcModelMerger.cs" />
+    <Compile Include="Extensions\ModelMerge\ThIfc2X3ModelMerger.cs" />
+    <Compile Include="Extensions\ModelMerge\ThIfc4ModelMerger.cs" />
+    <Compile Include="Extensions\ModelMerge\ThIfcModelMergeUtils.cs" />
     <Compile Include="Project\BoolToVisibilty.cs" />
     <Compile Include="Business\RenderEngineToHome.cs" />
     <Compile Include="Commands\Fix.cs" />

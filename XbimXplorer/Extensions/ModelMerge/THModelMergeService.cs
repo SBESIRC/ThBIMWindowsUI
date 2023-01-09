@@ -13,6 +13,12 @@ namespace XbimXplorer.Extensions.ModelMerge
 {
     public class THModelMergeService
     {
+        /// <summary>
+        /// 和模（两个Ifc文件）
+        /// </summary>
+        /// <param name="filePath1"></param>
+        /// <param name="filePath2"></param>
+        /// <returns></returns>
         public IfcStore ModelMerge(string filePath1, string filePath2)
         {
             var model = IfcStore.Open(filePath1);
@@ -28,10 +34,10 @@ namespace XbimXplorer.Extensions.ModelMerge
         }
 
         /// <summary>
-        /// IFC合模
+        /// 和模（两个IfcStore)
         /// </summary>
-        /// <param name="bigModel">95%ifc</param>
-        /// <param name="smallModel">5%ifc</param>
+        /// <param name="model"></param>
+        /// <param name="smallModel"></param>
         /// <returns></returns>
         public IfcStore ModelMerge(IfcStore model, IfcStore smallModel)
         {
@@ -175,6 +181,13 @@ namespace XbimXplorer.Extensions.ModelMerge
             return bigModel;
         }
 
+        /// <summary>
+        /// 和模（SU数据往Ifc数据）
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="suProject"></param>
+        /// <returns></returns>
+        /// <exception cref="NotSupportedException"></exception>
         public IfcStore ModelMerge(IfcStore model, ThSUProjectData suProject)
         {
             if(suProject == null || string.IsNullOrEmpty(model.FileName))
@@ -403,9 +416,6 @@ namespace XbimXplorer.Extensions.ModelMerge
             }
         }
 
-        /// <summary>
-        /// 结构和建筑合模(合模IFC内部的多个Site)
-        /// </summary>
         public IfcStore ModelMerge(THDocument currentDocument, IfcStore model)
         {
             var modelProject = model.Instances.FirstOrDefault<Xbim.Ifc2x3.Kernel.IfcProject>();

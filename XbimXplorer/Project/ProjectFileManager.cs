@@ -138,6 +138,8 @@ namespace XbimXplorer.Project
                 addPrjFile.MainFile = addPrjFile.FileInfos.Where(c => c.IsMainFile).FirstOrDefault();
                 addPrjFile.MainFileId = addPrjFile.MainFile != null ? addPrjFile.MainFile.ProjectFileId : "";
                 addPrjFile.LastUpdateTime = addPrjFile.MainFile.UploadTime;
+                addPrjFile.Uploader = addPrjFile.MainFile.Uploader;
+                addPrjFile.UploaderName = addPrjFile.MainFile.UploaderName;
                 addPrjFile.OpenFile = addPrjFile.MainFile.CanOpen ? addPrjFile.MainFile : addPrjFile.FileInfos.Where(c => c.CanOpen).FirstOrDefault();
                 res.Add(addPrjFile);
             }
@@ -933,10 +935,18 @@ namespace XbimXplorer.Project
             if (allRecords == null || allRecords.Count < 1)
                 return res;
             var allHisMainFileUplaods = ProjectFileDBHelper.GetDBProjectMainFiles(allRecords.Select(c => c.ProjectFileId).ToList());
+            bool isSu = appName.ToUpper() == "SU";
             //构造数据
             foreach (var mainItem in allRecords) 
             {
                 var mainHis = ProjectCommon.DBProjectFileToFileHistory(mainItem);
+                mainHis.CanChange = true;
+                if (mainHis.State != "已作废" && isSu) 
+                {
+                    mainHis.CanChange = false;
+                    if (!string.IsNullOrEmpty(mainHis.Occupier) && mainHis.Occupier == userId)
+                        mainHis.CanChange = true;
+                }
                 mainHis.NewState = mainHis.State;
                 //获取对应的历史，并按时间排序
                 var hisFiles = allHisMainFileUplaods.Where(c => c.ProjectFileId == mainItem.ProjectFileId).OrderBy(c => c.UploadTime).ToList();
@@ -946,6 +956,11 @@ namespace XbimXplorer.Project
                     his.ShowFileName = mainHis.MainFileName;
                     his.State = mainHis.State;
                     his.NewState = mainHis.State;
+                    his.CanChange = mainHis.CanChange;
+                    if (!his.CanChange && !string.IsNullOrEmpty(mainHis.Occupier)) 
+                    {
+                        his.NewState = "被占用";
+                    }
                     his.IsCurrentVersion = fileItem.IsDel == "0";
                     mainHis.FileHistoryDetails.Add(his);
                     if (his.IsCurrentVersion)
@@ -1002,6 +1017,66 @@ namespace XbimXplorer.Project
 
             }
             return isSuccess;
+        }
+        #endregion
+
+        #region 占用相关
+        public bool OccupyProjectFile(ShowProjectFile projectFileInfo) 
+        {
+            bool opRes = false;
+            var sqlDB = ProjectFileDBHelper.GetDBConnect();
+            try
+            {
+                //判断本机文件，是否在占用
+                bool canOccupied = true;
+                if (File.Exists(projectFileInfo.MainFile.FileLocalPath))
+                    canOccupied = !FileHelper.IsOccupied(projectFileInfo.MainFile.FileLocalPath);
+                if (!canOccupied)
+                    throw new Exception("本地文件被占用中，无法进行设置占用操作");
+                sqlDB.Ado.BeginTran();
+                ProjectFileDBHelper.OccupyProjectFile(sqlDB, userId, userName, projectFileInfo.ProjectFileId);
+                sqlDB.Ado.CommitTran();
+                //再次获取数据，判断结果
+                var newData = ProjectFileDBHelper.GetProjectFile(projectFileInfo.ProjectFileId);
+                if (null == newData || string.IsNullOrEmpty(newData.Occupier) || newData.Occupier != userId)
+                {
+                    throw new Exception("数据出出现错误");
+                }
+                opRes = true;
+            }
+            catch (Exception ex)
+            {
+                sqlDB.Ado.RollbackTran();
+                opRes = false;
+                MessageBox.Show(string.Format("占用失败，{0}", ex.Message), "操作提醒");
+            }
+            return opRes;
+        }
+        public bool UnOccupyProjectFile(ShowProjectFile projectFileInfo)
+        {
+            bool opRes = false;
+            var sqlDB = ProjectFileDBHelper.GetDBConnect();
+            try
+            {
+                //判断本机文件，是否在占用
+                sqlDB.Ado.BeginTran();
+                ProjectFileDBHelper.UnOccupyProjectFile(sqlDB,projectFileInfo.ProjectFileId);
+                sqlDB.Ado.CommitTran();
+                //再次获取数据，判断结果
+                var newData = ProjectFileDBHelper.GetProjectFile(projectFileInfo.ProjectFileId);
+                if (null == newData && !string.IsNullOrEmpty(newData.Occupier))
+                {
+                    throw new Exception("数据出出现错误");
+                }
+                opRes = true;
+            }
+            catch (Exception ex)
+            {
+                sqlDB.Ado.RollbackTran();
+                opRes = false;
+                MessageBox.Show(string.Format("解除占用失败，{0}", ex.Message), "操作提醒");
+            }
+            return opRes;
         }
         #endregion
     }

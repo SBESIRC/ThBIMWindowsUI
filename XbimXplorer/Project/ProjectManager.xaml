@@ -201,7 +201,7 @@
                           SelectedItem="{Binding YDBSelectProjectFile,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged,NotifyOnSourceUpdated=True}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="模型名称" Width="2*" Binding="{Binding ShowFileName}" IsReadOnly="True"></DataGridTextColumn>
-                        <DataGridTextColumn Header="上传人" Width="1*" Binding="{Binding OwnerName}" IsReadOnly="True"></DataGridTextColumn>
+                        <DataGridTextColumn Header="上传人" Width="1*" Binding="{Binding UploaderName}" IsReadOnly="True"></DataGridTextColumn>
                         <DataGridTextColumn Header="专业" Binding="{Binding MajorName}" IsReadOnly="True"  CanUserSort="False" CanUserResize="False"></DataGridTextColumn>
                         <DataGridTextColumn Header="更新时间" Width="130" Binding="{Binding LastUpdateTime,StringFormat='yyyy/MM/dd HH:mm:ss'}" IsReadOnly="True"></DataGridTextColumn>
                     </DataGrid.Columns>
@@ -233,13 +233,13 @@
                     <Label  Content="SU模型文件管理区" Grid.Row="0" Grid.Column="0"></Label>
                     <Button Content="历史记录" Grid.Column="1" Height="22" Width="70" VerticalContentAlignment="Center" Click="HistoryButton_Click" CommandParameter="SU"></Button>
                 </Grid>
-                <DataGrid Grid.Row="1" Margin="5" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" 
+                <DataGrid Grid.Row="1" Margin="5" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
+                          MouseRightButtonDown="ProjectFile_MouseRightButtonDown"
                           RowHeaderWidth="0" SelectionMode="Single"
                           ItemsSource="{Binding SuModels}"
                           SelectedItem="{Binding SUSelectProjectFile,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged,NotifyOnSourceUpdated=True}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="模型名称" Width="2*" Binding="{Binding ShowFileName}" IsReadOnly="True"></DataGridTextColumn>
-                        <DataGridTextColumn Header="上传人" Width="1*" Binding="{Binding OwnerName}" IsReadOnly="True"></DataGridTextColumn>
                         <DataGridTextColumn Header="占用人" Width="1*" Binding="{Binding OccupyName}" IsReadOnly="True"></DataGridTextColumn>
                         <DataGridTextColumn Header="专业" Binding="{Binding MajorName}" IsReadOnly="True"  CanUserSort="False" CanUserResize="False"></DataGridTextColumn>
                         <DataGridTextColumn Header="更新时间" Width="130" Binding="{Binding LastUpdateTime,StringFormat='yyyy/MM/dd HH:mm:ss'}" IsReadOnly="True"></DataGridTextColumn>
@@ -249,13 +249,6 @@
                             <EventSetter Event="MouseDoubleClick" Handler="Row_DoubleClick"/>
                         </Style>
                     </DataGrid.Resources>
-                    <DataGrid.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="更新" Click="UpdateFile_Click" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}},Path=PlacementTarget.SelectedItem}"></MenuItem>
-                            <MenuItem Header="作废" Click="DeleteFile_Click" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}},Path=PlacementTarget.SelectedItem}"></MenuItem>
-                            <MenuItem Header="上传服务器" Click="CheckAndUpdateFile" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}},Path=PlacementTarget.SelectedItem}"></MenuItem>
-                        </ContextMenu>
-                    </DataGrid.ContextMenu>
                 </DataGrid>
                 <Button Content="新建文件" x:Name="btnAddSUFile" Grid.Row="2" Height="25" Width="80" Margin="10,5,0,5" HorizontalAlignment="Left" Click="btnAddSUFile_Click"></Button>
             </Grid>
@@ -278,7 +271,7 @@
                           SelectedItem="{Binding IFCSelectProjectFile,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged,NotifyOnSourceUpdated=True}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="模型名称" Width="2*" Binding="{Binding ShowFileName}" IsReadOnly="True"></DataGridTextColumn>
-                        <DataGridTextColumn Header="上传人" Width="1*" Binding="{Binding OwnerName}" IsReadOnly="True"></DataGridTextColumn>
+                        <DataGridTextColumn Header="上传人" Width="1*" Binding="{Binding UploaderName}" IsReadOnly="True"></DataGridTextColumn>
                         <DataGridTextColumn Header="专业" Binding="{Binding MajorName}" IsReadOnly="True"  CanUserSort="False" CanUserResize="False"></DataGridTextColumn>
                         <DataGridTextColumn Header="更新时间" Width="130" Binding="{Binding LastUpdateTime,StringFormat='yyyy/MM/dd HH:mm:ss'}" IsReadOnly="True"></DataGridTextColumn>
                     </DataGrid.Columns>

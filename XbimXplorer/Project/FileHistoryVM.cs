@@ -174,6 +174,15 @@ namespace XbimXplorer.Project
                 this.RaisePropertyChanged();
             }
         }
+        public bool CanChange
+        {
+            get { return fileHistoryDetail.CanChange; }
+            set
+            {
+                fileHistoryDetail.CanChange = value;
+                this.RaisePropertyChanged();
+            }
+        }
         public string State
         {
             get { return fileHistoryDetail.State; }

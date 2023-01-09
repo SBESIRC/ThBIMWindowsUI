@@ -16,6 +16,7 @@ using Xbim.Common.Geometry;
 using Xbim.Ifc;
 using XbimXplorer.Extensions.ModelMerge;
 using XbimXplorer.ThBIMEngine;
+using System.Windows;
 
 namespace XbimXplorer
 {
@@ -292,6 +293,11 @@ namespace XbimXplorer
                         Log.Info("SU端数据和当前打开的项目不是同一项目,数据已丢弃");
                         continue;
                     }
+                    if (string.IsNullOrEmpty(prjFile.OccupyId) || prjFile.OccupyId != loginUser.UserLogin.Username) 
+                    {
+                        MessageBox.Show("当前SU文件为非占用状态，数据已丢弃");
+                        continue;
+                    }
                     var dir = Path.GetDirectoryName(ProjectPath);
                     var fileNameNoExt = Path.GetFileNameWithoutExtension(ProjectPath);
                     var ifcPath = Path.Combine(dir, fileNameNoExt + ".ifc");
@@ -345,6 +351,8 @@ namespace XbimXplorer
                         ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.BuildIfcModel(Model, project);
                         ThBIMServer.Ifc2x3.ThProtoBuf2IFC2x3Builder.SaveIfcModel(Model, ifcPath);
                         Model.Dispose();
+                        //IFC保存成功，触发检查服务
+                        CheckLocalFileServices.Instance.ForceUpdateProjectFile(prjFile);
                     }
                     foreach (var link in fileLinks) 
                     {

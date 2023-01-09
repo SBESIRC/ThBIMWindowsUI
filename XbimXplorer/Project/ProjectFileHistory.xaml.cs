@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace XbimXplorer.Project
 {
@@ -49,15 +50,29 @@ namespace XbimXplorer.Project
             fileHistoryVM.FilterByFileName(filterName);
         }
 
-        private void DataGrid_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        private void DataGrid_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
             DataGrid dGrid = (DataGrid)sender;
             if (dGrid == null)
                 return;
-            var rowData = dGrid.SelectedItem as FileHistoryDetailVM;
-            if (null == rowData)
+            dGrid.ContextMenu = null;
+            //这个时候datagrid的选中项还没有改变，不能通过选中项来处理
+            // 获取坐标
+            Point p = e.GetPosition((ItemsControl)sender);
+            //  通过指定 Point 返回命中测试的最顶层 Visual 对象。                                               
+            HitTestResult htr = VisualTreeHelper.HitTest((ItemsControl)sender, p);
+            TextBlock o = htr.VisualHit as TextBlock;
+            FileHistoryDetailVM fileHistory = null;
+            if (o != null)
+            {
+                DataGridRow dgr = GetParentObject<DataGridRow>(o) as DataGridRow;
+                fileHistory = dgr.DataContext as FileHistoryDetailVM;
+                dgr.Focus();
+                dgr.IsSelected = true;
+            }
+            if (null == fileHistory || !fileHistory.CanChange)
                 return;
-            if (rowData.NewState == "已作废")
+            if (fileHistory.NewState == "已作废")
             {
                 ContextMenu aMenu = new ContextMenu();
                 MenuItem syncMenu = new MenuItem();
@@ -140,6 +155,20 @@ namespace XbimXplorer.Project
                 }
             }
             return changed;
+        }
+        private T GetParentObject<T>(DependencyObject obj) where T : FrameworkElement
+        {
+            DependencyObject parent = VisualTreeHelper.GetParent(obj);
+
+            while (parent != null)
+            {
+                if (parent is T)
+                {
+                    return (T)parent;
+                }
+                parent = VisualTreeHelper.GetParent(parent);
+            }
+            return null;
         }
     }
 }

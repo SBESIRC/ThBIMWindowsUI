@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Threading;
 using THBimEngine.Common;
 using THBimEngine.Domain;
@@ -211,7 +212,7 @@ namespace XbimXplorer
             var fileInfo = dGridRow.DataContext as ShowProjectFile;
             CheckLocalFileAndOpen(fileInfo);
         }
-        private void CheckLocalFileAndOpen(ShowProjectFile fileInfo) 
+        private void CheckLocalFileAndOpen(ShowProjectFile fileInfo,bool openFile =true) 
         {
             if (fileInfo == null)
                 return;
@@ -220,7 +221,11 @@ namespace XbimXplorer
                 lableRemind.Content = "正在检查项目相应的文件（包含下载）,请耐心等待...";
                 gridRemind.Visibility = Visibility.Collapsed;
                 Refresh();
-                var checkMD5 = fileInfo.ApplcationName != EApplcationName.SU;
+                var checkMD5 = true;
+                if (fileInfo.ApplcationName == EApplcationName.SU) 
+                {
+                    checkMD5 = (string.IsNullOrEmpty(fileInfo.OccupyId) || fileInfo.OccupyId != loginUser.UserLogin.Username);
+                }
                 //检查并下载文件
                 foreach (var item in fileInfo.FileInfos) 
                 {
@@ -231,10 +236,16 @@ namespace XbimXplorer
                 if (fileInfo.ApplcationName == EApplcationName.SU)
                 {
                     projectFileManager.FileLocalPathCheckAndDownload(fileInfo.MainFile, checkMD5);
-                    if (!File.Exists(fileInfo.MainFile.FileLocalPath))
-                        return;
-                    CheckLocalFileServices.Instance.AddCheckFile(fileInfo);
-                    OpenFile(fileInfo.MainFile.FileLocalPath);
+                    if(File.Exists(fileInfo.MainFile.FileLocalPath))
+                        File.SetAttributes(fileInfo.MainFile.FileLocalPath, FileAttributes.Normal);
+                    if (openFile) 
+                    {
+                        if (!File.Exists(fileInfo.MainFile.FileLocalPath))
+                            return;
+                        if (!checkMD5)
+                            CheckLocalFileServices.Instance.AddCheckFile(fileInfo);
+                        OpenFile(fileInfo.MainFile.FileLocalPath, checkMD5);
+                    }
                 }
                 else
                 {
@@ -285,12 +296,21 @@ namespace XbimXplorer
                 Refresh();
             }
         }
-        private void OpenFile(string filePath) 
+        private void OpenFile(string filePath,bool isReadOnly) 
         {
             if (string.IsNullOrEmpty(filePath))
                 return;
             if (!File.Exists(filePath))
                 return;
+            var attributes = File.GetAttributes(filePath);
+            if (isReadOnly)
+            {
+                File.SetAttributes(filePath, attributes | FileAttributes.ReadOnly);
+            }
+            else 
+            {
+                File.SetAttributes(filePath, FileAttributes.Normal);
+            }
             Process.Start(filePath);
         }
 
@@ -551,6 +571,142 @@ namespace XbimXplorer
             aMenu.Items.Add(syncMenu);
             prjDGrid.ContextMenu = aMenu;
         }
+        private void ProjectFile_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e) 
+        {
+            DataGrid dGrid = (DataGrid)sender;
+            if (dGrid == null)
+                return;
+            dGrid.ContextMenu = null;
+            //这个时候datagrid的选中项还没有改变，不能通过选中项来处理
+            // 获取坐标
+            Point p = e.GetPosition((ItemsControl)sender);
+            //  通过指定 Point 返回命中测试的最顶层 Visual 对象。                                               
+            HitTestResult htr = VisualTreeHelper.HitTest((ItemsControl)sender, p);
+            TextBlock o = htr.VisualHit as TextBlock;
+            if (o != null)
+            {
+                DataGridRow dgr = GetParentObject<DataGridRow>(o) as DataGridRow;
+                dgr.Focus();
+                dgr.IsSelected = true;
+            }
+            var rowData = dGrid.SelectedItem as ShowProjectFile;
+            if (null == rowData)
+                return;
+            ContextMenu contextMenu = new ContextMenu();
+            if (rowData.ApplcationName == EApplcationName.SU) 
+            {
+                //只有占用后才能进行修改操作
+                if (string.IsNullOrEmpty(rowData.OccupyId))
+                {
+                    //可以占用
+                    MenuItem occupyMenu = new MenuItem();
+                    occupyMenu.Header = "设置为占用状态";
+                    occupyMenu.Click += OccupyMenu_Click;
+                    occupyMenu.CommandParameter = rowData;
+                    contextMenu.Items.Add(occupyMenu);
+                }
+                else if (rowData.OccupyId == loginUser.UserLogin.Username)
+                {
+                    //自己占用的
+                    MenuItem unOccupyMenu = new MenuItem();
+                    unOccupyMenu.Header = "设置为共享状态";
+                    unOccupyMenu.Click += UnOccupyMenu_Click;
+                    unOccupyMenu.CommandParameter = rowData;
+                    contextMenu.Items.Add(unOccupyMenu);
+                    MenuItem updateMenu = new MenuItem();
+                    updateMenu.Header = "更新";
+                    updateMenu.Click += UpdateFile_Click;
+                    updateMenu.CommandParameter = rowData;
+                    contextMenu.Items.Add(updateMenu);
+                    MenuItem deleteMenu = new MenuItem();
+                    deleteMenu.Header = "作废";
+                    deleteMenu.Click += DeleteFile_Click;
+                    deleteMenu.CommandParameter = rowData;
+                    contextMenu.Items.Add(deleteMenu);
+                    MenuItem uploadMenu = new MenuItem();
+                    uploadMenu.Header = "上传服务器";
+                    uploadMenu.Click += CheckAndUpdateFile;
+                    uploadMenu.CommandParameter = rowData;
+                    contextMenu.Items.Add(uploadMenu);
+                }
+                else 
+                {
+                    //别人占用的,没有任何修改的权限
+                }
+            }
+            dGrid.ContextMenu = contextMenu;
+        }
+
+        private void UnOccupyMenu_Click(object sender, RoutedEventArgs e)
+        {
+            //结束占用，如果是SU,需要检查一遍本机文件和远端文件是否需要上传
+            var menuItem = sender as MenuItem;
+            var selectItem = menuItem.CommandParameter as ShowProjectFile;
+            if (selectItem == null || string.IsNullOrEmpty(selectItem.MainFile.FileLocalPath))
+                return;
+            try
+            {
+                bool canOccupied = true;
+                if (File.Exists(selectItem.MainFile.FileLocalPath))
+                    canOccupied = !FileHelper.IsOccupied(selectItem.MainFile.FileLocalPath);
+                if (!canOccupied)
+                {
+                    string msg = string.Format("本机文件【{0}】还在占用中，请先关闭打开的文件", selectItem.ShowFileName);
+                    MessageBox.Show(msg, "操作提醒", MessageBoxButton.OK);
+                    return;
+                }
+                var checkPrjId = selectItem.ProjectFileId;
+                projectVM.ChangeSelectSubProject();
+                var newPrjInfo = projectVM.subProjectAllFileModels.Where(c => c.ProjectFileId == checkPrjId).FirstOrDefault();
+                if (null == newPrjInfo)
+                    return;
+                if (projectFileManager.UnOccupyProjectFile(newPrjInfo))
+                {
+                    //解除占用成功,将本机文件检查并上传
+                    if (selectItem.ApplcationName == EApplcationName.SU)
+                    {
+                        CheckLocalFileServices.Instance.ForceUpdateProjectFile(newPrjInfo);
+                        CheckLocalFileServices.Instance.RemoveCheckFile(checkPrjId);
+                    }
+                }
+                projectVM.ChangeSelectSubProject();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("占用失败，{0}", ex.Message), "操作提醒", MessageBoxButton.OK);
+            }
+            finally { }
+            
+        }
+
+        private void OccupyMenu_Click(object sender, RoutedEventArgs e)
+        {
+            var menuItem = sender as MenuItem;
+            var selectItem = menuItem.CommandParameter as ShowProjectFile;
+            if (selectItem == null || string.IsNullOrEmpty(selectItem.MainFile.FileLocalPath))
+                return;
+            try
+            {
+                projectVM.ChangeSelectSubProject();
+                var checkPrjId = selectItem.ProjectFileId;
+                var newPrjInfo = projectVM.subProjectAllFileModels.Where(c => c.ProjectFileId == checkPrjId).FirstOrDefault();
+                if (null == newPrjInfo)
+                    return;
+                //newPrjInfo.OccupyId = loginUser.UserLogin.Username;
+                CheckLocalFileAndOpen(newPrjInfo, false);
+                //newPrjInfo.OccupyId = "";
+                projectFileManager.OccupyProjectFile(selectItem);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("占用失败，{0}", ex.Message), "操作提醒", MessageBoxButton.OK);
+            }
+            finally 
+            {
+                projectVM.ChangeSelectSubProject();
+            }
+            
+        }
 
         private void HistoryButton_Click(object sender, RoutedEventArgs e)
         {
@@ -595,6 +751,20 @@ namespace XbimXplorer
                 }
             }
             projectVM.ChangeSelectSubProject();
+        }
+        private T GetParentObject<T>(DependencyObject obj) where T : FrameworkElement
+        {
+            DependencyObject parent = VisualTreeHelper.GetParent(obj);
+
+            while (parent != null)
+            {
+                if (parent is T)
+                {
+                    return (T)parent;
+                }
+                parent = VisualTreeHelper.GetParent(parent);
+            }
+            return null;
         }
     }
     public enum OperateType

@@ -145,6 +145,8 @@ namespace XbimXplorer.Project
             }
             showPrjFile.OwnerId = projectMainFile.CreaterId;
             showPrjFile.OwnerName = projectMainFile.CreaterName;
+            showPrjFile.OccupyId = projectMainFile.Occupier;
+            showPrjFile.OccupyName = projectMainFile.OccupierName;
             return showPrjFile;
         }
         public static ShowProjectFile DBVProjectMainFileToProjectShowFile(DBVProjectMainDelFile projectDelFile)
@@ -177,6 +179,8 @@ namespace XbimXplorer.Project
             var fileHistory = new FileHistory();
             fileHistory.MainFileId = projectFile.ProjectFileId;
             fileHistory.MainFileName = projectFile.FileName;
+            fileHistory.Occupier = projectFile.Occupier;
+            fileHistory.OccupierName = projectFile.OccupierName;
             fileHistory.State = projectFile.IsDel == 0 ? "" : "已作废";
             fileHistory.FileHistoryDetails = new List<FileHistoryDetail>();
             return fileHistory;

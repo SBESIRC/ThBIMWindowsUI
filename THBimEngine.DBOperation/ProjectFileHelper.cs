@@ -131,6 +131,31 @@ namespace THBimEngine.DBOperation
                 return null;
             return res.FirstOrDefault();
         }
+        public void OccupyProjectFile(string uId, string uName, string prjFileId) 
+        {
+            DelHisProjectFile(GetDBConnect(), uId, uName, prjFileId);
+        }
+        public void OccupyProjectFile(SqlSugarProvider sqlDB, string uId, string uName, string prjFileId)
+        {
+            sqlDB.Updateable<DBProjectFile>().SetColumns(it =>
+                new DBProjectFile()
+                {
+                    Occupier = uId,
+                    OccupierName = uName,
+                })
+                .Where(it => it.ProjectFileId == prjFileId
+                && it.IsDel == 0).ExecuteCommand();
+        }
+        public void UnOccupyProjectFile(SqlSugarProvider sqlDB, string prjFileId)
+        {
+            sqlDB.Updateable<DBProjectFile>().SetColumns(it =>
+                new DBProjectFile()
+                {
+                    Occupier = "",
+                    OccupierName = "",
+                })
+                .Where(it => it.ProjectFileId == prjFileId).ExecuteCommand();
+        }
         public void DelHisProjectFile(string uId, string uName, string prjFileId)
         {
             DelHisProjectFile(GetDBConnect(), uId,uName, prjFileId);
@@ -145,6 +170,8 @@ namespace THBimEngine.DBOperation
                     UpdateTime = DateTime.Now,
                     UpdatedBy = uId,
                     UpdatedUserName = uName,
+                    Occupier ="",
+                    OccupierName ="",
                 })
                 .Where(it => it.ProjectFileId == prjFileId
                 && it.IsDel == 0).ExecuteCommand();

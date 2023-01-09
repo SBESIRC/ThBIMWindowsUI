@@ -23,7 +23,7 @@
         <DataGrid Grid.Row="1" 
                   CanUserAddRows="False" 
                   Background="White"
-                  MouseRightButtonDown="DataGrid_MouseRightButtonDown"
+                  MouseRightButtonUp="DataGrid_MouseRightButtonUp"
                   AutoGenerateColumns="False"
                   Margin="5"
                   Height="500"

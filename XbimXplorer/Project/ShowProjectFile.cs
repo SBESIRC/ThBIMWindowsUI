@@ -14,6 +14,8 @@ namespace XbimXplorer
         public string OwnerName { get; set; }
         public string OccupyId { get; set; }
         public string OccupyName { get; set; }
+        public string Uploader { get; set; }
+        public string UploaderName { get; set; }
         public FileDetail OpenFile { get; set; }
         public bool CanLink
         {

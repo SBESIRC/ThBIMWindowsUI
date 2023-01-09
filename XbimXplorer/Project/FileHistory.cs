@@ -13,6 +13,9 @@ namespace XbimXplorer.Project
         public string OldMainFileUplaodId { get; set; }
         public string NewMainFileUplaodId { get; set; }
         public string State { get; set; }
+        public string Occupier { get; set; }
+        public string OccupierName { get; set; }
+        public bool CanChange { get; set; }
         public string NewState { get; set; }
         public List<FileHistoryDetail> FileHistoryDetails { get; set; }
     }
@@ -25,6 +28,7 @@ namespace XbimXplorer.Project
         public string UploaderName { get; set; }
         public string ShowFileName { get; set; }
         public bool IsCurrentVersion { get; set; }
+        public bool CanChange { get; set; }
         public string State { get; set; }
         public string NewState { get; set; }
     }

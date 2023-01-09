@@ -65,7 +65,7 @@ namespace XbimXplorer.Deduct.Model
             {
                 if (_CenterLine == null)
                 {
-                    //初始值null， 计算过一次如果出错就是length=0的line
+                    //初始值null，计算过一次如果出错就是length=0的line
                     CalculateWidthCenterLineNew();
                 }
                 return _CenterLine;

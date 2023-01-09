@@ -1,21 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
 using Xbim.Ifc;
-using Xbim.Ifc2x3;
-using Xbim.Ifc2x3.GeometryResource;
-using Xbim.Ifc2x3.ProfileResource;
 using Xbim.Ifc2x3.ProductExtension;
 using Xbim.Ifc2x3.Kernel;
 using Xbim.Ifc2x3.SharedBldgElements;
-using Xbim.Ifc2x3.GeometricModelResource;
-using Xbim.Ifc2x3.GeometricConstraintResource;
-
-using ThBIMServer.NTS;
 using XbimXplorer.Deduct.Model;
+using ThBIMServer.NTS;
+using NetTopologySuite.Operation.OverlayNG;
+using NetTopologySuite.Geometries;
 
 namespace XbimXplorer.Deduct
 {
@@ -33,6 +27,7 @@ namespace XbimXplorer.Deduct
             ModelList = new Dictionary<string, DeductGFCModel>();
             BuildStruct2D();
             BuildArchi2D();
+            FixArchi2D();
         }
 
         private void BuildStruct2D()
@@ -111,6 +106,102 @@ namespace XbimXplorer.Deduct
                         ModelList.Add(roomModel.UID, roomModel);
                         dmStorey.ChildItems.Add(roomModel.UID);
                     }
+                }
+            }
+        }
+
+        private void FixArchi2D()
+        {
+            var building = ModelList.Where(x => x.Value.ItemType == DeductType.Building).ToList();
+            for (int i = 0; i < building.Count; i++)
+            {
+                var buildingPair = building[i];
+                var storeys = ModelList.Where(x => x.Value.ItemType == DeductType.ArchiStorey && buildingPair.Value.ChildItems.Contains(x.Key)).ToList();
+                storeys = storeys.OrderBy(x => x.Value.GlobalZ).ToList();
+                var tol_angleSA = 1 / 180.0 * Math.PI;
+                var tol_Simplify = 1;
+                var tol_tooSmallCut = 201;
+
+                for (int j = 0; j < storeys.Count; j++)
+                {
+                    var storeyPair = storeys[j];
+                    var storeyItemList = ModelList.Where(x => storeyPair.Value.ChildItems.Contains(x.Key)).Select(x => x.Value).ToList();
+                    var archiWallList = storeyItemList.Where(x => x.ItemType == DeductType.ArchiWall).ToList();
+
+                    var geometries = new List<NetTopologySuite.Geometries.Geometry>();
+                    archiWallList.ForEach(x => geometries.Add(x.Outline));
+                    var spatialIndex = new ThNTSSpatialIndex(geometries);
+
+                    var add = new List<DeductGFCModel>();
+                    var delete = new List<DeductGFCModel>();
+                    archiWallList.ForEach(wall =>
+                    {
+                        var geometies = new List<Polygon>();
+                        var filter = spatialIndex.SelectCrossingPolygon(wall.Outline);
+                        var archiWalls = archiWallList.Where(x => filter.Contains(x.Outline)).Except<DeductGFCModel>(new List<DeductGFCModel> { wall }).Where(x => x.Width - wall.Width > 10.0).Where(x => DeductService.IsParallelWall(x, wall, tol_angleSA)).ToList();
+                        if (archiWalls.Count == 0)
+                        {
+                            return;
+                        }
+                        var geomArchi = wall.Outline;
+                        var geomStructList = archiWalls.Select(x => x.Outline).ToList();
+
+                        var geomStructBufferList = archiWalls.Select(x => DeductService.BufferWall(x, wall, wall.Width, tol_angleSA)).ToList();
+                        var geomStructUnion = OverlayNGRobust.Union(geomStructBufferList);
+
+                        if (geomStructUnion.Contains(geomArchi))
+                        {
+                            delete.Add(wall);
+                        }
+                        else
+                        {
+                            var cutArchiWallPolyTemp = new List<Polygon>();
+                            var cutArchiWall = geomArchi.Difference(geomStructUnion);
+                            if (cutArchiWall is GeometryCollection collect)
+                            {
+                                cutArchiWallPolyTemp.AddRange(collect.Geometries.OfType<Polygon>().ToList());
+                            }
+                            else if (cutArchiWall is Polygon cutArchiWallpl)
+                            {
+                                cutArchiWallPolyTemp.Add(cutArchiWallpl);
+                            }
+
+                            var cutArchiWallPoly = new List<Polygon>();
+                            cutArchiWallPoly.AddRange(cutArchiWallPolyTemp.SelectMany(x => x.SimplifyPl(tol_Simplify)));
+
+                            var cutArchiWallNotSmall = new List<Polygon>();
+                            cutArchiWallNotSmall.AddRange(cutArchiWallPoly);
+                            var cutPolyObb = cutArchiWallNotSmall.Where(x => x.Coordinates.Count() > 0).Select(x => x.ToObb()).ToList();
+
+                            var cutPolyObbNotSmall = DeductService.RemoveTooSmallCutWallShortSide(cutPolyObb, tol_tooSmallCut);
+
+                            if (cutPolyObbNotSmall.Count == 0)
+                            {
+                                delete.Add(wall);
+                            }
+                            else
+                            {
+                                geometies.AddRange(cutPolyObbNotSmall);
+                                delete.Add(wall);
+                            }
+                        }
+
+                        if (geometies.Count > 0)
+                        {
+                            add.AddRange(DeductService.ToWallModel(wall, geometies));
+                        }
+                    });
+
+                    delete.ForEach(x =>
+                    {
+                        ModelList.Remove(x.UID);
+                        storeyPair.Value.ChildItems.Remove(x.UID);
+                    });
+                    add.ForEach(x =>
+                    {
+                        ModelList.Add(x.UID, x);
+                        storeyPair.Value.ChildItems.Add(x.UID);
+                    });
                 }
             }
         }

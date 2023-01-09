@@ -154,7 +154,7 @@ namespace XbimXplorer.Deduct
         /// <param name="cutArchiWallPoly"></param>
         /// <param name="tol"></param>
         /// <returns></returns>
-        private static List<Polygon> RemoveTooSmallCutWallShortSide(List<Polygon> cutArchiWallPoly, double tol)
+        public static List<Polygon> RemoveTooSmallCutWallShortSide(List<Polygon> cutArchiWallPoly, double tol)
         {
             var notsmall = new List<Polygon>();
 
@@ -201,7 +201,7 @@ namespace XbimXplorer.Deduct
         /// <param name="tol"></param>
         /// <param name="angleTol"></param>
         /// <returns></returns>
-        private static Polygon BufferWall(DeductGFCModel strucWall, DeductGFCModel archiWall, double tol, double angleTol)
+        public static Polygon BufferWall(DeductGFCModel strucWall, DeductGFCModel archiWall, double tol, double angleTol)
         {
             Polygon bufferWall = strucWall.Outline;
 
@@ -225,17 +225,15 @@ namespace XbimXplorer.Deduct
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="strucWall"></param>
-        /// <param name="archiWall"></param>
+        /// <param name="firstWall"></param>
+        /// <param name="secondWall"></param>
         /// <param name="angleTol">radian</param>
         /// <returns></returns>
-        private static bool IsParallelWall(DeductGFCModel strucWall, DeductGFCModel archiWall, double angleTol)
+        public static bool IsParallelWall(DeductGFCModel firstWall, DeductGFCModel secondWall, double angleTol)
         {
             var isParallel = false;
-
-
-            var swV = new Vector2D(strucWall.CenterLine.P0, strucWall.CenterLine.P1).Normalize();
-            var awV = new Vector2D(archiWall.CenterLine.P0, archiWall.CenterLine.P1).Normalize();
+            var swV = new Vector2D(firstWall.CenterLine.P0, firstWall.CenterLine.P1).Normalize();
+            var awV = new Vector2D(secondWall.CenterLine.P0, secondWall.CenterLine.P1).Normalize();
 
             var angle = swV.Angle(awV);
 
@@ -276,7 +274,7 @@ namespace XbimXplorer.Deduct
             return newWallModel;
         }
 
-        private static List<Polygon> SimplifyPl(this Polygon pl, double tol)
+        public static List<Polygon> SimplifyPl(this Polygon pl, double tol)
         {
             var plR = new List<Polygon>();
 

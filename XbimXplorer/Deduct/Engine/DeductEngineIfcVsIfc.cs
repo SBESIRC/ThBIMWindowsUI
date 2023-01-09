@@ -38,7 +38,7 @@ namespace XbimXplorer.Deduct
             var deductWall = DeductWall(structStorey, archiStorey, storeyWallDict);
             var wallCutResult = CutWall(deductWall);
 
-            UpdateRelationship(archiStorey, wallCutResult);
+            DeductCommonService.UpdateRelationship(ModelList, archiStorey, wallCutResult);
 
         }
 
@@ -76,7 +76,6 @@ namespace XbimXplorer.Deduct
         {
             var wallConflictDict = new Dictionary<string, Dictionary<DeductGFCModel, List<DeductGFCModel>>>();
 
-            //foreach (var aStorey in archiStorey)
             for (int i = 0; i < archiStorey.Count(); i++)
             {
                 var wChange = new Dictionary<DeductGFCModel, List<DeductGFCModel>>();
@@ -169,130 +168,19 @@ namespace XbimXplorer.Deduct
                         newWall.AddRange(DeductService.CutBimWallGeom(wallCutPair.Key, wallCutPair.Value, out onlyDelete, i, debugPrintPathStorey));
                     }
 
-
-                    //检查门窗
-                    var doorNewWallDict = new Dictionary<Polygon, List<DeductGFCModel>>();
-                    foreach (var door in wallCutPair.Key.ChildItems)
-                    {
-                        if (ModelList.TryGetValue(door, out var doorModel))
-                        {
-                            var checkContainNewWall = CheckDoorToNewWall(doorModel.Outline, newWall);
-
-                            if (checkContainNewWall != null)
-                            {
-                                //包含门窗的新墙
-                                if (doorNewWallDict.ContainsKey(checkContainNewWall) == false)
-                                {
-                                    doorNewWallDict.Add(checkContainNewWall, new List<DeductGFCModel>());
-                                }
-                                doorNewWallDict[checkContainNewWall].Add(doorModel);
-                            }
-                            else
-                            {
-                                //删除门窗和楼层关系写在后面updateRelationship
-
-                            }
-                        }
-                        else
-                        {
-                            //删除门窗和楼层关系写在后面updateRelationship
-                        }
-                    }
-
+                    var doorList = ModelList.Where(x => wallCutPair.Key.ChildItems.Contains(x.Key)).Select(x => x.Value).ToList();
+                    var doorNewWallDict = DeductCommonService.LinkDoorToNewWall(doorList, newWall);
 
                     var newWallModel = new List<DeductGFCModel>();
                     if (onlyDelete == false)
                     {
-                        newWallModel.AddRange(DeductService.ToWallModel(wallCutPair.Key, newWall));
-                        foreach (var nwModel in newWallModel)
-                        {
-                            var doorSelect = doorNewWallDict.Where(x => x.Key == nwModel.Outline).FirstOrDefault();
-                            if (doorSelect.Key != null)
-                            {
-                                doorSelect.Value.ForEach(x => nwModel.ChildItems.Add(x.UID));
-                            }
-                        }
+                        newWallModel.AddRange(DeductCommonService.CreateNewWall(wallCutPair.Key, newWall, doorNewWallDict));
                     }
                     wallCutDict.Add(wallCutPair.Key.UID, new Tuple<bool, List<DeductGFCModel>>(onlyDelete, newWallModel));
                 }
             }
 
             return wallCutDict;
-        }
-
-        /// <summary>
-        /// 返回新的包括门的墙，如果没有则为null
-        /// </summary>
-        /// <param name="doorModel"></param>
-        /// <param name="newWall"></param>
-        /// <returns></returns>
-        private static Polygon CheckDoorToNewWall(Polygon doorModel, List<Polygon> newWall)
-        {
-            Polygon containW = null;
-
-            foreach (var w in newWall)
-            {
-                var buffW = w.Buffer(1);
-                if (buffW.Contains(doorModel))
-                {
-                    containW = w;
-                    break;
-                }
-            }
-
-            return containW;
-        }
-
-        public void UpdateRelationship(List<DeductGFCModel> archiStorey, Dictionary<string, Tuple<bool, List<DeductGFCModel>>> wallCutResult)
-        {
-            foreach (var wallCut in wallCutResult)
-            {
-                var newWallList = wallCut.Value.Item2;
-                if (newWallList.Count > 0)
-                {
-                    var storeyHasOriWall = archiStorey.Where(x => x.ChildItems.Contains(wallCut.Key)).FirstOrDefault();
-                    if (storeyHasOriWall != null)
-                    {
-                        var wallOri = ModelList[wallCut.Key];
-                        var doorOriList = ModelList.Where(x => wallOri.ChildItems.Contains(x.Key)).Select(x => x.Value).ToList();
-                        var doorList = new List<DeductGFCModel>();
-                        foreach (var nw in newWallList)
-                        {
-                            storeyHasOriWall.ChildItems.Add(nw.UID);
-                            ModelList.Add(nw.UID, nw);
-                            doorList.AddRange(nw.ChildItems.Select(x => ModelList[x]));
-                        }
-                        var removeDoor = doorOriList.Except(doorList).ToList();
-
-                        storeyHasOriWall.ChildItems.Remove(wallCut.Key);
-                        ModelList.Remove(wallCut.Key);
-                        removeDoor.ForEach(x =>
-                        {
-                            storeyHasOriWall.ChildItems.Remove(x.UID);
-                            ModelList.Remove(x.UID);
-                        });
-                    }
-                }
-                else if (wallCut.Value.Item1 == true)
-                {
-                    //删掉墙
-                    var storeyHasOriWall = archiStorey.Where(x => x.ChildItems.Contains(wallCut.Key)).FirstOrDefault();
-                    if (storeyHasOriWall != null)
-                    {
-                        var wallOri = ModelList[wallCut.Key];
-                        var doorOriList = ModelList.Where(x => wallOri.ChildItems.Contains(x.Key)).Select(x => x.Value).ToList();
-
-                        storeyHasOriWall.ChildItems.Remove(wallCut.Key);
-                        ModelList.Remove(wallCut.Key);
-                        doorOriList.ForEach(x =>
-                        {
-                            storeyHasOriWall.ChildItems.Remove(x.UID);
-                            ModelList.Remove(x.UID);
-                        });
-
-                    }
-                }
-            }
         }
     }
 }

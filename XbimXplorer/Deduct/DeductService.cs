@@ -95,14 +95,14 @@ namespace XbimXplorer.Deduct
                 if (printC != -1)
                 {
                     var script = "";
-                    DebugScript(new List<Polygon> { geomArchi }, "l0wallOri", 0, printC, ref script);
-                    DebugScript(geomStructList, "l0wallStruc", 1, printC, ref script);
-                    DebugScript(geomStructBufferList, "l1wallStrucBuff", 2, printC, ref script);
-                    DebugScript(cutArchiWallPolyTemp, "l2cutArchiWallPolyTemp", 3, printC, ref script);
-                    DebugScript(cutArchiWallPoly, "l3cutArchiWallPoly", 4, printC, ref script);
-                    DebugScript(cutArchiWallNotSmall, "l4cutArchiWallNotSmall", 5, printC, ref script);
-                    DebugScript(cutPolyObb, "l5cutPolyObb", 6, printC, ref script);
-                    DebugScript(cutPolyObbNotSmall, "l6cutPolyObbNotSmall", 11, printC, ref script);
+                    DeductCommonService.DebugScript(new List<Polygon> { geomArchi }, "l0wallOri", 0, printC, ref script);
+                    DeductCommonService.DebugScript(geomStructList, "l0wallStruc", 1, printC, ref script);
+                    DeductCommonService.DebugScript(geomStructBufferList, "l1wallStrucBuff", 2, printC, ref script);
+                    DeductCommonService.DebugScript(cutArchiWallPolyTemp, "l2cutArchiWallPolyTemp", 3, printC, ref script);
+                    DeductCommonService.DebugScript(cutArchiWallPoly, "l3cutArchiWallPoly", 4, printC, ref script);
+                    DeductCommonService.DebugScript(cutArchiWallNotSmall, "l4cutArchiWallNotSmall", 5, printC, ref script);
+                    DeductCommonService.DebugScript(cutPolyObb, "l5cutPolyObb", 6, printC, ref script);
+                    DeductCommonService.DebugScript(cutPolyObbNotSmall, "l6cutPolyObbNotSmall", 11, printC, ref script);
 
                     using (var fs = new System.IO.StreamWriter(printPath, true))
                     {
@@ -259,6 +259,7 @@ namespace XbimXplorer.Deduct
                 nWallModel.ZValue = oriWall.ZValue;
                 nWallModel.GlobalZ = oriWall.GlobalZ;
                 nWallModel.ItemType = oriWall.ItemType;
+                nWallModel.IFC = oriWall.IFC;
                 nWallModel.CalculateWidthCLWallWidth(oriWall.Width);
 
                 foreach (var pro in oriWall.Property)
@@ -326,29 +327,5 @@ namespace XbimXplorer.Deduct
             return objs;
         }
 
-        private static void DebugScript(List<Polygon> pls, string name, int color, int printC, ref string script)
-        {
-            var localS = "";
-            for (int i = 0; i < pls.Count; i++)
-            {
-                var pName = name + i.ToString() + printC;
-                localS += string.Format(@"var {0} = new Polyline();", pName) + System.Environment.NewLine;
-                foreach (var p in pls[i].Coordinates)
-                {
-                    var ptScript = string.Format("{0}.AddVertexAt({0}.NumberOfVertices, new Point2d({1}, {2}), 0, 0, 0);",
-                                            pName, p.X, p.Y);
-
-                    localS += ptScript + System.Environment.NewLine;
-                }
-            }
-            for (int i = 0; i < pls.Count; i++)
-            {
-                var pName = name + i.ToString() + printC;
-                var dS = string.Format(@"DrawUtils.ShowGeometry({0}, ""{1}"", {2});", pName, name, color);
-                localS += dS + System.Environment.NewLine;
-            }
-
-            script += localS + System.Environment.NewLine;
-        }
     }
 }

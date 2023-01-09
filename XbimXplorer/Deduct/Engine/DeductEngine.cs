@@ -31,44 +31,10 @@ namespace XbimXplorer.Deduct
             //var aProject = currDoc.AllBimProjects.Where(x => x.Major == EMajor.Architecture && x.ApplcationName == EApplcationName.IFC).FirstOrDefault();
 
             var aProject = currDoc.AllBimProjects.Where(x => x.Major != EMajor.Structure && x.ApplcationName == EApplcationName.IFC).FirstOrDefault();
+
             StructProject = sProject;
             ArchiProject = aProject;
         }
-
-        //public void DoIfcVsBimModel()
-        //{
-        //    if (!CheckProjetInvalid())
-        //    {
-        //        return;
-        //    }
-
-        //    var ifcStore = StructProject.SourceProject as Xbim.Ifc.IfcStore;
-
-        //    /////////////////////////////////////////
-        //    ////if (ifcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc4)
-        //    ////{
-        //    ////    // GetSpIdxIfc4(ifcStore);
-        //    ////    TryIfc4(ifcStore);
-        //    ////}
-        //    ////else if (ifcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
-        //    ////{
-        //    ////    TryIfc23(ifcStore);
-        //    ////}
-        //    /////////////////////////////////////////
-
-
-        //    if (ifcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
-        //    {
-        //        var engine = new DeductEngine23();
-        //        engine.IfcStore = ifcStore;
-        //        engine.ArchiProject = ArchiProject;
-        //        engine.DeductIFC23Engine();
-        //    }
-        //    else if (ifcStore.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc4)
-        //    {
-        //        DeductIFC4Engine(ifcStore);
-        //    }
-        //}
 
         public void DoIfcVsIfc()
         {
@@ -114,11 +80,6 @@ namespace XbimXplorer.Deduct
             {
                 return false;
             }
-            //if (ArchiProject.ApplcationName != EApplcationName.CAD)
-            //{
-            //    return false;
-            //}
-
             if (ArchiProject.ApplcationName != EApplcationName.IFC )
             {
                 return false;

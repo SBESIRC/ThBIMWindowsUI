@@ -103,7 +103,6 @@
     <Compile Include="Geometry\ThXbimRay3D.cs" />
     <Compile Include="Geometry\XbimMesher.cs" />
     <Compile Include="GFC2\THGFC2Extension.cs" />
-    <Compile Include="GFC2\ThBimToGFC2.cs" />
     <Compile Include="GFC2\ThGFC2Document.cs" />
     <Compile Include="Ifc2x3\ThIFC2x3Factory.cs" />
     <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3BrepExtension.cs" />

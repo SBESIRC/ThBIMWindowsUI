@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using THBimEngine.IO.GFC2;
 
 namespace XbimXplorer.Deduct.Model
 {
     public abstract class GFCElementModel
     {
-        private ThGFC2Document _gfcDoc;
-        private string _matirial = "";
+        //private ThGFC2Document _gfcDoc;
+        //public string Matirial = "";
+
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// 是否是构建元素(T:构建，F:图元)
@@ -19,6 +17,7 @@ namespace XbimXplorer.Deduct.Model
 
         /// <summary>
         /// GFC ID
+        /// GFC行数
         /// </summary>
         public int ID { get; set; }
 
@@ -28,7 +27,7 @@ namespace XbimXplorer.Deduct.Model
         public List<GFCElementModel> Primitives { get; set; }
 
         /// <summary>
-        /// 关系图元(图元-图元)
+        /// 父子关系关系图元(图元-图元)
         /// </summary>
         public List<GFCElementModel> RelationElements { get; set; }
 
@@ -37,13 +36,17 @@ namespace XbimXplorer.Deduct.Model
         /// </summary>
         public DeductGFCModel Model { get; set; }
 
-        public GFCElementModel(ThGFC2Document gfcDoc, string matirial)
+        public GFCElementModel(ThGFC2Document gfcDoc,int globalId, string name)
         {
             Primitives = new List<GFCElementModel>();
             RelationElements = new List<GFCElementModel>();
-            _gfcDoc = gfcDoc;
-            _matirial = matirial;
+            //_gfcDoc = gfcDoc;
+            Name = name;
             ID = -1;
         }
+
+        public abstract void AddGFCItemToConstruct(List<GFCElementModel> constructList);
+
+
     }
 }

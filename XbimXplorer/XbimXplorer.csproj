@@ -231,20 +231,20 @@
     </Compile>
     <Compile Include="CheckLocalFileServices.cs" />
     <Compile Include="Deduct\Build2DModelService.cs" />
-    <Compile Include="Deduct\Engine\DeductEngineIfcVsIfc2.cs" />
+    <Compile Include="Deduct\DeductCommonService.cs" />
+    <Compile Include="Deduct\Engine\DeductEngineIfcVsIfc.cs" />
     <Compile Include="Deduct\Model\DeductGFCModel.cs" />
     <Compile Include="Deduct\Model\GFCCeilingModel.cs" />
     <Compile Include="Deduct\Model\GFCDoorModel.cs" />
     <Compile Include="Deduct\Model\GFCElementModel.cs" />
-    <Compile Include="Deduct\Model\GFCFaceFloorFinishModel.cs" />
-    <Compile Include="Deduct\Model\GFCRoomModel.cs" />
+    <Compile Include="Deduct\Model\GFCFloorFinishModel.cs" />
     <Compile Include="Deduct\Model\GFCSlabModel.cs" />
-    <Compile Include="Deduct\Model\GFCWallFaceFinishModel.cs" />
+    <Compile Include="Deduct\Model\GFCWallFinishModel.cs" />
     <Compile Include="Deduct\Model\GFCWallModel.cs" />
     <Compile Include="Deduct\Model\GFCWindowModel.cs" />
+    <Compile Include="Deduct\Model\RoomFurnishModel.cs" />
     <Compile Include="Deduct\ThModelToGFC2.cs" />
     <Compile Include="Deduct\Engine\GFCConvertEngine.cs" />
-    <Compile Include="Deduct\Engine\GFCConvertEngine2.cs" />
     <Compile Include="ExportViewModel.cs" />
     <Compile Include="Extensions\IFCReverse.cs" />
     <Compile Include="Deduct\DeductService.cs" />

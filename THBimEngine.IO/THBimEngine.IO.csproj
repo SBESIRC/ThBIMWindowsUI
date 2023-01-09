@@ -141,7 +141,7 @@
     <Compile Include="ThBimXbimNTSMarshal.cs" />
     <Compile Include="Xbim\ThXbimBrepExtension.cs" />
     <Compile Include="Xbim\ThXbimGeometryService.cs" />
-    <Compile Include="Ifc2x3\ThXbimSlabEngine.cs" />
+    <Compile Include="ThBimXbimSlabEngine.cs" />
     <Compile Include="NTS\ThIFCNTSExtension.cs" />
     <Compile Include="NTS\ThIFCNTSFixedPrecision.cs" />
     <Compile Include="NTS\ThIFCNTSService.cs" />

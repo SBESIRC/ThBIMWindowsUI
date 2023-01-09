@@ -3,7 +3,7 @@
 using Xbim.Ifc;
 using Xbim.Common.Geometry;
 using Xbim.Ifc4.ProfileResource;
-using ThBIMServer.Ifc2x3;
+using THBimEngine.IO;
 
 namespace ThBIMServer.Ifc4
 {
@@ -19,7 +19,7 @@ namespace ThBIMServer.Ifc4
             var geometryParam = slab.BuildElement;
             var slabDes = slab.Descendings;
             XbimVector3D moveVector = XbimVector3D.Zero;
-            ThXbimSlabEngine slabxbimEngine = new ThXbimSlabEngine();
+            ThBimXbimSlabEngine slabxbimEngine = new ThBimXbimSlabEngine();
             IXbimSolidSet solidSet = slabxbimEngine.Engine.CreateSolidSet();
             var slabSolid = GetXBimSolid(geometryParam, moveVector, slabxbimEngine);
             foreach (var item in slabSolid)
@@ -69,7 +69,7 @@ namespace ThBIMServer.Ifc4
             return solids;
         }
 
-        public static List<IXbimSolid> GetXBimSolid(ThTCHBuiltElementData geometryParam, XbimVector3D moveVector, ThXbimSlabEngine slabxbimEngine)
+        public static List<IXbimSolid> GetXBimSolid(ThTCHBuiltElementData geometryParam, XbimVector3D moveVector, ThBimXbimSlabEngine slabxbimEngine)
         {
             var resList = new List<IXbimSolid>();
             IXbimSolid geoSolid = null;
@@ -83,7 +83,7 @@ namespace ThBIMServer.Ifc4
             return resList;
         }
 
-        private static IXbimSolid GetXBimSolid2x3(ThTCHBuiltElementData geometryStretch, XbimVector3D moveVector, IfcStore memoryModel, ThXbimSlabEngine slabxbimEngine)
+        private static IXbimSolid GetXBimSolid2x3(ThTCHBuiltElementData geometryStretch, XbimVector3D moveVector, IfcStore memoryModel, ThBimXbimSlabEngine slabxbimEngine)
         {
             IfcProfileDef profile = null;
             if (geometryStretch.Outline != null && geometryStretch.Outline.Shell != null && geometryStretch.Outline.Shell.Points.Count > 0)
@@ -100,7 +100,7 @@ namespace ThBIMServer.Ifc4
             return geoSolid;
         }
 
-        private static IXbimSolid GetXBimSolid2x3(ThTCHPolyline polyline, XbimVector3D moveVector, XbimVector3D zAxis, double zHeight, ThXbimSlabEngine slabxbimEngine)
+        private static IXbimSolid GetXBimSolid2x3(ThTCHPolyline polyline, XbimVector3D moveVector, XbimVector3D zAxis, double zHeight, ThBimXbimSlabEngine slabxbimEngine)
         {
             IfcProfileDef profile = slabxbimEngine.Model.ToIfcArbitraryClosedProfileDef(polyline);
             if (profile == null)

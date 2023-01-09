@@ -7,7 +7,6 @@ using Xbim.Common.Geometry;
 using Xbim.Ifc2x3.GeometryResource;
 using Xbim.Ifc2x3.TopologyResource;
 using Xbim.Ifc2x3.GeometricModelResource;
-using Xbim.Common.XbimExtensions;
 using THBimEngine.Domain;
 
 namespace ThBIMServer.Ifc2x3

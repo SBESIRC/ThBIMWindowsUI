@@ -1,8 +1,8 @@
 ﻿using Xbim.Ifc;
+using System.Linq;
 using Xbim.Common.Geometry;
 using Xbim.Ifc2x3.GeometryResource;
 using ThBIMServer.Geometries;
-using System.Linq;
 
 namespace ThBIMServer.Ifc2x3
 {

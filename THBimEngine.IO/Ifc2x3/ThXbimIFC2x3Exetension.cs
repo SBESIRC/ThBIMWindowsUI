@@ -1,9 +1,7 @@
 ﻿using Xbim.Ifc;
-using Xbim.Common.Geometry;
 using MathNet.Spatial.Euclidean;
 using Xbim.Ifc2x3.GeometryResource;
 using ThBIMServer.Geometries;
-using ThBIMServer.Ifc2x3;
 
 namespace ThBIMServer.Ifc2x3
 {

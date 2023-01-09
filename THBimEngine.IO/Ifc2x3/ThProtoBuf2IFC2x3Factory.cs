@@ -20,7 +20,6 @@ using Xbim.Ifc2x3.RepresentationResource;
 using ThBIMServer.NTS;
 using ThBIMServer.Geometries;
 using THBimEngine.Domain;
-using THBimEngine.Geometry;
 
 namespace ThBIMServer.Ifc2x3
 {

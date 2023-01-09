@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Collections.Generic;
 
 using Xbim.IO;
 using Xbim.Ifc;
 using Xbim.Ifc2x3.ProductExtension;
 using Xbim.Ifc2x3.SharedBldgElements;
-using System.Linq;
 
 namespace ThBIMServer.Ifc2x3
 {

@@ -112,10 +112,13 @@
     <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3CurveExtension.cs" />
     <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3Factory.cs" />
     <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3GeExtension.cs" />
+    <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3MappedItemFactory.cs" />
     <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3ProfileExtension.cs" />
     <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3RelAggregatesFactory.cs" />
     <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3RelDefinesFactory.cs" />
+    <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3SUExtension.cs" />
     <Compile Include="Ifc2x3\ThProtoBuf2IFCSolid3dExtension.cs" />
+    <Compile Include="Ifc2x3\ThXbimIFC2x3Exetension.cs" />
     <Compile Include="Ifc4\ThIFC4Factory.cs" />
     <Compile Include="Ifc4\ThProtoBuf2IFC4BrepExtension.cs" />
     <Compile Include="Ifc4\ThProtoBuf2IFC4Builder.cs" />

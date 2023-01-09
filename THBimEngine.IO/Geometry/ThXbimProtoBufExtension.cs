@@ -27,6 +27,15 @@ namespace ThBIMServer.Geometries
             };
         }
 
+        public static XbimMatrix3D ToXbimMatrix3D(this ThTCHMatrix3d m)
+        {
+            return new XbimMatrix3D(
+                m.Data11, m.Data12, m.Data13, m.Data14,
+                m.Data21, m.Data22, m.Data23, m.Data24,
+                m.Data31, m.Data32, m.Data33, m.Data34,
+                m.Data41, m.Data42, m.Data43, m.Data44);
+        }
+
         public static XbimVector3D ToXbimVector3D(this ThTCHVector3d v)
         {
             return new XbimVector3D(v.X, v.Y, v.Z);

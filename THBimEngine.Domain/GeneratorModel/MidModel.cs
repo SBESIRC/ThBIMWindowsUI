@@ -1,13 +1,10 @@
-﻿using log4net.Util.TypeConverters;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Web.Profile;
-using Xbim.Common;
 using Xbim.Ifc;
-using Xbim.Ifc2x3.MeasureResource;
+using Xbim.Common;
 using Xbim.Ifc4.Interfaces;
 
 namespace THBimEngine.Domain.GeneratorModel
@@ -100,20 +97,20 @@ namespace THBimEngine.Domain.GeneratorModel
                         foreach (var item in elements)
                         {
                             if (item.Name.ToString().Contains("CantiSlab")) continue;
-                            
+
                             var description = GetDescription(item);
                             if (description == "S_BEAM_梯梁" || description == "S_COLU_梯柱")
                                 continue;
-                            if(uniCompDepthDic.ContainsKey(item.Name))
+                            if (uniCompDepthDic.ContainsKey(item.Name))
                             {
-                                description ="折板";
+                                description = "折板";
                             }
                             var type = item.ToString().Split('.').Last();
                             if (type.Contains("IfcOpeningElement"))
                             {
                                 try
                                 {
-                                    if(item.Model.SchemaVersion.ToString()== "Ifc4")
+                                    if (item.Model.SchemaVersion.ToString() == "Ifc4")
                                     {
                                         if (!item.Name.ToString().Contains("Wall_Hole"))
                                             continue;
@@ -166,7 +163,7 @@ namespace THBimEngine.Domain.GeneratorModel
                                     holeDepthDic.Add(ifcwall.Openings.FirstOrDefault().GlobalId, uniComponent.y_len);
                                 }
                             }
-                            if(item is Xbim.Ifc4.SharedBldgElements.IfcWall ifcwall2)
+                            if (item is Xbim.Ifc4.SharedBldgElements.IfcWall ifcwall2)
                             {
                                 if (ifcwall2.HasOpenings.Count() > 0)
                                 {
@@ -189,9 +186,9 @@ namespace THBimEngine.Domain.GeneratorModel
                             {
                                 uniComponent.depth = 10;
                             }
-                            else if(description == "折板")
+                            else if (description == "折板")
                             {
-                                if(uniCompDepthDic.ContainsKey(item.Name))
+                                if (uniCompDepthDic.ContainsKey(item.Name))
                                 {
                                     uniComponent.depth = uniCompDepthDic[item.Name];
                                 }
@@ -217,9 +214,9 @@ namespace THBimEngine.Domain.GeneratorModel
                             }
 
                             UniComponents.Add(uniComponent);
-                            if(type.Contains("IfcOpeningElement"))
+                            if (type.Contains("IfcOpeningElement"))
                             {
-                                holeDic.Add(uniComponent.unique_id,new List<double>() 
+                                holeDic.Add(uniComponent.unique_id, new List<double>()
                                 { uniComponent.x_l+uniComponent.x_r , uniComponent.y_l+uniComponent.y_r, uniComponent.z_l, uniComponent.z_r});
                             }
                         }
@@ -227,7 +224,7 @@ namespace THBimEngine.Domain.GeneratorModel
                     buildingStorey.element_index_e.Add(uniComponentIndex - 1);
                     Buildingstoreys.Add(floorPara.Num, buildingStorey);
                 }
-                foreach(var i in holeDic.Keys)
+                foreach (var i in holeDic.Keys)
                 {
                     try
                     {
@@ -242,7 +239,7 @@ namespace THBimEngine.Domain.GeneratorModel
                             var xDiff = Math.Abs(holeDic[i][0] - holeDic[j][0]);
                             var yDiff = Math.Abs(holeDic[i][1] - holeDic[j][1]);
                             var holeDepth = holeDic[j][2] - holeDic[i][3];
-                            if (xDiff < 100 && yDiff < 100 && holeDepth > 0 && holeDepth < storey.top_elevation - storey.bottom_elevation && holeFloorDic[j] - holeFloorDic[i]==1)
+                            if (xDiff < 100 && yDiff < 100 && holeDepth > 0 && holeDepth < storey.top_elevation - storey.bottom_elevation && holeFloorDic[j] - holeFloorDic[i] == 1)
                             {
                                 var storeyj = Buildingstoreys[UniComponents[j].floor_num];
                                 UniComponents[i].properties.Add("LLHeight", (holeDic[j][2] - holeDic[i][3]).ToString());
@@ -256,11 +253,11 @@ namespace THBimEngine.Domain.GeneratorModel
                             UniComponents[i].properties.Add("LLElevation", "");
                         }
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         ;
                     }
-                    
+
                 }
             }
         }
@@ -295,9 +292,9 @@ namespace THBimEngine.Domain.GeneratorModel
                             var type = item.ToString().Split('.').Last();
 
                             //过滤掉除了梁以外的构件
-                            if (!type.Contains("IfcBeam")) 
+                            if (!type.Contains("IfcBeam"))
                                 continue;
-                            else 
+                            else
                                 type = "IfcWall";
                             var materialType = "";
                             try
@@ -330,7 +327,7 @@ namespace THBimEngine.Domain.GeneratorModel
                             var material = THBimMaterial.GetTHBimEntityMaterial(type, true);
 
 
-                            var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, Components[type], materialType,"PCWall");
+                            var uniComponent = new UniComponent(uid, material, ref uniComponentIndex, Components[type], materialType, "PCWall");
                             GetProfileName(item, uniComponent);
 
                             uniComponent.edge_ind_s = edgeIndex;
@@ -793,7 +790,7 @@ namespace THBimEngine.Domain.GeneratorModel
             try
             {
                 var profileName = "";
-                if (ifcEntity.Name.Value.ToString().Contains("SU")&& ifcEntity.GetType().Name.Contains("Beam"))
+                if (ifcEntity.Name.Value.ToString().Contains("SU") && ifcEntity.GetType().Name.Contains("Beam"))
                 {
                     var x = (ifcEntity as Xbim.Ifc2x3.Kernel.IfcObject).IsDefinedByProperties;
                     var y = ((Xbim.Ifc2x3.Kernel.IfcPropertySet)x.First().RelatingPropertyDefinition).HasProperties.First();
@@ -822,7 +819,7 @@ namespace THBimEngine.Domain.GeneratorModel
                     var ifcProduct = ifcEntity as Xbim.Ifc4.Kernel.IfcProduct;
                     var item = ifcProduct.Representation.Representations.First().Items[0];
                     var type = item.GetType().Name;
-                    if(type== "IfcMappedItem")
+                    if (type == "IfcMappedItem")
                     {
                         var mappedItem = (item as Xbim.Ifc4.GeometryResource.IfcMappedItem).MappingSource.MappedRepresentation.Items.FirstOrDefault();
                         profileName = GetProfileName(mappedItem, mappedItem.GetType().Name);
@@ -884,7 +881,7 @@ namespace THBimEngine.Domain.GeneratorModel
                 else if (type == "IfcBooleanResult")
                 {
                     string profileName = "";
-                     GetProfileName(item as Xbim.Ifc4.GeometricModelResource.IfcBooleanResult,ref profileName);
+                    GetProfileName(item as Xbim.Ifc4.GeometricModelResource.IfcBooleanResult, ref profileName);
                     return profileName;
                 }
             }
@@ -896,11 +893,11 @@ namespace THBimEngine.Domain.GeneratorModel
             var firstOperand = item.FirstOperand;
             if (firstOperand.GetType().Name == "IfcBooleanResult")
             {
-                GetProfileName(firstOperand as Xbim.Ifc4.GeometricModelResource.IfcBooleanResult,ref profileName);
+                GetProfileName(firstOperand as Xbim.Ifc4.GeometricModelResource.IfcBooleanResult, ref profileName);
             }
             else
             {
-               profileName = (firstOperand as Xbim.Ifc4.GeometricModelResource.IfcSweptAreaSolid).SweptArea.ProfileName.ToString();
+                profileName = (firstOperand as Xbim.Ifc4.GeometricModelResource.IfcSweptAreaSolid).SweptArea.ProfileName.ToString();
             }
         }
         private void GetProfileName(Xbim.Ifc2x3.GeometricModelResource.IfcBooleanResult item, ref string profileName)
@@ -938,7 +935,7 @@ namespace THBimEngine.Domain.GeneratorModel
 
         public double GetLength(Vec3 pt1, Vec3 pt2)
         {
-            return Math.Sqrt(Math.Pow(pt1.x - pt2.x,2) + Math.Pow(pt1.y - pt2.y,2));
+            return Math.Sqrt(Math.Pow(pt1.x - pt2.x, 2) + Math.Pow(pt1.y - pt2.y, 2));
         }
 
         public void GetTrianglesAndEdges(List<FaceTriangle> triangles, List<PointNormal> allPoints, int offsetIndex, ref int triangleIndex, ref int edgeIndex,
@@ -949,7 +946,7 @@ namespace THBimEngine.Domain.GeneratorModel
             var pts = new List<PointVector>();
             foreach (var triangle in triangles)
             {
-                var outingPolygon = new OutingPolygon(triangle, allPoints, offsetIndex, ref triangleIndex, uniComponent, 
+                var outingPolygon = new OutingPolygon(triangle, allPoints, offsetIndex, ref triangleIndex, uniComponent,
                     ref ptIndex, Points, firstTriangles, reverse);
                 var edges = GetEdgesByDir(outingPolygon, Points, ref edgeIndex, uniComponent.unique_id);
                 OutingPolygons.Add(outingPolygon);
@@ -958,17 +955,17 @@ namespace THBimEngine.Domain.GeneratorModel
             }
             if (uniComponent.name.Contains("Beam"))
             {
-                if(uniComponent.properties.ContainsKey("ProfileName"))
+                if (uniComponent.properties.ContainsKey("ProfileName"))
                 {
                     var lengths = new List<int>();
                     //var xylen = Math.Max(uniComponent.x_r-uniComponent.x_l,uniComponent.y_r-uniComponent.y_l);
                     Dictionary<int, int> dic = new Dictionary<int, int>();
-                    foreach (var edge in allEdges) 
+                    foreach (var edge in allEdges)
                     {
                         if (!lengths.Contains(Convert.ToInt32(edge.Len)))
                             lengths.Add(Convert.ToInt32(edge.Len));
                     }
-                    lengths=lengths.OrderByDescending(l=>l).ToList();
+                    lengths = lengths.OrderByDescending(l => l).ToList();
 
                     foreach (var edge in allEdges)
                     {

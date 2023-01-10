@@ -51,9 +51,14 @@
     <Compile Include="EncryptionFun.cs" />
     <Compile Include="OpenFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SelectEntity.cs" />
     <Compile Include="UI\EncryptionUI.xaml.cs">
       <DependentUpon>EncryptionUI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\SelectEntityUI.xaml.cs">
+      <DependentUpon>SelectEntityUI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModel\SelectEntityVM.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\THBimEngine.Application\THBimEngine.Application.csproj">
@@ -77,6 +82,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="UI\EncryptionUI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\SelectEntityUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -106,6 +106,9 @@
     <Compile Include="GFC2\ThBimToGFC2.cs" />
     <Compile Include="GFC2\ThGFC2Document.cs" />
     <Compile Include="Ifc2x3\ThIFC2x3Factory.cs" />
+    <Compile Include="Ifc2x3\ThNTSIFC2x3Extension.cs" />
+    <Compile Include="Ifc2x3\ThNTSIFC2x3IfcBoundedCurveExtension.cs" />
+    <Compile Include="Ifc2x3\ThNTSIFC2x3IfcProfileDefExtension.cs" />
     <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3BrepExtension.cs" />
     <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3Builder.cs" />
     <Compile Include="Ifc2x3\ThProtoBuf2IFC2x3CSGSolidExtension.cs" />
@@ -137,6 +140,7 @@
     <Compile Include="NTS\ThNTSSpatialIndex.cs" />
     <Compile Include="NTS\ThNTSIfcProductSpatialIndex.cs" />
     <Compile Include="NTS\ThXbimNTSExtension.cs" />
+    <Compile Include="ThBimNTSService.cs" />
     <Compile Include="ThBimXbimNTSMarshal.cs" />
     <Compile Include="Xbim\ThXbimBrepExtension.cs" />
     <Compile Include="Xbim\ThXbimGeometryService.cs" />

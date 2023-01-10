@@ -134,7 +134,6 @@
     <Compile Include="NTS\ThCADCoreNTSSimplify.cs" />
     <Compile Include="NTS\ThCoreNTSGeometryClipper.cs" />
     <Compile Include="NTS\ThIFCNTSExtension4.cs" />
-    <Compile Include="NTS\ThIFCNTSSpatialIndex4.cs" />
     <Compile Include="NTS\ThNTSSpatialIndex.cs" />
     <Compile Include="NTS\ThNTSIfcProductSpatialIndex.cs" />
     <Compile Include="NTS\ThXbimNTSExtension.cs" />
@@ -145,7 +144,6 @@
     <Compile Include="NTS\ThIFCNTSExtension.cs" />
     <Compile Include="NTS\ThIFCNTSFixedPrecision.cs" />
     <Compile Include="NTS\ThIFCNTSService.cs" />
-    <Compile Include="NTS\ThIFCNTSSpatialIndex.cs" />
     <Compile Include="NTS\ThNTSOperation.cs" />
     <Compile Include="NTS\ThTCHNTSExtension.cs" />
     <Compile Include="NTS\ThTCHNTSOperation.cs" />

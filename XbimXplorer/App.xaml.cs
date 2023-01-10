@@ -138,7 +138,14 @@ namespace XbimXplorer
             mainView.RenderScene();
 #else
             var login = new Login();
-            login.ShowDialog();
+            if (login.LoginSuccess)
+            {
+                login.CheckAndOpenMain();
+            }
+            else 
+            {
+                login.ShowDialog();
+            }
 #endif
         }
     }

@@ -15,8 +15,7 @@
         x:Name="MainWindow"
         WindowState="Maximized"
         ContentRendered="RenderedEvents" 
-        Icon="THBIM.ico"
-        Closing="XplorerMainWindow_Closing" >
+        Icon="THBIM.ico">
     <Window.Resources>
         <ObjectDataProvider x:Key="ModelProvider"  IsInitialLoadEnabled="False" ></ObjectDataProvider>
         <DataTemplate DataType="{x:Type viewModels:XbimModelViewModel}">
@@ -84,6 +83,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <Menu Grid.Row="0" Grid.Column="0">
                 <Menu.ItemsPanel>
@@ -224,6 +224,14 @@
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                 </ItemsControl>
+            </Grid>
+            <Grid Grid.Column="2" >
+                <Menu VerticalAlignment="Center">
+                    <MenuItem Header="" x:Name="topUserInfo">
+                        <MenuItem Header="切换服务器" x:Name="ChangeLocation" Click="ChangeLocation_Click"/>
+                        <MenuItem Header="切换用户" x:Name="Logout" Click="Logout_Click"/>
+                    </MenuItem>
+                </Menu>
             </Grid>
         </Grid>
 

@@ -226,6 +226,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ChangeLoginLocation.xaml.cs">
+      <DependentUpon>ChangeLoginLocation.xaml</DependentUpon>
+    </Compile>
     <Compile Include="CheckLocalFileServices.cs" />
     <Compile Include="Deduct\Build2DModelService.cs" />
     <Compile Include="Deduct\Engine\DeductEngineIfcVsIfc2.cs" />
@@ -386,6 +389,10 @@
       <DependentUpon>XplorerMainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="ChangeLoginLocation.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\AboutWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

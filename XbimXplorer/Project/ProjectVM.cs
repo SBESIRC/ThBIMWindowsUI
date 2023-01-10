@@ -171,12 +171,16 @@ namespace XbimXplorer.Project
             }
         }
         private ProjectFileManager projectManager;
+        public string UserId { get; set; }
+        public string LoginLocation { get; set; }
         public ProjectVM(List<DBProject> projects, ProjectFileManager projectFileManager)
         {
             FileLinks = new ObservableCollection<ShowFileLink>();
             AllProjects = new List<ShowProject>();
             Projects = new ObservableCollection<ShowProject>();
             projectManager = projectFileManager;
+            UserId = projectFileManager.userId;
+            LoginLocation = projectFileManager.location;
             var allName = EnumUtil.GetEnumDescriptions<EMajor>();
             MajorNames.AddRange(allName);
             allName = EnumUtil.GetEnumDescriptions<EApplcationName>();

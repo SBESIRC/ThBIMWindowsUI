@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using THBimEngine.Common;
 
 namespace XbimXplorer
@@ -11,6 +7,11 @@ namespace XbimXplorer
     class UserConfig
     {
         public ConfigHelper Config;
+        public string ConfigRemembPswKey = "RemembPsw";
+        public string ConfigUserName = "UserName";
+        public string ConfigUPsw = "UserPsw";
+        public string ConfigSelectLocation = "Local";
+        public string ConfigAutoLogin = "AutoLogin";
         string configPath = "";
         public UserConfig() 
         {
@@ -21,6 +22,10 @@ namespace XbimXplorer
                 Directory.CreateDirectory(currentDir);
             InitConfigFile(configPath);
             Config = new ConfigHelper(configPath);
+        }
+        public void SetStringValue(string key,string value) 
+        {
+            Config.UpdateOrAddAppConfig(key, value);
         }
         private void InitConfigFile(string filePath) 
         {
@@ -36,7 +41,9 @@ namespace XbimXplorer
             writer.WriteLine("  <appSettings>");
             writer.WriteLine("    <add key=\"RemembPsw\" value=\"True\"/>");
             writer.WriteLine("    <add key=\"UserName\" value=\"\"/>");
-            writer.WriteLine("    <add key=\"RemembPsw\" value=\"\"/>");
+            writer.WriteLine("    <add key=\"UserPsw\" value=\"\"/>");
+            writer.WriteLine("    <add key=\"Local\" value=\"\"/>");
+            writer.WriteLine("    <add key=\"AutoLogin\" value=\"True\"/>");
             writer.WriteLine("  </appSettings>");
             writer.WriteLine("</configuration>");
             writer.Close();

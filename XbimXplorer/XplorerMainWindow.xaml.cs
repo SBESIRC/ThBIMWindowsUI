@@ -112,10 +112,7 @@ namespace XbimXplorer
         public XplorerMainWindow(UserInfo user, bool preventPluginLoad = false)
         {
             InitializeComponent();
-            loginUser = user;
-            projectFileManager = new ProjectFileManager(user);
-            CheckLocalFileServices.Instance.BindingUserInfo(user);
-            CheckLocalFileServices.Instance.StartCheck();
+            UserLogin(user);
             ProgressChanged = OnProgressChanged;
             _geoIndexIfcIndexMap = new Dictionary<int, int>();
             _dispatcherTimer = new DispatcherTimer();
@@ -1391,7 +1388,58 @@ namespace XbimXplorer
             Log.Info(string.Format("Total Count : {0}", sumCount));
             MessageBox.Show("统计完成，请前往日志中查看结果", "提醒");
         }
+        private void UserLogin(UserInfo user,bool checkHis =true) 
+        {
+            bool isFirst = loginUser == null;
+            if(!isFirst
+                && checkHis 
+                && user.LoginLocation == loginUser.LoginLocation 
+                && user.UserLogin.Username == loginUser.UserLogin.Username)
+                return;
+            loginUser = user;
+            projectFileManager = new ProjectFileManager(loginUser);
+            CheckLocalFileServices.Instance.StopCheck();
+            CheckLocalFileServices.Instance.ClearAllCheckFile();
+            CheckLocalFileServices.Instance.BindingUserInfo(loginUser);
+            CheckLocalFileServices.Instance.StartCheck();
+            topUserInfo.Header = string.Format("{0}[{1}公司]", loginUser.ChineseName, loginUser.LoginLocation);
+            if (isFirst || null == DocumentManager || CurrentDocument == null)
+                return;
+            CurrentDocument.ClearAllData();
+            DocumentManager.RemoveAllDocument();
+            CurrentDocument = null;
+            SetOpenedModelFileName("");
+        }
 
+        private void Logout_Click(object sender, RoutedEventArgs e)
+        {
+            var login = new Login(false,false);
+            login.Owner = this;
+            var res = login.ShowDialog();
+            if (login.userInfo == null)
+                return;
+            //切换用户登录成功
+            UserLogin(login.userInfo);
+        }
+
+        private void ChangeLocation_Click(object sender, RoutedEventArgs e)
+        {
+            var changeLoginLocation = new ChangeLoginLocation(loginUser.LoginLocation);
+            changeLoginLocation.Owner = this;
+            var res = changeLoginLocation.ShowDialog();
+            if (res != true)
+                return;
+            var newLocation = changeLoginLocation.GetSelectLocation();
+            if (string.IsNullOrEmpty(newLocation))
+                return;
+            if (loginUser.LoginLocation == newLocation)
+                return;
+            //修改成功，需要将数据写入到记录中
+            UserConfig userConfig = new UserConfig();
+            userConfig.SetStringValue(userConfig.ConfigSelectLocation, newLocation);
+            loginUser.LoginLocation = newLocation;
+            UserLogin(loginUser, false);
+        }
         //private void MenuItem_Deduct_Click(object sender, RoutedEventArgs e)
         //{
         //    if (CurrentDocument == null)

@@ -73,7 +73,8 @@ namespace THBimEngine.Application
         }
         public void RemoveAllDocument() 
         {
-        
+            AllDocuments.Clear();
+            CurrentDocument = null;
         }
         /// <summary>
         /// Document切换事件

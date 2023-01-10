@@ -169,6 +169,13 @@ namespace XbimXplorer
                 checkFiles = checkFiles.Where(c => c.ProjectFileId != key).ToList();
             }
         }
+        public void ClearAllCheckFile() 
+        {
+            lock (checkFiles)
+            {
+                checkFiles.Clear();
+            }
+        }
         public void StartCheck() 
         {
             lock (checkTimer) 

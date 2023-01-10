@@ -73,8 +73,14 @@ namespace XbimXplorer
         }
         private void InitUserProjects()
         {
+            if (null != projectVM)
+            {
+                if (projectVM.UserId != loginUser.UserLogin.Username || projectVM.LoginLocation != loginUser.LoginLocation)
+                    projectVM = null;
+            }
             if (null == projectVM)
             {
+                
                 var userPojects = projectFileManager.ProjectDBHelper.GetUserProjects(loginUser.PreSSOId);
                 projectVM = new ProjectVM(userPojects, projectFileManager);
             }

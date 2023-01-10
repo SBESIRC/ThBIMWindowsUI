@@ -42,20 +42,28 @@ namespace XbimXplorer.Project
             var dir = Path.GetDirectoryName(localPath);
             ProjectCommon.CheckAndAddDir(dir);
             bool needDownload = true;
-            if (checkFileMD5 && File.Exists(localPath)) 
+            if (File.Exists(localPath)) 
             {
-                var fileMD5 = FileHelper.GetMD5ByMD5CryptoService(localPath);
-                if (fileMD5 == fileInfo.FileMD5)
+                File.SetAttributes(localPath, FileAttributes.Normal);
+                if (checkFileMD5)
                 {
-                    needDownload = false;
+                    var fileMD5 = FileHelper.GetMD5ByMD5CryptoService(localPath);
+                    if (fileMD5 == fileInfo.FileMD5)
+                    {
+                        needDownload = false;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            File.Delete(localPath);
+                        }
+                        catch { }
+                    }
                 }
                 else 
                 {
-                    try 
-                    {
-                        File.Delete(localPath);
-                    }
-                    catch { }
+                    needDownload = false;
                 }
             }
             if (!needDownload)

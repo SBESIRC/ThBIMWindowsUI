@@ -640,6 +640,8 @@ namespace XbimXplorer
                     uploadMenu.Click += CheckAndUpdateFile;
                     uploadMenu.CommandParameter = rowData;
                     contextMenu.Items.Add(uploadMenu);
+                    if (File.Exists(rowData.MainFile.FileLocalPath))
+                        File.SetAttributes(rowData.MainFile.FileLocalPath, FileAttributes.Normal);
                 }
                 else 
                 {

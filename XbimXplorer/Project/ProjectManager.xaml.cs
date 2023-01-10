@@ -212,6 +212,18 @@ namespace XbimXplorer
             var fileInfo = dGridRow.DataContext as ShowProjectFile;
             CheckLocalFileAndOpen(fileInfo);
         }
+        private void PrjSubPrjRow_DoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (sender == null)
+                return;
+            var dGridRow = sender as DataGridRow;
+            if (dGridRow == null)
+                return;
+            var prjInfo = dGridRow.DataContext as ShowProject;
+            if (null == prjInfo || prjInfo.IsChild)
+                return;
+            prjInfo.IsExpand = !prjInfo.IsExpand;
+        }
         private void CheckLocalFileAndOpen(ShowProjectFile fileInfo,bool openFile =true) 
         {
             if (fileInfo == null)

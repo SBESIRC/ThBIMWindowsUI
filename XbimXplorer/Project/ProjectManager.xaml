@@ -166,6 +166,7 @@
                         <Setter Property="Visibility" Value="{Binding RowVisibility,UpdateSourceTrigger=PropertyChanged,NotifyOnSourceUpdated=True}" />
                         <Setter Property="VerticalContentAlignment" Value="Center"/>
                         <Setter Property="VerticalAlignment" Value="Stretch"></Setter>
+                        <EventSetter Event="MouseDoubleClick" Handler="PrjSubPrjRow_DoubleClick"/>
                     </Style>
                 </DataGrid.RowStyle>
             </DataGrid>

@@ -3,6 +3,8 @@ using Xbim.Common.Geometry;
 
 namespace THBimEngine.Geometry
 {
+    // References:
+    //  https://github.com/Eneroth3/sketchup-community-lib/blob/master/modules/geom/transformation.rb
     public static class XbimMatrixHelper
     {
         public static double XScale(this XbimMatrix3D matrix)
@@ -48,6 +50,36 @@ namespace THBimEngine.Geometry
         public static XbimVector3D ZAxis(this XbimMatrix3D matrix)
         {
             return new XbimVector3D(matrix.Backward.X / matrix.M44, matrix.Backward.Y / matrix.M44, matrix.Backward.Z / matrix.M44);
+        }
+
+        public static double Determinant(this XbimMatrix3D matrix)
+        {
+            return matrix.XAxis().DotProduct(matrix.YAxis().CrossProduct(matrix.ZAxis()));
+        }
+
+        public static XbimMatrix3D CreateFromAxes(XbimPoint3D origin, XbimVector3D xaxis, XbimVector3D yaxis, XbimVector3D zaxis)
+        {
+            return new XbimMatrix3D(
+                xaxis.X, xaxis.Y, xaxis.Z, 0,
+                yaxis.X, yaxis.Y, yaxis.Z, 0,
+                zaxis.X, zaxis.Y, zaxis.Z, 0,
+                origin.X, origin.Y, origin.Z, 1);
+        }
+
+        public static XbimMatrix3D RemoveScaling(this XbimMatrix3D matrix, bool allowFlip = false)
+        {
+            var xaxis = matrix.XAxis().Normalized();
+            if (matrix.IsFlipped() && !allowFlip)
+            {
+                xaxis = xaxis.Negated();
+            }
+            var origin = new XbimPoint3D(matrix.OffsetX, matrix.OffsetY, matrix.OffsetZ);
+            return CreateFromAxes(origin, xaxis, matrix.YAxis().Normalized(), matrix.ZAxis().Normalized());
+        }
+
+        public static bool IsSheared(this XbimMatrix3D matrix, double angularTolerance)
+        {
+            return !matrix.XAxis().IsParallel(matrix.YAxis().CrossProduct(matrix.ZAxis()), angularTolerance);
         }
 
         public static bool IsFlipped(this XbimMatrix3D matrix)

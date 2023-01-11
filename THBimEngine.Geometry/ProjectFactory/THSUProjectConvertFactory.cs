@@ -22,7 +22,7 @@ namespace THBimEngine.Geometry.ProjectFactory
             bimProject.ProjectIdentity = project.Root.GlobalId;
             if (createSolidMesh && !project.IsFaceMesh)
             {
-                CreateSolidMesh(allEntitys.Values.ToList());
+                //CreateSolidMesh(allEntitys.Values.ToList());
             }
             foreach (var item in allStoreys)
             {

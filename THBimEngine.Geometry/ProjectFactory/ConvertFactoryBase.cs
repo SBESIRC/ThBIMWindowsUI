@@ -38,63 +38,63 @@ namespace THBimEngine.Geometry.ProjectFactory
         public abstract ConvertResult ProjectConvert(object prject, bool createSolidMesh);
         public virtual void CreateSolidMesh(List<THBimEntity> meshEntitys)
         {
-            //step2 转换每个实体的Solid;
-            Parallel.ForEach(meshEntitys, new ParallelOptions(), entity =>
-            {
-                if (entity == null)
-                    return;
-                var geometryFactory = new GeometryFactory(schemaVersion);
-                if (entity.GeometryParam is GeometryFacetedBrep facetedBrep)
-                {
-                    var res = geometryFactory.BrepFaceToXbimShapeGeometry(facetedBrep);
-                    entity.AllShapeGeometries.Add(new THBimShapeGeometry(res));
-                }
-                else if (entity is THBimIFCEntity ifcEntity)
-                {
-                    //geometryFactory.GetXBimSolid(ifcEntity.IfcEntity);
-                }
-                else if (entity is THBimSlab slab)
-                {
-                    var solids = geometryFactory.GetSlabSolid(entity.GeometryParam, slab.SlabDescendingDatas, XbimVector3D.Zero);
-                    if (null != solids && solids.Count > 0)
-                        entity.EntitySolids.AddRange(solids);
-                }
-                else
-                {
-                    var solids = geometryFactory.GetXBimSolid(entity.GeometryParam, XbimVector3D.Zero);
-                    if (null != solids && solids.Count > 0)
-                        entity.EntitySolids.AddRange(solids);
-                }
+            ////step2 转换每个实体的Solid;
+            //Parallel.ForEach(meshEntitys, new ParallelOptions(), entity =>
+            //{
+            //    if (entity == null)
+            //        return;
+            //    var geometryFactory = new GeometryFactory(schemaVersion);
+            //    if (entity.GeometryParam is GeometryFacetedBrep facetedBrep)
+            //    {
+            //        var res = geometryFactory.BrepFaceToXbimShapeGeometry(facetedBrep);
+            //        entity.AllShapeGeometries.Add(new THBimShapeGeometry(res));
+            //    }
+            //    else if (entity is THBimIFCEntity ifcEntity)
+            //    {
+            //        //geometryFactory.GetXBimSolid(ifcEntity.IfcEntity);
+            //    }
+            //    else if (entity is THBimSlab slab)
+            //    {
+            //        var solids = geometryFactory.GetSlabSolid(entity.GeometryParam, slab.SlabDescendingDatas, XbimVector3D.Zero);
+            //        if (null != solids && solids.Count > 0)
+            //            entity.EntitySolids.AddRange(solids);
+            //    }
+            //    else
+            //    {
+            //        var solids = geometryFactory.GetXBimSolid(entity.GeometryParam, XbimVector3D.Zero);
+            //        if (null != solids && solids.Count > 0)
+            //            entity.EntitySolids.AddRange(solids);
+            //    }
 
-            });
-            //step3 Solid剪切和Mesh
-            Parallel.ForEach(meshEntitys, new ParallelOptions(), entity =>
-            {
-                if (entity == null || entity.EntitySolids.Count<1)
-                    return;
-                GeometryFactory geometryFactory = new GeometryFactory(schemaVersion);
-                var openingSolds = new List<IXbimSolid>();
-                foreach (var opening in entity.Openings)
-                {
-                    if (opening.EntitySolids.Count < 1)
-                    {
-                        var opEntity = meshEntitys.Find(c => c.Uid == opening.Uid);
-                        if (null != opEntity)
-                        {
-                            foreach (var solid in opEntity.EntitySolids)
-                                openingSolds.Add(solid);
-                        }
-                    }
-                    else
-                    {
-                        foreach (var solid in opening.EntitySolids)
-                            openingSolds.Add(solid);
-                    }
-                }
-                var geo = geometryFactory.GetShapeGeometry(entity.EntitySolids, openingSolds);
-                entity.AllShapeGeometries.Add(new THBimShapeGeometry(geo));
+            //});
+            ////step3 Solid剪切和Mesh
+            //Parallel.ForEach(meshEntitys, new ParallelOptions(), entity =>
+            //{
+            //    if (entity == null || entity.EntitySolids.Count < 1)
+            //        return;
+            //    GeometryFactory geometryFactory = new GeometryFactory(schemaVersion);
+            //    var openingSolds = new List<IXbimSolid>();
+            //    foreach (var opening in entity.Openings)
+            //    {
+            //        if (opening.EntitySolids.Count < 1)
+            //        {
+            //            var opEntity = meshEntitys.Find(c => c.Uid == opening.Uid);
+            //            if (null != opEntity)
+            //            {
+            //                foreach (var solid in opEntity.EntitySolids)
+            //                    openingSolds.Add(solid);
+            //            }
+            //        }
+            //        else
+            //        {
+            //            foreach (var solid in opening.EntitySolids)
+            //                openingSolds.Add(solid);
+            //        }
+            //    }
+            //    var geo = geometryFactory.GetShapeGeometry(entity.EntitySolids, openingSolds);
+            //    entity.AllShapeGeometries.Add(new THBimShapeGeometry(geo));
 
-            });
+            //});
         }
         protected virtual void InitOrClearData()
         {

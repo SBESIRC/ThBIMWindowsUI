@@ -29,7 +29,7 @@ namespace THBimEngine.Geometry.ProjectFactory
             bimProject.ProjectIdentity = project.Root.GlobalId;
             if (createSolidMesh)
             {
-                CreateSolidMesh(allEntitys.Values.ToList());
+                //CreateSolidMesh(allEntitys.Values.ToList());
             }
             //var gridLines = new List<GridLine>();
             //var gridCircles = new List<GridCircle>();

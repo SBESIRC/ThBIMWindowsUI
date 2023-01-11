@@ -14,13 +14,13 @@ namespace THBimEngine.Domain
 			PointIndex = pIndex;
 			Point = new PointVector() 
 			{ 
-				X = (float)point.X, 
+				X = -(float)point.X, 
 				Y = (float)point.Z, 
 				Z = (float)point.Y 
 			};
 			Normal = new PointVector() 
 			{ 
-				X = (float)normal.X,
+				X = -(float)normal.X,
 				Y = (float)normal.Z, 
 				Z = (float)normal.Y 
 			};
@@ -36,13 +36,13 @@ namespace THBimEngine.Domain
 			var realData = this.Clone();
 			realData.Point = new PointVector()
             {
-                X = (float)Point.X,
+                X = -(float)Point.X,
                 Y = (float)Point.Z,
                 Z = (float)Point.Y
             }; ;
 			realData.Normal = new PointVector()
 			{
-				X = (float)Normal.X,
+				X = -(float)Normal.X,
                 Y = (float)Normal.Z,
                 Z = (float)Normal.Y
             };

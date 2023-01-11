@@ -33,7 +33,7 @@
                   CanUserReorderColumns="False" SelectionMode="Single" ItemsSource="{Binding ShowFiles}">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="名称" Binding="{Binding ShowFileName}" Width="200" IsReadOnly="True"></DataGridTextColumn>
-                <DataGridTextColumn Header="上传人" Binding="{Binding UploaderName}" Width="100" IsReadOnly="True"></DataGridTextColumn>
+                <DataGridTextColumn Header="占用人" Binding="{Binding UploaderName}" Width="100" IsReadOnly="True"></DataGridTextColumn>
                 <DataGridTextColumn Header="上传时间" Width="150" Binding="{Binding FileUploadTime,StringFormat='yyyy/MM/dd HH:mm:ss'}" IsReadOnly="True"></DataGridTextColumn>
                 <DataGridTextColumn Header="状态" Width="80" Binding="{Binding NewState}" IsReadOnly="True"></DataGridTextColumn>
             </DataGrid.Columns>

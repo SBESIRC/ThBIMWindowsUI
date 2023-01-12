@@ -1448,101 +1448,92 @@ namespace XbimXplorer
             var res = exportForm.ShowDialog();
         }
 
-        //private void MenuItem_Deduct_Click(object sender, RoutedEventArgs e)
-        //{
-        //    if (CurrentDocument == null)
-        //        return;
-        //    int DoDeduct = 1;//是否走扣减逻辑 0:扣减墙门窗 1：不扣减墙门窗装修，2：扣减墙门窗，不扣减墙门窗装修
+        private void MenuItem_Deduct_Click(object sender, RoutedEventArgs e)
+        {
+            if (CurrentDocument == null)
+                return;
+            int DoDeduct = 2;//是否走扣减逻辑 0:扣减墙门窗 1：不扣减墙门窗装修，2：扣减墙门窗，不扣减墙门窗装修
 
-        //    //如果要打开装修部分的逻辑，就不要走扣减逻辑了，要把DoDeduct置为false
-        //    if (DoDeduct == 0)
-        //    {
-        //        var deductService = new DeductEngine(CurrentDocument);
-        //        deductService.DoIfcVsIfc();
-        //        var aProject = deductService.ArchiProject;
-        //        //var convertEngin = new GFCConvertEngine(deductService.ModelList, @"D:\tryZhang.gfc2");
-        //        var convertEngin = new GFCConvertEngine(deductService.ModelList, @"D:\project\14.ThBim\chart\tryZhang.gfc2");
-        //        convertEngin.WithFitment = false;
-        //        convertEngin.ToGFCEngine(aProject);
-        //    }
-        //    else if (DoDeduct == 1)
-        //    {
-        //        var deductService = new DeductEngine(CurrentDocument);
-        //        var aProject = deductService.ArchiProject;
-        //        var sProject = deductService.StructProject;
-        //        var build2D = new Build2DModelService();
-        //        build2D.IfcArchi = aProject.SourceProject as Xbim.Ifc.IfcStore;
-        //        build2D.IfcStruct = sProject.SourceProject as Xbim.Ifc.IfcStore;
-        //        build2D.Build2DModel();
-        //        //var convertEngin = new GFCConvertEngine(build2D.ModelList, @"D:\tryFurnish.gfc2");
-        //        //var convertEngin = new GFCConvertEngine(build2D.ModelList, @"D:\project\14.ThBim\chart\tryFurnish.gfc2");
-        //        //convertEngin.WithFitment = true;
-        //        //convertEngin.ToGFCEngine(aProject);
+            //如果要打开装修部分的逻辑，就不要走扣减逻辑了，要把DoDeduct置为false
+            if (DoDeduct == 0)
+            {
+                var deductService = new DeductEngine(CurrentDocument);
+                deductService.DoIfcVsIfc();
+                var aProject = deductService.ArchiProject;
+                //var convertEngin = new GFCConvertEngine(deductService.ModelList, @"D:\try.gfc2");
+                var convertEngin = new GFCConvertEngine(deductService.ModelList, @"D:\project\14.ThBim\chart\try.gfc2");
+                convertEngin.WithFitment = false;
+                convertEngin.ToGFCEngine(aProject);
+            }
+            else if (DoDeduct == 1)
+            {
+                var deductService = new DeductEngine(CurrentDocument);
+                var aProject = deductService.ArchiProject;
+                var sProject = deductService.StructProject;
+                var build2D = new Build2DModelService();
+                build2D.IfcArchi = aProject.SourceProject as Xbim.Ifc.IfcStore;
+                build2D.IfcStruct = sProject.SourceProject as Xbim.Ifc.IfcStore;
+                build2D.Build2DModel();
+               
+                //var convertEngin2 = new GFCConvertEngine(build2D.ModelList, @"D:\tryFurnish.gfc2");
+                var convertEngin2 = new GFCConvertEngine(build2D.ModelList, @"D:\project\14.ThBim\chart\tryFurnish.gfc2");
+                convertEngin2.WithFitment = true;
+                convertEngin2.ToGFCEngine(aProject);
+            }
+            else if (DoDeduct == 2)
+            {
+                var deductService = new DeductEngine(CurrentDocument);
+                deductService.DoIfcVsIfc();
+                var aProject = deductService.ArchiProject;
+                //var convertEngin = new GFCConvertEngine(deductService.ModelList, @"D:\try.gfc2");
+                var convertEngin = new GFCConvertEngine(deductService.ModelList, @"D:\project\14.ThBim\chart\try.gfc2");
+                convertEngin.WithFitment = false;
+                convertEngin.ToGFCEngine(aProject);
 
-        //        var convertEngin2 = new GFCConvertEngine2(build2D.ModelList);
-        //        convertEngin2.WithFitment = true;
-        //        convertEngin2.ToGFCEngine(aProject, @"D:\tryFurnish.gfc2");
-        //    }
-        //    else if (DoDeduct == 2)
-        //    {
-        //        var deductService = new DeductEngine(CurrentDocument);
-        //        deductService.DoIfcVsIfc();
-        //        var aProject = deductService.ArchiProject;
-        //        //var convertEngin = new GFCConvertEngine(deductService.ModelList, @"D:\tryZhang.gfc2");
-        //        var convertEngin = new GFCConvertEngine(deductService.ModelList, @"D:\project\14.ThBim\chart\tryZhang.gfc2");
-        //        convertEngin.WithFitment = false;
-        //        convertEngin.ToGFCEngine(aProject);
+                var deductServiceFitment = new DeductEngine(CurrentDocument);
+                var aProjectFitment = deductServiceFitment.ArchiProject;
+                var sProjectFitment = deductServiceFitment.StructProject;
+                var build2D = new Build2DModelService();
+                build2D.IfcArchi = aProjectFitment.SourceProject as Xbim.Ifc.IfcStore;
+                build2D.IfcStruct = sProjectFitment.SourceProject as Xbim.Ifc.IfcStore;
+                build2D.Build2DModel();
+                //var convertEnginFitment = new GFCConvertEngine(build2D.ModelList, @"D:\tryFurnish.gfc2");
+                var convertEnginFitment = new GFCConvertEngine(build2D.ModelList, @"D:\project\14.ThBim\chart\tryFurnish.gfc2");
+                convertEnginFitment.WithFitment = true;
+                convertEnginFitment.ToGFCEngine(aProjectFitment);
+            }
+        }
 
-        //        var deductServiceFitment = new DeductEngine(CurrentDocument);
-        //        var aProjectFitment = deductServiceFitment.ArchiProject;
-        //        var sProjectFitment = deductServiceFitment.StructProject;
-        //        var build2D = new Build2DModelService();
-        //        build2D.IfcArchi = aProjectFitment.SourceProject as Xbim.Ifc.IfcStore;
-        //        build2D.IfcStruct = sProjectFitment.SourceProject as Xbim.Ifc.IfcStore;
-        //        build2D.Build2DModel();
-        //        //var convertEnginFitment = new GFCConvertEngine(build2D.ModelList, @"D:\tryFurnish.gfc2");
-        //        var convertEnginFitment = new GFCConvertEngine(build2D.ModelList, @"D:\project\14.ThBim\chart\tryFurnish.gfc2");
-        //        convertEnginFitment.WithFitment = true;
-        //        convertEnginFitment.ToGFCEngine(aProjectFitment);
-        //    }
-        //}
+        private void MenuItem_Deduct_Open_Click(object sender, RoutedEventArgs e)
+        {
+            if (CurrentDocument == null)
+                return;
 
-        //private void MenuItem_Deduct_Open_Click(object sender, RoutedEventArgs e)
-        //{
-        //    if (CurrentDocument == null)
-        //        return;
+            //var aPath = @"D:\建筑1012.ifc";
+            //var sPath = @"D:\0929-结构32.ifc";
 
-        //    //Demo For zxr（文件路径你需要改一下）
+            //var aPath = @"D:\project\14.ThBim\chart\建筑1012.ifc";
+            //var sPath = @"D:\project\14.ThBim\chart\0929-结构32.ifc";
 
-        //    //var aPath = @"D:\1130建筑模型.ifc"; 
-        //    //var sPath = @"D:\1130结构模型.ifc";
+            var aPath = @"D:\project\14.ThBim\chart\1130建筑模型-0110更新.ifc";
+            var sPath = @"D:\project\14.ThBim\chart\同润结构.ifc";
 
-        //    //var aPath = @"D:\建筑1012.ifc";
-        //    //var sPath = @"D:\0929-结构32.ifc";
-
-        //    //var aPath = @"D:\project\14.ThBim\chart\1130建筑模型.ifc";
-        //    //var sPath = @"D:\project\14.ThBim\chart\1130结构模型.ifc";
-
-        //    var aPath = @"D:\project\14.ThBim\chart\建筑1012.ifc";
-        //    var sPath = @"D:\project\14.ThBim\chart\0929-结构32.ifc";
-
-
-        //    var loadPrjs = new List<ProjectParameter>();
-        //    loadPrjs.Add(new ProjectParameter()
-        //    {
-        //        OpenFilePath = aPath,
-        //        ProjectId = aPath,
-        //        Major = EMajor.Architecture,
-        //        Source = EApplcationName.IFC,
-        //    });
-        //    loadPrjs.Add(new ProjectParameter()
-        //    {
-        //        OpenFilePath = sPath,
-        //        ProjectId = sPath,
-        //        Major = EMajor.Structure,
-        //        Source = EApplcationName.IFC,
-        //    });
-        //    LoadFilesToCurrentDocument(loadPrjs);
-        //}
+            var loadPrjs = new List<ProjectParameter>();
+            loadPrjs.Add(new ProjectParameter()
+            {
+                OpenFilePath = aPath,
+                ProjectId = aPath,
+                Major = EMajor.Architecture,
+                Source = EApplcationName.IFC,
+            });
+            loadPrjs.Add(new ProjectParameter()
+            {
+                OpenFilePath = sPath,
+                ProjectId = sPath,
+                Major = EMajor.Structure,
+                Source = EApplcationName.IFC,
+            });
+            LoadFilesToCurrentDocument(loadPrjs);
+        }
     }
 }

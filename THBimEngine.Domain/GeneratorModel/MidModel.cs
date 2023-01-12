@@ -790,6 +790,7 @@ namespace THBimEngine.Domain.GeneratorModel
             try
             {
                 var profileName = "";
+                string bg = "";
                 if (ifcEntity.Name.Value.ToString().Contains("SU") && ifcEntity.GetType().Name.Contains("Beam"))
                 {
                     var x = (ifcEntity as Xbim.Ifc2x3.Kernel.IfcObject).IsDefinedByProperties;
@@ -797,6 +798,11 @@ namespace THBimEngine.Domain.GeneratorModel
                     var z = (string)(y as Xbim.Ifc2x3.PropertyResource.IfcPropertySingleValue).NominalValue.Value;
                     var val1 = z.Split(',')[1];
                     var val2 = z.Split(',').Last();
+                    if(val2.Contains("/"))
+                    {
+                        bg = val2.Split('/').Last();
+                        val2 = val2.Split('/').First();
+                    }
                     profileName = "Rec_" + val1 + "*" + val2;
                 }
                 else if (ifcEntity.Model.SchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
@@ -835,6 +841,16 @@ namespace THBimEngine.Domain.GeneratorModel
                     string[] xyLen = profileName.Split('_')[1].Split('*');
                     uniComponent.x_len = Convert.ToDouble(xyLen[0]);
                     uniComponent.y_len = Convert.ToDouble(xyLen[1]);
+                    if(bg!="")
+                    {
+                        double val1 = 0, val2 = 0;
+                        var v1 = bg.Split('~').First().Split('G').Last();
+                        var v2 = bg.Split('~').Last().Split('G').Last().Split(')').First();
+                        if (v1 != "") val1 = Convert.ToDouble(v1)*1000;
+                        if (v2 != "") val2 = Convert.ToDouble(v2)*1000;
+                        uniComponent.description = "("+val1+","+"0),("+val2+",0)";
+                    }
+                        
                 }
                 else if (profileName.StartsWith("21"))
                 {

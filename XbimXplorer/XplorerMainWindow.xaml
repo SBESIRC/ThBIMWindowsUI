@@ -198,6 +198,9 @@
                 <MenuItem Header="构件数量统计" Click="MenuItem_Click" Width="90" HorizontalAlignment="Left" ToolTip="统计数量通过日志视图查看"
                       VerticalContentAlignment="Center"
                       HorizontalContentAlignment="Center"></MenuItem>
+                <MenuItem Header="导出" Click="MenuItem_Export_Click" Width="40" HorizontalAlignment="Left"
+                      VerticalContentAlignment="Center"
+                      HorizontalContentAlignment="Center"></MenuItem>
                 <!--<MenuItem Header="扣减demo" Click="MenuItem_Deduct_Click" Width="80" HorizontalAlignment="Left"
                       VerticalContentAlignment="Center"
                       HorizontalContentAlignment="Center"></MenuItem>

@@ -525,5 +525,265 @@ namespace XbimXplorer.Extensions.ModelMerge
 
             return NewModel;
         }
+
+        /// <summary>
+        /// 和模（SU数据往Ifc数据）
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="suProject"></param>
+        /// <returns></returns>
+        /// <exception cref="NotSupportedException"></exception>
+        public IfcStore ModelMerge(IfcStore model, List<ThSUProjectData> suProjects)
+        {
+            if (suProjects.Count == 0 || string.IsNullOrEmpty(model.FileName))
+                return null;
+            var bigModel = IfcStore.Open(model.FileName);
+            if (bigModel.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc2X3)
+            {
+                //先做一个最简单的，两个Ifc2X3的IFC模型合并，后续再考虑版本问题
+                var bigProject = bigModel.Instances.FirstOrDefault<Xbim.Ifc2x3.Kernel.IfcProject>();
+                //var smallProject = smallModel.Instances.FirstOrDefault<Xbim.Ifc2x3.Kernel.IfcProject>();
+
+                var bigBuildings = bigProject.Sites.FirstOrDefault()?.Buildings.FirstOrDefault() as Xbim.Ifc2x3.ProductExtension.IfcBuilding;
+                //var smallBuildings = smallProject.Sites.FirstOrDefault()?.Buildings.FirstOrDefault();
+                var MaxStdFlrNo = 0;
+                //处理95%
+                List<Tuple<int, double, double>> StoreyDic = new List<Tuple<int, double, double>>();
+                int storey95No = 0;
+                foreach (Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey BuildingStorey in bigBuildings.BuildingStoreys)
+                {
+                    double Storey_Elevation = BuildingStorey.Elevation.Value;
+                    double Storey_Height = double.Parse(((BuildingStorey.PropertySets.FirstOrDefault().PropertySetDefinitions.FirstOrDefault() as Xbim.Ifc2x3.Kernel.IfcPropertySet).HasProperties.FirstOrDefault(o => o.Name == "Height") as Xbim.Ifc2x3.PropertyResource.IfcPropertySingleValue).NominalValue.Value.ToString());
+                    var storeyName = BuildingStorey.Name.ToString().Replace('B', '-').Replace("F", "").Replace("M", "");
+                    if (storeyName.Contains("R"))
+                    {
+                        storey95No++;
+                    }
+                    else
+                    {
+                        storey95No = int.Parse(storeyName);
+                    }
+                    StoreyDic.Add((storey95No, Storey_Elevation, Storey_Height).ToTuple());
+                    //获取标准层信息，因为不是所有的IFC都会符合我们约定俗成的"标准"，所以这里加上try...catch
+                    //即符合我们标准的我们获取，不符合的"跳过"
+                    try
+                    {
+                        var property = BuildingStorey.Model.Instances.OfType<Xbim.Ifc2x3.Kernel.IfcRelDefinesByProperties>().FirstOrDefault(o => o.RelatedObjects.Contains(BuildingStorey));
+                        if (property != null)
+                        {
+                            var stdFlrNoPrp = (property.RelatingPropertyDefinition as Xbim.Ifc2x3.Kernel.IfcPropertySet).HasProperties
+                                .Where(o => o.Name.Equals("StdFlrNo")).FirstOrDefault()
+                                as Xbim.Ifc2x3.PropertyResource.IfcPropertySingleValue;
+                            var stdFlrNo = int.Parse(stdFlrNoPrp.NominalValue.ToString());
+                            MaxStdFlrNo = Math.Max(stdFlrNo, MaxStdFlrNo);
+                        }
+                    }
+                    catch
+                    {
+                        // do not
+                    }
+                }
+                StoreyDic = StoreyDic.OrderBy(x => x.Item1).ToList();
+
+                //处理5%
+                var storeys = new List<IfcBuildingStorey>();
+                foreach (var suProject in suProjects)
+                {
+                    var definitions = suProject.Definitions;
+                    foreach (var BuildingStorey in suProject.Building.Storeys)
+                    {
+                        var bigStorey = StoreyDic.FirstOrDefault(o => o.Item1 == BuildingStorey.Number);
+                        double Storey_z = BuildingStorey.Elevation;
+                        if (bigStorey == null)
+                        {
+                            bigStorey = StoreyDic.FirstOrDefault(o => Math.Abs(o.Item2 - Storey_z) <= 200);
+                            if (bigStorey == null)
+                            {
+                                if (Math.Abs(Storey_z - (StoreyDic.Last().Item2 + StoreyDic.Last().Item3)) <= 200)
+                                {
+                                    //楼层高度 = 最顶层的标高 + 最顶层的层高，说明这个是新的一层
+                                    var storeyNo = StoreyDic.Last().Item1 + 1;
+                                    StoreyDic.Add((storeyNo, Storey_z, 0.0).ToTuple());
+                                    bigStorey = StoreyDic.Last();
+                                }
+                                else if (Storey_z < StoreyDic.First().Item2)
+                                {
+                                    var storeyNo = StoreyDic.First().Item1 - 1;
+                                    if (storeyNo == 0)
+                                    {
+                                        storeyNo--;
+                                    }
+                                    StoreyDic.Insert(0, (storeyNo, Storey_z, StoreyDic.First().Item2 - Storey_z).ToTuple());
+                                    bigStorey = StoreyDic.First();
+                                }
+                                else if (Storey_z > (StoreyDic.Last().Item2 + StoreyDic.Last().Item3))
+                                {
+                                    var storeyNo = StoreyDic.Last().Item1 + 1;
+                                    StoreyDic.Add((storeyNo, Storey_z, 0.0).ToTuple());
+                                    bigStorey = StoreyDic.Last();
+                                }
+                                else
+                                {
+                                    bigStorey = StoreyDic.FirstOrDefault(o => Storey_z - o.Item2 > -200);
+                                }
+                            }
+                        }
+                        var storeyName = bigStorey.Item1.ToString().Replace('-', 'B');
+                        var storey = bigBuildings.BuildingStoreys.FirstOrDefault(o => o.Name==storeyName || Math.Abs(o.Elevation.Value - Storey_z) < 10) as Xbim.Ifc2x3.ProductExtension.IfcBuildingStorey;
+                        if (storey == null)
+                        {
+                            storey = storeys.FirstOrDefault(o => Math.Abs(o.Elevation.Value - Storey_z) < 10);
+                        }
+                        if (storey == null)
+                        {
+
+                            storey = ThProtoBuf2IFC2x3Factory.CreateStorey(bigModel, bigBuildings, BuildingStorey);
+                            storeys.Add(storey);
+                        }
+                        var suElements = new List<IfcBuildingElement>();
+                        foreach (var element in BuildingStorey.Buildings)
+                        {
+                            var def = definitions[element.Component.DefinitionIndex];
+                            IfcBuildingElement ifcBuildingElement;
+                            ifcBuildingElement = ThProtoBuf2IFC2x3Factory.CreatedSUElement(bigModel, def, element.Component);
+                            suElements.Add(ifcBuildingElement);
+                        }
+                        using (var txn = bigModel.BeginTransaction("relContainEntitys2Storey"))
+                        {
+                            //for ifc2x3
+                            var relContainedIn = bigModel.Instances.New<Xbim.Ifc2x3.ProductExtension.IfcRelContainedInSpatialStructure>();
+                            storey.ContainsElements.Append<Xbim.Ifc2x3.Interfaces.IIfcRelContainedInSpatialStructure>(relContainedIn);
+
+                            relContainedIn.RelatingStructure = storey;
+                            relContainedIn.RelatedElements.AddRange(suElements);
+                            txn.Commit();
+                        }
+                    }
+                }
+                
+                // IfcRelAggregates 关系
+                ThProtoBuf2IFC2x3RelAggregatesFactory.Create(bigModel, bigBuildings, storeys);
+                //返回
+                return bigModel;
+            }
+            else if (bigModel.IfcSchemaVersion == Xbim.Common.Step21.IfcSchemaVersion.Ifc4)
+            {
+                var bigProject = bigModel.Instances.FirstOrDefault<Xbim.Ifc4.Kernel.IfcProject>();
+
+                var bigBuildings = bigProject.Sites.FirstOrDefault()?.Buildings.FirstOrDefault() as Xbim.Ifc4.ProductExtension.IfcBuilding;
+                var MaxStdFlrNo = 0;
+                //处理95%
+                List<Tuple<int, double, double>> StoreyDic = new List<Tuple<int, double, double>>();
+                foreach (Xbim.Ifc4.ProductExtension.IfcBuildingStorey BuildingStorey in bigBuildings.BuildingStoreys)
+                {
+                    double Storey_Elevation = BuildingStorey.Elevation.Value;
+                    double Storey_Height = double.Parse(((BuildingStorey.PropertySets.FirstOrDefault().PropertySetDefinitions.FirstOrDefault() as Xbim.Ifc4.Kernel.IfcPropertySet).HasProperties.FirstOrDefault(o => o.Name == "Height") as Xbim.Ifc4.PropertyResource.IfcPropertySingleValue).NominalValue.Value.ToString());
+                    var storeyName = BuildingStorey.Name.ToString().Replace('B', '-').Replace("F", "").Replace("M", "");
+                    StoreyDic.Add((int.Parse(storeyName), Storey_Elevation, Storey_Height).ToTuple());
+                    //获取标准层信息，因为不是所有的IFC都会符合我们约定俗成的"标准"，所以这里加上try...catch
+                    //即符合我们标准的我们获取，不符合的"跳过"
+                    try
+                    {
+                        var property = BuildingStorey.Model.Instances.OfType<Xbim.Ifc4.Kernel.IfcRelDefinesByProperties>().FirstOrDefault(o => o.RelatedObjects.Contains(BuildingStorey));
+                        if (property != null)
+                        {
+                            var stdFlrNoPrp = (property.RelatingPropertyDefinition as Xbim.Ifc4.Kernel.IfcPropertySet).HasProperties
+                                .Where(o => o.Name.Equals("StdFlrNo")).FirstOrDefault()
+                                as Xbim.Ifc4.PropertyResource.IfcPropertySingleValue;
+                            var stdFlrNo = int.Parse(stdFlrNoPrp.NominalValue.ToString());
+                            MaxStdFlrNo = Math.Max(stdFlrNo, MaxStdFlrNo);
+                        }
+                    }
+                    catch
+                    {
+                        // do not
+                    }
+                }
+                StoreyDic = StoreyDic.OrderBy(x => x.Item1).ToList();
+
+                //处理5%
+                var storeys = new List<Xbim.Ifc4.ProductExtension.IfcBuildingStorey>();
+                foreach (var suProject in suProjects)
+                {
+                    var definitions = suProject.Definitions;
+                    foreach (var BuildingStorey in suProject.Building.Storeys)
+                    {
+                        var bigStorey = StoreyDic.FirstOrDefault(o => o.Item1 == BuildingStorey.Number);
+                        double Storey_z = BuildingStorey.Elevation;
+                        if (bigStorey == null)
+                        {
+                            bigStorey = StoreyDic.FirstOrDefault(o => Math.Abs(o.Item2 - Storey_z) <= 200);
+                            if (bigStorey == null)
+                            {
+                                if (Math.Abs(Storey_z - (StoreyDic.Last().Item2 + StoreyDic.Last().Item3)) <= 200)
+                                {
+                                    //楼层高度 = 最顶层的标高 + 最顶层的层高，说明这个是新的一层
+                                    var storeyNo = StoreyDic.Last().Item1 + 1;
+                                    StoreyDic.Add((storeyNo, Storey_z, 0.0).ToTuple());
+                                    bigStorey = StoreyDic.Last();
+                                }
+                                else if (Storey_z < StoreyDic.First().Item2)
+                                {
+                                    var storeyNo = StoreyDic.First().Item1 - 1;
+                                    if (storeyNo == 0)
+                                    {
+                                        storeyNo--;
+                                    }
+                                    StoreyDic.Insert(0, (storeyNo, Storey_z, StoreyDic.First().Item2 - Storey_z).ToTuple());
+                                    bigStorey = StoreyDic.First();
+                                }
+                                else if (Storey_z > (StoreyDic.Last().Item2 + StoreyDic.Last().Item3))
+                                {
+                                    var storeyNo = StoreyDic.Last().Item1 + 1;
+                                    StoreyDic.Add((storeyNo, Storey_z, 0.0).ToTuple());
+                                    bigStorey = StoreyDic.Last();
+                                }
+                                else
+                                {
+                                    bigStorey = StoreyDic.FirstOrDefault(o => Storey_z - o.Item2 > -200);
+                                }
+                            }
+                        }
+                        var storeyName = bigStorey.Item1.ToString().Replace('-', 'B');
+                        var storey = bigBuildings.BuildingStoreys.FirstOrDefault(o => o.Name==storeyName || Math.Abs(o.Elevation.Value - Storey_z) < 10) as Xbim.Ifc4.ProductExtension.IfcBuildingStorey;
+                        if (storey == null)
+                        {
+                            storey = storeys.FirstOrDefault(o => Math.Abs(o.Elevation.Value - Storey_z) < 10);
+                        }
+                        if (storey == null)
+                        {
+                            storey = ThProtoBuf2IFC4Factory.CreateStorey(bigModel, bigBuildings, BuildingStorey);
+                            storeys.Add(storey);
+                        }
+                        var suElements = new List<Xbim.Ifc4.ProductExtension.IfcBuildingElement>();
+                        foreach (var element in BuildingStorey.Buildings)
+                        {
+                            var def = definitions[element.Component.DefinitionIndex];
+                            Xbim.Ifc4.ProductExtension.IfcBuildingElement ifcBuildingElement;
+                            ifcBuildingElement = ThProtoBuf2IFC4Factory.CreatedSUElement(bigModel, def, element.Component);
+                            suElements.Add(ifcBuildingElement);
+                        }
+                        using (var txn = bigModel.BeginTransaction("relContainEntitys2Storey"))
+                        {
+                            //for ifc2x3
+                            var relContainedIn = bigModel.Instances.New<Xbim.Ifc4.ProductExtension.IfcRelContainedInSpatialStructure>();
+                            storey.ContainsElements.Append<Xbim.Ifc4.Interfaces.IIfcRelContainedInSpatialStructure>(relContainedIn);
+
+                            relContainedIn.RelatingStructure = storey;
+                            relContainedIn.RelatedElements.AddRange(suElements);
+                            txn.Commit();
+                        }
+                    }
+                }
+                // IfcRelAggregates 关系
+                ThProtoBuf2IFC4RelAggregatesFactory.Create(bigModel, bigBuildings, storeys);
+                //返回
+                return bigModel;
+            }
+            else
+            {
+                throw new NotSupportedException("Not Support this IFC Version");
+            }
+        }
     }
 }

@@ -1440,6 +1440,14 @@ namespace XbimXplorer
             loginUser.LoginLocation = newLocation;
             UserLogin(loginUser, false);
         }
+
+        private void MenuItem_Export_Click(object sender, RoutedEventArgs e)
+        {
+            var exportForm = new Export();
+            exportForm.Owner = this;
+            var res = exportForm.ShowDialog();
+        }
+
         //private void MenuItem_Deduct_Click(object sender, RoutedEventArgs e)
         //{
         //    if (CurrentDocument == null)

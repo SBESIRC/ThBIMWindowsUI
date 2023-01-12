@@ -973,7 +973,6 @@ namespace ThBIMServer.Ifc2x3
                     {
                         d.Name = "SU Element";
                         d.GlobalId = IfcGloballyUniqueId.FromGuid(Guid.NewGuid());
-                        d.Description =  componentData.Material?.MaterialName;
                     });
                 }
                 if (componentData.InstanceName != null)

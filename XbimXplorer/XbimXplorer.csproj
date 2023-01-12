@@ -245,7 +245,6 @@
     <Compile Include="Deduct\ThModelToGFC2.cs" />
     <Compile Include="Deduct\Engine\GFCConvertEngine.cs" />
     <Compile Include="Deduct\Engine\GFCConvertEngine2.cs" />
-    <Compile Include="ExportViewModel.cs" />
     <Compile Include="Extensions\IFCReverse.cs" />
     <Compile Include="Deduct\DeductService.cs" />
     <Compile Include="Extensions\ModelConvert\IIfcModelConverter.cs" />
@@ -370,9 +369,6 @@
       <DependentUpon>UploadDBFile.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserConfig.cs" />
-    <Compile Include="Export.xaml.cs">
-      <DependentUpon>Export.xaml</DependentUpon>
-    </Compile>
     <Compile Include="XplorerMainWindow.IApplication.xaml.cs">
       <DependentUpon>XplorerMainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -478,10 +474,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UploadDBFile.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Export.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

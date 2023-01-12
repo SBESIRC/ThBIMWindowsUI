@@ -876,7 +876,7 @@ namespace THBimEngine.Domain.GeneratorModel
                     return (item as Xbim.Ifc2x3.GeometricModelResource.IfcExtrudedAreaSolid).SweptArea.ProfileName;
 
                 }
-                else if (type == "IfcBooleanResult")
+                else if (type == "IfcBooleanResult" || type == "IfcBooleanClippingResult")
                 {
                     string profileName = "";
                     GetProfileName(item as Xbim.Ifc2x3.GeometricModelResource.IfcBooleanResult, ref profileName);

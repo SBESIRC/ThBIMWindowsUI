@@ -878,7 +878,7 @@ namespace THBimEngine.Domain.GeneratorModel
                     return (item as Xbim.Ifc4.GeometricModelResource.IfcExtrudedAreaSolid).SweptArea.ProfileName;
 
                 }
-                else if (type == "IfcBooleanResult")
+                else if (type == "IfcBooleanResult"|| type == "IfcBooleanClippingResult")
                 {
                     string profileName = "";
                     GetProfileName(item as Xbim.Ifc4.GeometricModelResource.IfcBooleanResult, ref profileName);
@@ -897,7 +897,14 @@ namespace THBimEngine.Domain.GeneratorModel
             }
             else
             {
-                profileName = (firstOperand as Xbim.Ifc4.GeometricModelResource.IfcSweptAreaSolid).SweptArea.ProfileName.ToString();
+                if(firstOperand.GetType().Name== "IfcBooleanClippingResult")
+                {
+                    GetProfileName(firstOperand as Xbim.Ifc4.GeometricModelResource.IfcBooleanClippingResult, ref profileName);
+                }
+                else
+                {
+                    profileName = (firstOperand as Xbim.Ifc4.GeometricModelResource.IfcSweptAreaSolid).SweptArea.ProfileName.ToString();
+                }
             }
         }
         private void GetProfileName(Xbim.Ifc2x3.GeometricModelResource.IfcBooleanResult item, ref string profileName)

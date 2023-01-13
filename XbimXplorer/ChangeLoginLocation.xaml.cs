@@ -52,5 +52,14 @@ namespace XbimXplorer
         {
             return selectLocation;
         }
+
+        private void listLocation_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (listLocation.SelectedItem == null)
+                return;
+            selectLocation = listLocation.SelectedItem.ToString();
+            this.DialogResult = true;
+            this.Close();
+        }
     }
 }

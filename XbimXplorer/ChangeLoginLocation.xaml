@@ -15,8 +15,7 @@
             <RowDefinition Height="40"></RowDefinition>
         </Grid.RowDefinitions>
         <Label Content="用户当前服务器：" x:Name="labShowLocation"></Label>
-        <ListBox SelectionMode="Single" Grid.Row="1" x:Name="listLocation">
-            
+        <ListBox SelectionMode="Single" Grid.Row="1" x:Name="listLocation" MouseDoubleClick="listLocation_MouseDoubleClick">
         </ListBox>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Row="99">
             <Button Content="确认" Height="25" Width="50" x:Name="btnOK" Click="btnOK_Click"></Button>

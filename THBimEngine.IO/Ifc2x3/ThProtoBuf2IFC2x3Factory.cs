@@ -1016,11 +1016,12 @@ namespace ThBIMServer.Ifc2x3
                 {
                     body = model.ConstructToIfcExtrudedAreaSolid(body as IfcFacetedBrep, out objectPlacement);
                 }
-                var shape = ThIFC2x3Factory.CreateFaceBasedSurfaceBody(model, body);
+                var shape1 = model.CreateIfcMappedItem(body, objectPlacement);
+                var shape = ThIFC2x3Factory.CreateFaceBasedSurfaceBody(model, shape1);
                 ret.Representation = ThIFC2x3Factory.CreateProductDefinitionShape(model, shape);
-
+                
                 //object placement
-                ret.ObjectPlacement = model.ToIfcLocalPlacement(objectPlacement);
+                //ret.ObjectPlacement = model.ToIfcLocalPlacement(objectPlacement);
 
                 txn.Commit();
                 return ret;

@@ -17,12 +17,32 @@ namespace ThBIMServer.Ifc2x3
                 m.MappingTarget = model.CreateCartesianTransformationOperator(transform);
             });
         }
+        
+        public static IfcMappedItem CreateIfcMappedItem(this IfcStore model,
+            IfcRepresentationItem shape, XbimMatrix3D transform)
+        {
+            return model.Instances.New<IfcMappedItem>(m =>
+            {
+                m.MappingSource = model.CreateRepresentationMap(shape);
+                m.MappingTarget = model.CreateCartesianTransformationOperator(transform);
+            });
+        }
 
         private static IfcRepresentationMap CreateRepresentationMap(this IfcStore model, IfcShapeRepresentation shape)
         {
             return model.Instances.New<IfcRepresentationMap>(m =>
             {
                 m.MappedRepresentation = shape;
+            });
+        }
+
+        private static IfcRepresentationMap CreateRepresentationMap(this IfcStore model, IfcRepresentationItem shape)
+        {
+            var mappedRepresentation = model.Instances.New<IfcRepresentation>();
+            mappedRepresentation.Items.Add(shape);
+            return model.Instances.New<IfcRepresentationMap>(m =>
+            {
+                m.MappedRepresentation = mappedRepresentation;
             });
         }
 

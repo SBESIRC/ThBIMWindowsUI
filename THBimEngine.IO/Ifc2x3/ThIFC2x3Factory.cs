@@ -33,7 +33,7 @@ namespace ThBIMServer.Ifc2x3
                 {
                     s.Items.Add(item);
                     s.ContextOfItems = context;
-                    s.RepresentationType =item is IfcExtrudedAreaSolid ? "SweptSolid" : "Brep";
+                    s.RepresentationType = "MappedRepresentation";
                     s.RepresentationIdentifier = "Body";
                 });
             }
